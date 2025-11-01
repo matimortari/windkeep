@@ -4,12 +4,12 @@ import { updateOrganizationSchema } from "#shared/lib/schemas/org"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const orgId = getRouterParam(event, "orgId")
-  if (!orgId) {
+  const org = getRouterParam(event, "org")
+  if (!org) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireOrgRole(user.id, orgId, ["OWNER", "ADMIN"])
+  await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateOrganizationSchema.safeParse(body)
@@ -22,8 +22,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const updatedOrganization = await db.organization.update({
-    where: { id: orgId },
+  const updatedOrg = await db.organization.update({
+    where: { id: org },
     data: {
       name: result.data.name,
     },
@@ -43,5 +43,5 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return updatedOrganization
+  return updatedOrg
 })

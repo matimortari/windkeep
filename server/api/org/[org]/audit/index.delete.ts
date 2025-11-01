@@ -3,12 +3,12 @@ import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const orgId = getRouterParam(event, "orgId")
-  if (!orgId) {
+  const org = getRouterParam(event, "org")
+  if (!org) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireOrgRole(user.id, orgId, ["OWNER"])
+  await requireOrgRole(user.id, org, ["OWNER"])
 
   const query = getQuery(event)
   const olderThan = query.olderThan as string | undefined
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   // Build filter
   const where: any = {
-    organizationId: orgId,
+    organizationId: org,
   }
 
   // Delete logs older than specified date

@@ -4,13 +4,13 @@ import { updateMemberRoleSchema } from "#shared/lib/schemas/org"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const orgId = getRouterParam(event, "orgId")
-  const memberId = getRouterParam(event, "memberId")
-  if (!orgId || !memberId) {
+  const org = getRouterParam(event, "org")
+  const member = getRouterParam(event, "member")
+  if (!org || !member) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID and Member ID are required" })
   }
 
-  const userMembership = await requireOrgRole(user.id, orgId, ["OWNER", "ADMIN"])
+  const userMembership = await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateMemberRoleSchema.safeParse(body)
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const targetMembership = await db.organizationMembership.findUnique({
-    where: { userId_organizationId: { userId: memberId, organizationId: orgId } },
+    where: { userId_organizationId: { userId: member, organizationId: org } },
   })
   if (!targetMembership) {
     throw createError({ statusCode: 404, statusMessage: "Member not found in organization" })
@@ -34,13 +34,13 @@ export default defineEventHandler(async (event) => {
   if (userMembership.role !== "OWNER" && (result.data.role === "OWNER" || targetMembership.role === "OWNER")) {
     throw createError({ statusCode: 403, statusMessage: "You do not have permission to change this member's role." })
   }
-  if (memberId === user.id) {
+  if (member === user.id) {
     throw createError({ statusCode: 400, statusMessage: "You cannot change your own role." })
   }
 
   if (targetMembership.role === "OWNER" && result.data.role !== "OWNER") {
     const ownerCount = await db.organizationMembership.count({
-      where: { organizationId: orgId, role: "OWNER" },
+      where: { organizationId: org, role: "OWNER" },
     })
     if (ownerCount === 1) {
       throw createError({ statusCode: 400, statusMessage: "Cannot demote the last owner." })
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedMembership = await db.organizationMembership.update({
-    where: { userId_organizationId: { userId: memberId, organizationId: orgId } },
+    where: { userId_organizationId: { userId: member, organizationId: org } },
     data: { role: result.data.role },
     include: {
       user: {

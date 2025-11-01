@@ -5,17 +5,17 @@ import { createSecretSchema } from "#shared/lib/schemas/secret"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  if (!projectId) {
+  const project = getRouterParam(event, "project")
+  if (!project) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN"])
+  await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = createSecretSchema.safeParse({
     ...body,
-    projectId,
+    project,
   })
   if (!result.success) {
     throw createError({
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     where: {
       key_projectId: {
         key: result.data.key,
-        projectId,
+        projectId: project,
       },
     },
   })
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
   const secretData: any = {
     key: result.data.key,
     description: result.data.description,
-    projectId,
+    project,
   }
 
   if (body.values && Array.isArray(body.values)) {
