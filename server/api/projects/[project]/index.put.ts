@@ -4,12 +4,12 @@ import { updateProjectSchema } from "#shared/lib/schemas/project"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  if (!projectId) {
+  const project = getRouterParam(event, "project")
+  if (!project) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN"])
+  await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateProjectSchema.safeParse(body)
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const existingProject = await db.project.findUnique({
-    where: { id: projectId },
+    where: { id: project },
     select: { organizationId: true },
   })
   if (!existingProject) {
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
           result.data.name ? { name: result.data.name, organizationId: existingProject.organizationId } : {},
           result.data.slug ? { slug: result.data.slug } : {},
         ].filter(condition => Object.keys(condition).length > 0),
-        NOT: { id: projectId },
+        NOT: { id: project },
       },
     })
     if (conflictingProject) {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedProject = await db.project.update({
-    where: { id: projectId },
+    where: { id: project },
     data: {
       name: result.data.name,
       slug: result.data.slug,

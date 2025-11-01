@@ -4,13 +4,13 @@ import { updateProjectMemberSchema } from "#shared/lib/schemas/project"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  const memberId = getRouterParam(event, "memberId")
-  if (!projectId || !memberId) {
+  const project = getRouterParam(event, "project")
+  const member = getRouterParam(event, "member")
+  if (!project || !member) {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
   }
 
-  const userRole = await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN"])
+  const userRole = await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateProjectMemberSchema.safeParse(body)
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const targetRole = await db.projectRole.findUnique({
-    where: { userId_projectId: { userId: memberId, projectId } },
+    where: { userId_projectId: { userId: member, projectId: project } },
   })
   if (!targetRole) {
     throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
@@ -35,14 +35,14 @@ export default defineEventHandler(async (event) => {
   }
 
   // Prevent users from changing their own role
-  if (memberId === user.id) {
+  if (member === user.id) {
     throw createError({ statusCode: 400, statusMessage: "You cannot change your own role" })
   }
 
   if (targetRole.role === "OWNER" && result.data.role !== "OWNER") {
     const ownerCount = await db.projectRole.count({
       where: {
-        projectId,
+        projectId: project,
         role: "OWNER",
       },
     })
@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedRole = await db.projectRole.update({
-    where: { userId_projectId: { userId: memberId, projectId } },
+    where: { userId_projectId: { userId: member, projectId: project } },
     data: { role: result.data.role },
     include: {
       user: {

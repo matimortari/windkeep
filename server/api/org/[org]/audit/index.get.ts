@@ -3,12 +3,12 @@ import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const orgId = getRouterParam(event, "orgId")
-  if (!orgId) {
+  const org = getRouterParam(event, "org")
+  if (!org) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireOrgRole(user.id, orgId, ["OWNER", "ADMIN"])
+  await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
 
   const query = getQuery(event)
   const limit = Number(query.limit) || 50
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const action = query.action as string | undefined
 
   const where: any = {
-    organizationId: orgId,
+    organizationId: org,
   }
   if (projectId) {
     where.projectId = projectId
