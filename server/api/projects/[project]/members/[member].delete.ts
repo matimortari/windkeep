@@ -3,16 +3,16 @@ import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  const memberId = getRouterParam(event, "memberId")
+  const project = getRouterParam(event, "project")
+  const member = getRouterParam(event, "member")
 
-  if (!projectId || !memberId) {
+  if (!project || !member) {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
   }
 
   // Check if the member exists in the project
   const targetRole = await db.projectRole.findUnique({
-    where: { userId_projectId: { userId: memberId, projectId } },
+    where: { userId_projectId: { userId: member, projectId: project } },
   })
 
   if (!targetRole) {
@@ -20,11 +20,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // Allow self-removal (unless user is last owner)
-  if (memberId === user.id) {
+  if (member === user.id) {
     if (targetRole.role === "OWNER") {
       const ownerCount = await db.projectRole.count({
         where: {
-          projectId,
+          projectId: project,
           role: "OWNER",
         },
       })
@@ -34,14 +34,14 @@ export default defineEventHandler(async (event) => {
     }
   }
   else {
-    const userRole = await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN"])
+    const userRole = await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
     if (userRole.role !== "OWNER" && targetRole.role === "OWNER") {
       throw createError({ statusCode: 403, statusMessage: "Only owners can remove other owners" })
     }
   }
 
   await db.projectRole.delete({
-    where: { userId_projectId: { userId: memberId, projectId } },
+    where: { userId_projectId: { userId: member, projectId: project } },
   })
 
   return { success: true, message: "Member removed successfully" }

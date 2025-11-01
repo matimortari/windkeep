@@ -5,13 +5,13 @@ import { updateSecretSchema } from "#shared/lib/schemas/secret"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  const secretId = getRouterParam(event, "secretId")
-  if (!projectId || !secretId) {
+  const project = getRouterParam(event, "project")
+  const secret = getRouterParam(event, "secret")
+  if (!project || !secret) {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Secret ID are required" })
   }
 
-  await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN"])
+  await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateSecretSchema.safeParse(body)
@@ -24,13 +24,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const existingSecret = await db.secret.findUnique({
-    where: { id: secretId },
+    where: { id: secret },
     select: { projectId: true },
   })
   if (!existingSecret) {
     throw createError({ statusCode: 404, statusMessage: "Secret not found" })
   }
-  if (existingSecret.projectId !== projectId) {
+  if (existingSecret.projectId !== project) {
     throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
   }
 
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
       await db.secretValue.upsert({
         where: {
           secretId_environment: {
-            secretId,
+            secretId: secret,
             environment: val.environment,
           },
         },
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
           value: encrypt(val.value),
         },
         create: {
-          secretId,
+          secretId: secret,
           environment: val.environment,
           value: encrypt(val.value),
         },
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedSecret = await db.secret.update({
-    where: { id: secretId },
+    where: { id: secret },
     data: updateData,
     include: {
       values: {

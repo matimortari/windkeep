@@ -5,17 +5,17 @@ import { createInvitationSchema } from "#shared/lib/schemas/org"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const orgId = getRouterParam(event, "orgId")
-  if (!orgId) {
+  const org = getRouterParam(event, "org")
+  if (!org) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireOrgRole(user.id, orgId, ["OWNER", "ADMIN"])
+  await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = createInvitationSchema.safeParse({
     ...body,
-    organizationId: orgId,
+    organizationId: org,
   })
 
   if (!result.success) {
@@ -30,20 +30,20 @@ export default defineEventHandler(async (event) => {
     where: {
       userId_organizationId: {
         userId: result.data.email,
-        organizationId: orgId,
+        organizationId: org,
       },
     },
   })
 
   if (existingMember) {
-    throw createError({ statusCode: 409, statusMessage: "User is already a member of this organization",})
+    throw createError({ statusCode: 409, statusMessage: "User is already a member of this organization" })
   }
 
   // Check if there's already a pending invitation
   const existingInvitation = await db.invitation.findFirst({
     where: {
       email: result.data.email,
-      organizationId: orgId,
+      organizationId: org,
       expiresAt: {
         gt: new Date(),
       },
@@ -56,12 +56,12 @@ export default defineEventHandler(async (event) => {
   // Generate invitation token
   const token = randomBytes(32).toString("hex")
   const expiresAt = new Date()
-expiresAt.setHours(expiresAt.getHours() + 12) // 12 hours expiration
+  expiresAt.setHours(expiresAt.getHours() + 12) // 12 hours expiration
 
   const invitation = await db.invitation.create({
     data: {
       email: result.data.email,
-      organizationId: orgId,
+      organizationId: org,
       role: result.data.role || "MEMBER",
       token,
       expiresAt,

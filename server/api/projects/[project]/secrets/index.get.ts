@@ -4,15 +4,15 @@ import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  if (!projectId) {
+  const project = getRouterParam(event, "project")
+  if (!project) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN", "MEMBER"])
+  await requireProjectRole(user.id, project, ["OWNER", "ADMIN", "MEMBER"])
 
   const secrets = await db.secret.findMany({
-    where: { projectId },
+    where: { projectId: project },
     include: {
       values: {
         select: {

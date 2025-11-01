@@ -3,15 +3,15 @@ import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  if (!projectId) {
+  const project = getRouterParam(event, "project")
+  if (!project) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, projectId, ["OWNER"])
+  await requireProjectRole(user.id, project, ["OWNER"])
 
-  const project = await db.project.findUnique({
-    where: { id: projectId },
+  const projectData = await db.project.findUnique({
+    where: { id: project },
     select: {
       id: true,
       name: true,
@@ -22,18 +22,18 @@ export default defineEventHandler(async (event) => {
       },
     },
   })
-  if (!project) {
+  if (!projectData) {
     throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
   // Delete the project (cascade will handle secrets, secret values, roles, and audit logs)
   await db.project.delete({
-    where: { id: projectId },
+    where: { id: project },
   })
 
   return {
     success: true,
-    message: `Project "${project.name}" deleted successfully`,
-    secretsDeleted: project._count.secrets,
+    message: `Project "${projectData.name}" deleted successfully`,
+    secretsDeleted: projectData._count.secrets,
   }
 })
