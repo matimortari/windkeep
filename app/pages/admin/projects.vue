@@ -60,10 +60,9 @@
 </template>
 
 <script setup lang="ts">
-import type { CreateProjectInput } from "#shared/lib/schemas/project"
-
 const { activeOrg } = useUserActions()
-const { allProjects, createProject, fetchProjects, errors } = useProjectActions()
+const { allProjects, createProject, fetchProjects } = useProjectActions()
+const projectStore = useProjectStore()
 
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
@@ -84,16 +83,21 @@ const filteredProjects = computed(() => {
   })
 })
 
-async function handleCreateProject(payload: CreateProjectInput) {
+async function handleCreateProject(payload: { name: string, slug: string, description: string }) {
   try {
-    await createProject(payload)
+    await createProject({
+      name: payload.name,
+      slug: payload.slug,
+      description: payload.description || undefined,
+      organizationId: activeOrg.value!.id,
+    })
     if (activeOrg.value?.id) {
       await fetchProjects(activeOrg.value.id)
     }
     isDialogOpen.value = false
   }
   catch (err: any) {
-    errors.value.createProject = err.message
+    projectStore.errors.createProject = err.message
   }
 }
 
@@ -103,7 +107,7 @@ watch(activeOrg, async (newOrg) => {
       await fetchProjects(newOrg.id)
     }
     catch (err: any) {
-      errors.value.getProjects = err.message
+      projectStore.errors.getProjects = err.message
     }
   }
 }, { immediate: true })
