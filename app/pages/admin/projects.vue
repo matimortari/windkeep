@@ -92,7 +92,7 @@ async function handleCreateProject(payload: { name: string, slug: string, descri
       organizationId: activeOrg.value!.id,
     })
     if (activeOrg.value?.id) {
-      await fetchProjects(activeOrg.value.id)
+      await fetchProjects()
     }
     isDialogOpen.value = false
   }
@@ -104,7 +104,7 @@ async function handleCreateProject(payload: { name: string, slug: string, descri
 watch(activeOrg, async (newOrg) => {
   if (newOrg) {
     try {
-      await fetchProjects(newOrg.id)
+      await fetchProjects()
     }
     catch (err: any) {
       projectStore.errors.getProjects = err.message

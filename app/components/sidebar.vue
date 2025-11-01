@@ -76,7 +76,7 @@ async function handleCreateProject(project: { name: string, slug: string, descri
       organizationId: props.org!.id,
     })
     if (props.org?.id) {
-      await fetchProjects(props.org.id)
+      await fetchProjects()
     }
     isDialogOpen.value = false
   }

@@ -7,10 +7,9 @@ export function useProjectActions() {
 
   /**
    * Fetch all projects, optionally filtered by organization
-   * @param orgId Optional organization ID to filter projects
    */
-  const fetchProjects = async (orgId?: string) => {
-    await projectStore.getProjects(orgId)
+  const fetchProjects = async () => {
+    await projectStore.getProjects()
   }
 
   /**
