@@ -41,6 +41,8 @@ interface OrganizationMembership {
 interface Project {
   id: string
   name: string
+  slug: string
+  description?: string | null
   organizationId: string
   createdAt: Date | string
   updatedAt: Date | string

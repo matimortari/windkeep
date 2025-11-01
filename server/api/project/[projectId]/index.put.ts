@@ -29,16 +29,21 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
-  // Check if project with same name already exists in this organization
-  if (result.data.name) {
+  // Check if project with same name or slug already exists
+  if (result.data.name || result.data.slug) {
     const conflictingProject = await db.project.findFirst({
       where: {
-        name: result.data.name,
-        organizationId: existingProject.organizationId,
+        OR: [
+          result.data.name ? { name: result.data.name, organizationId: existingProject.organizationId } : {},
+          result.data.slug ? { slug: result.data.slug } : {},
+        ].filter(condition => Object.keys(condition).length > 0),
         NOT: { id: projectId },
       },
     })
     if (conflictingProject) {
+      if (conflictingProject.slug === result.data.slug) {
+        throw createError({ statusCode: 409, statusMessage: "A project with this slug already exists" })
+      }
       throw createError({ statusCode: 409, statusMessage: "A project with this name already exists in the organization" })
     }
   }
@@ -47,6 +52,8 @@ export default defineEventHandler(async (event) => {
     where: { id: projectId },
     data: {
       name: result.data.name,
+      slug: result.data.slug,
+      description: result.data.description,
     },
     include: {
       organization: {
