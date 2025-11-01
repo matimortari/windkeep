@@ -16,20 +16,19 @@
 </template>
 
 <script setup lang="ts">
-const userStore = useUserStore()
-const projectStore = useProjectStore()
+const { user, organizations, fetchUser } = useUserActions()
+const { fetchProjects } = useProjectActions()
 
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
-const user = computed(() => userStore.user)
-const orgs = computed(() => userStore.organizations)
+const orgs = organizations
 
 async function getUserData() {
   try {
-    await userStore.getUser()
-    if (userStore.user?.activeOrgId) {
-      await projectStore.getProjects()
+    await fetchUser()
+    if (user.value?.activeOrgId) {
+      await fetchProjects()
     }
     else {
       await navigateTo("/onboarding/create-org")
