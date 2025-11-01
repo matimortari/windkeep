@@ -13,6 +13,10 @@ export function useOrganizationActions() {
     const org = await organizationStore.createOrg(data)
     if (org) {
       await userStore.getUser()
+      // Set the newly created org as active if user has no active org
+      if (!userStore.user?.activeOrgId && org.id) {
+        await userStore.setActiveOrg(org.id)
+      }
     }
     return org
   }
