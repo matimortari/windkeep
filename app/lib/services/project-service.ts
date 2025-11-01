@@ -4,11 +4,9 @@ import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/s
 export const projectService = {
   /**
    * Fetch all projects for current user
-   * @param orgId Optional organization ID to filter projects
    */
-  getProjects: async (orgId?: string) => {
-    const url = orgId ? `${API_URL}/projects?orgId=${orgId}` : `${API_URL}/projects`
-    const res = await $fetch(url, {
+  getProjects: async () => {
+    const res = await $fetch(`${API_URL}/projects`, {
       method: "GET",
       credentials: "include",
     })
