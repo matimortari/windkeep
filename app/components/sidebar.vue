@@ -46,8 +46,6 @@
 </template>
 
 <script setup lang="ts">
-import type { CreateProjectInput } from "#shared/lib/schemas/project"
-
 const props = defineProps<{
   org?: Pick<Organization, "id" | "name"> & { role?: Role }
   isOpen: boolean
@@ -55,7 +53,8 @@ const props = defineProps<{
 
 defineEmits(["update:isOpen"])
 
-const { allProjects, createProject, fetchProjects, errors } = useProjectActions()
+const { allProjects, createProject, fetchProjects } = useProjectActions()
+const projectStore = useProjectStore()
 
 const isDialogOpen = ref(false)
 
@@ -68,12 +67,12 @@ const projectsFromOrg = computed(() => {
   )
 })
 
-async function handleCreateProject(project: CreateProjectInput) {
+async function handleCreateProject(project: { name: string, slug: string, description: string }) {
   try {
     await createProject({
       name: project.name,
       slug: project.slug,
-      description: project.description ?? undefined,
+      description: project.description || undefined,
       organizationId: props.org!.id,
     })
     if (props.org?.id) {
@@ -82,13 +81,13 @@ async function handleCreateProject(project: CreateProjectInput) {
     isDialogOpen.value = false
   }
   catch (err: any) {
-    errors.value.createProject = err.message
+    projectStore.errors.createProject = err.message
   }
 }
 
 watch(isDialogOpen, (val) => {
   if (val)
-    errors.value.createProject = null
+    projectStore.errors.createProject = null
 })
 </script>
 
