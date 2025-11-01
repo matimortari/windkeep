@@ -1,0 +1,70 @@
+import type { EventHandlerRequest, H3Event } from "h3"
+import db from "#server/lib/db"
+
+export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
+  const session = await getUserSession(event)
+  if (session?.user?.id) {
+    return session.user
+  }
+
+  const authHeader = event.node.req.headers.authorization
+  if (!authHeader) {
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" })
+  }
+
+  return session.user
+}
+
+export async function requireOrgRole(userId: string, organizationId: string, roles: string[]) {
+  const membership = await db.organizationMembership.findUnique({
+    where: { userId_organizationId: { userId, organizationId } },
+    select: { role: true },
+  })
+
+  if (!membership) {
+    throw createError({ statusCode: 403, message: "Access denied: not an organization member" })
+  }
+  if (!roles.includes(membership.role)) {
+    throw createError({ statusCode: 403, message: "Access denied: insufficient permissions" })
+  }
+
+  return membership
+}
+
+export async function requireProjectRole(userId: string, projectId: string, roles: string[]) {
+  const membership = await db.projectRole.findUnique({
+    where: { userId_projectId: { userId, projectId } },
+    select: { role: true },
+  })
+
+  if (!membership) {
+    throw createError({ statusCode: 403, message: "Access denied: not a project member" })
+  }
+  if (!roles.includes(membership.role)) {
+    throw createError({ statusCode: 403, message: "Access denied: insufficient permissions" })
+  }
+
+  return membership
+}
+
+export async function createAuditLog({ userId, organizationId, projectId, action, description, req }: any) {
+  const ip = req?.headers?.["x-forwarded-for"] || req?.socket?.remoteAddress || null
+  const userAgent = req?.headers?.["user-agent"] || null
+
+  await db.auditLog.create({
+    data: {
+      userId,
+      organizationId,
+      projectId,
+      action,
+      description: description || `${action} - IP: ${ip || "unknown"}, User-Agent: ${userAgent || "unknown"}`,
+    },
+  })
+}
+
+export function getInviteBaseUrl(event: any) {
+  const protocol = event.req.headers["x-forwarded-proto"] || "http"
+  const host = event.req.headers.host
+
+  return `${protocol}://${host}`
+}
