@@ -1,0 +1,147 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Environment {
+  DEVELOPMENT
+  STAGING
+  PRODUCTION
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id           String                   @id @default(cuid())
+  email        String                   @unique
+  name         String
+  image        String?
+  apiToken     String?                  @unique
+  activeOrgId  String?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  accounts     Account[]
+  memberships  OrganizationMembership[]
+  projectRoles ProjectRole[]
+  invitations  Invitation[]
+  auditLogs    AuditLog[]
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Organization {
+  id          String                   @id @default(cuid())
+  name        String
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  memberships OrganizationMembership[]
+  projects    Project[]
+  invitations Invitation[]
+  auditLogs   AuditLog[]
+}
+
+model OrganizationMembership {
+  userId         String
+  organizationId String
+  role           Role     @default(MEMBER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, organizationId])
+}
+
+model Project {
+  id             String        @id @default(cuid())
+  name           String
+  organizationId String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  secrets        Secret[]
+  roles          ProjectRole[]
+  auditLogs      AuditLog[]
+}
+
+model ProjectRole {
+  userId    String
+  projectId String
+  role      Role     @default(MEMBER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+}
+
+model Secret {
+  id          String        @id @default(cuid())
+  key         String
+  description String?
+  projectId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  values      SecretValue[]
+
+  @@unique([key, projectId])
+}
+
+model SecretValue {
+  id          String      @id @default(cuid())
+  secretId    String
+  environment Environment
+  value       String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  secret      Secret      @relation(fields: [secretId], references: [id], onDelete: Cascade)
+
+  @@unique([secretId, environment])
+}
+
+model Invitation {
+  id             String       @id @default(cuid())
+  email          String
+  organizationId String
+  role           Role         @default(MEMBER)
+  token          String       @unique
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedById    String
+  invitedBy      User         @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id             String        @id @default(cuid())
+  userId         String
+  organizationId String?
+  projectId      String?
+  action         String
+  description    String?
+  createdAt      DateTime      @default(now())
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project        Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
