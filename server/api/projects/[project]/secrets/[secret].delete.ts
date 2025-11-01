@@ -3,16 +3,16 @@ import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
-  const secretId = getRouterParam(event, "secretId")
-  if (!projectId || !secretId) {
+  const project = getRouterParam(event, "project")
+  const secret = getRouterParam(event, "secret")
+  if (!project || !secret) {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Secret ID are required" })
   }
 
-  await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN"])
+  await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
 
-  const secret = await db.secret.findUnique({
-    where: { id: secretId },
+  const secretData = await db.secret.findUnique({
+    where: { id: secret },
     select: {
       id: true,
       key: true,
@@ -24,21 +24,21 @@ export default defineEventHandler(async (event) => {
       },
     },
   })
-  if (!secret) {
+  if (!secretData) {
     throw createError({ statusCode: 404, statusMessage: "Secret not found" })
   }
-  if (secret.projectId !== projectId) {
+  if (secretData.projectId !== project) {
     throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
   }
 
   // Delete the secret (cascade will handle secret values)
   await db.secret.delete({
-    where: { id: secretId },
+    where: { id: secret },
   })
 
   return {
     success: true,
-    message: `Secret "${secret.key}" deleted successfully`,
-    valuesDeleted: secret._count.values,
+    message: `Secret "${secretData.key}" deleted successfully`,
+    valuesDeleted: secretData._count.values,
   }
 })

@@ -44,5 +44,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "No projects found" })
   }
 
-  return projects
+  return { projects }
 })
