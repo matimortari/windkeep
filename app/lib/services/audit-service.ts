@@ -6,7 +6,7 @@ export const auditService = {
    * @param orgId Organization ID
    * @param params Query parameters for filtering and pagination
    */
-  getAuditLogs: async (orgId: string, params?: GetAuditLogsInput): Promise<AuditLogsResponse> => {
+  getAuditLogs: async (orgId: string, params?: GetAuditLogsInput) => {
     const queryParams = new URLSearchParams()
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -15,20 +15,7 @@ export const auditService = {
         }
       })
     }
-    const res = await $fetch<AuditLogsResponse>(`${API_URL}/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, {
-      method: "GET",
-      credentials: "include",
-    })
-
-    return res
-  },
-
-  /**
-   * Get available filter options for audit logs
-   * @param orgId Organization ID
-   */
-  getAuditFilters: async (orgId: string): Promise<AuditFilters> => {
-    const res = await $fetch<AuditFilters>(`${API_URL}/org/${orgId}/audit/filters`, {
+    const res = await $fetch(`${API_URL}/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, {
       method: "GET",
       credentials: "include",
     })
