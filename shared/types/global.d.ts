@@ -102,9 +102,26 @@ interface AuditLog {
   organizationId?: string | null
   projectId?: string | null
   action: string
+  resource?: string
+  metadata?: any
   description?: string | null
   createdAt: Date | string
   user?: User
   organization?: Organization | null
   project?: Project | null
+}
+
+interface AuditLogsPagination {
+  page: number
+  limit: number
+  totalPages: number
+  totalItems: number
+  hasNext: boolean
+  hasPrev: boolean
+}
+
+interface AuditFilters {
+  users: Array<{ id: string, name: string | null, email: string }>
+  projects: Array<{ id: string, name: string }>
+  actions: string[]
 }
