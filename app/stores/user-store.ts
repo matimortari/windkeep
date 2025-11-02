@@ -40,7 +40,10 @@ export const useUserStore = defineStore("user", () => {
           id: activeMembership.organization.id,
           name: activeMembership.organization.name,
           role: activeMembership.role,
-        }
+          createdAt: (activeMembership.organization as any).createdAt,
+          updatedAt: (activeMembership.organization as any).updatedAt,
+          members: (activeMembership.organization as any).memberships || [],
+        } as any
         if (!userData.activeOrgId) {
           await userService.updateUser({ activeOrgId: activeMembership.organization.id })
         }

@@ -21,6 +21,20 @@ export default defineEventHandler(async (event) => {
             select: {
               id: true,
               name: true,
+              createdAt: true,
+              updatedAt: true,
+              memberships: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                      email: true,
+                      image: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
