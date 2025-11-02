@@ -10,9 +10,11 @@ export default defineEventHandler(async (event) => {
 
   await requireOrgRole(user.id, org, ["OWNER"])
 
-  const query = getQuery(event)
-  const olderThan = query.olderThan as string | undefined
-  const projectId = query.projectId as string | undefined
+  const body = await readBody(event)
+  const olderThan = body.olderThan as string | undefined
+  const projectId = body.projectId as string | undefined
+  const userId = body.userId as string | undefined
+  const action = body.action as string | undefined
 
   // Build filter
   const where: any = {
@@ -31,6 +33,16 @@ export default defineEventHandler(async (event) => {
   // Delete logs for specific project
   if (projectId) {
     where.projectId = projectId
+  }
+
+  // Delete logs for specific user
+  if (userId) {
+    where.userId = userId
+  }
+
+  // Delete logs for specific action
+  if (action) {
+    where.action = { contains: action, mode: "insensitive" }
   }
 
   const result = await db.auditLog.deleteMany({ where })
