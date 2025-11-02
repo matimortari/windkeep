@@ -1,7 +1,7 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <header class="navigation-group border-b py-2">
-      <nuxt-link :to="`/admin/${project.slug}`" aria-label="Go back" class="flex items-center">
+      <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
         <icon name="ph:arrow-left-bold" size="25" class="hover:scale-sm text-muted-foreground hover:text-accent" />
       </nuxt-link>
       <h2 class="max-w-lg truncate">
@@ -63,7 +63,7 @@
         </h5>
 
         <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
-          <li v-for="member in project?.members" :key="member.userId" class="card navigation-group w-full justify-between overflow-hidden">
+          <li v-for="member in project?.roles" :key="member.userId" class="card navigation-group w-full justify-between overflow-hidden">
             <div class="flex min-w-0 flex-row items-center gap-2">
               <img :src="member.user?.image ?? undefined" alt="Avatar" class="hidden size-10 rounded-full border-2 md:block">
               <div class="flex min-w-0 flex-col">
@@ -177,8 +177,8 @@ const newMemberRole = ref(ROLES[0]?.value ?? "member")
 
 const project = computed(() => allProjects.value.find(p => p.slug === slug))
 
-const isOwner = computed(() => project.value?.members.find((m: any) => m.userId === user.value?.id)?.role === "owner")
-const isAdmin = computed(() => project.value?.members.find((m: any) => m.userId === user.value?.id)?.role === "admin")
+const isOwner = computed(() => project.value?.roles?.find((m: any) => m.userId === user.value?.id)?.role === "OWNER")
+const isAdmin = computed(() => project.value?.roles?.find((m: any) => m.userId === user.value?.id)?.role === "ADMIN")
 
 const projectFields = [
   {
