@@ -9,10 +9,9 @@ export const useAuditStore = defineStore("audit", () => {
     limit: 20,
   })
   const loading = ref<boolean>(false)
-  const errors = ref<Record<"getAuditLogs" | "deleteAuditLogs" | "getFilters", string | null>>({
+  const errors = ref<Record<"getAuditLogs" | "deleteAuditLogs", string | null>>({
     getAuditLogs: null,
     deleteAuditLogs: null,
-    getFilters: null,
   })
 
   async function getAuditLogs(orgId: string, params?: GetAuditLogsInput) {
@@ -22,8 +21,9 @@ export const useAuditStore = defineStore("audit", () => {
     try {
       const res = await auditService.getAuditLogs(orgId, params)
 
-      auditLogs.value = res.auditLogs
+      auditLogs.value = res.auditLogs as AuditLog[]
       pagination.value = res.pagination
+      filters.value = res.filters
       if (params) {
         currentFilters.value = { ...currentFilters.value, ...params }
       }
@@ -53,24 +53,6 @@ export const useAuditStore = defineStore("audit", () => {
     catch (err: any) {
       errors.value.deleteAuditLogs = err?.message || "Failed to delete audit logs"
       console.error("deleteAuditLogs error:", err)
-    }
-    finally {
-      loading.value = false
-    }
-  }
-
-  async function getFilters(orgId: string) {
-    loading.value = true
-    errors.value.getFilters = null
-
-    try {
-      const res = await auditService.getAuditFilters(orgId)
-      filters.value = res
-      return res
-    }
-    catch (err: any) {
-      errors.value.getFilters = err?.message || "Failed to fetch audit filters"
-      console.error("getFilters error:", err)
     }
     finally {
       loading.value = false
@@ -125,7 +107,6 @@ export const useAuditStore = defineStore("audit", () => {
     currentFilters,
     getAuditLogs,
     deleteAuditLogs,
-    getFilters,
     updateFilters,
     resetFilters,
     nextPage,
