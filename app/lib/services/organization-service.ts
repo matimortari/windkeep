@@ -1,4 +1,4 @@
-import type { AcceptInviteInput, CreateOrgInput, InviteMemberInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/lib/schemas/org"
+import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/lib/schemas/org-schema"
 
 export const organizationService = {
   /**
@@ -78,7 +78,7 @@ export const organizationService = {
    * @param orgId Organization ID
    * @param data Invitation data
    */
-  createInvite: async (orgId: string, data: InviteMemberInput) => {
+  createInvite: async (orgId: string, data: CreateInviteInput) => {
     const res = await $fetch(`${API_URL}/org/${orgId}/invite/create`, {
       method: "POST",
       body: data,

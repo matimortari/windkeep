@@ -17,8 +17,8 @@ declare module "#auth-utils" {
     userId: string
     provider: string
     providerAccountId: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt?: Date | string
+    updatedAt?: Date | string
     user?: User
   }
 }

@@ -15,17 +15,11 @@ export default defineEventHandler(async (event) => {
     where: { projectId: project },
     include: {
       values: {
-        select: {
-          id: true,
-          environment: true,
-          value: true,
-          createdAt: true,
-          updatedAt: true,
-        },
         orderBy: {
           environment: "asc",
         },
       },
+      project: true,
     },
     orderBy: {
       key: "asc",

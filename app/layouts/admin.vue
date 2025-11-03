@@ -2,7 +2,7 @@
   <Loading v-if="isLoading" />
 
   <div v-show="!isLoading" class="min-h-screen">
-    <Toolbar :orgs="orgs" :org="user?.activeOrgId" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+    <Toolbar :orgs="orgs ?? []" :org="user?.activeOrgId" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
     <div class="flex flex-1 pb-8">
       <Sidebar v-if="user?.activeOrgId" :org="orgs.find(o => o.id === user?.activeOrgId)" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
@@ -16,13 +16,19 @@
 </template>
 
 <script setup lang="ts">
-const { user, organizations, fetchUser } = useUserActions()
+const { user, fetchUser } = useUserActions()
 const { fetchProjects } = useProjectActions()
 
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
-const orgs = organizations
+const orgs = computed(() =>
+  user.value?.memberships?.map(m => ({
+    id: m.organization?.id ?? m.organizationId,
+    name: m.organization?.name ?? "",
+    role: m.role,
+  })) ?? [],
+)
 
 async function getUserData() {
   try {

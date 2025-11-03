@@ -30,7 +30,7 @@
               <li
                 v-for="env in ['development', 'staging', 'production']" :key="env"
                 role="menuitem" class="hover:bg-muted rounded p-2 capitalize"
-                @click="handleExportToEnv(env); isDropdownOpen = false"
+                @click="handleExport(env)"
               >
                 {{ env }}
               </li>
@@ -74,7 +74,7 @@ const { activeOrg } = useUserActions()
 const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets } = useProjectActions()
 
 const project = computed(() => allProjects.value.find(p => p.slug === slug) || null)
-const { handleImportFromEnv, handleExportToEnv } = useEnvFile(project.value?.id)
+const { handleImportFromEnv: importFromEnv, handleExportToEnv: exportToEnv } = useEnvFile(project.value?.id)
 const secrets = projectSecrets
 
 const selectedSecret = ref<Secret | null>(null)
@@ -86,6 +86,30 @@ const isDropdownOpen = ref(false)
 useClickOutside(dropdownRef, () => {
   isDropdownOpen.value = false
 }, { escapeKey: true })
+
+async function handleImportFromEnv(importedSecrets: Secret[]) {
+  const result = await importFromEnv(importedSecrets)
+
+  if (result.failed > 0) {
+    console.error("Import errors:", result.errors)
+  }
+
+  if (result.success > 0) {
+    // Optionally show success toast notification here
+    console.log(`Successfully imported ${result.success} secrets`)
+  }
+}
+
+function handleExport(env: string) {
+  const result = exportToEnv(env)
+
+  if (!result.success) {
+    console.error("Export error:", result.error)
+    // Optionally show toast notification here
+  }
+
+  isDropdownOpen.value = false
+}
 
 async function handleSubmit(secret: any) {
   isDialogOpen.value = false
@@ -110,10 +134,10 @@ async function handleSubmit(secret: any) {
 }
 
 watch([project, activeOrg], ([proj, org]) => {
-  if (proj && org && proj.organization?.id !== org.id) {
-    useRouter().push("/admin/projects")
+  if (proj && org && proj.organizationId && proj.organizationId !== org.id) {
+    navigateTo("/admin/projects")
   }
-}, { immediate: true })
+}, { immediate: false })
 
 watch(() => project.value?.id, async (id: string | undefined) => {
   if (!id)

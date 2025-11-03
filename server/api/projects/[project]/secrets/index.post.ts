@@ -1,7 +1,7 @@
 import db from "#server/lib/db"
 import { encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
-import { createSecretSchema } from "#shared/lib/schemas/secret"
+import { createSecretSchema } from "#shared/lib/schemas/secret-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = createSecretSchema.safeParse({
     ...body,
-    project,
+    projectId: project,
   })
   if (!result.success) {
     throw createError({
@@ -23,12 +23,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid input",
       data: result.error.flatten().fieldErrors,
     })
-  }
-
-  // Validate secret key format (alphanumeric, underscores, dashes)
-  const keyRegex = /^[A-Z0-9_]+$/
-  if (!keyRegex.test(result.data.key)) {
-    throw createError({ statusCode: 400, statusMessage: "Secret key must contain only uppercase letters, numbers, and underscores" })
   }
 
   const existingSecret = await db.secret.findUnique({
@@ -46,7 +40,7 @@ export default defineEventHandler(async (event) => {
   const secretData: any = {
     key: result.data.key,
     description: result.data.description,
-    project,
+    projectId: project,
   }
 
   if (body.values && Array.isArray(body.values)) {

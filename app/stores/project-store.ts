@@ -1,5 +1,5 @@
-import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/lib/schemas/project"
-import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret"
+import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/lib/schemas/project-schema"
+import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret-schema"
 
 export const useProjectStore = defineStore("project", () => {
   const projects = ref<any[]>([])
@@ -33,12 +33,12 @@ export const useProjectStore = defineStore("project", () => {
     deleteProjectSecret: null,
   })
 
-  async function getProjects(orgId?: string) {
+  async function getProjects() {
     loading.value = true
     errors.value.getProjects = null
 
     try {
-      const res = await projectService.getProjects(orgId) as { projects: any[] }
+      const res = await projectService.getProjects()
       projects.value = res.projects || []
     }
     catch (err: any) {
@@ -180,15 +180,17 @@ export const useProjectStore = defineStore("project", () => {
 
     try {
       const res = await projectService.getProjectSecrets(projectId)
-      secrets.value = res.secrets || []
+      const fetchedSecrets = Array.isArray(res) ? res : []
+      secrets.value = fetchedSecrets
       if (currentProject.value?.id === projectId) {
-        currentProject.value.secrets = res.secrets || []
+        currentProject.value.secrets = fetchedSecrets
       }
-      return res.secrets || []
+      return fetchedSecrets
     }
     catch (err: any) {
       errors.value.getProjectSecrets = err?.message || "Failed to get project secrets"
       console.error("getProjectSecrets error:", err)
+      return []
     }
     finally {
       loading.value = false
@@ -201,17 +203,21 @@ export const useProjectStore = defineStore("project", () => {
 
     try {
       const res = await projectService.createProjectSecret(projectId, data)
+
+      secrets.value.push(res)
       if (currentProject.value?.id === projectId) {
         if (!currentProject.value.secrets) {
           currentProject.value.secrets = []
         }
         currentProject.value.secrets.push(res)
       }
+
       return res
     }
     catch (err: any) {
       errors.value.createProjectSecret = err?.message || "Failed to create project secret"
       console.error("createProjectSecret error:", err)
+      throw err
     }
     finally {
       loading.value = false
@@ -224,17 +230,25 @@ export const useProjectStore = defineStore("project", () => {
 
     try {
       const res = await projectService.updateProjectSecret(projectId, secretId, data)
+
+      const secretsIndex = secrets.value.findIndex((s: any) => s.id === secretId)
+      if (secretsIndex !== -1) {
+        secrets.value[secretsIndex] = res
+      }
+
       if (currentProject.value?.id === projectId && currentProject.value.secrets) {
-        const index = currentProject.value.secrets.findIndex((s: any) => s.id === secretId)
-        if (index !== -1) {
-          currentProject.value.secrets[index] = res
+        const currentIndex = currentProject.value.secrets.findIndex((s: any) => s.id === secretId)
+        if (currentIndex !== -1) {
+          currentProject.value.secrets[currentIndex] = res
         }
       }
+
       return res
     }
     catch (err: any) {
       errors.value.updateProjectSecret = err?.message || "Failed to update project secret"
       console.error("updateProjectSecret error:", err)
+      throw err
     }
     finally {
       loading.value = false
@@ -247,6 +261,9 @@ export const useProjectStore = defineStore("project", () => {
 
     try {
       await projectService.deleteProjectSecret(projectId, secretId)
+
+      // Update both secrets array and currentProject.secrets
+      secrets.value = secrets.value.filter((s: any) => s.id !== secretId)
       if (currentProject.value?.id === projectId && currentProject.value.secrets) {
         currentProject.value.secrets = currentProject.value.secrets.filter((s: any) => s.id !== secretId)
       }
@@ -254,6 +271,7 @@ export const useProjectStore = defineStore("project", () => {
     catch (err: any) {
       errors.value.deleteProjectSecret = err?.message || "Failed to delete project secret"
       console.error("deleteProjectSecret error:", err)
+      throw err
     }
     finally {
       loading.value = false

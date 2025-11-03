@@ -7,9 +7,15 @@
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="key" class="text-sm font-semibold">Key</label>
-        <input id="key" v-model="form.key" type="text" class="w-full">
+        <input
+          id="key"
+          v-model="form.key"
+          type="text"
+          class="w-full"
+          :disabled="isUpdateMode"
+        >
         <span class="text-muted-foreground text-xs">
-          The unique identifier for the secret.
+          The name for the secret.
         </span>
       </div>
 
@@ -102,11 +108,27 @@ function resetForm() {
   validationError.value = null
 }
 
+function normalizeKey(key: string): string {
+  return key
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "")
+}
+
 async function handleSubmit() {
   validationError.value = null
 
   if (!form.value.key.trim()) {
     validationError.value = "Secret key is required"
+    return
+  }
+
+  const normalizedKey = normalizeKey(form.value.key)
+
+  if (!normalizedKey) {
+    validationError.value = "Secret key must contain at least one valid character"
     return
   }
 
@@ -117,7 +139,7 @@ async function handleSubmit() {
   }
   else {
     await createSecret(props.projectId, {
-      key: form.value.key.trim(),
+      key: normalizedKey,
       description: form.value.description.trim(),
       projectId: props.projectId,
     })

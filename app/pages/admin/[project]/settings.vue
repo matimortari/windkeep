@@ -169,16 +169,13 @@ const route = useRoute()
 const slug = route.params.project
 const { createActionHandler } = useActionIcon()
 const { user, activeOrg } = useUserActions()
-const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, removeMember, fetchProjects, errors } = useProjectActions()
+const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, removeMember, fetchProjects, isOwner, isAdmin, errors } = useProjectActions()
 
 const addMemberSuccess = ref<string | null>(null)
 const newMemberId = ref("")
 const newMemberRole = ref(ROLES[0]?.value ?? "member")
 
 const project = computed(() => allProjects.value.find(p => p.slug === slug))
-const currentUserRole = computed(() => project.value?.roles?.find((m: any) => m.userId === user.value?.id)?.role)
-const isOwner = computed(() => currentUserRole.value === "OWNER")
-const isAdmin = computed(() => currentUserRole.value === "ADMIN")
 
 const projectFields = [
   {
@@ -301,10 +298,10 @@ async function handleDeleteProject() {
 }
 
 watch([project, activeOrg], ([proj, org]) => {
-  if (proj && org && proj.organization?.id !== org.id) {
+  if (proj && org && proj.organizationId && proj.organizationId !== org.id) {
     navigateTo("/admin/projects")
   }
-}, { immediate: true })
+}, { immediate: false })
 
 watch(() => project.value?.id, async (id: string | undefined) => {
   const projectTitle = allProjects.value?.find(p => p.id === id)?.name

@@ -6,50 +6,17 @@ export default defineEventHandler(async (event) => {
 
   const userData = await db.user.findUnique({
     where: { id: user.id },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      image: true,
-      apiToken: true,
-      activeOrgId: true,
-      createdAt: true,
-      updatedAt: true,
+    include: {
       memberships: {
-        include: {
-          organization: {
-            select: {
-              id: true,
-              name: true,
-              createdAt: true,
-              updatedAt: true,
-              memberships: {
-                include: {
-                  user: {
-                    select: {
-                      id: true,
-                      name: true,
-                      email: true,
-                      image: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
+        select: {
+          role: true,
+          organizationId: true,
+          organization: true,
         },
       },
       projectRoles: {
-        include: {
-          project: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              description: true,
-              organizationId: true,
-            },
-          },
+        select: {
+          project: true,
         },
       },
     },

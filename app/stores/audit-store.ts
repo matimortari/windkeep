@@ -1,4 +1,4 @@
-import type { DeleteAuditLogsInput, GetAuditLogsInput } from "#shared/lib/schemas/audit-logs"
+import type { DeleteAuditLogsInput, GetAuditLogsInput } from "#shared/lib/schemas/audit-schema"
 
 export const useAuditStore = defineStore("audit", () => {
   const auditLogs = ref<AuditLog[]>([])

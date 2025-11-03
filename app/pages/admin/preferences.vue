@@ -130,12 +130,16 @@ const userFields = [
   {
     label: "Active Organization",
     description: "The organization you are currently working in.",
-    value: computed(() => activeOrg.value?.name),
+    value: computed(() => activeOrg.value?.name || "N/A"),
   },
   {
     label: "Active Organization Role",
     description: "Your role within the active organization.",
-    value: computed(() => activeOrg.value?.role),
+    value: computed(() => {
+      const membership = user.value?.memberships?.find(m => m.organizationId === user.value?.activeOrgId)
+      const role = membership?.role || "N/A"
+      return role === "N/A" ? role : role.charAt(0) + role.slice(1).toLowerCase()
+    }),
   },
   {
     label: "Joined On",

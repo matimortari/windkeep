@@ -1,8 +1,7 @@
-import type { UpdateUserInput } from "#shared/lib/schemas/user"
+import type { UpdateUserInput } from "#shared/lib/schemas/user-schema"
 
 export function useUserActions() {
   const userStore = useUserStore()
-  const router = useRouter()
 
   /**
    * Fetch and initialize user data
@@ -40,55 +39,38 @@ export function useUserActions() {
    */
   const deleteAccount = async () => {
     await userStore.deleteUser()
-    await router.push("/sign-in")
+    await navigateTo("/sign-in")
   }
 
   /**
-   * Check if user has a specific role in the active organization
-   * @param requiredRole Role to check against (OWNER, ADMIN, or MEMBER)
+   * User getter
    */
-  const hasRole = (requiredRole: Role | Role[]) => {
-    if (!userStore.activeOrg)
-      return false
-
-    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
-    return roles.includes(userStore.activeOrg.role)
-  }
+  const user = computed(() => userStore.user)
 
   /**
-   * Check if user is an owner of the active organization
+   * Active organization getter
    */
-  const isOwner = computed(() => hasRole("OWNER"))
+  const activeOrg = computed(() => userStore.activeOrg)
 
   /**
-   * Check if user is an admin or owner of the active organization
+   * Loading state
    */
-  const isAdmin = computed(() => hasRole(["OWNER", "ADMIN"]))
+  const loading = computed(() => userStore.loading)
 
   /**
-   * Check if user has any organization membership
+   * Error state
    */
-  const hasOrganization = computed(() => userStore.organizations.length > 0)
+  const errors = computed(() => userStore.errors)
 
   return {
-    // Store state
-    user: computed(() => userStore.user),
-    organizations: computed(() => userStore.organizations),
-    activeOrg: computed(() => userStore.activeOrg),
-    loading: computed(() => userStore.loading),
-    errors: computed(() => userStore.errors),
-
-    // Actions
+    user,
+    activeOrg,
+    loading,
+    errors,
     fetchUser,
     switchOrganization,
     updateProfile,
     updateProfileImage,
     deleteAccount,
-
-    // Role checks
-    hasRole,
-    isOwner,
-    isAdmin,
-    hasOrganization,
   }
 }
