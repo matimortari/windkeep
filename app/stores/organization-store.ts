@@ -1,4 +1,4 @@
-import type { AcceptInviteInput, CreateOrgInput, InviteMemberInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/lib/schemas/org"
+import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/lib/schemas/org-schema"
 
 export const useOrganizationStore = defineStore("org", () => {
   const organizations = ref<Organization[]>([])
@@ -49,7 +49,7 @@ export const useOrganizationStore = defineStore("org", () => {
       const res = await organizationService.updateOrg(orgId, data)
       const index = organizations.value.findIndex(o => o.id === orgId)
       if (index !== -1) {
-        organizations.value[index] = res as any
+        organizations.value[index] = res
       }
       if (currentOrg.value?.id === orgId) {
         currentOrg.value = { ...currentOrg.value, ...res }
@@ -95,7 +95,7 @@ export const useOrganizationStore = defineStore("org", () => {
       if (currentOrg.value?.id === orgId && currentOrg.value.members) {
         const index = currentOrg.value.members.findIndex((m: any) => m.userId === memberId)
         if (index !== -1) {
-          currentOrg.value.members[index] = res as any
+          currentOrg.value.members[index] = res
         }
       }
 
@@ -129,7 +129,7 @@ export const useOrganizationStore = defineStore("org", () => {
     }
   }
 
-  async function createInvite(orgId: string, data: InviteMemberInput) {
+  async function createInvite(orgId: string, data: CreateInviteInput) {
     loading.value = true
     errors.value.createInvite = null
 
@@ -160,8 +160,8 @@ export const useOrganizationStore = defineStore("org", () => {
     try {
       const res = await organizationService.acceptInvite(orgId, data)
       const existingOrg = organizations.value.find(o => o.id === orgId)
-      if (!existingOrg) {
-        organizations.value.push(res as any)
+      if (!existingOrg && res.organization) {
+        organizations.value.push(res.organization)
       }
 
       return res

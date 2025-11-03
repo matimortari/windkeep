@@ -1,12 +1,12 @@
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
-import { acceptInvitationSchema } from "#shared/lib/schemas/org"
+import { acceptInviteSchema } from "#shared/lib/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const body = await readBody(event)
 
-  const result = acceptInvitationSchema.safeParse(body)
+  const result = acceptInviteSchema.safeParse(body)
   if (!result.success) {
     throw createError({
       statusCode: 400,

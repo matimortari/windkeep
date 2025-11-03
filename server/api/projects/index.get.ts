@@ -12,29 +12,9 @@ export default defineEventHandler(async (event) => {
       ],
     },
     include: {
-      organization: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      roles: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
-        },
-      },
-      secrets: {
-        include: {
-          values: true,
-        },
-      },
+      organization: true,
+      roles: true,
+      secrets: true,
     },
     orderBy: {
       createdAt: "desc",

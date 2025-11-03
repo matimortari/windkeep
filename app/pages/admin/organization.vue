@@ -203,14 +203,14 @@
 <script setup lang="ts">
 const { createActionHandler } = useActionIcon()
 const { user, activeOrg, fetchUser } = useUserActions()
-const { updateOrganization, deleteOrganization, updateMemberRole, removeMember, inviteMember, errors: orgErrors } = useOrganizationActions()
+const { updateOrganization, deleteOrganization, updateMemberRole, removeMember, inviteMember, isOwner, isAdmin, errors: orgErrors } = useOrganizationActions()
 const { allProjects } = useProjectActions()
 
 const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
 const orgProjects = computed(() => allProjects.value.filter(p => p.organizationId === activeOrg.value?.id))
 const orgMembers = computed(() => {
-  const members = (activeOrg.value as any)?.members || []
+  const members = (activeOrg.value)?.memberships || []
   return members.map((m: any) => ({
     id: m.user?.id,
     name: m.user?.name,
@@ -219,10 +219,6 @@ const orgMembers = computed(() => {
     role: m.role || "MEMBER",
   }))
 })
-
-const currentUserRole = computed(() => orgMembers.value.find((m: any) => m.id === user.value?.id)?.role)
-const isOwner = computed(() => currentUserRole.value === "OWNER")
-const isAdmin = computed(() => currentUserRole.value === "ADMIN")
 
 const orgFields = [
   {

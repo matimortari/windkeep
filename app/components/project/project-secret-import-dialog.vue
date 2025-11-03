@@ -83,6 +83,15 @@ function parseEnv(text: string): Record<string, string> {
   return parsed
 }
 
+function normalizeKey(key: string): string {
+  return key
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "")
+}
+
 function handleSubmit() {
   validationError.value = null
 
@@ -92,8 +101,17 @@ function handleSubmit() {
     return
   }
 
+  // Normalize keys to match backend requirements
+  const normalizedParsed: Record<string, string> = {}
+  for (const [key, value] of Object.entries(parsed)) {
+    const normalizedKey = normalizeKey(key)
+    if (normalizedKey) {
+      normalizedParsed[normalizedKey] = value
+    }
+  }
+
   const duplicateKeys: string[] = []
-  for (const [key] of Object.entries(parsed)) {
+  for (const [key] of Object.entries(normalizedParsed)) {
     const existing = props.secrets.find(secret => secret.key === key)
     if (existing?.values?.some(v => v.environment === selectedEnv.value)) {
       duplicateKeys.push(key)
@@ -104,7 +122,7 @@ function handleSubmit() {
     return
   }
 
-  const payload = Object.entries(parsed).map(([key, value]) => {
+  const payload = Object.entries(normalizedParsed).map(([key, value]) => {
     const secretId = crypto.randomUUID()
     return {
       id: secretId,

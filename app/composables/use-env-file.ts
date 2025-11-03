@@ -3,58 +3,76 @@ export function useEnvFile(projectId: string) {
 
   const project = computed(() => projectsStore.projects.find(p => p.id === projectId))
 
-  const handleImportFromEnv = async (importedSecrets: Secret[]) => {
+  const handleImportFromEnv = async (importedSecrets: Secret[]): Promise<{ success: number, failed: number, errors: string[] }> => {
     if (!importedSecrets || importedSecrets.length === 0) {
-      return
+      return { success: 0, failed: 0, errors: ["No secrets to import"] }
     }
+
+    const errors: string[] = []
+    let successCount = 0
+    let failedCount = 0
 
     const results = await Promise.allSettled(importedSecrets.map(async (secret) => {
       if (!secret.key) {
         throw new Error("Secret key is required")
       }
 
-      const existing = projectsStore.secrets.find((s: any) => s.key === secret.key && s.projectId === projectId)
+      const existing = projectsStore.secrets.find((s: Secret) => s.key === secret.key && s.projectId === projectId)
+
       if (existing) {
         const existingValues = existing.values ?? []
         const newValues = secret.values ?? []
 
         const mergedValues = [...existingValues]
-        newValues.forEach((newValue: any) => {
-          const existingIndex = mergedValues.findIndex((v: any) => v.environment === newValue.environment)
+        newValues.forEach((newValue: SecretValue) => {
+          const existingIndex = mergedValues.findIndex((v: SecretValue) => v.environment === newValue.environment)
           if (existingIndex >= 0) {
-            mergedValues[existingIndex] = newValue
+            mergedValues[existingIndex] = { ...mergedValues[existingIndex], value: newValue.value }
           }
           else {
             mergedValues.push(newValue)
           }
         })
 
-        return projectsStore.updateProjectSecret(projectId, existing.id!, {
-          description: secret.description ?? undefined,
-          values: mergedValues,
-        })
+        const updatePayload: any = {}
+        if (secret.description !== undefined) {
+          updatePayload.description = secret.description
+        }
+        updatePayload.values = mergedValues
+
+        return await projectsStore.updateProjectSecret(projectId, existing.id!, updatePayload)
       }
       else {
-        return projectsStore.createProjectSecret(projectId, {
+        const createPayload: any = {
           key: secret.key,
           description: secret.description ?? "",
-          values: secret.values ?? [],
-        })
+          projectId,
+        }
+        createPayload.values = secret.values ?? []
+
+        return await projectsStore.createProjectSecret(projectId, createPayload)
       }
     }))
 
-    const failures = results.filter(result => result.status === "rejected")
-    if (failures.length > 0) {
-      return
-    }
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        failedCount++
+        const secretKey = importedSecrets[index]?.key || "Unknown"
+        errors.push(`Failed to import "${secretKey}": ${result.reason?.message || "Unknown error"}`)
+      }
+      else {
+        successCount++
+      }
+    })
 
-    results.filter(result => result.status === "fulfilled")
     await projectsStore.getProjectSecrets(projectId)
+
+    return { success: successCount, failed: failedCount, errors }
   }
 
-  const handleExportToEnv = async (env: string | null | undefined) => {
+  const handleExportToEnv = (env: string | null | undefined): { success: boolean, error?: string } => {
     if (!env) {
-      return
+      return { success: false, error: "Environment not specified" }
     }
 
     const filteredSecrets = projectsStore.secrets
@@ -67,20 +85,27 @@ export function useEnvFile(projectId: string) {
       .join("\n")
 
     if (!filteredSecrets) {
-      return
+      return { success: false, error: "No secrets found for this environment" }
     }
 
-    const blob = new Blob([filteredSecrets], { type: "text/plain" })
-    const projectName = project.value?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "") || "project"
-    const fileName = `.env.${projectName}.${env}`
-    const url = URL.createObjectURL(blob)
-    const a = Object.assign(document.createElement("a"), {
-      href: url,
-      download: fileName,
-    })
-    a.click()
+    try {
+      const blob = new Blob([filteredSecrets], { type: "text/plain" })
+      const projectName = project.value?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "") || "project"
+      const fileName = `.env.${projectName}.${env.toLowerCase()}`
+      const url = URL.createObjectURL(blob)
+      const a = Object.assign(document.createElement("a"), {
+        href: url,
+        download: fileName,
+      })
+      a.click()
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+      return { success: true }
+    }
+    catch (error: any) {
+      return { success: false, error: error?.message || "Failed to export secrets" }
+    }
   }
 
   return { handleImportFromEnv, handleExportToEnv }

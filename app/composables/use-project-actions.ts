@@ -1,9 +1,8 @@
-import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/lib/schemas/project"
-import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret"
+import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/lib/schemas/project-schema"
+import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret-schema"
 
 export function useProjectActions() {
   const projectStore = useProjectStore()
-  const router = useRouter()
 
   /**
    * Fetch all projects, optionally filtered by organization
@@ -35,7 +34,7 @@ export function useProjectActions() {
    */
   const deleteProject = async (projectId: string) => {
     await projectStore.deleteProject(projectId)
-    await router.push("/admin/projects")
+    await navigateTo("/admin/projects")
   }
 
   /**
@@ -118,24 +117,24 @@ export function useProjectActions() {
   const projectSecrets = computed(() => projectStore.secrets)
 
   /**
-   * Check if current project has members
-   */
-  const hasMembers = computed(() => {
-    return currentProject.value?.members && currentProject.value.members.length > 0
-  })
-
-  /**
-   * Check if current project has secrets
-   */
-  const hasSecrets = computed(() => {
-    return currentProject.value?.secrets && currentProject.value.secrets.length > 0
-  })
-
-  /**
    * Get member count for current project
    */
   const memberCount = computed(() => {
     return currentProject.value?.members?.length || 0
+  })
+
+  /**
+   * Check if current user is owner or admin of the project
+   */
+  const isOwner = computed(() => {
+    return projectStore.currentProject?.members.find((m: any) => m.userId === useUserStore().user?.id)?.role === "owner"
+  })
+
+  /**
+   * Check if current user is admin of the project
+   */
+  const isAdmin = computed(() => {
+    return projectStore.currentProject?.members.find((m: any) => m.userId === useUserStore().user?.id)?.role === "admin"
   })
 
   /**
@@ -155,36 +154,37 @@ export function useProjectActions() {
     })
   }
 
+  /**
+   * Loading state
+   */
+  const loading = computed(() => projectStore.loading)
+
+  /**
+   * Error state
+   */
+  const errors = computed(() => projectStore.errors)
+
   return {
-    // Store state
     currentProject,
     allProjects,
     projectSecrets,
-    loading: computed(() => projectStore.loading),
-    errors: computed(() => projectStore.errors),
-
-    // Project actions
+    memberCount,
+    secretCount,
+    isOwner,
+    isAdmin,
+    loading,
+    errors,
     fetchProjects,
     createProject,
     updateProject,
     deleteProject,
-
-    // Member actions
     addMember,
     updateMemberRole,
     removeMember,
-
-    // Secret actions
     fetchSecrets,
     createSecret,
     updateSecret,
     deleteSecret,
-
-    // Computed properties
-    hasMembers,
-    hasSecrets,
-    memberCount,
-    secretCount,
     getSecretsByEnvironment,
   }
 }
