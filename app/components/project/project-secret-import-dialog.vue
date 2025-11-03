@@ -10,7 +10,7 @@
       <div class="flex flex-col items-start gap-1">
         <span class="text-sm font-semibold">Environment</span>
         <select v-model="selectedEnv" class="w-full capitalize">
-          <option v-for="env in ['development', 'staging', 'production']" :key="env" :value="env" class="capitalize">
+          <option v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env" :value="env" class="capitalize">
             {{ env }}
           </option>
         </select>
@@ -21,7 +21,7 @@
 
       <footer class="flex flex-row items-center justify-between">
         <p class="text-warning">
-          {{ projectStore.errors.createProjectSecret || " " }}
+          {{ validationError || errors.createProjectSecret || " " }}
         </p>
 
         <div class="navigation-group">
@@ -46,13 +46,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void
-  (e: "save", secrets: Secret[]): void
+  (e: "save", secrets: Partial<Secret>[]): void
 }>()
 
-const projectStore = useProjectStore()
+const { errors } = useProjectActions()
 
 const envContent = ref("")
-const selectedEnv = ref<Environment>("development")
+const selectedEnv = ref<Environment>("DEVELOPMENT")
+const validationError = ref<string | null>(null)
 
 function parseEnv(text: string): Record<string, string> {
   const lines = text.split("\n")
@@ -83,11 +84,11 @@ function parseEnv(text: string): Record<string, string> {
 }
 
 function handleSubmit() {
-  projectStore.errors.createProjectSecret = null
+  validationError.value = null
 
   const parsed = parseEnv(envContent.value)
   if (!Object.entries(parsed).length) {
-    projectStore.errors.createProjectSecret = "No valid key-value pairs found."
+    validationError.value = "No valid key-value pairs found."
     return
   }
 
@@ -99,11 +100,11 @@ function handleSubmit() {
     }
   }
   if (duplicateKeys.length > 0) {
-    projectStore.errors.createProjectSecret = `The following keys already exist: ${duplicateKeys.join(", ")}`
+    validationError.value = `The following keys already exist: ${duplicateKeys.join(", ")}`
     return
   }
 
-  const payload: Secret[] = Object.entries(parsed).map(([key, value]) => {
+  const payload = Object.entries(parsed).map(([key, value]) => {
     const secretId = crypto.randomUUID()
     return {
       id: secretId,
@@ -118,7 +119,7 @@ function handleSubmit() {
         },
       ],
     }
-  })
+  }) as Partial<Secret>[]
 
   emit("save", payload)
   emit("close")
@@ -127,8 +128,8 @@ function handleSubmit() {
 watch(() => props.isOpen, (open) => {
   if (open) {
     envContent.value = ""
-    selectedEnv.value = "development"
-    projectStore.errors.createProjectSecret = null
+    selectedEnv.value = "DEVELOPMENT"
+    validationError.value = null
   }
 })
 </script>

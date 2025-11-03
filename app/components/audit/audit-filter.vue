@@ -85,9 +85,7 @@ const emit = defineEmits<{
 }>()
 
 const { auditLogs, pagination, filters, currentFilters, getActions, applyFilters, nextPage, prevPage, deleteLogs } = useAudit()
-const userStore = useUserStore()
-const auditStore = useAuditStore()
-const activeOrg = computed(() => userStore.activeOrg)
+const { activeOrg } = useUserActions()
 
 const dateFilter = ref("")
 const isUserDropdownOpen = ref(false)
@@ -169,12 +167,7 @@ async function handleDeleteLogs() {
     userId: currentFilters.value.userId,
   }
 
-  try {
-    await deleteLogs(activeOrg.value.id, deleteParams)
-  }
-  catch (err: any) {
-    auditStore.errors.deleteAuditLogs = err.message
-  }
+  await deleteLogs(activeOrg.value.id, deleteParams)
 }
 </script>
 

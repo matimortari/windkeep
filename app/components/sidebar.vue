@@ -54,7 +54,6 @@ const props = defineProps<{
 defineEmits(["update:isOpen"])
 
 const { allProjects, createProject, fetchProjects } = useProjectActions()
-const projectStore = useProjectStore()
 
 const isDialogOpen = ref(false)
 
@@ -68,27 +67,17 @@ const projectsFromOrg = computed(() => {
 })
 
 async function handleCreateProject(project: { name: string, slug: string, description: string }) {
-  try {
-    await createProject({
-      name: project.name,
-      slug: project.slug,
-      description: project.description || undefined,
-      organizationId: props.org!.id,
-    })
-    if (props.org?.id) {
-      await fetchProjects()
-    }
-    isDialogOpen.value = false
+  await createProject({
+    name: project.name,
+    slug: project.slug,
+    description: project.description || undefined,
+    organizationId: props.org!.id,
+  })
+  if (props.org?.id) {
+    await fetchProjects()
   }
-  catch (err: any) {
-    projectStore.errors.createProject = err.message
-  }
+  isDialogOpen.value = false
 }
-
-watch(isDialogOpen, (val) => {
-  if (val)
-    projectStore.errors.createProject = null
-})
 </script>
 
 <style scoped>
