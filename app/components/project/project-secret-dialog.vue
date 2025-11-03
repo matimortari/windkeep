@@ -32,7 +32,7 @@
 
       <footer class="flex flex-row items-center justify-between">
         <p class="text-warning">
-          {{ isUpdateMode ? projectStore.errors.updateProjectSecret || '' : projectStore.errors.createProjectSecret || '' }}
+          {{ validationError || (isUpdateMode ? errors.updateProjectSecret : errors.createProjectSecret) || '' }}
         </p>
 
         <div class="navigation-group">
@@ -43,7 +43,7 @@
             class="btn-success"
             type="submit"
             aria-label="Save Secret"
-            :disabled="projectStore.loading"
+            :disabled="loading"
           >
             Save
           </button>
@@ -67,14 +67,15 @@ const emit = defineEmits<{
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 
-const { createSecret, updateSecret } = useProjectActions()
-const projectStore = useProjectStore()
+const { createSecret, updateSecret, errors, loading } = useProjectActions()
 
 const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({
   key: "",
   description: "",
   values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
 })
+
+const validationError = ref<string | null>(null)
 
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
@@ -98,40 +99,31 @@ function resetForm() {
     }
   }
 
-  projectStore.errors.createProjectSecret = null
-  projectStore.errors.updateProjectSecret = null
+  validationError.value = null
 }
 
 async function handleSubmit() {
-  projectStore.errors.createProjectSecret = null
-  projectStore.errors.updateProjectSecret = null
+  validationError.value = null
 
   if (!form.value.key.trim()) {
-    const errorKey = isUpdateMode.value ? "updateProjectSecret" : "createProjectSecret"
-    projectStore.errors[errorKey] = "Secret key is required"
+    validationError.value = "Secret key is required"
     return
   }
 
-  try {
-    if (isUpdateMode.value) {
-      await updateSecret(props.projectId, props.selectedSecret!.id, {
-        description: form.value.description.trim(),
-      })
-    }
-    else {
-      await createSecret(props.projectId, {
-        key: form.value.key.trim(),
-        description: form.value.description.trim(),
-        projectId: props.projectId,
-      })
-    }
+  if (isUpdateMode.value) {
+    await updateSecret(props.projectId, props.selectedSecret!.id, {
+      description: form.value.description.trim(),
+    })
+  }
+  else {
+    await createSecret(props.projectId, {
+      key: form.value.key.trim(),
+      description: form.value.description.trim(),
+      projectId: props.projectId,
+    })
+  }
 
-    emit("close")
-  }
-  catch (err: any) {
-    const errorKey = isUpdateMode.value ? "updateProjectSecret" : "createProjectSecret"
-    projectStore.errors[errorKey] = err.message
-  }
+  emit("close")
 }
 
 watch(() => props.isOpen, (open) => {

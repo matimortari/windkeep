@@ -62,7 +62,6 @@
 <script setup lang="ts">
 const { activeOrg } = useUserActions()
 const { allProjects, createProject, fetchProjects } = useProjectActions()
-const projectStore = useProjectStore()
 
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
@@ -84,31 +83,21 @@ const filteredProjects = computed(() => {
 })
 
 async function handleCreateProject(payload: { name: string, slug: string, description: string }) {
-  try {
-    await createProject({
-      name: payload.name,
-      slug: payload.slug,
-      description: payload.description || undefined,
-      organizationId: activeOrg.value!.id,
-    })
-    if (activeOrg.value?.id) {
-      await fetchProjects()
-    }
-    isDialogOpen.value = false
+  await createProject({
+    name: payload.name,
+    slug: payload.slug,
+    description: payload.description || undefined,
+    organizationId: activeOrg.value!.id,
+  })
+  if (activeOrg.value?.id) {
+    await fetchProjects()
   }
-  catch (err: any) {
-    projectStore.errors.createProject = err.message
-  }
+  isDialogOpen.value = false
 }
 
 watch(activeOrg, async (newOrg) => {
   if (newOrg) {
-    try {
-      await fetchProjects()
-    }
-    catch (err: any) {
-      projectStore.errors.getProjects = err.message
-    }
+    await fetchProjects()
   }
 }, { immediate: true })
 
