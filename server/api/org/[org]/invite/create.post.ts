@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto"
 import db from "#server/lib/db"
 import { getInviteBaseUrl, getUserFromSession, requireOrgRole } from "#server/lib/utils"
-import { createInvitationSchema } from "#shared/lib/schemas/org"
+import { createInviteSchema } from "#shared/lib/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
-  const result = createInvitationSchema.safeParse({
+  const result = createInviteSchema.safeParse({
     ...body,
     organizationId: org,
   })
@@ -26,16 +26,17 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const existingMember = await db.organizationMembership.findUnique({
-    where: {
-      userId_organizationId: {
-        userId: result.data.email,
-        organizationId: org,
+  // Check if user already exists with this email
+  const existingUser = await db.user.findUnique({
+    where: { email: result.data.email },
+    include: {
+      memberships: {
+        where: { organizationId: org },
       },
     },
   })
 
-  if (existingMember) {
+  if (existingUser?.memberships && existingUser.memberships.length > 0) {
     throw createError({ statusCode: 409, statusMessage: "User is already a member of this organization" })
   }
 

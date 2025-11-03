@@ -1,6 +1,6 @@
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
-import { updateProjectSchema } from "#shared/lib/schemas/project"
+import { updateProjectSchema } from "#shared/lib/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -56,29 +56,7 @@ export default defineEventHandler(async (event) => {
       description: result.data.description,
     },
     include: {
-      organization: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      roles: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              image: true,
-            },
-          },
-        },
-      },
-      _count: {
-        select: {
-          secrets: true,
-        },
-      },
+      organization: true,
     },
   })
 

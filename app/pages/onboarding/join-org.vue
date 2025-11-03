@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 const route = useRoute()
-const { acceptInvitation, errors } = useOrganizationActions()
+const { acceptInvite, errors } = useOrganizationActions()
 
 const token = ref(route.query.token as string || "")
 const joinOrgSuccess = ref<string | null>(null)
@@ -49,7 +49,7 @@ async function handleAcceptInvite() {
   joinOrgSuccess.value = null
 
   try {
-    const res = await acceptInvitation(token.value, { token: token.value })
+    const res = await acceptInvite(token.value, { token: token.value })
     if (res) {
       joinOrgSuccess.value = "Invitation accepted! Redirecting."
       setTimeout(() => navigateTo("/admin/projects"), 2000)

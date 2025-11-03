@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  org?: Pick<Organization, "id" | "name"> & { role?: Role }
+  org?: Organization | null
   isOpen: boolean
 }>()
 
@@ -58,15 +58,10 @@ const { allProjects, createProject, fetchProjects } = useProjectActions()
 const isDialogOpen = ref(false)
 
 const projectsFromOrg = computed(() => {
-  if (!props.org?.id)
-    return []
-
-  return allProjects.value.filter(
-    project => project.organizationId === props.org!.id && typeof project.name === "string",
-  )
+  return allProjects.value.filter(project => typeof project.name === "string")
 })
 
-async function handleCreateProject(project: { name: string, slug: string, description: string }) {
+async function handleCreateProject(project: Pick<Project, "name" | "slug" | "description">) {
   await createProject({
     name: project.name,
     slug: project.slug,

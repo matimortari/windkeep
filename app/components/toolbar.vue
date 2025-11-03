@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  orgs: Array<Pick<Organization, "id" | "name"> & { role?: Role }>
+  orgs: Array<Organization>
   isSidebarOpen: boolean
 }>()
 

@@ -1,7 +1,7 @@
 import db from "#server/lib/db"
 import { encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
-import { updateSecretSchema } from "#shared/lib/schemas/secret"
+import { updateSecretSchema } from "#shared/lib/schemas/secret-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -68,14 +68,7 @@ export default defineEventHandler(async (event) => {
     where: { id: secret },
     data: updateData,
     include: {
-      values: {
-        select: {
-          id: true,
-          environment: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      },
+      values: true,
       project: {
         select: {
           id: true,

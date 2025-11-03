@@ -4,12 +4,12 @@ type Role = "OWNER" | "ADMIN" | "MEMBER"
 interface User {
   id: string
   email: string
-  name: string | null
+  name: string
   image?: string | null
   apiToken?: string | null
   activeOrgId?: string | null
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   accounts?: Account[]
   memberships?: OrganizationMembership[]
   projectRoles?: ProjectRole[]
@@ -20,8 +20,8 @@ interface User {
 interface Organization {
   id: string
   name: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   memberships?: OrganizationMembership[]
   projects?: Project[]
   invitations?: Invitation[]
@@ -32,10 +32,10 @@ interface OrganizationMembership {
   userId: string
   organizationId: string
   role: Role
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user?: User
-  organization?: Organization | Pick<Organization, "id" | "name">
+  organization?: Organization
 }
 
 interface Project {
@@ -44,8 +44,8 @@ interface Project {
   slug: string
   description?: string | null
   organizationId: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   organization?: Organization
   secrets?: Secret[]
   roles?: ProjectRole[]
@@ -56,8 +56,8 @@ interface ProjectRole {
   userId: string
   projectId: string
   role: Role
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user?: User
   project?: Project
 }
@@ -67,8 +67,8 @@ interface Secret {
   key: string
   description?: string | null
   projectId: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   project?: Project
   values?: SecretValue[]
 }
@@ -78,8 +78,8 @@ interface SecretValue {
   secretId: string
   environment: Environment
   value: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   secret?: Secret
 }
 
@@ -90,7 +90,7 @@ interface Invitation {
   role: Role
   token: string
   expiresAt: Date | string
-  createdAt: Date | string
+  createdAt?: Date | string
   organization?: Organization
   invitedById: string
   invitedBy?: User
@@ -102,10 +102,10 @@ interface AuditLog {
   organizationId?: string | null
   projectId?: string | null
   action: string
-  resource?: string
+  resource?: string | null
   metadata?: any
   description?: string | null
-  createdAt: Date | string
+  createdAt?: Date | string
   user?: User
   organization?: Organization | null
   project?: Project | null

@@ -1,6 +1,6 @@
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
-import { addProjectMemberSchema } from "#shared/lib/schemas/project"
+import { addProjectMemberSchema } from "#shared/lib/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)

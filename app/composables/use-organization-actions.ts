@@ -1,19 +1,17 @@
-import type { AcceptInvitationInput, CreateInvitationInput, CreateOrganizationInput, UpdateMemberRoleInput, UpdateOrganizationInput } from "#shared/lib/schemas/org"
+import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/lib/schemas/org-schema"
 
 export function useOrganizationActions() {
   const organizationStore = useOrganizationStore()
   const userStore = useUserStore()
-  const router = useRouter()
 
   /**
    * Create a new organization
    * @param data Organization creation data (name)
    */
-  const createOrganization = async (data: CreateOrganizationInput) => {
+  const createOrganization = async (data: CreateOrgInput) => {
     const org = await organizationStore.createOrg(data)
     if (org) {
       await userStore.getUser()
-      // Set the newly created org as active if user has no active org
       if (!userStore.user?.activeOrgId && org.id) {
         await userStore.setActiveOrg(org.id)
       }
@@ -26,7 +24,7 @@ export function useOrganizationActions() {
    * @param orgId Organization ID
    * @param data Organization data to update (name)
    */
-  const updateOrganization = async (orgId: string, data: UpdateOrganizationInput) => {
+  const updateOrganization = async (orgId: string, data: UpdateOrgInput) => {
     const org = await organizationStore.updateOrg(orgId, data)
     if (org) {
       await userStore.getUser()
@@ -42,7 +40,7 @@ export function useOrganizationActions() {
     await organizationStore.deleteOrg(orgId)
     await userStore.getUser()
     if (userStore.activeOrg?.id === orgId) {
-      await router.push("/onboarding/create-org")
+      await navigateTo("/onboarding/create-org")
     }
   }
 
@@ -52,7 +50,7 @@ export function useOrganizationActions() {
    * @param memberId Member ID
    * @param data Updated member data (role)
    */
-  const updateMemberRole = async (orgId: string, memberId: string, data: UpdateMemberRoleInput) => {
+  const updateMemberRole = async (orgId: string, memberId: string, data: UpdateOrgMemberInput) => {
     return await organizationStore.updateOrgMember(orgId, memberId, data)
   }
 
@@ -70,7 +68,7 @@ export function useOrganizationActions() {
    * @param orgId Organization ID
    * @param data Invitation data (email, role)
    */
-  const inviteMember = async (orgId: string, data: CreateInvitationInput) => {
+  const inviteMember = async (orgId: string, data: CreateInviteInput) => {
     return await organizationStore.createInvite(orgId, data)
   }
 
@@ -79,7 +77,7 @@ export function useOrganizationActions() {
    * @param orgId Organization ID
    * @param data Invitation acceptance data (token)
    */
-  const acceptInvitation = async (orgId: string, data: AcceptInvitationInput) => {
+  const acceptInvite = async (orgId: string, data: AcceptInviteInput) => {
     const org = await organizationStore.acceptInvite(orgId, data)
     if (org) {
       await userStore.getUser()
@@ -119,25 +117,46 @@ export function useOrganizationActions() {
     return currentOrganization.value?.members?.length || 0
   })
 
+  /**
+   * Check if current user is owner or admin of the organization
+   */
+  const isOwner = computed(() => {
+    return organizationStore.currentOrg?.memberships.find((m: any) => m.userId === userStore.user?.id)?.role === "owner"
+  })
+
+  /**
+   * Check if current user is admin of the organization
+   */
+  const isAdmin = computed(() => {
+    return organizationStore.currentOrg?.memberships.find((m: any) => m.userId === userStore.user?.id)?.role === "admin"
+  })
+
+  /**
+   * Loading state
+   */
+  const loading = computed(() => organizationStore.loading)
+
+  /**
+   * Error state
+   */
+  const errors = computed(() => organizationStore.errors)
+
   return {
-    // Store state
     currentOrganization,
     allOrganizations,
-    loading: computed(() => organizationStore.loading),
-    errors: computed(() => organizationStore.errors),
-
-    // Actions
+    loading,
+    errors,
+    hasMembers,
+    hasInvites,
+    memberCount,
+    isOwner,
+    isAdmin,
     createOrganization,
     updateOrganization,
     deleteOrganization,
     updateMemberRole,
     removeMember,
     inviteMember,
-    acceptInvitation,
-
-    // Computed properties
-    hasMembers,
-    hasInvites,
-    memberCount,
+    acceptInvite,
   }
 }
