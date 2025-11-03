@@ -42,7 +42,7 @@ export function useOrganizationActions() {
     await organizationStore.deleteOrg(orgId)
     await userStore.getUser()
     if (userStore.activeOrg?.id === orgId) {
-      await router.push("/")
+      await router.push("/onboarding/create-org")
     }
   }
 

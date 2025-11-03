@@ -176,9 +176,9 @@ const newMemberId = ref("")
 const newMemberRole = ref(ROLES[0]?.value ?? "member")
 
 const project = computed(() => allProjects.value.find(p => p.slug === slug))
-
-const isOwner = computed(() => project.value?.roles?.find((m: any) => m.userId === user.value?.id)?.role === "OWNER")
-const isAdmin = computed(() => project.value?.roles?.find((m: any) => m.userId === user.value?.id)?.role === "ADMIN")
+const currentUserRole = computed(() => project.value?.roles?.find((m: any) => m.userId === user.value?.id)?.role)
+const isOwner = computed(() => currentUserRole.value === "OWNER")
+const isAdmin = computed(() => currentUserRole.value === "ADMIN")
 
 const projectFields = [
   {
@@ -239,91 +239,65 @@ const copyIcon = projectFields.map(() => createActionHandler("ph:copy-bold"))
 const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 
 async function handleAddMember() {
-  errors.value.addProjectMember = null
   addMemberSuccess.value = null
-
-  if (!project.value?.id || !newMemberId.value.trim()) {
-    errors.value.addProjectMember = "User ID is required."
+  if (!project.value?.id || !newMemberId.value.trim())
     return
-  }
 
-  try {
-    await addMember(project.value.id, {
-      userId: newMemberId.value.trim(),
-      role: newMemberRole.value as Role,
-    })
+  const success = await addMember(project.value.id, {
+    userId: newMemberId.value.trim(),
+    role: newMemberRole.value as Role,
+  })
+
+  if (success) {
     await fetchProjects()
     addMemberSuccess.value = "Member added successfully."
     newMemberId.value = ""
     newMemberRole.value = ROLES[0]?.value ?? "member"
   }
-  catch (err: any) {
-    errors.value.addProjectMember = err.message
-  }
 }
 
 async function handleUpdateMemberRole(memberId: string, newRole: Role) {
-  errors.value.updateProjectMember = null
   if (!project.value?.id)
     return
 
-  try {
-    await updateMemberRole(project.value.id, memberId, { role: newRole })
+  const success = await updateMemberRole(project.value.id, memberId, { role: newRole })
+  if (success)
     await fetchProjects()
-  }
-  catch (err: any) {
-    errors.value.updateProjectMember = err.message
-  }
 }
 
 async function handleRemoveMember(memberId: string) {
-  errors.value.removeProjectMember = null
   if (!project.value?.id)
     return
   if (!confirm("Are you sure you want to remove this member?"))
     return
 
-  try {
-    await removeMember(project.value.id, memberId)
-    await fetchProjects()
-  }
-  catch (err: any) {
-    errors.value.removeProjectMember = err.message
-  }
+  await removeMember(project.value.id, memberId)
+  await fetchProjects()
 }
 
 async function handleSubmit(index: number) {
-  errors.value.updateProject = null
   if (!project.value?.id)
     return
 
-  try {
-    await updateProject(project.value.id, {
-      name: project.value?.name,
-      slug: project.value?.slug,
-      description: project.value?.description,
-    })
+  const success = await updateProject(project.value.id, {
+    name: project.value?.name,
+    slug: project.value?.slug,
+    description: project.value?.description,
+  })
+
+  if (success) {
     await fetchProjects()
     saveIcon[index]?.triggerSuccess()
-  }
-  catch (err: any) {
-    errors.value.updateProject = err.message
   }
 }
 
 async function handleDeleteProject() {
-  errors.value.deleteProject = null
   if (!project.value?.id)
     return
   if (!confirm("Are you sure you want to delete this project? This action cannot be undone."))
     return
 
-  try {
-    await deleteProject(project.value.id)
-  }
-  catch (err: any) {
-    errors.value.deleteProject = err.message
-  }
+  await deleteProject(project.value.id)
 }
 
 watch([project, activeOrg], ([proj, org]) => {
