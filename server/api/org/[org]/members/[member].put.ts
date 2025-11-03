@@ -1,6 +1,6 @@
 import db from "#server/lib/db"
 import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
-import { updateMemberRoleSchema } from "#shared/lib/schemas/org"
+import { updateMemberRoleSchema } from "#shared/lib/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)

@@ -1,6 +1,6 @@
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
-import { createOrganizationSchema } from "#shared/lib/schemas/org"
+import { createOrganizationSchema } from "#shared/lib/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)

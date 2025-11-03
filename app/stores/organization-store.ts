@@ -1,4 +1,4 @@
-import type { AcceptInviteInput, CreateOrgInput, InviteMemberInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/lib/schemas/org"
+import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/lib/schemas/org"
 
 export const useOrganizationStore = defineStore("org", () => {
   const organizations = ref<Organization[]>([])
@@ -29,7 +29,7 @@ export const useOrganizationStore = defineStore("org", () => {
 
     try {
       const res = await organizationService.createOrg(data)
-      organizations.value.push(res)
+      organizations.value.push(res as any)
       return res
     }
     catch (err: any) {
@@ -129,7 +129,7 @@ export const useOrganizationStore = defineStore("org", () => {
     }
   }
 
-  async function createInvite(orgId: string, data: InviteMemberInput) {
+  async function createInvite(orgId: string, data: CreateInviteInput) {
     loading.value = true
     errors.value.createInvite = null
 

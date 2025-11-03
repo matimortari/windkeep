@@ -5,7 +5,7 @@ import { del } from "@vercel/blob"
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
-  // Check if user is the owner of any organization
+  // Find organizations where user is the sole owner and delete them
   const ownedOrgs = await db.organizationMembership.findMany({
     where: {
       userId: user.id,
@@ -20,16 +20,11 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // If user is the sole owner of any organization, prevent deletion
   for (const membership of ownedOrgs) {
-    const ownerCount = membership.organization.memberships.filter(
-      m => m.role === "OWNER",
-    ).length
-
+    const ownerCount = membership.organization.memberships.filter(m => m.role === "OWNER").length
     if (ownerCount === 1) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: `Cannot delete account. You are the sole owner of organization "${membership.organization.name}". Please transfer ownership or delete the organization first.`,
+      await db.organization.delete({
+        where: { id: membership.organization.id },
       })
     }
   }
