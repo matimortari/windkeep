@@ -46,7 +46,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void
-  (e: "save", secrets: Partial<Secret>[]): void
+  (e: "save", secrets: Secret[]): void
 }>()
 
 const { errors } = useProjectActions()
@@ -110,16 +110,20 @@ function handleSubmit() {
       id: secretId,
       key,
       projectId: props.projectId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       values: [
         {
           id: crypto.randomUUID(),
           secretId,
           environment: selectedEnv.value,
           value,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
-    }
-  }) as Partial<Secret>[]
+    } as Secret
+  })
 
   emit("save", payload)
   emit("close")

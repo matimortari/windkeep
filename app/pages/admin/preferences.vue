@@ -166,45 +166,27 @@ async function handleUpdateImage(event: Event) {
   if (!file)
     return
 
-  try {
-    const res = await updateProfileImage(file)
-    if (res?.imageUrl && user.value) {
-      user.value.image = res.imageUrl
-    }
-  }
-  catch (err: any) {
-    console.error(err)
+  const res = await updateProfileImage(file)
+  if (res?.imageUrl && user.value) {
+    user.value.image = res.imageUrl
   }
 }
 
 async function handleSubmit(index: number) {
-  if (!user.value?.id)
+  if (!user.value?.id || !user.value?.name)
     return
-  if (!user.value?.name) {
-    return
-  }
 
-  try {
-    await updateProfile({
-      name: user.value.name,
-    })
-    saveIcon[index]?.triggerSuccess()
-  }
-  catch (err: any) {
-    console.error(err)
-  }
+  await updateProfile({
+    name: user.value.name,
+  })
+  saveIcon[index]?.triggerSuccess()
 }
 
 async function handleDeleteUser() {
   if (!confirm("Are you sure you want to delete your account? This action cannot be undone."))
     return
 
-  try {
-    await deleteAccount()
-  }
-  catch (err: any) {
-    console.error(err)
-  }
+  await deleteAccount()
 }
 
 useHead({

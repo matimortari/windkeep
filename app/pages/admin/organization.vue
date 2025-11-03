@@ -128,8 +128,8 @@
       </header>
 
       <div class="navigation-group self-end">
-        <p v-if="inviteError" class="text-warning">
-          {{ inviteError }}
+        <p v-if="orgErrors.createInvite" class="text-warning">
+          {{ orgErrors.createInvite }}
         </p>
         <p v-if="inviteSuccess" class="text-success">
           {{ inviteSuccess }}
@@ -164,8 +164,8 @@
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="leaveOrgError" class="text-warning">
-            {{ leaveOrgError }}
+          <p v-if="orgErrors.removeOrgMember" class="text-warning">
+            {{ orgErrors.removeOrgMember }}
           </p>
 
           <button class="btn-danger" aria-label="Leave Organization" @click="handleLeaveOrg">
@@ -186,8 +186,8 @@
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="deleteOrgError" class="text-warning">
-            {{ deleteOrgError }}
+          <p v-if="orgErrors.deleteOrg" class="text-warning">
+            {{ orgErrors.deleteOrg }}
           </p>
 
           <button class="btn-danger" aria-label="Delete Organization" @click="handleDeleteOrg">
@@ -207,9 +207,6 @@ const { updateOrganization, deleteOrganization, updateMemberRole, removeMember, 
 const { allProjects } = useProjectActions()
 
 const userRoles = ref<Record<string, Role>>({})
-const leaveOrgError = ref<string | null>(null)
-const deleteOrgError = ref<string | null>(null)
-const inviteError = ref<string | null>(null)
 const inviteSuccess = ref<string | null>(null)
 const orgProjects = computed(() => allProjects.value.filter(p => p.organizationId === activeOrg.value?.id))
 const orgMembers = computed(() => {
@@ -223,8 +220,9 @@ const orgMembers = computed(() => {
   }))
 })
 
-const isOwner = computed(() => orgMembers.value.find((m: any) => m.id === user.value?.id)?.role === "OWNER")
-const isAdmin = computed(() => orgMembers.value.find((m: any) => m.id === user.value?.id)?.role === "ADMIN")
+const currentUserRole = computed(() => orgMembers.value.find((m: any) => m.id === user.value?.id)?.role)
+const isOwner = computed(() => currentUserRole.value === "OWNER")
+const isAdmin = computed(() => currentUserRole.value === "ADMIN")
 
 const orgFields = [
   {
@@ -261,108 +259,73 @@ const copyIcon = orgFields.map(() => createActionHandler("ph:copy-bold"))
 const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 
 async function handleCreateInvite() {
-  orgErrors.value.createInvite = null
   inviteSuccess.value = null
-  if (!activeOrg.value?.id) {
-    orgErrors.value.createInvite = "Organization ID is required"
+  if (!activeOrg.value?.id)
     return
-  }
 
-  try {
-    const invite = await inviteMember(activeOrg.value.id, {
-      email: "",
-      organizationId: activeOrg.value.id,
-      role: "MEMBER",
-    }) as any
-    const baseUrl = getBaseUrl()
-    const inviteLink = `${baseUrl}/onboarding/join-org?token=${invite.invitation.token}`
+  const invite = await inviteMember(activeOrg.value.id, {
+    email: "",
+    organizationId: activeOrg.value.id,
+    role: "MEMBER",
+  }) as any
+
+  if (invite) {
+    const inviteLink = `${getBaseUrl()}/onboarding/join-org?token=${invite.invitation.token}`
     await navigator.clipboard.writeText(inviteLink)
     inviteSuccess.value = "Invite link copied to clipboard!"
-  }
-  catch (err: any) {
-    orgErrors.value.createInvite = err.message
   }
 }
 
 async function handleUpdateMemberRole(memberId: string, newRole: Role) {
-  orgErrors.value.updateOrgMember = null
   if (!activeOrg.value?.id)
     return
 
-  try {
-    await updateMemberRole(activeOrg.value.id, memberId, { role: newRole })
+  const success = await updateMemberRole(activeOrg.value.id, memberId, { role: newRole })
+  if (success)
     await fetchUser()
-  }
-  catch (err: any) {
-    orgErrors.value.updateOrgMember = err.message
-  }
 }
 
 async function handleRemoveMember(memberId: string) {
-  orgErrors.value.removeOrgMember = null
   if (!activeOrg.value?.id)
     return
   if (!confirm("Are you sure you want to remove this member?"))
     return
 
-  try {
-    await removeMember(activeOrg.value.id, memberId)
-    await fetchUser()
-  }
-  catch (err: any) {
-    orgErrors.value.removeOrgMember = err.message
-  }
+  await removeMember(activeOrg.value.id, memberId)
+  await fetchUser()
 }
 
 async function handleSubmit(index: number) {
-  orgErrors.value.updateOrg = null
   if (!activeOrg.value?.id)
     return
 
-  try {
-    await updateOrganization(activeOrg.value.id, {
-      name: activeOrg.value.name || "",
-    })
+  const success = await updateOrganization(activeOrg.value.id, {
+    name: activeOrg.value.name || "",
+  })
+
+  if (success) {
     await fetchUser()
     saveIcon[index]?.triggerSuccess()
-  }
-  catch (err: any) {
-    orgErrors.value.updateOrg = err.message
   }
 }
 
 async function handleLeaveOrg() {
-  orgErrors.value.removeOrgMember = null
-  if (!activeOrg.value?.id || !user.value?.id) {
-    orgErrors.value.removeOrgMember = "Missing organization or user ID."
+  if (!activeOrg.value?.id || !user.value?.id)
     return
-  }
   if (!confirm("Are you sure you want to leave this organization? This action cannot be undone."))
     return
 
-  try {
-    await removeMember(activeOrg.value.id, user.value.id)
-    await navigateTo("/onboarding/create-org")
-  }
-  catch (err: any) {
-    orgErrors.value.removeOrgMember = err.message
-  }
+  await removeMember(activeOrg.value.id, user.value.id)
+  await navigateTo("/onboarding/create-org")
 }
 
 async function handleDeleteOrg() {
-  orgErrors.value.deleteOrg = null
-  const orgId = activeOrg.value?.id
-  if (!orgId)
+  if (!activeOrg.value?.id)
     return
   if (!confirm("Are you sure you want to delete this organization? This action cannot be undone."))
     return
 
-  try {
-    await deleteOrganization(orgId)
-  }
-  catch (err: any) {
-    orgErrors.value.deleteOrg = err.message
-  }
+  await deleteOrganization(activeOrg.value.id)
 }
 
 watch(orgMembers, (users: Array<{ id?: string, role: string }>) => {
