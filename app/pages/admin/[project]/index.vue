@@ -71,7 +71,7 @@
 const route = useRoute()
 const slug = route.params.project
 const { activeOrg } = useUserActions()
-const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets, errors } = useProjectActions()
+const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets } = useProjectActions()
 
 const project = computed(() => allProjects.value.find(p => p.slug === slug) || null)
 const { handleImportFromEnv, handleExportToEnv } = useEnvFile(project.value?.id)
@@ -92,24 +92,21 @@ async function handleSubmit(secret: any) {
   dialogType.value = null
   selectedSecret.value = null
 
-  try {
-    if (secret.id) {
-      await updateSecret(project.value?.id, secret.id, {
+  if (!project.value?.id)
+    return
+
+  const success = secret.id
+    ? await updateSecret(project.value.id, secret.id, {
         description: secret.description ?? "",
       })
-    }
-    else {
-      await createSecret(project.value?.id, {
+    : await createSecret(project.value.id, {
         key: secret.key,
         description: secret.description ?? "",
-        projectId: project.value?.id,
+        projectId: project.value.id,
       })
-    }
-    await fetchSecrets(project.value?.id)
-  }
-  catch (err: any) {
-    errors.value.createProjectSecret = err.message
-  }
+
+  if (success)
+    await fetchSecrets(project.value.id)
 }
 
 watch([project, activeOrg], ([proj, org]) => {
