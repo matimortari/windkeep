@@ -30,7 +30,7 @@
 
       <footer class="flex flex-row items-center justify-between">
         <p class="text-warning">
-          {{ errors.createProject || " " }}
+          {{ validationError || errors.createProject || " " }}
         </p>
 
         <nav class="navigation-group">
@@ -57,7 +57,6 @@ const emit = defineEmits<{
 }>()
 
 const { errors } = useProjectActions()
-const projectStore = useProjectStore()
 
 const form = ref<{ name: string, slug: string, description: string }>({
   name: "",
@@ -65,11 +64,13 @@ const form = ref<{ name: string, slug: string, description: string }>({
   description: "",
 })
 
+const validationError = ref<string | null>(null)
+
 async function handleSubmit() {
-  projectStore.errors.createProject = null
+  validationError.value = null
 
   if (!form.value.name.trim()) {
-    projectStore.errors.createProject = "Project name is required"
+    validationError.value = "Project name is required"
     return
   }
 
@@ -88,7 +89,7 @@ watch(() => props.isOpen, (open) => {
     form.value.name = ""
     form.value.slug = ""
     form.value.description = ""
-    projectStore.errors.createProject = null
+    validationError.value = null
   }
 }, { immediate: true })
 </script>
