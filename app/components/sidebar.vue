@@ -53,12 +53,12 @@ const props = defineProps<{
 
 defineEmits(["update:isOpen"])
 
-const { allProjects, createProject, fetchProjects } = useProjectActions()
+const { activeOrgProjects, createProject, fetchProjects } = useProjectActions()
 
 const isDialogOpen = ref(false)
 
 const projectsFromOrg = computed(() => {
-  return allProjects.value.filter(project => typeof project.name === "string")
+  return activeOrgProjects.value.filter(project => typeof project.name === "string")
 })
 
 async function handleCreateProject(project: Pick<Project, "name" | "slug" | "description">) {
