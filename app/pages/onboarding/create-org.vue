@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { createOrganizationSchema } from "#shared/lib/schemas/org"
+import { createOrganizationSchema } from "#shared/lib/schemas/org-schema"
 
 const { user, fetchUser } = useUserActions()
 const { createOrganization, errors } = useOrganizationActions()
@@ -54,29 +54,12 @@ async function handleCreateOrg() {
 
   const result = createOrganizationSchema.safeParse(localOrg.value)
   if (!result.success) {
-    const firstError = result.error.issues[0]
-    if (firstError?.path[0] === "name") {
-      if (firstError?.code === "too_small") {
-        errors.value.createOrg = "Organization name must be at least 2 characters long."
-      }
-      else if (firstError?.code === "too_big") {
-        errors.value.createOrg = "Organization name must be no more than 100 characters long."
-      }
-    }
-    else {
-      errors.value.createOrg = firstError?.message ?? "An unknown error occurred."
-    }
+    errors.value.createOrg = result.error.flatten().fieldErrors.name?.[0] ?? "Invalid organization name."
     return
   }
 
-  try {
-    await createOrganization(result.data)
-    localOrg.value.name = ""
-    navigateTo("/admin/projects")
-  }
-  catch (err: any) {
-    errors.value.createOrg = err.message
-  }
+  await createOrganization(result.data)
+  navigateTo("/admin/projects")
 }
 
 onMounted(async () => {

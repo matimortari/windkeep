@@ -134,10 +134,10 @@ async function handleSubmit(secret: any) {
 }
 
 watch([project, activeOrg], ([proj, org]) => {
-  if (proj && org && proj.organization?.id !== org.id) {
-    useRouter().push("/admin/projects")
+  if (proj && org && proj.organizationId && proj.organizationId !== org.id) {
+    navigateTo("/admin/projects")
   }
-}, { immediate: true })
+}, { immediate: false })
 
 watch(() => project.value?.id, async (id: string | undefined) => {
   if (!id)

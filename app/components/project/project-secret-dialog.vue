@@ -15,10 +15,7 @@
           :disabled="isUpdateMode"
         >
         <span class="text-muted-foreground text-xs">
-          Must contain only uppercase letters, numbers, and underscores (e.g., API_KEY, DATABASE_URL).
-        </span>
-        <span v-if="normalizedKeyPreview && normalizedKeyPreview !== form.key" class="text-accent text-xs">
-          Will be saved as: <strong>{{ normalizedKeyPreview }}</strong>
+          The name for the secret.
         </span>
       </div>
 
@@ -87,12 +84,6 @@ const form = ref<{ key: string, description: string, values: Record<Environment,
 const validationError = ref<string | null>(null)
 
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
-
-const normalizedKeyPreview = computed(() => {
-  if (isUpdateMode.value || !form.value.key)
-    return ""
-  return normalizeKey(form.value.key)
-})
 
 function resetForm() {
   if (props.selectedSecret) {
