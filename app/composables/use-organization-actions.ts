@@ -4,6 +4,33 @@ export function useOrganizationActions() {
   const organizationStore = useOrganizationStore()
   const userStore = useUserStore()
 
+  const currentOrganization = computed(() => organizationStore.currentOrg)
+  const allOrganizations = computed(() => organizationStore.organizations)
+  const loading = computed(() => organizationStore.loading)
+  const errors = computed(() => organizationStore.errors)
+
+  const hasMembers = computed(() => {
+    return currentOrganization.value?.members && currentOrganization.value.members.length > 0
+  })
+
+  const hasInvites = computed(() => {
+    return currentOrganization.value?.invites && currentOrganization.value.invites.length > 0
+  })
+
+  const memberCount = computed(() => {
+    return currentOrganization.value?.members?.length || 0
+  })
+
+  const isOwner = computed(() => {
+    const org = userStore.activeOrg || organizationStore.currentOrg
+    return org?.memberships?.find((m: any) => m.userId === userStore.user?.id)?.role === "OWNER"
+  })
+
+  const isAdmin = computed(() => {
+    const org = userStore.activeOrg || organizationStore.currentOrg
+    return org?.memberships?.find((m: any) => m.userId === userStore.user?.id)?.role === "ADMIN"
+  })
+
   /**
    * Create a new organization
    * @param data Organization creation data (name)
@@ -12,9 +39,7 @@ export function useOrganizationActions() {
     const org = await organizationStore.createOrg(data)
     if (org) {
       await userStore.getUser()
-      if (!userStore.user?.activeOrgId && org.id) {
-        await userStore.setActiveOrg(org.id)
-      }
+      await userStore.setActiveOrg(org.id)
     }
     return org
   }
@@ -85,61 +110,6 @@ export function useOrganizationActions() {
     }
     return org
   }
-
-  /**
-   * Get current organization details
-   */
-  const currentOrganization = computed(() => organizationStore.currentOrg)
-
-  /**
-   * Get all organizations
-   */
-  const allOrganizations = computed(() => organizationStore.organizations)
-
-  /**
-   * Check if current organization has members
-   */
-  const hasMembers = computed(() => {
-    return currentOrganization.value?.members && currentOrganization.value.members.length > 0
-  })
-
-  /**
-   * Check if current organization has invites
-   */
-  const hasInvites = computed(() => {
-    return currentOrganization.value?.invites && currentOrganization.value.invites.length > 0
-  })
-
-  /**
-   * Get member count for current organization
-   */
-  const memberCount = computed(() => {
-    return currentOrganization.value?.members?.length || 0
-  })
-
-  /**
-   * Check if current user is owner or admin of the organization
-   */
-  const isOwner = computed(() => {
-    return organizationStore.currentOrg?.memberships.find((m: any) => m.userId === userStore.user?.id)?.role === "owner"
-  })
-
-  /**
-   * Check if current user is admin of the organization
-   */
-  const isAdmin = computed(() => {
-    return organizationStore.currentOrg?.memberships.find((m: any) => m.userId === userStore.user?.id)?.role === "admin"
-  })
-
-  /**
-   * Loading state
-   */
-  const loading = computed(() => organizationStore.loading)
-
-  /**
-   * Error state
-   */
-  const errors = computed(() => organizationStore.errors)
 
   return {
     currentOrganization,

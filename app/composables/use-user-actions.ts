@@ -2,12 +2,28 @@ import type { UpdateUserInput } from "#shared/lib/schemas/user-schema"
 
 export function useUserActions() {
   const userStore = useUserStore()
+  const { clear } = useUserSession()
+
+  const user = computed(() => userStore.user)
+  const activeOrg = computed(() => userStore.activeOrg)
+  const loading = computed(() => userStore.loading)
+  const errors = computed(() => userStore.errors)
 
   /**
    * Fetch and initialize user data
    */
   const fetchUser = async () => {
-    await userStore.getUser()
+    try {
+      await userStore.getUser()
+      if (!userStore.user) {
+        await clear()
+        await navigateTo("/", { replace: true })
+      }
+    }
+    catch {
+      await clear()
+      await navigateTo("/", { replace: true })
+    }
   }
 
   /**
@@ -16,6 +32,9 @@ export function useUserActions() {
    */
   const switchOrganization = async (orgId: string) => {
     await userStore.setActiveOrg(orgId)
+    if (import.meta.client) {
+      window.location.reload()
+    }
   }
 
   /**
@@ -35,32 +54,13 @@ export function useUserActions() {
   }
 
   /**
-   * Delete user account and redirect to sign-in page
+   * Delete user account and session cookies
    */
   const deleteAccount = async () => {
     await userStore.deleteUser()
-    await navigateTo("/sign-in")
+    await clear()
+    await navigateTo("/")
   }
-
-  /**
-   * User getter
-   */
-  const user = computed(() => userStore.user)
-
-  /**
-   * Active organization getter
-   */
-  const activeOrg = computed(() => userStore.activeOrg)
-
-  /**
-   * Loading state
-   */
-  const loading = computed(() => userStore.loading)
-
-  /**
-   * Error state
-   */
-  const errors = computed(() => userStore.errors)
 
   return {
     user,

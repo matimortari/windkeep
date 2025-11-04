@@ -28,7 +28,7 @@
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown scroll-area -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
               <li
-                v-for="env in ['development', 'staging', 'production']" :key="env"
+                v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env"
                 role="menuitem" class="hover:bg-muted rounded p-2 capitalize"
                 @click="handleExport(env)"
               >

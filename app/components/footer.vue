@@ -60,7 +60,6 @@ const footerSections = [
             { label: "Sign out", action: signOut },
           ]
       ),
-
     ],
   },
   {

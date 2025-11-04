@@ -94,7 +94,6 @@ async function setActiveOrg(orgId: string) {
   try {
     isDropdownOpen.value = false
     await switchOrganization(orgId)
-    await navigateTo(route.fullPath, { replace: true })
   }
   catch (err: any) {
     errors.value.setActiveOrg = err.message
