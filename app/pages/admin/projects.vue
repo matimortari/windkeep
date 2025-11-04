@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 const { activeOrg } = useUserActions()
-const { allProjects, createProject, fetchProjects } = useProjectActions()
+const { activeOrgProjects, createProject, fetchProjects } = useProjectActions()
 
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
@@ -71,7 +71,7 @@ const sort = ref<{ key: string, direction: "asc" | "desc" }>({
 })
 
 const filteredProjects = computed(() => {
-  const filtered = allProjects.value.filter(project =>
+  const filtered = activeOrgProjects.value.filter(project =>
     typeof project.name === "string" && project.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 

@@ -169,7 +169,7 @@ const route = useRoute()
 const slug = route.params.project
 const { createActionHandler } = useActionIcon()
 const { user, activeOrg } = useUserActions()
-const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, removeMember, fetchProjects, isOwner, isAdmin, errors } = useProjectActions()
+const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, removeMember, fetchProjects, isOwner, isAdmin, errors, setCurrentProject } = useProjectActions()
 
 const addMemberSuccess = ref<string | null>(null)
 const newMemberId = ref("")
@@ -296,6 +296,12 @@ async function handleDeleteProject() {
 
   await deleteProject(project.value.id)
 }
+
+watch(() => project.value?.id, (id) => {
+  if (id) {
+    setCurrentProject(id)
+  }
+}, { immediate: true })
 
 watch([project, activeOrg], ([proj, org]) => {
   if (proj && org && proj.organizationId && proj.organizationId !== org.id) {

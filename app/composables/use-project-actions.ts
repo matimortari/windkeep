@@ -3,9 +3,27 @@ import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/s
 
 export function useProjectActions() {
   const projectStore = useProjectStore()
+  const userStore = useUserStore()
+
+  const currentProject = computed(() => projectStore.currentProject)
+  const allProjects = computed(() => projectStore.projects)
+  const projectSecrets = computed(() => projectStore.secrets)
+  const loading = computed(() => projectStore.loading)
+  const errors = computed(() => projectStore.errors)
 
   /**
-   * Fetch all projects, optionally filtered by organization
+   * Get projects filtered by the active organization
+   */
+  const activeOrgProjects = computed(() => {
+    const activeOrgId = userStore.activeOrg?.id
+    if (!activeOrgId) {
+      return []
+    }
+    return projectStore.projects.filter((project: any) => project.organizationId === activeOrgId)
+  })
+
+  /**
+   * Fetch all projects
    */
   const fetchProjects = async () => {
     await projectStore.getProjects()
@@ -102,21 +120,6 @@ export function useProjectActions() {
   }
 
   /**
-   * Get current project details
-   */
-  const currentProject = computed(() => projectStore.currentProject)
-
-  /**
-   * Get all projects
-   */
-  const allProjects = computed(() => projectStore.projects)
-
-  /**
-   * Get current project secrets
-   */
-  const projectSecrets = computed(() => projectStore.secrets)
-
-  /**
    * Get member count for current project
    */
   const memberCount = computed(() => {
@@ -124,18 +127,22 @@ export function useProjectActions() {
   })
 
   /**
-   * Check if current user is owner or admin of the project
+   * Check if current user is owner of a project
+   * @param projectId Optional project ID. If not provided, uses currentProject
    */
-  const isOwner = computed(() => {
-    return projectStore.currentProject?.members.find((m: any) => m.userId === useUserStore().user?.id)?.role === "owner"
-  })
+  const isOwner = (projectId?: string) => {
+    const project = projectStore.projects.find((p: any) => p.id === projectId)
+    return project?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "OWNER"
+  }
 
   /**
-   * Check if current user is admin of the project
+   * Check if current user is admin of a project
+   * @param projectId Optional project ID. If not provided, uses currentProject
    */
-  const isAdmin = computed(() => {
-    return projectStore.currentProject?.members.find((m: any) => m.userId === useUserStore().user?.id)?.role === "admin"
-  })
+  const isAdmin = (projectId?: string) => {
+    const project = projectStore.projects.find((p: any) => p.id === projectId)
+    return project?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "ADMIN"
+  }
 
   /**
    * Get secret count for current project
@@ -154,19 +161,10 @@ export function useProjectActions() {
     })
   }
 
-  /**
-   * Loading state
-   */
-  const loading = computed(() => projectStore.loading)
-
-  /**
-   * Error state
-   */
-  const errors = computed(() => projectStore.errors)
-
   return {
     currentProject,
     allProjects,
+    activeOrgProjects,
     projectSecrets,
     memberCount,
     secretCount,
