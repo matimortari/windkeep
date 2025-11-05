@@ -73,7 +73,7 @@ model OrganizationMembership {
 model Project {
   id             String        @id @default(cuid())
   name           String
-  slug           String        @unique
+  slug           String
   description    String?
   organizationId String
   createdAt      DateTime      @default(now())
@@ -82,6 +82,8 @@ model Project {
   secrets        Secret[]
   roles          ProjectRole[]
   auditLogs      AuditLog[]
+
+  @@unique([slug, organizationId])
 }
 
 model ProjectRole {

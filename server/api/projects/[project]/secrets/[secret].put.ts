@@ -1,5 +1,5 @@
 import db from "#server/lib/db"
-import { encrypt } from "#server/lib/encryption"
+import { decrypt, encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 import { updateSecretSchema } from "#shared/lib/schemas/secret-schema"
 
@@ -39,8 +39,8 @@ export default defineEventHandler(async (event) => {
     updateData.description = result.data.description
   }
 
-  if (body.values && Array.isArray(body.values)) {
-    for (const val of body.values) {
+  if (result.data.values && Array.isArray(result.data.values)) {
+    for (const val of result.data.values) {
       if (!val.environment || !val.value) {
         continue
       }
@@ -78,5 +78,11 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return updatedSecret
+  return {
+    ...updatedSecret,
+    values: updatedSecret.values.map(val => ({
+      ...val,
+      value: decrypt(val.value),
+    })),
+  }
 })
