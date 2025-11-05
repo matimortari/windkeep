@@ -127,22 +127,18 @@ export function useProjectActions() {
   })
 
   /**
-   * Check if current user is owner of a project
-   * @param projectId Optional project ID. If not provided, uses currentProject
+   * Check if current user is owner of the current project
    */
-  const isOwner = (projectId?: string) => {
-    const project = projectStore.projects.find((p: any) => p.id === projectId)
-    return project?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "OWNER"
-  }
+  const isOwner = computed(() => {
+    return currentProject.value?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "OWNER"
+  })
 
   /**
-   * Check if current user is admin of a project
-   * @param projectId Optional project ID. If not provided, uses currentProject
+   * Check if current user is admin of the current project
    */
-  const isAdmin = (projectId?: string) => {
-    const project = projectStore.projects.find((p: any) => p.id === projectId)
-    return project?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "ADMIN"
-  }
+  const isAdmin = computed(() => {
+    return currentProject.value?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "ADMIN"
+  })
 
   /**
    * Get secret count for current project
@@ -161,6 +157,14 @@ export function useProjectActions() {
     })
   }
 
+  /**
+   * Set the current project by ID
+   * @param projectId Project ID to set as current, or null to clear
+   */
+  const setCurrentProject = (projectId: string | null) => {
+    projectStore.setCurrentProject(projectId)
+  }
+
   return {
     currentProject,
     allProjects,
@@ -168,10 +172,10 @@ export function useProjectActions() {
     projectSecrets,
     memberCount,
     secretCount,
-    isOwner,
-    isAdmin,
     loading,
     errors,
+    isOwner,
+    isAdmin,
     fetchProjects,
     createProject,
     updateProject,
@@ -184,5 +188,6 @@ export function useProjectActions() {
     updateSecret,
     deleteSecret,
     getSecretsByEnvironment,
+    setCurrentProject,
   }
 }
