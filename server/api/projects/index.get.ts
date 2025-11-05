@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   const projects = await db.project.findMany({
     where: {
-      OR: [
+      AND: [
         { organization: { memberships: { some: { userId: user.id } } } },
         { roles: { some: { userId: user.id } } },
       ],

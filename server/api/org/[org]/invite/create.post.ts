@@ -27,34 +27,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check if user already exists with this email
-  const existingUser = await db.user.findUnique({
-    where: { email: result.data.email },
-    include: {
-      memberships: {
-        where: { organizationId: org },
-      },
-    },
-  })
-
-  if (existingUser?.memberships && existingUser.memberships.length > 0) {
-    throw createError({ statusCode: 409, statusMessage: "User is already a member of this organization" })
-  }
-
-  // Check if there's already a pending invitation
-  const existingInvitation = await db.invitation.findFirst({
-    where: {
-      email: result.data.email,
-      organizationId: org,
-      expiresAt: {
-        gt: new Date(),
-      },
-    },
-  })
-  if (existingInvitation) {
-    throw createError({ statusCode: 409, statusMessage: "An invitation for this email already exists" })
-  }
-
   // Generate invitation token
   const token = randomBytes(32).toString("hex")
   const expiresAt = new Date()
@@ -62,9 +34,7 @@ export default defineEventHandler(async (event) => {
 
   const invitation = await db.invitation.create({
     data: {
-      email: result.data.email,
       organizationId: org,
-      role: result.data.role || "MEMBER",
       token,
       expiresAt,
       invitedById: user.id,
@@ -94,12 +64,11 @@ export default defineEventHandler(async (event) => {
     action: "organization.invite.created",
     resource: "organization_invite",
     metadata: {
-      inviteeEmail: invitation.email,
-      role: invitation.role,
       organizationName: invitation.organization.name,
       expiresAt: invitation.expiresAt.toISOString(),
+      tokenPrefix: token.substring(0, 8),
     },
-    description: `Invited ${invitation.email} to join organization "${invitation.organization.name}" as ${invitation.role}`,
+    description: `Created invite link for organization "${invitation.organization.name}"`,
     event,
   })
 
