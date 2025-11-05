@@ -25,7 +25,6 @@
         </p>
       </div>
 
-      <!-- Project Details -->
       <div v-for="(field, index) in projectFields" :key="index" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
@@ -47,7 +46,12 @@
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
-          <input class="w-full" type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
+          <input
+            class="w-full"
+            type="text"
+            :value="field.model?.value"
+            @input="field.update?.(($event.target as HTMLInputElement).value)"
+          >
           <button class="btn" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
@@ -73,9 +77,9 @@
               </div>
             </div>
 
-            <nav v-if="(isOwner || isAdmin) && member.userId !== user?.id && member.role !== 'owner'" class="navigation-group justify-end md:w-1/3" aria-label="Project Member Actions">
+            <nav v-if="(isOwner || isAdmin) && member.userId !== user?.id && member.role !== 'OWNER'" class="navigation-group justify-end md:w-1/3" aria-label="Project Member Actions">
               <select v-model="member.role">
-                <option v-for="role in ROLES.filter(r => r.value !== 'owner')" :key="role.value" :value="role.value" class="capitalize">
+                <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value" class="capitalize">
                   {{ role.label }}
                 </option>
               </select>
@@ -83,7 +87,7 @@
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(member.userId, member.role)">
                 <icon name="ph:floppy-disk-bold" size="15" />
               </button>
-              <button v-if="isOwner && String(member.role) !== 'owner'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(member.userId)">
+              <button v-if="isOwner && String(member.role) !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(member.userId)">
                 <icon name="ph:x-bold" size="15" />
               </button>
             </nav>
@@ -107,7 +111,7 @@
         <div class="flex flex-row items-center gap-2">
           <input v-model="newMemberId" type="text" placeholder="User ID" class="w-48">
           <select v-model="newMemberRole" class="md:min-w-[120px]">
-            <option v-for="role in [...ROLES].reverse().filter(r => r.value !== 'owner')" :key="role.value" :value="role.value">
+            <option v-for="role in [...ROLES].reverse().filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
               {{ role.label }}
             </option>
           </select>
@@ -129,7 +133,7 @@
     </section>
 
     <!-- Danger Zone -->
-    <section v-if="isOwner" class="flex flex-col">
+    <section class="flex flex-col">
       <header class="flex flex-col items-start gap-1 border-b p-4 text-start">
         <h3>
           Danger Zone
@@ -139,7 +143,29 @@
         </p>
       </header>
 
-      <nav class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Delete Project">
+      <nav v-if="!isOwner" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Leave Project">
+        <header class="flex flex-col gap-1">
+          <h5>
+            Leave Project
+          </h5>
+          <p class="text-warning">
+            This action is irreversible. You will no longer have access to this project.
+          </p>
+        </header>
+
+        <div class="navigation-group self-end">
+          <p v-if="errors.removeProjectMember" class="text-warning">
+            {{ errors.removeProjectMember }}
+          </p>
+
+          <button class="btn-danger" aria-label="Leave Project" @click="handleLeaveProject">
+            <icon name="ph:sign-out-bold" size="20" />
+            <span>Confirm</span>
+          </button>
+        </div>
+      </nav>
+
+      <nav v-if="isOwner" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Delete Project">
         <header class="flex flex-col gap-1">
           <h5>
             Delete Project
@@ -173,7 +199,11 @@ const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, 
 
 const addMemberSuccess = ref<string | null>(null)
 const newMemberId = ref("")
-const newMemberRole = ref(ROLES[0]?.value ?? "member")
+const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
+
+const localProjectName = ref("")
+const localProjectSlug = ref("")
+const localProjectDescription = ref("")
 
 const project = computed(() => allProjects.value.find(p => p.slug === slug))
 
@@ -182,10 +212,9 @@ const projectFields = [
     label: "Project Name",
     description: "The name of your project.",
     type: "input",
-    model: computed(() => project.value?.name),
+    model: computed(() => localProjectName.value),
     update: (value: string) => {
-      if (project.value)
-        project.value.name = value
+      localProjectName.value = value
     },
     onSave: handleSubmit,
     editable: isOwner,
@@ -198,12 +227,11 @@ const projectFields = [
   },
   {
     label: "Project Slug",
-    description: "This slug is used in the URL to access your project.",
+    description: "This slug is used in the URL to access your project. Lowercase alphanumeric with hyphens only.",
     type: "input",
-    model: computed(() => project.value?.slug),
+    model: computed(() => localProjectSlug.value),
     update: (value: string) => {
-      if (project.value)
-        project.value.slug = value
+      localProjectSlug.value = value
     },
     onSave: handleSubmit,
     editable: isOwner,
@@ -212,10 +240,9 @@ const projectFields = [
     label: "Project Description",
     description: "Briefly describe the purpose or content of this project.",
     type: "input",
-    model: computed(() => project.value?.description),
+    model: computed(() => localProjectDescription.value),
     update: (value: string) => {
-      if (project.value)
-        project.value.description = value
+      localProjectDescription.value = value
     },
     onSave: handleSubmit,
     editable: isOwner,
@@ -249,7 +276,7 @@ async function handleAddMember() {
     await fetchProjects()
     addMemberSuccess.value = "Member added successfully."
     newMemberId.value = ""
-    newMemberRole.value = ROLES[0]?.value ?? "member"
+    newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
   }
 }
 
@@ -276,15 +303,23 @@ async function handleSubmit(index: number) {
   if (!project.value?.id)
     return
 
+  const oldSlug = project.value.slug
+  const newSlug = localProjectSlug.value
+
   const success = await updateProject(project.value.id, {
-    name: project.value?.name,
-    slug: project.value?.slug,
-    description: project.value?.description,
+    name: localProjectName.value,
+    slug: localProjectSlug.value,
+    description: localProjectDescription.value,
   })
 
   if (success) {
     await fetchProjects()
     saveIcon[index]?.triggerSuccess()
+
+    // If slug was changed, navigate to the new URL
+    if (oldSlug !== newSlug) {
+      await navigateTo(`/admin/${newSlug}/settings`)
+    }
   }
 }
 
@@ -296,6 +331,32 @@ async function handleDeleteProject() {
 
   await deleteProject(project.value.id)
 }
+
+async function handleLeaveProject() {
+  if (!project.value?.id || !user.value?.id)
+    return
+  if (!confirm("Are you sure you want to leave this project? This action cannot be undone."))
+    return
+
+  await removeMember(project.value.id, user.value.id)
+  await navigateTo("/admin/projects")
+}
+
+// Redirect if user is not a member of the project
+watch([project, allProjects], ([proj, projects]) => {
+  if (projects.length > 0 && !proj) {
+    navigateTo("/admin/projects", { replace: true })
+  }
+}, { immediate: true })
+
+// Initialize local state when project loads
+watch(() => project.value, (proj) => {
+  if (proj) {
+    localProjectName.value = proj.name
+    localProjectSlug.value = proj.slug
+    localProjectDescription.value = proj.description || ""
+  }
+}, { immediate: true })
 
 watch(() => project.value?.id, (id) => {
   if (id) {

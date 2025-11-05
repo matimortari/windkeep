@@ -75,9 +75,9 @@ export const SIDEBAR_NAV_LINKS = [
 ]
 
 export const ROLES = [
-  { value: "owner", label: "Owner" },
-  { value: "admin", label: "Admin" },
-  { value: "member", label: "Member" },
+  { value: "OWNER", label: "Owner" },
+  { value: "ADMIN", label: "Admin" },
+  { value: "MEMBER", label: "Member" },
 ]
 
 export const ENVIRONMENTS = [
