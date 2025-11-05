@@ -13,6 +13,14 @@ export const createSecretSchema = z.object({
     .transform(val => val.trim())
     .optional(),
   projectId: z.cuid(),
+  values: z
+    .array(
+      z.object({
+        environment: z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"]),
+        value: z.string().min(1, "Secret value is required"),
+      }),
+    )
+    .optional(),
 })
 
 export const updateSecretSchema = z.object({
@@ -22,6 +30,14 @@ export const updateSecretSchema = z.object({
     .transform(val => val.trim())
     .optional()
     .nullable(),
+  values: z
+    .array(
+      z.object({
+        environment: z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"]),
+        value: z.string().min(1, "Secret value is required"),
+      }),
+    )
+    .optional(),
 })
 
 export const createSecretValueSchema = z.object({

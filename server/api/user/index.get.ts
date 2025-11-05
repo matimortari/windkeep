@@ -11,7 +11,22 @@ export default defineEventHandler(async (event) => {
         select: {
           role: true,
           organizationId: true,
-          organization: true,
+          organization: {
+            include: {
+              memberships: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                      email: true,
+                      image: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
       projectRoles: {

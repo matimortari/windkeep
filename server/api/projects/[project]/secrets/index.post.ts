@@ -1,5 +1,5 @@
 import db from "#server/lib/db"
-import { encrypt } from "#server/lib/encryption"
+import { decrypt, encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 import { createSecretSchema } from "#shared/lib/schemas/secret-schema"
 
@@ -43,9 +43,9 @@ export default defineEventHandler(async (event) => {
     projectId: project,
   }
 
-  if (body.values && Array.isArray(body.values)) {
+  if (result.data.values && Array.isArray(result.data.values)) {
     secretData.values = {
-      create: body.values.map((val: any) => ({
+      create: result.data.values.map((val: any) => ({
         environment: val.environment,
         value: encrypt(val.value),
       })),
@@ -55,14 +55,7 @@ export default defineEventHandler(async (event) => {
   const secret = await db.secret.create({
     data: secretData,
     include: {
-      values: {
-        select: {
-          id: true,
-          environment: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      },
+      values: true,
       project: {
         select: {
           id: true,
@@ -72,5 +65,11 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return secret
+  return {
+    ...secret,
+    values: secret.values.map(val => ({
+      ...val,
+      value: decrypt(val.value),
+    })),
+  }
 })
