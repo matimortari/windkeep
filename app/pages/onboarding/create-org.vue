@@ -54,7 +54,7 @@ async function handleCreateOrg() {
 
   const result = createOrganizationSchema.safeParse(localOrg.value)
   if (!result.success) {
-    errors.value.createOrg = result.error.flatten().fieldErrors.name?.[0] ?? "Invalid organization name."
+    errors.value.createOrg = "Organization name must be at least 2 characters long."
     return
   }
 
