@@ -2,6 +2,7 @@ import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
 import { acceptInviteSchema } from "#shared/lib/schemas/org-schema"
+import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -9,11 +10,7 @@ export default defineEventHandler(async (event) => {
 
   const result = acceptInviteSchema.safeParse(body)
   if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid input",
-      data: result.error.flatten().fieldErrors,
-    })
+    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
   const invitation = await db.invitation.findUnique({
