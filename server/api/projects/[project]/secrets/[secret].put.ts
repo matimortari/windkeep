@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { decrypt, encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
@@ -25,7 +26,11 @@ export default defineEventHandler(async (event) => {
 
   const existingSecret = await db.secret.findUnique({
     where: { id: secret },
-    select: { projectId: true },
+    select: {
+      projectId: true,
+      key: true,
+      description: true,
+    },
   })
   if (!existingSecret) {
     throw createError({ statusCode: 404, statusMessage: "Secret not found" })
@@ -73,9 +78,35 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
+          organizationId: true,
         },
       },
     },
+  })
+
+  const changes = []
+  if (result.data.description !== undefined && result.data.description !== existingSecret.description) {
+    changes.push("description")
+  }
+  if (result.data.values && result.data.values.length > 0) {
+    changes.push(`${result.data.values.length} environment value(s)`)
+  }
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: updatedSecret.project.organizationId,
+    projectId: project,
+    action: "secret.updated",
+    resource: "secret",
+    metadata: {
+      secretId: updatedSecret.id,
+      secretKey: updatedSecret.key,
+      projectName: updatedSecret.project.name,
+      changedFields: changes,
+      updatedEnvironments: result.data.values?.map(v => v.environment) || [],
+    },
+    description: `Updated secret "${updatedSecret.key}" in project "${updatedSecret.project.name}" (${changes.join(", ")})`,
+    event,
   })
 
   return {
