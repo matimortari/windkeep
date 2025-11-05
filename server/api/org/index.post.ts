@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
 import { createOrganizationSchema } from "#shared/lib/schemas/org-schema"
@@ -39,6 +40,18 @@ export default defineEventHandler(async (event) => {
         },
       },
     },
+  })
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: organization.id,
+    action: "organization.created",
+    resource: "organization",
+    metadata: {
+      organizationName: organization.name,
+    },
+    description: `Created organization "${organization.name}"`,
+    event,
   })
 
   return organization

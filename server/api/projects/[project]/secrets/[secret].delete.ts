@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 
@@ -17,6 +18,12 @@ export default defineEventHandler(async (event) => {
       id: true,
       key: true,
       projectId: true,
+      project: {
+        select: {
+          name: true,
+          organizationId: true,
+        },
+      },
       _count: {
         select: {
           values: true,
@@ -34,6 +41,22 @@ export default defineEventHandler(async (event) => {
   // Delete the secret (cascade will handle secret values)
   await db.secret.delete({
     where: { id: secret },
+  })
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: secretData.project.organizationId,
+    projectId: project,
+    action: "secret.deleted",
+    resource: "secret",
+    metadata: {
+      secretId: secretData.id,
+      secretKey: secretData.key,
+      projectName: secretData.project.name,
+      valuesDeleted: secretData._count.values,
+    },
+    description: `Deleted secret "${secretData.key}" from project "${secretData.project.name}" (${secretData._count.values} value(s) deleted)`,
+    event,
   })
 
   return {

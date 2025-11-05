@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 import { updateProjectMemberSchema } from "#shared/lib/schemas/project-schema"
@@ -67,9 +68,28 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
+          organizationId: true,
         },
       },
     },
+  })
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: updatedRole.project.organizationId,
+    projectId: project,
+    action: "project.member.role_updated",
+    resource: "project_member",
+    metadata: {
+      targetUserId: updatedRole.user.id,
+      targetUserEmail: updatedRole.user.email,
+      targetUserName: updatedRole.user.name,
+      oldRole: targetRole.role,
+      newRole: updatedRole.role,
+      projectName: updatedRole.project.name,
+    },
+    description: `Updated ${updatedRole.user.name} (${updatedRole.user.email}) role from ${targetRole.role} to ${updatedRole.role} in project "${updatedRole.project.name}"`,
+    event,
   })
 
   return updatedRole
