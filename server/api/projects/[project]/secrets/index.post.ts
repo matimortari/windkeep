@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { decrypt, encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
@@ -60,9 +61,27 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
+          organizationId: true,
         },
       },
     },
+  })
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: secret.project.organizationId,
+    projectId: project,
+    action: "secret.created",
+    resource: "secret",
+    metadata: {
+      secretId: secret.id,
+      secretKey: secret.key,
+      projectName: secret.project.name,
+      environmentCount: secret.values.length,
+      environments: secret.values.map(v => v.environment),
+    },
+    description: `Created secret "${secret.key}" in project "${secret.project.name}" with ${secret.values.length} environment(s)`,
+    event,
   })
 
   return {

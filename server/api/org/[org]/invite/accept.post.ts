@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
 import { acceptInviteSchema } from "#shared/lib/schemas/org-schema"
@@ -79,6 +80,21 @@ export default defineEventHandler(async (event) => {
       where: { id: invitation.id },
     }),
   ])
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: invitation.organizationId,
+    action: "organization.invite.accepted",
+    resource: "organization_invite",
+    metadata: {
+      role: membership.role,
+      organizationName: membership.organization.name,
+      userName: membership.user.name,
+      userEmail: membership.user.email,
+    },
+    description: `${membership.user.name} (${membership.user.email}) accepted invitation and joined organization "${membership.organization.name}" as ${membership.role}`,
+    event,
+  })
 
   return membership
 })

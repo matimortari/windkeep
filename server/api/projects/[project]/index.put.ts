@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 import { updateProjectSchema } from "#shared/lib/schemas/project-schema"
@@ -23,7 +24,12 @@ export default defineEventHandler(async (event) => {
 
   const existingProject = await db.project.findUnique({
     where: { id: project },
-    select: { organizationId: true },
+    select: {
+      organizationId: true,
+      name: true,
+      slug: true,
+      description: true,
+    },
   })
   if (!existingProject) {
     throw createError({ statusCode: 404, statusMessage: "Project not found" })
@@ -59,6 +65,35 @@ export default defineEventHandler(async (event) => {
     include: {
       organization: true,
     },
+  })
+
+  const changes = []
+  if (result.data.name && result.data.name !== existingProject.name) {
+    changes.push(`name: "${existingProject.name}" → "${result.data.name}"`)
+  }
+  if (result.data.slug && result.data.slug !== existingProject.slug) {
+    changes.push(`slug: "${existingProject.slug}" → "${result.data.slug}"`)
+  }
+  if (result.data.description !== undefined && result.data.description !== existingProject.description) {
+    changes.push("description")
+  }
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: updatedProject.organizationId,
+    projectId: project,
+    action: "project.updated",
+    resource: "project",
+    metadata: {
+      projectName: updatedProject.name,
+      oldName: existingProject.name,
+      newName: result.data.name,
+      oldSlug: existingProject.slug,
+      newSlug: result.data.slug,
+      changedFields: changes,
+    },
+    description: `Updated project "${updatedProject.name}" (${changes.length > 0 ? changes.join(", ") : "no changes"})`,
+    event,
   })
 
   return updatedProject

@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto"
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getInviteBaseUrl, getUserFromSession, requireOrgRole } from "#server/lib/utils"
 import { createInviteSchema } from "#shared/lib/schemas/org-schema"
@@ -86,6 +87,21 @@ export default defineEventHandler(async (event) => {
   })
 
   const inviteUrl = `${getInviteBaseUrl(event)}/onboarding/join-org?token=${token}`
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: org,
+    action: "organization.invite.created",
+    resource: "organization_invite",
+    metadata: {
+      inviteeEmail: invitation.email,
+      role: invitation.role,
+      organizationName: invitation.organization.name,
+      expiresAt: invitation.expiresAt.toISOString(),
+    },
+    description: `Invited ${invitation.email} to join organization "${invitation.organization.name}" as ${invitation.role}`,
+    event,
+  })
 
   return { invitation, inviteUrl }
 })

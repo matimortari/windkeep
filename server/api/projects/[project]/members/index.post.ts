@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 import { addProjectMemberSchema } from "#shared/lib/schemas/project-schema"
@@ -93,6 +94,23 @@ export default defineEventHandler(async (event) => {
         },
       },
     },
+  })
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: project.organizationId,
+    projectId,
+    action: "project.member.added",
+    resource: "project_member",
+    metadata: {
+      targetUserId: projectRole.user.id,
+      targetUserEmail: projectRole.user.email,
+      targetUserName: projectRole.user.name,
+      role: projectRole.role,
+      projectName: projectRole.project.name,
+    },
+    description: `Added ${projectRole.user.name} (${projectRole.user.email}) as ${projectRole.role} to project "${projectRole.project.name}"`,
+    event,
   })
 
   return projectRole

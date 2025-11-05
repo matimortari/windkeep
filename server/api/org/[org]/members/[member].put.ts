@@ -1,3 +1,4 @@
+import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
 import { updateMemberRoleSchema } from "#shared/lib/schemas/org-schema"
@@ -59,7 +60,29 @@ export default defineEventHandler(async (event) => {
           image: true,
         },
       },
+      organization: {
+        select: {
+          name: true,
+        },
+      },
     },
+  })
+
+  await createAuditLog({
+    userId: user.id,
+    organizationId: org,
+    action: "organization.member.role_updated",
+    resource: "organization_member",
+    metadata: {
+      targetUserId: updatedMembership.user.id,
+      targetUserEmail: updatedMembership.user.email,
+      targetUserName: updatedMembership.user.name,
+      oldRole: targetMembership.role,
+      newRole: updatedMembership.role,
+      organizationName: updatedMembership.organization.name,
+    },
+    description: `Updated ${updatedMembership.user.name} (${updatedMembership.user.email}) role from ${targetMembership.role} to ${updatedMembership.role} in organization "${updatedMembership.organization.name}"`,
+    event,
   })
 
   return updatedMembership

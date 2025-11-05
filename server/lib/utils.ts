@@ -48,21 +48,6 @@ export async function requireProjectRole(userId: string, projectId: string, role
   return membership
 }
 
-export async function createAuditLog({ userId, organizationId, projectId, action, description, req }: any) {
-  const ip = req?.headers?.["x-forwarded-for"] || req?.socket?.remoteAddress || null
-  const userAgent = req?.headers?.["user-agent"] || null
-
-  await db.auditLog.create({
-    data: {
-      userId,
-      organizationId,
-      projectId,
-      action,
-      description: description || `${action} - IP: ${ip || "unknown"}, User-Agent: ${userAgent || "unknown"}`,
-    },
-  })
-}
-
 export function getInviteBaseUrl(event: any) {
   const protocol = event.req.headers["x-forwarded-proto"] || "http"
   const host = event.req.headers.host
