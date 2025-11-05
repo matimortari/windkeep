@@ -133,6 +133,13 @@ async function handleSubmit(secret: any) {
     await fetchSecrets(project.value.id)
 }
 
+// Redirect if user is not a member of the project
+watch([project, allProjects], ([proj, projects]) => {
+  if (projects.length > 0 && !proj) {
+    navigateTo("/admin/projects", { replace: true })
+  }
+}, { immediate: true })
+
 watch([project, activeOrg], ([proj, org]) => {
   if (proj && org && proj.organizationId && proj.organizationId !== org.id) {
     navigateTo("/admin/projects")
