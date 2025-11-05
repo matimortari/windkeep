@@ -4,24 +4,17 @@ import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const org = getRouterParam(event, "org")
-  if (!org) {
+  if (!org)
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
-  }
 
   await requireOrgRole(user.id, org, ["OWNER"])
 
-  const body = await readBody(event)
-  const olderThan = body.olderThan as string | undefined
-  const projectId = body.projectId as string | undefined
-  const userId = body.userId as string | undefined
-  const action = body.action as string | undefined
+  const body = (await readBody(event).catch(() => ({}))) || {}
 
-  // Build filter
-  const where: any = {
-    organizationId: org,
-  }
+  const { olderThan, projectId, userId, action } = body as Record<string, string | undefined>
 
-  // Delete logs older than specified date
+  const where: any = { organizationId: org }
+
   if (olderThan) {
     const date = new Date(olderThan)
     if (Number.isNaN(date.getTime())) {
@@ -30,20 +23,12 @@ export default defineEventHandler(async (event) => {
     where.createdAt = { lt: date }
   }
 
-  // Delete logs for specific project
-  if (projectId) {
+  if (projectId)
     where.projectId = projectId
-  }
-
-  // Delete logs for specific user
-  if (userId) {
+  if (userId)
     where.userId = userId
-  }
-
-  // Delete logs for specific action
-  if (action) {
+  if (action)
     where.action = { contains: action, mode: "insensitive" }
-  }
 
   const result = await db.auditLog.deleteMany({ where })
 

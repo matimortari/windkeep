@@ -24,9 +24,7 @@ export const updateMemberRoleSchema = z.object({
 })
 
 export const createInviteSchema = z.object({
-  email: z.email("Invalid email address").transform(val => val.trim().toLowerCase()),
   organizationId: z.cuid(),
-  role: z.enum(["OWNER", "ADMIN", "MEMBER"]).optional().default("MEMBER"),
 })
 
 export const acceptInviteSchema = z.object({

@@ -33,9 +33,6 @@ export default defineEventHandler(async (event) => {
   if (invitation.expiresAt < new Date()) {
     throw createError({ statusCode: 410, statusMessage: "Invitation has expired" })
   }
-  if (invitation.email !== user.email) {
-    throw createError({ statusCode: 403, statusMessage: "This invitation was sent to a different email address" })
-  }
 
   const existingMembership = await db.organizationMembership.findUnique({
     where: {
@@ -57,7 +54,7 @@ export default defineEventHandler(async (event) => {
       data: {
         userId: user.id,
         organizationId: invitation.organizationId,
-        role: invitation.role,
+        role: "MEMBER",
       },
       include: {
         organization: {
@@ -87,12 +84,11 @@ export default defineEventHandler(async (event) => {
     action: "organization.invite.accepted",
     resource: "organization_invite",
     metadata: {
-      role: membership.role,
       organizationName: membership.organization.name,
       userName: membership.user.name,
       userEmail: membership.user.email,
     },
-    description: `${membership.user.name} (${membership.user.email}) accepted invitation and joined organization "${membership.organization.name}" as ${membership.role}`,
+    description: `${membership.user.name} (${membership.user.email}) joined organization "${membership.organization.name}" via invite link`,
     event,
   })
 

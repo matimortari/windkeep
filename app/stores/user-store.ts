@@ -21,7 +21,19 @@ export const useUserStore = defineStore("user", () => {
       user.value = userData as User
       if (user.value?.activeOrgId) {
         const membership = user.value.memberships?.find(m => m.organizationId === user.value?.activeOrgId)
-        activeOrg.value = membership?.organization || null
+        if (membership?.organization) {
+          // Ensure we have the full organization data with all memberships
+          activeOrg.value = {
+            ...membership.organization,
+            memberships: membership.organization.memberships || [],
+          }
+        }
+        else {
+          activeOrg.value = null
+        }
+      }
+      else {
+        activeOrg.value = null
       }
     }
     catch (err: any) {
@@ -43,7 +55,16 @@ export const useUserStore = defineStore("user", () => {
     try {
       await userService.updateUser({ activeOrgId: orgId })
       const membership = user.value.memberships?.find(org => org.organizationId === orgId)
-      activeOrg.value = membership?.organization || null
+      if (membership?.organization) {
+        // Ensure we have the full organization data with all memberships
+        activeOrg.value = {
+          ...membership.organization,
+          memberships: membership.organization.memberships || [],
+        }
+      }
+      else {
+        activeOrg.value = null
+      }
     }
     catch (err: any) {
       errors.value.setActiveOrg = err?.message || "Failed to set active organization"

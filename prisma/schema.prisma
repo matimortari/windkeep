@@ -125,9 +125,7 @@ model SecretValue {
 
 model Invitation {
   id             String       @id @default(cuid())
-  email          String
   organizationId String
-  role           Role         @default(MEMBER)
   token          String       @unique
   expiresAt      DateTime
   createdAt      DateTime     @default(now())

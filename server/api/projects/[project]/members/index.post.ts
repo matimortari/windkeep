@@ -5,7 +5,7 @@ import { addProjectMemberSchema } from "#shared/lib/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const projectId = getRouterParam(event, "projectId")
+  const projectId = getRouterParam(event, "project")
 
   if (!projectId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
