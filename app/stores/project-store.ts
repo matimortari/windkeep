@@ -278,6 +278,17 @@ export const useProjectStore = defineStore("project", () => {
     }
   }
 
+  function setCurrentProject(projectId: string | null) {
+    if (projectId === null) {
+      currentProject.value = null
+      return
+    }
+    const project = projects.value.find(p => p.id === projectId)
+    if (project) {
+      currentProject.value = project
+    }
+  }
+
   return {
     loading,
     errors,
@@ -295,5 +306,6 @@ export const useProjectStore = defineStore("project", () => {
     createProjectSecret,
     updateProjectSecret,
     deleteProjectSecret,
+    setCurrentProject,
   }
 })
