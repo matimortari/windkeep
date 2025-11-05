@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 const { activeOrg } = useUserActions()
-const { fetchAuditLogs, loading } = useAudit()
+const { fetchAuditLogs, loading } = useAuditActions()
 
 const showSensitiveInfo = ref(false)
 
