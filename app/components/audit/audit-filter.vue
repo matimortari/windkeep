@@ -28,7 +28,7 @@
 
       <div ref="actionDropdownRef" class="relative">
         <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
-          <span>{{ getActions.find(a => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
+          <span>{{ getActions.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
           <icon name="ph:caret-down-bold" size="15" />
         </button>
         <transition name="dropdown">
@@ -84,7 +84,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: boolean]
 }>()
 
-const { auditLogs, pagination, filters, currentFilters, getActions, applyFilters, nextPage, prevPage, deleteLogs } = useAudit()
+const { auditLogs, pagination, filters, currentFilters, getActions, applyFilters, nextPage, prevPage, deleteLogs } = useAuditActions()
 const { activeOrg } = useUserActions()
 
 const dateFilter = ref("")
@@ -108,7 +108,7 @@ function getUserDisplayName(userId?: string) {
   if (!userId)
     return "All Users"
 
-  const user = availableUsers.value.find(u => u.id === userId)
+  const user = availableUsers.value.find((u: { id: string, name: string | null, email: string }) => u.id === userId)
   return user?.name || user?.email
 }
 
