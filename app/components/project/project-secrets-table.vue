@@ -81,7 +81,7 @@ const emit = defineEmits(["edit", "deleted", "update"])
 const { deleteSecret } = useProjectActions()
 
 const visibleKeys = ref<Record<string, boolean>>({})
-const environments = ref(["development", "staging", "production"])
+const environments = ref(["DEVELOPMENT", "STAGING", "PRODUCTION"])
 const sort = ref<{ key: string, direction: "asc" | "desc" }>({
   key: "key",
   direction: "asc",

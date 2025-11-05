@@ -132,9 +132,17 @@ async function handleSubmit() {
     return
   }
 
+  const values = Object.entries(form.value.values)
+    .filter(([_, value]) => value.trim() !== "")
+    .map(([environment, value]) => ({
+      environment: environment as Environment,
+      value: value.trim(),
+    }))
+
   if (isUpdateMode.value) {
     await updateSecret(props.projectId, props.selectedSecret!.id, {
       description: form.value.description.trim(),
+      values,
     })
   }
   else {
@@ -142,6 +150,7 @@ async function handleSubmit() {
       key: normalizedKey,
       description: form.value.description.trim(),
       projectId: props.projectId,
+      values,
     })
   }
 
