@@ -3,6 +3,7 @@ import db from "#server/lib/db"
 import { decrypt, encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 import { updateSecretSchema } from "#shared/lib/schemas/secret-schema"
+import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -17,11 +18,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateSecretSchema.safeParse(body)
   if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid input",
-      data: result.error.flatten().fieldErrors,
-    })
+    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
   const existingSecret = await db.secret.findUnique({

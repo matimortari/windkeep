@@ -1,6 +1,7 @@
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
 import { updateUserSchema } from "#shared/lib/schemas/user-schema"
+import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -8,11 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const result = updateUserSchema.safeParse(body)
   if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid input",
-      data: result.error.flatten().fieldErrors,
-    })
+    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
   // If activeOrgId is being updated, verify user is a member of that organization
