@@ -20,15 +20,16 @@ export default defineEventHandler(async (event) => {
   // Check if project with same name or slug already exists in this organization
   const conflictingProject = await db.project.findFirst({
     where: {
+      organizationId: result.data.organizationId,
       OR: [
-        { name: result.data.name, organizationId: result.data.organizationId },
+        { name: result.data.name },
         { slug: result.data.slug },
       ],
     },
   })
   if (conflictingProject) {
     if (conflictingProject.slug === result.data.slug) {
-      throw createError({ statusCode: 409, statusMessage: "A project with this slug already exists" })
+      throw createError({ statusCode: 409, statusMessage: "A project with this slug already exists in the organization" })
     }
     throw createError({ statusCode: 409, statusMessage: "A project with this name already exists in the organization" })
   }

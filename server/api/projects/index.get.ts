@@ -13,7 +13,18 @@ export default defineEventHandler(async (event) => {
     },
     include: {
       organization: true,
-      roles: true,
+      roles: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+      },
       secrets: true,
     },
     orderBy: {
