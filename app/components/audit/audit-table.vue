@@ -33,25 +33,21 @@
 
         <!-- Data rows -->
         <tr v-for="log in auditLogs" v-else :key="log.id" class="hover:bg-muted border text-sm">
-          <td class="max-w-sm truncate border p-2 md:max-w-24" :title="actions.find(a => a.value === log.action)?.label">
-            {{ actions.find(a => a.value === log.action)?.label }}
+          <td class="border p-2" :title="getActionLabel(log.action)">
+            <div class="navigation-group max-w-xs truncate">
+              <icon :name="getResourceIcon(log.resource ?? null)" size="16" />
+              <span class="text-caption">{{ getActionLabel(log.action) }}</span>
+            </div>
           </td>
-          <td class="text-caption max-w-sm truncate border p-2 md:max-w-28" :title="log.resource">
-            {{ log.resource }}
+          <td class="text-caption max-w-md truncate border p-2 md:max-w-96" :title="log.description || 'No description'">
+            {{ log.description || 'No description' }}
           </td>
-          <td class="text-caption max-w-md truncate border p-2 md:max-w-60" :title="plainMetadata(log.metadata)">
-            <span v-html="formatMetadata(log.metadata)" />
-          </td>
-          <td class="text-caption max-w-sm truncate border p-2 md:max-w-24" :title="log.user?.name || log.user?.email">
+          <td class="text-caption max-w-sm truncate border p-2 md:max-w-32" :title="log.user?.name || log.user?.email">
             {{ log.user?.name || log.user?.email }}
           </td>
-          <td class="text-caption max-w-sm truncate border p-2 md:max-w-32" :title="formatDate(log.createdAt)">
-            {{ formatDate(log.createdAt) }}
+          <td class="text-caption max-w-sm truncate border p-2 md:max-w-40" :title="log.createdAt ? formatDate(log.createdAt) : 'N/A'">
+            {{ log.createdAt ? formatDate(log.createdAt) : 'N/A' }}
           </td>
-          <!-- <td class="text-caption max-w-sm truncate border p-2 md:max-w-24" :title="showSensitiveInfo ? formatSensitiveData(log.metadata, 1000) : 'Hidden'">
-            <span v-if="showSensitiveInfo" v-html="formatSensitiveData(log.metadata, 1000)" />
-            <span v-else>Hidden</span>
-          </td> -->
         </tr>
       </tbody>
     </table>
@@ -59,19 +55,7 @@
 </template>
 
 <script setup lang="ts">
-// defineProps<{
-//   showSensitiveInfo?: boolean
-// }>()
-
-// formatSensitiveData
-
-const { auditLogs, loading, formatDate, formatMetadata, getTableHeaders, getActions } = useAudit()
+const { auditLogs, loading, formatDate, getTableHeaders, getActionLabel, getResourceIcon } = useAuditActions()
 
 const tableHeaders = getTableHeaders()
-const actions = getActions
-
-function plainMetadata(metadata: any) {
-  const html = formatMetadata(metadata)
-  return html.replace(/<[^>]*>?/g, "")
-}
 </script>
