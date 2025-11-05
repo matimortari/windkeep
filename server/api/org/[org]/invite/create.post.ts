@@ -3,6 +3,7 @@ import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getInviteBaseUrl, getUserFromSession, requireOrgRole } from "#server/lib/utils"
 import { createInviteSchema } from "#shared/lib/schemas/org-schema"
+import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -18,13 +19,8 @@ export default defineEventHandler(async (event) => {
     ...body,
     organizationId: org,
   })
-
   if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid input",
-      data: result.error.flatten().fieldErrors,
-    })
+    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
   // Generate invitation token

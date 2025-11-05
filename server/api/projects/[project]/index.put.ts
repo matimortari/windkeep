@@ -2,6 +2,7 @@ import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
 import { updateProjectSchema } from "#shared/lib/schemas/project-schema"
+import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -15,11 +16,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid input",
-      data: result.error.flatten().fieldErrors,
-    })
+    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
   const existingProject = await db.project.findUnique({
