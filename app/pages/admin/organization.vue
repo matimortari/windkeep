@@ -41,18 +41,20 @@
           </button>
         </div>
 
-        <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
+        <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
           <input class="w-full" type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
 
+        <span v-else-if="field.type === 'input'" class="navigation-group justify-end">{{ field.model?.value }}</span>
+
         <span v-else class="navigation-group justify-end">{{ field.value }}</span>
       </div>
 
       <!-- Organization Projects List -->
-      <section v-if="isOwner || isAdmin" class="flex flex-col justify-between border-b p-4 md:px-10">
+      <section class="flex flex-col justify-between border-b p-4 md:px-10">
         <h5>
           Organization Projects
         </h5>
@@ -72,7 +74,7 @@
               <nuxt-link :to="`/admin/${project?.slug}`" class="btn">
                 <icon name="ph:eye-bold" size="15" />
               </nuxt-link>
-              <nuxt-link :to="`/admin/${project?.slug}/settings`" class="btn">
+              <nuxt-link v-if="isOwner || isAdmin" :to="`/admin/${project?.slug}/settings`" class="btn">
                 <icon name="ph:gear-bold" size="15" />
               </nuxt-link>
             </nav>
@@ -99,7 +101,7 @@
 
             <nav v-if="isOwner && orgUser.id !== user?.id" class="navigation-group justify-end" aria-label="Organization Member Actions">
               <select v-model="userRoles[orgUser.id as string]">
-                <option v-for="role in ROLES.filter(r => r.value !== 'owner')" :key="role.value" :value="role.value" class="capitalize">
+                <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value" class="capitalize">
                   {{ role.label }}
                 </option>
               </select>
@@ -259,15 +261,12 @@ async function handleCreateInvite() {
   if (!activeOrg.value?.id)
     return
 
-  const invite = await inviteMember(activeOrg.value.id, {
-    email: "",
+  const result = await inviteMember(activeOrg.value.id, {
     organizationId: activeOrg.value.id,
-    role: "MEMBER",
-  }) as any
+  })
 
-  if (invite) {
-    const inviteLink = `${getBaseUrl()}/onboarding/join-org?token=${invite.invitation.token}`
-    await navigator.clipboard.writeText(inviteLink)
+  if (result?.inviteUrl) {
+    await navigator.clipboard.writeText(result.inviteUrl)
     inviteSuccess.value = "Invite link copied to clipboard!"
   }
 }

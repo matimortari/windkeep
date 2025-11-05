@@ -3,7 +3,11 @@
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="name" class="text-sm font-semibold">Project Name</label>
-        <input id="name" v-model="form.name" type="text" class="w-full">
+        <input
+          id="name" v-model="form.name"
+          type="text" class="w-full"
+          required
+        >
       </div>
 
       <div class="flex flex-col items-start gap-1">
@@ -13,10 +17,10 @@
           v-model="form.slug"
           type="text"
           class="w-full"
-          :placeholder="form.name.trim().toLowerCase().replace(/\s+/g, '-')"
+          :placeholder="suggestedSlug"
         >
         <span class="text-muted-foreground text-xs">
-          This will be used in the project URL.
+          Used in project URL. Lowercase alphanumeric with hyphens only.
         </span>
       </div>
 
@@ -30,7 +34,7 @@
 
       <footer class="flex flex-row items-center justify-between">
         <p class="text-warning">
-          {{ validationError || errors.createProject || " " }}
+          {{ errors.createProject || " " }}
         </p>
 
         <nav class="navigation-group">
@@ -64,19 +68,24 @@ const form = ref<{ name: string, slug: string, description: string }>({
   description: "",
 })
 
-const validationError = ref<string | null>(null)
+const suggestedSlug = computed(() => {
+  if (!form.value.name)
+    return "my-project"
+  return form.value.name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+})
 
 async function handleSubmit() {
-  validationError.value = null
-
-  if (!form.value.name.trim()) {
-    validationError.value = "Project name is required"
-    return
-  }
+  const finalSlug = form.value.slug.trim() || suggestedSlug.value
 
   const payload = {
     name: form.value.name.trim(),
-    slug: form.value.slug.trim() || form.value.name.trim().toLowerCase().replace(/\s+/g, "-"),
+    slug: finalSlug,
     description: form.value.description.trim(),
   }
 
@@ -89,7 +98,6 @@ watch(() => props.isOpen, (open) => {
     form.value.name = ""
     form.value.slug = ""
     form.value.description = ""
-    validationError.value = null
   }
 }, { immediate: true })
 </script>
