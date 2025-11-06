@@ -124,8 +124,7 @@ async function setUserFilter(userId: string) {
   if (!activeOrg.value?.id)
     return
 
-  const newFilters = { ...currentFilters.value, userId: userId || undefined }
-  await applyFilters(activeOrg.value.id, newFilters)
+  await applyFilters(activeOrg.value.id, { ...currentFilters.value, userId: userId || undefined })
   isUserDropdownOpen.value = false
 }
 
@@ -133,20 +132,21 @@ async function setActionFilter(action: string) {
   if (!activeOrg.value?.id)
     return
 
-  const newFilters = { ...currentFilters.value, action: action || undefined }
-  await applyFilters(activeOrg.value.id, newFilters)
+  await applyFilters(activeOrg.value.id, { ...currentFilters.value, action: action || undefined })
   isActionDropdownOpen.value = false
 }
 
 async function handlePrevPage() {
   if (!activeOrg.value?.id || !pagination.value?.hasPrev)
     return
+
   await prevPage(activeOrg.value.id)
 }
 
 async function handleNextPage() {
   if (!activeOrg.value?.id || !pagination.value?.hasNext)
     return
+
   await nextPage(activeOrg.value.id)
 }
 

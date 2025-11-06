@@ -101,7 +101,6 @@ function handleSubmit() {
     return
   }
 
-  // Normalize keys to match backend requirements
   const normalizedParsed: Record<string, string> = {}
   for (const [key, value] of Object.entries(parsed)) {
     const normalizedKey = normalizeKey(key)

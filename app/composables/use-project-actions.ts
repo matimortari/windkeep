@@ -47,6 +47,14 @@ export function useProjectActions() {
   }
 
   /**
+   * Set the current project by ID
+   * @param projectId Project ID to set as current, or null to clear
+   */
+  const setCurrentProject = (projectId: string | null) => {
+    projectStore.setCurrentProject(projectId)
+  }
+
+  /**
    * Delete a project and redirect to projects page
    * @param projectId Project ID
    */
@@ -120,13 +128,6 @@ export function useProjectActions() {
   }
 
   /**
-   * Get member count for current project
-   */
-  const memberCount = computed(() => {
-    return currentProject.value?.members?.length || 0
-  })
-
-  /**
    * Check if current user is owner of the current project
    */
   const isOwner = computed(() => {
@@ -140,38 +141,11 @@ export function useProjectActions() {
     return currentProject.value?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "ADMIN"
   })
 
-  /**
-   * Get secret count for current project
-   */
-  const secretCount = computed(() => {
-    return currentProject.value?.secrets?.length || 0
-  })
-
-  /**
-   * Filter secrets by environment
-   * @param environment Environment to filter by
-   */
-  const getSecretsByEnvironment = (environment: string) => {
-    return computed(() => {
-      return projectSecrets.value.filter((s: any) => s.environment === environment)
-    })
-  }
-
-  /**
-   * Set the current project by ID
-   * @param projectId Project ID to set as current, or null to clear
-   */
-  const setCurrentProject = (projectId: string | null) => {
-    projectStore.setCurrentProject(projectId)
-  }
-
   return {
     currentProject,
     allProjects,
     activeOrgProjects,
     projectSecrets,
-    memberCount,
-    secretCount,
     loading,
     errors,
     isOwner,
@@ -179,6 +153,7 @@ export function useProjectActions() {
     fetchProjects,
     createProject,
     updateProject,
+    setCurrentProject,
     deleteProject,
     addMember,
     updateMemberRole,
@@ -187,7 +162,5 @@ export function useProjectActions() {
     createSecret,
     updateSecret,
     deleteSecret,
-    getSecretsByEnvironment,
-    setCurrentProject,
   }
 }

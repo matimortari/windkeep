@@ -46,6 +46,8 @@
 </template>
 
 <script setup lang="ts">
+import type { CreateProjectInput } from "#shared/lib/schemas/project-schema"
+
 const props = defineProps<{
   org?: Organization | null
   isOpen: boolean
@@ -61,7 +63,7 @@ const projectsFromOrg = computed(() => {
   return activeOrgProjects.value.filter(project => typeof project.name === "string")
 })
 
-async function handleCreateProject(project: Pick<Project, "name" | "slug" | "description">) {
+async function handleCreateProject(project: Omit<CreateProjectInput, "organizationId">) {
   await createProject({
     name: project.name,
     slug: project.slug,

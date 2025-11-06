@@ -71,7 +71,7 @@ defineEmits<(e: "toggleSidebar") => void>()
 const { toggleTheme, themeIcon } = useTheme()
 const { clear } = useUserSession()
 const route = useRoute()
-const { user, switchOrganization, errors } = useUserActions()
+const { user, setCurrentOrganization, errors } = useUserActions()
 
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
@@ -93,7 +93,7 @@ async function setActiveOrg(orgId: string) {
 
   try {
     isDropdownOpen.value = false
-    await switchOrganization(orgId)
+    await setCurrentOrganization(orgId)
   }
   catch (err: any) {
     errors.value.setActiveOrg = err.message

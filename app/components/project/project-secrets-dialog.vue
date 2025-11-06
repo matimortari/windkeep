@@ -124,10 +124,7 @@ async function handleSubmit() {
     validationError.value = "Secret key is required"
     return
   }
-
-  const normalizedKey = normalizeKey(form.value.key)
-
-  if (!normalizedKey) {
+  if (!normalizeKey(form.value.key)) {
     validationError.value = "Secret key must contain at least one valid character"
     return
   }
@@ -147,7 +144,7 @@ async function handleSubmit() {
   }
   else {
     await createSecret(props.projectId, {
-      key: normalizedKey,
+      key: normalizeKey(form.value.key),
       description: form.value.description.trim(),
       projectId: props.projectId,
       values,
