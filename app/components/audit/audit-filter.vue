@@ -57,14 +57,14 @@
         @change="updateDateFilter"
       >
 
-      <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="handlePrevPage">
+      <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="prevPage(activeOrg!.id)">
         <icon name="ph:arrow-left-bold" size="20" />
       </button>
       <div class="text-caption flex flex-col items-center justify-center gap-1 whitespace-nowrap md:mx-4">
         <span>{{ pagination.page }} / {{ pagination.totalPages }}</span>
         <span v-if="auditLogs.length" class="text-xs italic">{{ logsSummary }}</span>
       </div>
-      <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="handleNextPage">
+      <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="nextPage(activeOrg!.id)">
         <icon name="ph:arrow-right-bold" size="20" />
       </button>
 
@@ -101,8 +101,13 @@ const availableUsers = computed(() => {
   return filters.value?.users || []
 })
 
-useClickOutside(userDropdownRef, () => isUserDropdownOpen.value = false, { escapeKey: true })
-useClickOutside(actionDropdownRef, () => isActionDropdownOpen.value = false, { escapeKey: true })
+useClickOutside(userDropdownRef, () => {
+  isUserDropdownOpen.value = false
+}, { escapeKey: true })
+
+useClickOutside(actionDropdownRef, () => {
+  isActionDropdownOpen.value = false
+}, { escapeKey: true })
 
 function getUserDisplayName(userId?: string) {
   if (!userId)
@@ -113,41 +118,18 @@ function getUserDisplayName(userId?: string) {
 }
 
 async function updateDateFilter() {
-  if (!activeOrg.value?.id)
-    return
-
   const newFilters = { ...currentFilters.value, startDate: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined }
-  await applyFilters(activeOrg.value.id, newFilters)
+  await applyFilters(activeOrg.value!.id, newFilters)
 }
 
 async function setUserFilter(userId: string) {
-  if (!activeOrg.value?.id)
-    return
-
-  await applyFilters(activeOrg.value.id, { ...currentFilters.value, userId: userId || undefined })
+  await applyFilters(activeOrg.value!.id, { ...currentFilters.value, userId })
   isUserDropdownOpen.value = false
 }
 
 async function setActionFilter(action: string) {
-  if (!activeOrg.value?.id)
-    return
-
-  await applyFilters(activeOrg.value.id, { ...currentFilters.value, action: action || undefined })
+  await applyFilters(activeOrg.value!.id, { ...currentFilters.value, action })
   isActionDropdownOpen.value = false
-}
-
-async function handlePrevPage() {
-  if (!activeOrg.value?.id || !pagination.value?.hasPrev)
-    return
-
-  await prevPage(activeOrg.value.id)
-}
-
-async function handleNextPage() {
-  if (!activeOrg.value?.id || !pagination.value?.hasNext)
-    return
-
-  await nextPage(activeOrg.value.id)
 }
 
 const logsSummary = computed(() => {
@@ -156,18 +138,14 @@ const logsSummary = computed(() => {
 })
 
 async function handleDeleteLogs() {
-  if (!activeOrg.value?.id)
-    return
   if (!confirm(`Are you sure you want to delete ${logsSummary.value}? This action cannot be undone.`))
     return
 
-  const deleteParams = {
+  await deleteLogs(activeOrg.value!.id, {
     olderThan: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined,
     action: currentFilters.value.action,
     userId: currentFilters.value.userId,
-  }
-
-  await deleteLogs(activeOrg.value.id, deleteParams)
+  })
 }
 </script>
 

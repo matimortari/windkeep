@@ -16,7 +16,7 @@
         </nuxt-link>
         <div class="navigation-group">
           <icon name="ph:key-bold" size="20" />
-          <span class="text-sm">{{ totalSecrets }}</span>
+          <span class="text-sm">{{ props.project.secrets?.length }}</span>
         </div>
       </div>
 
@@ -31,8 +31,4 @@
 const props = defineProps<{
   project: Project
 }>()
-
-const totalSecrets = computed(() => {
-  return props.project.secrets?.length ?? 0
-})
 </script>

@@ -20,12 +20,12 @@
       </button>
     </div>
 
-    <p v-if="!projectsFromOrg.length" class="text-muted-foreground py-2 text-sm">
+    <p v-if="!activeOrgProjects.length" class="text-muted-foreground py-2 text-sm">
       No projects yet.
     </p>
 
     <nav v-else aria-label="Projects Navigation" class="scroll-area flex max-h-64 flex-col gap-2 overflow-x-hidden">
-      <nuxt-link v-for="project in projectsFromOrg" :key="project.id" :to="`/admin/${project.slug}`" class="text-caption truncate hover:underline">
+      <nuxt-link v-for="project in activeOrgProjects" :key="project.id" :to="`/admin/${project.slug}`" class="text-caption truncate hover:underline">
         {{ project.name }}
       </nuxt-link>
     </nav>
@@ -49,7 +49,7 @@
 import type { CreateProjectInput } from "#shared/lib/schemas/project-schema"
 
 const props = defineProps<{
-  org?: Organization | null
+  org?: Organization
   isOpen: boolean
 }>()
 
@@ -58,10 +58,6 @@ defineEmits(["update:isOpen"])
 const { activeOrgProjects, createProject, fetchProjects } = useProjectActions()
 
 const isDialogOpen = ref(false)
-
-const projectsFromOrg = computed(() => {
-  return activeOrgProjects.value.filter(project => typeof project.name === "string")
-})
 
 async function handleCreateProject(project: Omit<CreateProjectInput, "organizationId">) {
   await createProject({
