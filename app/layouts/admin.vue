@@ -2,7 +2,7 @@
   <Loading v-if="isLoading" />
 
   <div v-show="!isLoading" class="min-h-screen">
-    <Toolbar :orgs="orgs ?? []" :org="user?.activeOrgId" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+    <Toolbar :orgs="orgs ?? []" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
     <div class="flex flex-1 pb-8">
       <Sidebar v-if="user?.activeOrgId" :org="orgs.find(o => o.id === user?.activeOrgId)" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />

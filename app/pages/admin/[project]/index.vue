@@ -73,7 +73,7 @@ const slug = route.params.project
 const { activeOrg } = useUserActions()
 const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets } = useProjectActions()
 
-const project = computed(() => allProjects.value.find(p => p.slug === slug) || null)
+const project = computed(() => allProjects.value.find(p => p.slug === slug))
 const { handleImportFromEnv: importFromEnv, handleExportToEnv: exportToEnv } = useEnvFile(project.value?.id)
 const secrets = projectSecrets
 

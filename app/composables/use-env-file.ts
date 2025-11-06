@@ -1,9 +1,7 @@
 import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret-schema"
 
 export function useEnvFile(projectId: string) {
-  const projectsStore = useProjectStore()
-
-  const project = computed(() => projectsStore.projects.find(p => p.id === projectId))
+  const { currentProject, projectSecrets, updateSecret, createSecret, fetchSecrets } = useProjectActions()
 
   const handleImportFromEnv = async (importedSecrets: Secret[]): Promise<{ success: number, failed: number, errors: string[] }> => {
     if (!importedSecrets || importedSecrets.length === 0) {
@@ -19,7 +17,7 @@ export function useEnvFile(projectId: string) {
         throw new Error("Secret key is required")
       }
 
-      const existing = projectsStore.secrets.find((s: Secret) => s.key === secret.key && s.projectId === projectId)
+      const existing = projectSecrets.value.find((s: Secret) => s.key === secret.key && s.projectId === projectId)
       if (existing) {
         const existingValues = existing.values ?? []
         const newValues = secret.values ?? []
@@ -41,7 +39,7 @@ export function useEnvFile(projectId: string) {
         }
         updatePayload.values = mergedValues
 
-        return await projectsStore.updateProjectSecret(projectId, existing.id!, updatePayload)
+        return await updateSecret(projectId, existing.id!, updatePayload)
       }
       else {
         const createPayload: CreateSecretInput = {
@@ -51,7 +49,7 @@ export function useEnvFile(projectId: string) {
         }
         createPayload.values = secret.values ?? []
 
-        return await projectsStore.createProjectSecret(projectId, createPayload)
+        return await createSecret(projectId, createPayload)
       }
     }))
 
@@ -65,7 +63,7 @@ export function useEnvFile(projectId: string) {
       }
     })
 
-    await projectsStore.getProjectSecrets(projectId)
+    await fetchSecrets(projectId)
 
     return { success: successCount, failed: failedCount, errors }
   }
@@ -75,7 +73,7 @@ export function useEnvFile(projectId: string) {
       return { success: false, error: "Environment not specified" }
     }
 
-    const filteredSecrets = projectsStore.secrets
+    const filteredSecrets = projectSecrets.value
       .filter((s: Secret) => s.projectId === projectId)
       .map((s: Secret) => {
         const value = s.values?.find((v: SecretValue) => v.environment === env)?.value
@@ -90,7 +88,7 @@ export function useEnvFile(projectId: string) {
 
     try {
       const blob = new Blob([filteredSecrets], { type: "text/plain" })
-      const projectName = project.value?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "") || "project"
+      const projectName = currentProject.value?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "")
       const fileName = `.env.${projectName}.${env.toLowerCase()}`
       const url = URL.createObjectURL(blob)
       const a = Object.assign(document.createElement("a"), {
