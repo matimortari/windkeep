@@ -9,18 +9,6 @@ export function useOrganizationActions() {
   const loading = computed(() => organizationStore.loading)
   const errors = computed(() => organizationStore.errors)
 
-  const hasMembers = computed(() => {
-    return currentOrganization.value?.members && currentOrganization.value.members.length > 0
-  })
-
-  const hasInvites = computed(() => {
-    return currentOrganization.value?.invites && currentOrganization.value.invites.length > 0
-  })
-
-  const memberCount = computed(() => {
-    return currentOrganization.value?.members?.length || 0
-  })
-
   const isOwner = computed(() => {
     const org = userStore.activeOrg || organizationStore.currentOrg
     return org?.memberships?.find((m: any) => m.userId === userStore.user?.id)?.role === "OWNER"
@@ -116,9 +104,6 @@ export function useOrganizationActions() {
     allOrganizations,
     loading,
     errors,
-    hasMembers,
-    hasInvites,
-    memberCount,
     isOwner,
     isAdmin,
     createOrganization,

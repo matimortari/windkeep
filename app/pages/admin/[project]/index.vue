@@ -88,26 +88,12 @@ useClickOutside(dropdownRef, () => {
 }, { escapeKey: true })
 
 async function handleImportFromEnv(importedSecrets: Secret[]) {
-  const result = await importFromEnv(importedSecrets)
-
-  if (result.failed > 0) {
-    console.error("Import errors:", result.errors)
-  }
-
-  if (result.success > 0) {
-    // Optionally show success toast notification here
-    console.log(`Successfully imported ${result.success} secrets`)
-  }
+  await importFromEnv(importedSecrets)
+  isDialogOpen.value = false
 }
 
 function handleExport(env: string) {
-  const result = exportToEnv(env)
-
-  if (!result.success) {
-    console.error("Export error:", result.error)
-    // Optionally show toast notification here
-  }
-
+  exportToEnv(env)
   isDropdownOpen.value = false
 }
 

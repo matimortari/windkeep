@@ -46,46 +46,7 @@ export function useAuditActions() {
     }).format(d)
   }
 
-  function formatMetadata(metadata: any): string {
-    if (!metadata)
-      return ""
-
-    if (typeof metadata === "string") {
-      try {
-        metadata = JSON.parse(metadata)
-      }
-      catch {
-        return metadata
-      }
-    }
-
-    if (typeof metadata === "object") {
-      const entries = Object.entries(metadata)
-      if (entries.length === 0)
-        return ""
-
-      // Filter out common metadata fields that are already shown elsewhere
-      const filteredEntries = entries.filter(([key]) =>
-        !["ip", "userAgent"].includes(key),
-      )
-
-      if (filteredEntries.length === 0)
-        return ""
-
-      return filteredEntries
-        .map(([key, value]) => {
-          const displayKey = key.replace(/([A-Z])/g, " $1").toLowerCase()
-          const displayValue = Array.isArray(value) ? value.join(", ") : String(value)
-          return `<strong>${displayKey}:</strong> ${displayValue}`
-        })
-        .join(" • ")
-    }
-
-    return String(metadata)
-  }
-
   const getActions = [
-    // Organization actions
     { label: "Organization Created", value: "organization.created" },
     { label: "Organization Updated", value: "organization.updated" },
     { label: "Organization Deleted", value: "organization.deleted" },
@@ -94,16 +55,12 @@ export function useAuditActions() {
     { label: "Organization Member Added", value: "organization.member.added" },
     { label: "Organization Member Role Updated", value: "organization.member.role_updated" },
     { label: "Organization Member Removed", value: "organization.member.removed" },
-
-    // Project actions
     { label: "Project Created", value: "project.created" },
     { label: "Project Updated", value: "project.updated" },
     { label: "Project Deleted", value: "project.deleted" },
     { label: "Project Member Added", value: "project.member.added" },
     { label: "Project Member Role Updated", value: "project.member.role_updated" },
     { label: "Project Member Removed", value: "project.member.removed" },
-
-    // Secret actions
     { label: "Secret Created", value: "secret.created" },
     { label: "Secret Updated", value: "secret.updated" },
     { label: "Secret Deleted", value: "secret.deleted" },
@@ -154,7 +111,6 @@ export function useAuditActions() {
     prevPage,
     goToPage,
     formatDate,
-    formatMetadata,
     getTableHeaders,
     getActionLabel,
     getResourceIcon,
