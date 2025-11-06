@@ -30,7 +30,7 @@ export function useUserActions() {
    * Switch to a different active organization
    * @param orgId Organization ID to switch to
    */
-  const switchOrganization = async (orgId: string) => {
+  const setCurrentOrganization = async (orgId: string) => {
     await userStore.setActiveOrg(orgId)
     if (import.meta.client) {
       window.location.reload()
@@ -68,7 +68,7 @@ export function useUserActions() {
     loading,
     errors,
     fetchUser,
-    switchOrganization,
+    setCurrentOrganization,
     updateProfile,
     updateProfileImage,
     deleteAccount,

@@ -1,3 +1,5 @@
+import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret-schema"
+
 export function useEnvFile(projectId: string) {
   const projectsStore = useProjectStore()
 
@@ -18,7 +20,6 @@ export function useEnvFile(projectId: string) {
       }
 
       const existing = projectsStore.secrets.find((s: Secret) => s.key === secret.key && s.projectId === projectId)
-
       if (existing) {
         const existingValues = existing.values ?? []
         const newValues = secret.values ?? []
@@ -34,7 +35,7 @@ export function useEnvFile(projectId: string) {
           }
         })
 
-        const updatePayload: any = {}
+        const updatePayload: UpdateSecretInput = {}
         if (secret.description !== undefined) {
           updatePayload.description = secret.description
         }
@@ -43,7 +44,7 @@ export function useEnvFile(projectId: string) {
         return await projectsStore.updateProjectSecret(projectId, existing.id!, updatePayload)
       }
       else {
-        const createPayload: any = {
+        const createPayload: CreateSecretInput = {
           key: secret.key,
           description: secret.description ?? "",
           projectId,
@@ -57,8 +58,7 @@ export function useEnvFile(projectId: string) {
     results.forEach((result, index) => {
       if (result.status === "rejected") {
         failedCount++
-        const secretKey = importedSecrets[index]?.key || "Unknown"
-        errors.push(`Failed to import "${secretKey}": ${result.reason?.message || "Unknown error"}`)
+        errors.push(`Failed to import "${importedSecrets[index]?.key}": ${result.reason?.message || "Unknown error"}`)
       }
       else {
         successCount++
@@ -76,9 +76,9 @@ export function useEnvFile(projectId: string) {
     }
 
     const filteredSecrets = projectsStore.secrets
-      .filter((s: any) => s.projectId === projectId)
-      .map((s: any) => {
-        const value = s.values?.find((v: any) => v.environment === env)?.value
+      .filter((s: Secret) => s.projectId === projectId)
+      .map((s: Secret) => {
+        const value = s.values?.find((v: SecretValue) => v.environment === env)?.value
         return value ? `${s.key}="${value}"` : null
       })
       .filter(Boolean)

@@ -212,8 +212,7 @@ const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
 const orgProjects = computed(() => allProjects.value.filter(p => p.organizationId === activeOrg.value?.id))
 const orgMembers = computed(() => {
-  const members = (activeOrg.value)?.memberships || []
-  return members.map((m: any) => ({
+  return ((activeOrg.value)?.memberships || []).map((m: any) => ({
     id: m.user?.id,
     name: m.user?.name,
     email: m.user?.email,

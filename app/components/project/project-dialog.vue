@@ -3,11 +3,7 @@
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="name" class="text-sm font-semibold">Project Name</label>
-        <input
-          id="name" v-model="form.name"
-          type="text" class="w-full"
-          required
-        >
+        <input id="name" v-model="form.name" type="text" class="w-full">
       </div>
 
       <div class="flex flex-col items-start gap-1">
@@ -71,6 +67,7 @@ const form = ref<{ name: string, slug: string, description: string }>({
 const suggestedSlug = computed(() => {
   if (!form.value.name)
     return "my-project"
+
   return form.value.name
     .trim()
     .toLowerCase()
