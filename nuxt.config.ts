@@ -41,7 +41,7 @@ export default defineNuxtConfig({
     processCSSVariables: true,
     families: [
       // Base fonts (default, display, mono)
-      { name: "Inter", provider: "google", weights: ["300 800"] },
+      { name: "Roboto", provider: "google", weights: ["300 800"] },
       { name: "Jockey One", provider: "google", weights: ["400"] },
       { name: "JetBrains Mono", provider: "google", weights: ["400"] },
 
