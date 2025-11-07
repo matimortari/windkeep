@@ -40,10 +40,13 @@ export default defineNuxtConfig({
   fonts: {
     processCSSVariables: true,
     families: [
-      { name: "Inter", provider: "google" },
-      { name: "Jockey One", provider: "google" },
-      { name: "Siklscreen", provider: "google" },
-      { name: "JetBrains Mono", provider: "google" },
+      // Base fonts (default, display, mono)
+      { name: "Inter", provider: "google", weights: ["300 800"] },
+      { name: "Jockey One", provider: "google", weights: ["400"] },
+      { name: "JetBrains Mono", provider: "google", weights: ["400"] },
+
+      // Decorative fonts
+      { name: "Silkscreen", provider: "google", weights: ["400 700"] },
     ],
   },
   icon: {
