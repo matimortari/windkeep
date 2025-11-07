@@ -71,7 +71,7 @@ html.light {
   --color-accent: var(--accent);
   --color-border: var(--border);
 
-  --font-default: "Inter", sans-serif;
+  --font-default: "Roboto", sans-serif;
   --font-display: "Jockey One";
   --font-display-alt: "Silkscreen", sans-serif;
   --font-mono: "JetBrains Mono", monospace;

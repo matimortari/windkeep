@@ -5,7 +5,7 @@
       :initial="{ opacity: 0, y: -10, scale: 0.8 }" :visible="{ opacity: 1, y: 0, scale: 1 }"
       :duration="800"
     >
-      <h1>
+      <h1 class="font-display">
         Welcome to SecretkeepR
       </h1>
       <p class="text-caption">
@@ -74,7 +74,6 @@ useHead({
 })
 
 definePageMeta({
-  layout: "fullscreen",
   middleware: auth,
 })
 </script>
