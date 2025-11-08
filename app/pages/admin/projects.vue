@@ -40,14 +40,15 @@
       >
         <ProjectCard :project="project" />
       </li>
+
       <button
         v-motion :initial="{ opacity: 0 }"
         :enter="{ opacity: 1 }" :duration="600"
-        class="card text-muted-foreground hover:border-accent! flex h-[180px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
+        class="card hover:border-accent! flex h-[180px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
         aria-label="Add New Project" @click="isDialogOpen = true"
       >
         <icon name="ph:plus-bold" size="50" />
-        <span class="text-muted-foreground">Add New Project...</span>
+        <span class="text-caption">Add New Project...</span>
       </button>
     </ul>
 

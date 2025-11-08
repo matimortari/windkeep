@@ -5,7 +5,7 @@
         <img :src="themeTitle" alt="Wordmark" width="100">
 
         <div class="flex flex-row items-center justify-between gap-4">
-          <p class="text-muted-foreground text-sm whitespace-nowrap">
+          <p class="text-caption whitespace-nowrap">
             © {{ new Date().getFullYear() }} SecretkeepR. All rights reserved.
           </p>
 

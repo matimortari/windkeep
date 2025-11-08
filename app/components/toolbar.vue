@@ -4,7 +4,7 @@
       <Logo />
 
       <nav class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
-        <div class="md:navigation-group text-muted-foreground hidden">
+        <div class="md:navigation-group text-caption hidden">
           <span>/</span>
           <span>{{ user.name }}</span>
           <span>/</span>
@@ -12,7 +12,7 @@
 
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
-            <span class="text-muted-foreground">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
+            <span class="text-caption">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
             <icon name="ph:caret-down-bold" size="20" />
           </button>
 
@@ -36,7 +36,7 @@
           </transition>
         </div>
 
-        <div class="md:navigation-group text-muted-foreground hidden">
+        <div class="md:navigation-group text-caption hidden">
           <span>/</span>
           <span class="capitalize">{{ currentPage }}</span>
         </div>

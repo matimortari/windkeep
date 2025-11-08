@@ -4,7 +4,7 @@
       <h2>
         Brand & Assets
       </h2>
-      <p class="text-muted-foreground">
+      <p class="text-caption">
         Download SecretkeepR logos and explore our design colors.
       </p>
     </header>
@@ -29,7 +29,7 @@
         <h3>
           Brand Colors
         </h3>
-        <p class="text-muted-foreground flex items-center gap-2 text-sm">
+        <p class="text-caption">
           Tip: Switch between light and dark themes to explore the full palette.
         </p>
       </div>
@@ -123,6 +123,4 @@ useHead({
   link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/brand" }],
   meta: [{ name: "description", content: "SecretkeepR Brand Assets." }],
 })
-
-
 </script>

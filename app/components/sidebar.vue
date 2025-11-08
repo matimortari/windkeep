@@ -6,7 +6,7 @@
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <span class="font-semibold">Overview</span>
-    <nav class="text-muted-foreground flex flex-col gap-1 py-2 text-sm font-semibold" aria-label="Main Navigation">
+    <nav class="text-caption flex flex-col gap-1 py-2" aria-label="Main Navigation">
       <nuxt-link v-for="link in SIDEBAR_NAV_LINKS" :key="link.url" :to="link.url" class="navigation-group hover:bg-muted rounded p-2">
         <icon :name="link.icon" size="30" />
         <span>{{ link.label }}</span>
@@ -20,12 +20,12 @@
       </button>
     </div>
 
-    <p v-if="!activeOrgProjects.length" class="text-muted-foreground py-2 text-sm">
+    <p v-if="!activeOrgProjects.length" class="text-caption py-2">
       No projects yet.
     </p>
 
-    <nav v-else aria-label="Projects Navigation" class="scroll-area flex max-h-64 flex-col gap-2 overflow-x-hidden">
-      <nuxt-link v-for="project in activeOrgProjects" :key="project.id" :to="`/admin/${project.slug}`" class="text-caption truncate hover:underline">
+    <nav v-else aria-label="Projects Navigation" class="scroll-area text-caption flex max-h-64 flex-col gap-2 overflow-x-hidden">
+      <nuxt-link v-for="project in activeOrgProjects" :key="project.id" :to="`/admin/${project.slug}`" class="truncate hover:underline">
         {{ project.name }}
       </nuxt-link>
     </nav>
@@ -36,7 +36,7 @@
       aria-label="GitHub Repository"
     >
       <icon name="simple-icons:github" size="25" />
-      <span class="text-muted-foreground text-sm font-semibold">
+      <span class="text-caption">
         Support This Project
       </span>
     </nuxt-link>

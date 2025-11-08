@@ -10,7 +10,7 @@
         </p>
       </div>
 
-      <div class="navigation-group text-muted-foreground absolute bottom-4 left-4 gap-4">
+      <div class="navigation-group text-caption absolute bottom-4 left-4 gap-4">
         <nuxt-link :to="`/admin/${project.slug}/settings`" class="flex items-center">
           <icon name="ph:gear-bold" size="20" class="hover:text-accent" />
         </nuxt-link>
