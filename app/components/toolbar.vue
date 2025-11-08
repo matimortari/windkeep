@@ -1,10 +1,10 @@
 <template>
   <div v-if="user" class="navigation-group bg-card justify-between border-b-2 px-4 py-2">
     <div class="navigation-group">
-      <Logo />
+      <Logo class="hidden md:flex" />
 
       <nav class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
-        <div class="md:navigation-group text-muted-foreground hidden">
+        <div class="md:navigation-group text-caption hidden">
           <span>/</span>
           <span>{{ user.name }}</span>
           <span>/</span>
@@ -12,8 +12,8 @@
 
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
-            <span class="text-muted-foreground">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
-            <icon name="ph:caret-down-bold" size="20" />
+            <span class="text-caption">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
+            <icon name="ph:caret-down-bold" size="20" class="transition-transform" :class="[isDropdownOpen ? 'text-muted-foreground rotate-180' : 'rotate-0']" />
           </button>
 
           <transition name="dropdown" mode="out-in">
@@ -27,8 +27,8 @@
               </li>
 
               <li class="hover:bg-muted truncate rounded p-2">
-                <nuxt-link to="/onboarding/create-org" class="navigation-group">
-                  <icon name="ph:plus-bold" size="20" class="text-accent" />
+                <nuxt-link to="/onboarding/create-org" class="navigation-group group" role="menuitem">
+                  <icon name="ph:plus-bold" size="20" class="text-accent transition-transform group-hover:scale-125" />
                   <span>Create Organization</span>
                 </nuxt-link>
               </li>
@@ -36,7 +36,7 @@
           </transition>
         </div>
 
-        <div class="md:navigation-group text-muted-foreground hidden">
+        <div class="md:navigation-group text-caption hidden">
           <span>/</span>
           <span class="capitalize">{{ currentPage }}</span>
         </div>

@@ -16,8 +16,13 @@
             <icon name="ph:magnifying-glass-bold" size="20" />
           </span>
         </div>
+
         <button aria-label="Sort by Name" class="btn" @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'">
-          <icon name="ph:arrow-down-bold" size="20" title="Sort by Name" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
+          <icon
+            name="ph:arrow-down-bold" size="20"
+            title="Sort by Name" class="transition-transform"
+            :class="[sort.direction === 'asc' ? 'rotate-180' : 'rotate-0']"
+          />
         </button>
 
         <button class="btn-primary" aria-label="Add New Project" @click="isDialogOpen = true">
@@ -40,14 +45,15 @@
       >
         <ProjectCard :project="project" />
       </li>
+
       <button
         v-motion :initial="{ opacity: 0 }"
         :enter="{ opacity: 1 }" :duration="600"
-        class="card text-muted-foreground hover:border-accent! flex h-[180px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
+        class="card group hover:border-accent! flex h-[180px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
         aria-label="Add New Project" @click="isDialogOpen = true"
       >
-        <icon name="ph:plus-bold" size="50" />
-        <span class="text-muted-foreground">Add New Project...</span>
+        <icon name="ph:plus-bold" size="50" class="text-muted-foreground group-hover:text-accent transition-transform group-hover:scale-110" />
+        <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
       </button>
     </ul>
 

@@ -4,7 +4,7 @@
       <h2>
         Brand & Assets
       </h2>
-      <p class="text-muted-foreground">
+      <p class="text-caption">
         Download SecretkeepR logos and explore our design colors.
       </p>
     </header>
@@ -29,20 +29,26 @@
         <h3>
           Brand Colors
         </h3>
-        <p class="text-muted-foreground flex items-center gap-2 text-sm">
+        <p class="text-caption">
           Tip: Switch between light and dark themes to explore the full palette.
         </p>
       </div>
 
-      <div class="my-4 grid w-full grid-cols-1 gap-2 md:grid-cols-3 lg:grid-cols-6">
+      <div class="m-4 grid w-full grid-cols-1 gap-4 md:grid-cols-5">
         <div v-for="color in brandColors" :key="color.name" class="flex flex-col items-center">
-          <div class="relative h-20 w-full cursor-pointer rounded-lg border-2 transition" :style="{ backgroundColor: `var(${color.var})` }" @click="handleCopyColor(color.var)">
-            <div class="absolute inset-0 flex items-center justify-center rounded-md bg-black/60 opacity-0 transition-opacity">
-              <span class="text-sm font-semibold"> {{ copiedColor === color.var ? 'Copied!' : 'Copy color' }} </span>
+          <div
+            class="group relative h-24 w-full cursor-pointer rounded-lg border-2 transition"
+            :style="{ backgroundColor: `var(${color.var})` }"
+            @click="handleCopyColor(color.var)"
+          >
+            <div class="absolute inset-0 flex items-center justify-center rounded-md bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
+              <span class="text-sm font-semibold">
+                {{ copiedColor === color.var ? 'Copied!' : 'Copy color' }}
+              </span>
             </div>
           </div>
 
-          <p class="flex w-full flex-col items-start p-1 text-start">
+          <p class="flex w-full flex-row items-start justify-between p-1 text-start">
             <span class="text-sm font-semibold">{{ color.name }}</span>
             <span class="text-xs">{{ colorValues[color.var] }}</span>
           </p>
@@ -72,18 +78,15 @@ const brandColors = [
   { name: "Card Foreground", var: "--card-foreground" },
   { name: "Overlay", var: "--overlay" },
   { name: "Overlay Foreground", var: "--overlay-foreground" },
+  { name: "Muted", var: "--muted" },
+  { name: "Muted Foreground", var: "--muted-foreground" },
   { name: "Primary", var: "--primary" },
   { name: "Primary Foreground", var: "--primary-foreground" },
   { name: "Secondary", var: "--secondary" },
   { name: "Secondary Foreground", var: "--secondary-foreground" },
-  { name: "Muted", var: "--muted" },
-  { name: "Muted Foreground", var: "--muted-foreground" },
-  { name: "Danger", var: "--danger" },
-  { name: "Danger Foreground", var: "--danger-foreground" },
-  { name: "Success", var: "--success" },
-  { name: "Success Foreground", var: "--success-foreground" },
   { name: "Accent", var: "--accent" },
-  { name: "Border", var: "--border" },
+  { name: "Danger", var: "--danger" },
+  { name: "Success", var: "--success" },
 ]
 
 const colorValues = ref<Record<string, string>>({})
@@ -123,6 +126,4 @@ useHead({
   link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/brand" }],
   meta: [{ name: "description", content: "SecretkeepR Brand Assets." }],
 })
-
-
 </script>

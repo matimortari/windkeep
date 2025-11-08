@@ -5,37 +5,37 @@ export const API_URL = "/api"
 export const HIGHLIGHTS = [
   {
     title: "Rapid Onboarding",
-    description: "Provision your workspace and start managing secrets in seconds with minimal configuration.",
+    description: "Get your workspace up and running in seconds with a minimal setup, so you can quickly start managing your secrets.",
   },
   {
-    title: "Open Source Transparency",
-    description: "All code is open-source and free to use, ensuring trust and extensibility.",
+    title: "Free & Open Source",
+    description: "SecretkeepR is a fully open-source project, giving you full visibility into the codebase and the flexibility to extend it as needed.",
   },
   {
-    title: "Security-First Architecture",
-    description: "Secrets are encrypted end-to-end using AES-256-CBC with per-secret random IVs.",
+    title: "Encrypted & Safe",
+    description: "Every secret is securely encrypted from end to end using AES-256-CBC with a unique key for each secret, keeping your data safe and private.",
   },
 ]
 
 export const FEATURES = [
   {
-    title: "End-to-End Encryption",
-    description: "Secrets remain encrypted at rest and in transit, via AES-256 encryption.",
-    icon: "dinkie-icons:lock",
-  },
-  {
-    title: "Access Control",
-    description: "Role-based permissions allow fine-grained control over who can view, edit, or manage secrets at organization and project level.",
+    title: "Controlled Access",
+    description: "Role-based permissions allow you to control who can view, edit, or manage secrets at both the organization and project levels.",
     icon: "dinkie-icons:entry",
   },
   {
-    title: "Audit Logging",
-    description: "All sensitive operations, including secret modifications and organization changes, are logged and timestamped.",
+    title: "Audit Logs",
+    description: "Every sensitive operation, from secret changes to role updates, is logged with timestamps for full traceability and accountability.",
     icon: "dinkie-icons:right-magnifying-glass",
   },
   {
-    title: "Command Line Interface",
-    description: "Interact with secrets programmatically via the open-source command-line interface, powered by Go.",
+    title: "Secure Encryption",
+    description: "Secrets are encrypted both in transit and at rest, keeping your data secure and ensuring that only authorized users can access them.",
+    icon: "dinkie-icons:lock",
+  },
+  {
+    title: "Command-Line Tool",
+    description: "Use the open-source CLI to securely access and manage secrets programmatically, integrating seamlessly into scripts or pipelines.",
     icon: "dinkie-icons:code",
   },
 ]
@@ -43,19 +43,19 @@ export const FEATURES = [
 export const FAQS = [
   {
     question: "How does role-based access control work for organizations?",
-    answer: "Organizations have three roles: Owner, Admin, and Member. Owners have full control over the organization, its projects, and members. Admins can invite and manage members. Members don't have any administrative privileges, but can access the secrets of projects they are part of.",
+    answer: "Each organization has a single Owner, who can manage projects, add or remove members, and configure organization-wide settings. Organization Admins can invite and manage members, but they don't have full control over organization settings. Members can access the data for the organization and the projects they belong to, but they cannot modify settings or manage other users. This structure keeps sensitive operations secure while allowing teams to collaborate effectively.",
   },
   {
     question: "How does role-based access control work for projects?",
-    answer: "Projects have three roles: Owner, Admin, and Member. Owners have full control over the project and its secrets. Admins can add and remove members, update roles, and handle secrets. Members can only view secrets within the project.",
+    answer: "Projects follow a similar structure to organizations. The Project Owner has full control over the project and its secrets, including managing members and permissions. Admins can add or remove members, update roles, and manage secrets, but they cannot change project ownership. Members can view secrets, but cannot change them or adjust project settings. This ensures that project-level operations are handled securely.",
   },
   {
-    question: "How does audit logging work?",
-    answer: "All actions within an organization are logged with timestamps and metadata, providing a clear history for transparency and accountability. Audit logs are visible to all members, but only the organization Owner can selectively delete entries.",
+    question: "What is audit logging and why is it important?",
+    answer: "Audit logs record every sensitive action performed within the system — such as updating secrets, changing roles, or modifying projects. Each log entry captures who performed the action, timestamps, and additional metadata, providing a complete history for reference. Audit logs help teams stay transparent, investigate issues, and maintain accountability. All members in the organization can view the logs, but only the Owner can delete entries if necessary.",
   },
   {
-    question: "What are the benefits of using the CLI?",
-    answer: "The CLI tool allows users to retrieve secrets for a project directly from their IDE or terminal, eliminating the need for a hardcoded .env file. It also enables the automation of project/organization management tasks via scripts.",
+    question: "What is the SecretkeepR CLI and how can i use it?",
+    answer: "The SecretkeepR CLI allows you to interact with secrets and projects directly from your terminal, eliminating the need for hardcoded .env files and making it easy to integrate secrets into scripts and automated workflows. Whether you're retrieving secrets, updating them, or managing project settings, the CLI makes these tasks faster, more consistent, and scriptable.",
   },
 ]
 

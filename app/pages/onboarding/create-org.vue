@@ -29,7 +29,7 @@
     </form>
 
     <p class="text-caption flex min-h-4 flex-col items-center gap-2">
-      <span v-if="errors.createOrg" class="text-danger-foreground">{{ errors.createOrg }}</span>
+      <span v-if="errors.createOrg" class="text-danger">{{ errors.createOrg }}</span>
 
       <span> Already have an invite? <nuxt-link to="/onboarding/join-org" class="text-primary hover:underline">
         Join an Organization

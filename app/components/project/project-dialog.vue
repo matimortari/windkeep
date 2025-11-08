@@ -29,7 +29,7 @@
       </div>
 
       <footer class="flex flex-row items-center justify-between">
-        <p class="text-warning">
+        <p class="text-danger">
           {{ errors.createProject || " " }}
         </p>
 
