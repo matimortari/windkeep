@@ -7,38 +7,33 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=matimortari_secretkeepr&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=matimortari_secretkeepr)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=matimortari_secretkeepr&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=matimortari_secretkeepr)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat&colorA=0d1117)](https://opensource.org/licenses/MIT)
-[![Follow on GitHub](https://img.shields.io/github/followers/matimortari?label=Follow&style=social)](https://github.com/matimortari)
 
-**SecretkeepR** is a secrets manager designed to help users and organizations **securely manage and share environment variables**. It provides access controls for managing projects, users, and encrypted secrets across multiple organizations. It also includes a **command-line interface** for easy interaction with your secrets and projects.
+[**SecretkeepR**](https://secretkeepr.vercel.app) is a secrets management platform that helps organizations securely store, manage, and share sensitive information. It features role-based access control, audit logging, encrypted storage, and an integrated command line interface for easy secret management.
 
-For CLI usage and setup, see the [CLI documentation](./cli/README.md).
-
-[**Check it out!** 🔍](https://secretkeepr.vercel.app)
+Also check out the [**CLI documentation**](./cli/README.md) for usage and setup instructions.
 
 </div>
 
-## Key Features
+## Features
 
-- **User Authentication:** Sign in with Google, GitHub, or GitLab accounts.
-- **Multi-Tenant Architecture:** Support for multiple organizations, each with its own projects, members, and secrets.
-- **Project-Based Secrets Management:** Create, manage, import, and export secrets within projects.
-- **Role-Based Access Control:** Assign roles to members within organizations and control access to projects and secrets. Invite new members via the invitation system.
-- **Audit Logs:** Track sensitive operations like secret changes and organization updates.
-- **Encrypted Secrets:** Secrets are encrypted at rest and never exposed unencrypted beyond the UI.
-- **CLI Integration:** Manage secrets and projects directly from your terminal with the SecretkeepR CLI.
-- **Theme Toggle:** Switch between light and dark modes to suit your preference.
+- **User Authentication:** Sign in using your Google, GitHub, or GitLab account.
+- **Multi-Tenant Architecture:** Each organization operates within its own environment, with dedicated members and projects, providing full access control.
+- **Role-Based Access Control:** Control access at both organization and project levels for maximum flexibility and security.
+- **Audit Logs:** Monitor your organization's activities with detailed audit logs tracking sensitive operations, such as secret changes and role updates.
+- **Encrypted Secrets:** Your secrets are encrypted at rest and never exposed unencrypted beyond the UI.
+- **CLI Integration:** Take control from your terminal with the SecretkeepR CLI for fast, scriptable management.
 
 ## Stack
 
 - **Nuxt.js** with **Vue** composition API and **Nitro** server engine.
-- **OAuth** authentication with Google, GitHub, or GitLab via **nuxt-auth-utils**.
+- **OAuth** authentication with Google, GitHub, or GitLab.
 - **Prisma** for **PostgreSQL** database management.
 - **Pinia** for state management.
 - **Zod** for schema validation.
 - **TypeScript**.
 - **ESLint**.
 - **Tailwind CSS**.
-- **Framer Motion** via **@vueuse/motion**.
+- **Framer Motion**.
 - **Go** for CLI development using **Cobra**.
 - **Vercel** for deployment, blob storage and website analytics.
 
@@ -52,5 +47,4 @@ Feel free to reach out to discuss collaboration opportunities or to say hello!
 
 ## License
 
-This project is licensed under the [MIT License](./LICENSE).
-You are free to use, modify, and distribute this software in accordance with the license terms.
+This project is licensed under the [**MIT License**](./LICENSE).

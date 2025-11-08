@@ -37,7 +37,7 @@
       </div>
 
       <footer class="flex flex-row items-center justify-between">
-        <p class="text-warning">
+        <p class="text-danger">
           {{ validationError || (isUpdateMode ? errors.updateProjectSecret : errors.createProjectSecret) || '' }}
         </p>
 

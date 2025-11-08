@@ -13,8 +13,8 @@
             />
           </th>
 
-          <th v-for="env in environments" :key="env" class="border-x p-2 text-start capitalize md:w-1/6">
-            <span>{{ env }}</span>
+          <th v-for="env in environments" :key="env" class="border-x p-2 text-start md:w-1/6">
+            <span>{{ capitalizeFirst(env) }}</span>
           </th>
         </tr>
       </thead>
@@ -37,13 +37,13 @@
             </div>
 
             <nav class="flex items-center justify-end gap-2 md:justify-start">
-              <button aria-label="Toggle Secret Value Visibility" class="flex items-center" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
+              <button aria-label="Toggle Secret Value Visibility" class="hover:text-primary transition-colors" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
                 <icon :name="visibleKeys[secret.key] ? 'carbon:view' : 'carbon:view-off'" size="20" />
               </button>
-              <button aria-label="Edit Secret" class="flex items-center" @click="handleUpdateSecret(secret.key)">
+              <button aria-label="Edit Secret" class="hover:text-primary transition-colors" @click="handleUpdateSecret(secret.key)">
                 <icon name="carbon:edit" size="20" />
               </button>
-              <button aria-label="Delete Secret" class="flex items-center" @click="handleDeleteSecret(secret.key)">
+              <button aria-label="Delete Secret" class="hover:text-danger transition-colors" @click="handleDeleteSecret(secret.key)">
                 <icon name="carbon:delete" size="20" />
               </button>
             </nav>
@@ -52,14 +52,13 @@
           <td v-for="env in environments" :key="env" class="text-muted-foreground w-[150px] max-w-[150px] overflow-hidden border p-2 font-mono text-sm">
             <div class="flex flex-row items-center justify-between gap-4">
               <span
-                class="max-w-[80%] truncate select-none"
-                :class="[getSecretValue(secret.key, env) ? 'bg-muted hover:text-accent! cursor-pointer rounded px-1' : '']"
+                class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, env) ? 'bg-muted hover:text-accent! cursor-pointer rounded px-1 transition-colors' : '']"
                 @click="copyToClipboard(getSecretValue(secret.key, env))"
               >
                 {{ renderValue(secret.key, env) }}
               </span>
 
-              <button aria-label="Copy Secret Value" @click="copyToClipboard(getSecretValue(secret.key, env))">
+              <button aria-label="Copy Secret Value" class="hover:text-primary transition-colors" @click="copyToClipboard(getSecretValue(secret.key, env))">
                 <icon name="carbon:copy" size="20" />
               </button>
             </div>

@@ -15,7 +15,7 @@
           </p>
         </header>
 
-        <p v-if="Object.values(orgErrors).some(Boolean)" class="text-warning">
+        <p v-if="Object.values(orgErrors).some(Boolean)" class="text-danger">
           {{ Object.values(orgErrors).find(Boolean) }}
         </p>
       </div>
@@ -34,7 +34,7 @@
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
           <button
-            class="btn" title="Copy to Clipboard"
+            class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
@@ -43,7 +43,7 @@
 
         <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
           <input class="w-full" type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
-          <button class="btn" aria-label="Save Changes" @click="field.onSave(index)">
+          <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
@@ -60,11 +60,7 @@
         </h5>
 
         <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
-          <li
-            v-for="project
-              in orgProjects" :key="project.id"
-            class="card navigation-group w-full justify-between"
-          >
+          <li v-for="project in orgProjects" :key="project.id" class="card navigation-group w-full justify-between">
             <div class="flex flex-col gap-1 truncate">
               <span>{{ project?.name }}</span>
               <span class="text-caption">{{ project?.description || "No description provided." }}</span>
@@ -92,9 +88,10 @@
           <li v-for="orgUser in orgMembers" :key="orgUser.id" class="card navigation-group w-full justify-between overflow-hidden">
             <div class="flex min-w-0 flex-row items-center gap-2">
               <img :src="orgUser.image ?? undefined" alt="Avatar" class="hidden size-10 rounded-full border-2 md:block">
+
               <div class="flex min-w-0 flex-col">
                 <span class="truncate">{{ orgUser?.name }}</span>
-                <span class="text-caption truncate">Role: {{ orgUser?.role }}</span>
+                <span class="text-caption truncate">Role: {{ capitalizeFirst(orgUser?.role) }}</span>
                 <span class="text-caption truncate">{{ orgUser?.id }}</span>
               </div>
             </div>
@@ -102,7 +99,7 @@
             <nav v-if="isOwner && orgUser.id !== user?.id" class="navigation-group justify-end" aria-label="Organization Member Actions">
               <select v-model="userRoles[orgUser.id as string]">
                 <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value" class="capitalize">
-                  {{ role.label }}
+                  {{ capitalizeFirst(role.label) }}
                 </option>
               </select>
 
@@ -130,7 +127,7 @@
       </header>
 
       <div class="navigation-group self-end">
-        <p v-if="orgErrors.createInvite" class="text-warning">
+        <p v-if="orgErrors.createInvite" class="text-danger">
           {{ orgErrors.createInvite }}
         </p>
         <p v-if="inviteSuccess" class="text-success">
@@ -160,13 +157,13 @@
           <h5>
             Leave Organization
           </h5>
-          <p class="text-warning">
+          <p class="text-danger">
             This action is irreversible. You will no longer have access to this organization.
           </p>
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="orgErrors.removeOrgMember" class="text-warning">
+          <p v-if="orgErrors.removeOrgMember" class="text-danger">
             {{ orgErrors.removeOrgMember }}
           </p>
 
@@ -182,13 +179,13 @@
           <h5>
             Delete Organization
           </h5>
-          <p class="text-warning">
+          <p class="text-danger">
             This action is irreversible. All data associated with this organization will be permanently deleted.
           </p>
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="orgErrors.deleteOrg" class="text-warning">
+          <p v-if="orgErrors.deleteOrg" class="text-danger">
             {{ orgErrors.deleteOrg }}
           </p>
 

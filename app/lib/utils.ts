@@ -16,6 +16,10 @@ export function copyToClipboard(val: string) {
     navigator.clipboard.writeText(val)
 }
 
+export function capitalizeFirst(str: string) {
+  return str.charAt(0) + str.slice(1).toLowerCase()
+}
+
 export function getBaseUrl(): string {
   const config = useRuntimeConfig()
   const url = config.public.baseUrl

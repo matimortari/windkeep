@@ -12,8 +12,7 @@
           Your Secrets, Secured.
         </h1>
         <p class="text-muted-foreground max-w-xl leading-5 font-semibold md:text-lg">
-          No more .env headaches. SecretkeepR is designed to help users and organizations securely manage and share secrets.
-          It provides access controls for managing projects, users, and secrets.
+          No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
         </p>
       </div>
 
@@ -77,13 +76,13 @@
 
     <div class="flex w-full max-w-2xl flex-col divide-y">
       <div v-for="(item, index) in FAQS" :key="index" class="space-y-2 py-4">
-        <button class="hover:text-primary flex w-full items-center justify-between text-start font-semibold transition" @click="toggleAccordion(index)">
+        <button class="hover:text-primary group flex w-full items-center justify-between text-start font-semibold" @click="toggleAccordion(index)">
           <span>{{ item.question }}</span>
-          <icon :name="openIndex === index ? 'ph:minus-bold' : 'ph:plus-bold'" size="20" class="shrink-0" />
+          <icon name="ph:plus-bold" size="20" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
         </button>
 
         <transition name="accordion">
-          <p v-if="openIndex === index" class="text-caption">
+          <p v-if="openIndex === index" class="text-caption transition-transform">
             {{ item.answer }}
           </p>
         </transition>
@@ -94,13 +93,13 @@
   <section
     id="cli" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex flex-col items-center gap-12 px-8 py-16 text-center md:px-32 md:text-start"
+    :duration="800" class="flex flex-col items-center gap-8 px-8 py-16 text-center md:px-32 md:text-start"
   >
     <header class="flex flex-col items-center gap-2">
       <h2 class="font-display">
         Command Line Interface
       </h2>
-      <p class="text-caption max-w-lg text-center leading-5">
+      <p class="text-caption max-w-sm text-center leading-5">
         Manage secrets and projects directly from your terminal. Fast, secure, and open-source.
       </p>
     </header>

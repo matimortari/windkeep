@@ -7,15 +7,15 @@
   >
     <span class="font-semibold">Overview</span>
     <nav class="text-caption flex flex-col gap-1 py-2" aria-label="Main Navigation">
-      <nuxt-link v-for="link in SIDEBAR_NAV_LINKS" :key="link.url" :to="link.url" class="navigation-group hover:bg-muted rounded p-2">
-        <icon :name="link.icon" size="30" />
+      <nuxt-link v-for="link in SIDEBAR_NAV_LINKS" :key="link.url" :to="link.url" class="navigation-group group hover:bg-muted rounded p-2">
+        <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />
         <span>{{ link.label }}</span>
       </nuxt-link>
     </nav>
 
-    <div class="navigation-group justify-between">
+    <div class="flex flex-row items-center justify-between">
       <span class="font-semibold">Projects</span>
-      <button class="hover:text-accent" aria-label="Create New Project" @click="isDialogOpen = true">
+      <button class="hover:text-accent transition-transform hover:scale-125" aria-label="Create New Project" @click="isDialogOpen = true">
         <icon name="ph:plus-bold" size="25" />
       </button>
     </div>
@@ -31,11 +31,10 @@
     </nav>
 
     <nuxt-link
-      to="https://github.com/matimortari/secretkeepr" class="navigation-group border-t py-4"
-      rel="noopener" target="_blank"
-      aria-label="GitHub Repository"
+      to="https://github.com/matimortari/secretkeepr" target="_blank"
+      class="navigation-group group border-t py-4 hover:underline" aria-label="GitHub Repository"
     >
-      <icon name="simple-icons:github" size="25" />
+      <icon name="simple-icons:github" size="25" class="group-hover:text-accent transition-transform group-hover:scale-110" />
       <span class="text-caption">
         Support This Project
       </span>
