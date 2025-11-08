@@ -13,11 +13,11 @@
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span class="text-muted-foreground">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
-            <icon name="ph:caret-down-bold" size="20" class="hover:scale-md hover:text-accent transition-all" />
+            <icon name="ph:caret-down-bold" size="20" />
           </button>
 
           <transition name="dropdown" mode="out-in">
-            <ul v-if="isDropdownOpen" class="dropdown scroll-area space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
+            <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
               <li
                 v-for="org in orgs" :key="org.id"
                 role="menuitem" class="hover:bg-muted cursor-pointer truncate rounded p-2 whitespace-nowrap"
@@ -26,9 +26,9 @@
                 <span>{{ org.name }}</span>
               </li>
 
-              <li class="group hover:bg-muted truncate rounded p-2">
+              <li class="hover:bg-muted truncate rounded p-2">
                 <nuxt-link to="/onboarding/create-org" class="navigation-group">
-                  <icon name="ph:plus-bold" size="20" class="group-hover:scale-md text-accent transition-all" />
+                  <icon name="ph:plus-bold" size="20" class="text-accent" />
                   <span>Create Organization</span>
                 </nuxt-link>
               </li>

@@ -2,7 +2,7 @@
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <header class="navigation-group border-b py-2">
       <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
-        <icon name="ph:arrow-left-bold" size="25" class="hover:scale-sm text-muted-foreground hover:text-accent" />
+        <icon name="ph:arrow-left-bold" size="25" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
       <h2 class="max-w-lg truncate">
         {{ project?.name }}
