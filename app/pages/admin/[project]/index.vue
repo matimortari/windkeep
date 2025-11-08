@@ -53,13 +53,13 @@
       :project-id="project?.id" @edit="(secret: Secret) => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = secret }"
     />
 
-    <ProjectSecretDialog
+    <ProjectSecretsDialog
       :is-open="isDialogOpen && dialogType === 'secret'" :selected-secret="selectedSecret"
       :project-id="project?.id ?? ''" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
       @save="handleSubmit"
     />
 
-    <ProjectSecretImportDialog
+    <ProjectSecretsImportDialog
       :is-open="isDialogOpen && dialogType === 'env'" :project-id="project?.id ?? ''"
       :secrets="secrets" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
       @save="handleImportFromEnv"

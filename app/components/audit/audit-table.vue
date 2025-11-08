@@ -23,10 +23,10 @@
         </tr>
 
         <tr v-else-if="auditLogs.length === 0">
-          <td :colspan="getTableHeaders().length" class="text-muted-foreground border p-8 text-center">
+          <td :colspan="getTableHeaders().length" class="text-caption border p-8 text-center">
             <div class="navigation-group">
-              <icon name="material-symbols:search-off" size="20" />
-              <span>No audit logs found</span>
+              <icon name="material-symbols:search-off" size="30" />
+              <span>No audit logs found.</span>
             </div>
           </td>
         </tr>

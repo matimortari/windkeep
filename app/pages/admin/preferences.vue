@@ -15,7 +15,7 @@
           </p>
         </header>
 
-        <p v-if="Object.values(errors).some(Boolean)" class="text-warning">
+        <p v-if="Object.values(errors).some(Boolean)" class="text-danger">
           {{ Object.values(errors).find(Boolean) }}
         </p>
       </div>
@@ -34,7 +34,7 @@
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
           <button
-            class="btn" title="Copy to Clipboard"
+            class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
@@ -43,7 +43,7 @@
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
           <input class="w-full" type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
-          <button class="btn" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
+          <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
@@ -80,13 +80,13 @@
           <h5>
             Delete Account
           </h5>
-          <p class="text-warning">
+          <p class="text-danger">
             This action is irreversible. All your data will be permanently deleted.
           </p>
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="errors.deleteUser" class="text-warning">
+          <p v-if="errors.deleteUser" class="text-danger">
             {{ errors.deleteUser }}
           </p>
 
@@ -137,8 +137,7 @@ const userFields = [
     description: "Your role within the active organization.",
     value: computed(() => {
       const membership = user.value?.memberships?.find(m => m.organizationId === user.value?.activeOrgId)
-      const role = membership?.role || "N/A"
-      return role === "N/A" ? role : role.charAt(0) + role.slice(1).toLowerCase()
+      return capitalizeFirst(membership?.role || "N/A")
     }),
   },
   {

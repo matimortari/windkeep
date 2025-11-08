@@ -29,7 +29,7 @@
     </form>
 
     <p class="text-caption flex min-h-4 flex-col items-center gap-2">
-      <span v-if="errors.acceptInvite" class="text-danger-foreground">{{ errors.acceptInvite }}</span>
+      <span v-if="errors.acceptInvite" class="text-danger">{{ errors.acceptInvite }}</span>
       <span v-else-if="joinOrgSuccess" class="text-success">
         {{ joinOrgSuccess }}
       </span>

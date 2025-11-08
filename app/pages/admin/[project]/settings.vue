@@ -20,7 +20,7 @@
           </p>
         </header>
 
-        <p v-if="Object.values(errors).some(Boolean)" class="text-warning">
+        <p v-if="Object.values(errors).some(Boolean)" class="text-danger">
           {{ Object.values(errors).find(Boolean) }}
         </p>
       </div>
@@ -38,7 +38,7 @@
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
           <button
-            class="btn" title="Copy to Clipboard"
+            class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
@@ -52,7 +52,7 @@
             :value="field.model?.value"
             @input="field.update?.(($event.target as HTMLInputElement).value)"
           >
-          <button class="btn" aria-label="Save Changes" @click="field.onSave(index)">
+          <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
@@ -70,17 +70,18 @@
           <li v-for="member in project?.roles" :key="member.userId" class="card navigation-group w-full justify-between overflow-hidden">
             <div class="flex min-w-0 flex-row items-center gap-2">
               <img :src="member.user?.image ?? undefined" alt="Avatar" class="hidden size-10 rounded-full border-2 md:block">
+
               <div class="flex min-w-0 flex-col">
                 <span class="truncate">{{ member.user?.name }}</span>
-                <span class="text-caption truncate">Role: {{ member.role }}</span>
+                <span class="text-caption truncate">Role: {{ capitalizeFirst(member.role) }}</span>
                 <span class="text-caption truncate">{{ member.userId }}</span>
               </div>
             </div>
 
             <nav v-if="(isOwner || isAdmin) && member.userId !== user?.id && member.role !== 'OWNER'" class="navigation-group justify-end md:w-1/3" aria-label="Project Member Actions">
               <select v-model="member.role">
-                <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value" class="capitalize">
-                  {{ role.label }}
+                <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
+                  {{ capitalizeFirst(role.label) }}
                 </option>
               </select>
 
@@ -112,13 +113,13 @@
           <input v-model="newMemberId" type="text" placeholder="User ID" class="w-48">
           <select v-model="newMemberRole" class="md:min-w-[120px]">
             <option v-for="role in [...ROLES].reverse().filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
-              {{ role.label }}
+              {{ capitalizeFirst(role.label) }}
             </option>
           </select>
         </div>
 
         <div class="navigation-group self-end">
-          <p v-if="errors.addProjectMember" class="text-warning">
+          <p v-if="errors.addProjectMember" class="text-danger">
             {{ errors.addProjectMember }}
           </p>
           <p v-if="addMemberSuccess" class="text-success">
@@ -148,13 +149,13 @@
           <h5>
             Leave Project
           </h5>
-          <p class="text-warning">
+          <p class="text-danger">
             This action is irreversible. You will no longer have access to this project.
           </p>
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="errors.removeProjectMember" class="text-warning">
+          <p v-if="errors.removeProjectMember" class="text-danger">
             {{ errors.removeProjectMember }}
           </p>
 
@@ -170,13 +171,13 @@
           <h5>
             Delete Project
           </h5>
-          <p class="text-warning">
+          <p class="text-danger">
             This action is irreversible. All data associated with this project will be permanently deleted.
           </p>
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="errors.deleteProject" class="text-warning">
+          <p v-if="errors.deleteProject" class="text-danger">
             {{ errors.deleteProject }}
           </p>
 
