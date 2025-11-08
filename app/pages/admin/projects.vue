@@ -17,11 +17,7 @@
           </span>
         </div>
         <button aria-label="Sort by Name" class="btn" @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'">
-          <icon
-            name="ph:arrow-down-bold" size="20"
-            class="transition-all" title="Sort by Name"
-            :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'"
-          />
+          <icon name="ph:arrow-down-bold" size="20" title="Sort by Name" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
         </button>
 
         <button class="btn-primary" aria-label="Add New Project" @click="isDialogOpen = true">
@@ -47,11 +43,11 @@
       <button
         v-motion :initial="{ opacity: 0 }"
         :enter="{ opacity: 1 }" :duration="600"
-        class="card group text-muted-foreground hover:border-accent! flex h-[180px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent! transition-all"
+        class="card text-muted-foreground hover:border-accent! flex h-[180px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
         aria-label="Add New Project" @click="isDialogOpen = true"
       >
-        <icon name="ph:plus-bold" size="50" class="group-hover:scale-md group-hover:text-accent transition-all" />
-        <span class="group-hover:scale-sm text-muted-foreground transition-all">Add New Project...</span>
+        <icon name="ph:plus-bold" size="50" />
+        <span class="text-muted-foreground">Add New Project...</span>
       </button>
     </ul>
 

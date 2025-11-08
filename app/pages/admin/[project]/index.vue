@@ -2,7 +2,7 @@
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <header class="navigation-group border-b py-2">
       <nuxt-link to="/admin/projects" aria-label="Go back" class="flex items-center">
-        <icon name="ph:arrow-left-bold" size="25" class="hover:scale-sm text-muted-foreground hover:text-accent" />
+        <icon name="ph:arrow-left-bold" size="25" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
       <h2 class="max-w-lg truncate">
         {{ project?.name }}
@@ -26,7 +26,7 @@
           </button>
 
           <transition name="dropdown" mode="out-in">
-            <ul v-if="isDropdownOpen" class="dropdown scroll-area -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
+            <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
               <li
                 v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env"
                 role="menuitem" class="hover:bg-muted rounded p-2 capitalize"
