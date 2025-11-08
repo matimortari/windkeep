@@ -17,11 +17,8 @@
   --muted: #2c2b2b;
   --muted-foreground: #8a8a8a;
   --danger: #c54d38;
-  --danger-foreground: #e42525;
   --success: #2b5e3c;
-  --success-foreground: #327047;
   --accent: #859260;
-  --border: #333333;
 
   /*
     Base styles
@@ -52,11 +49,8 @@ html.light {
   --muted: #d5d6c3;
   --muted-foreground: #6b6363;
   --danger: #c54d38;
-  --danger-foreground: #e42525;
   --success: #2b5e3c;
-  --success-foreground: #327047;
   --accent: #404b3d;
-  --border: #c4c4c4;
 }
 
 /*
@@ -76,11 +70,8 @@ html.light {
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-danger: var(--danger);
-  --color-danger-foreground: var(--danger-foreground);
   --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
   --color-accent: var(--accent);
-  --color-border: var(--border);
 
   --font-default: "Roboto", sans-serif;
   --font-display: "Jockey One";
@@ -102,7 +93,7 @@ html.light {
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--border);
+    border-color: var(--muted);
   }
 
   *:focus-visible {
@@ -120,8 +111,8 @@ h1 {
   font-weight: 700;
 }
 h2 {
-  font-size: 1.75rem;
-  line-height: 1.75rem;
+  font-size: 2rem;
+  line-height: 2rem;
   font-weight: 700;
 }
 h3 {
@@ -146,18 +137,14 @@ h6 {
 }
 
 .text-caption,
-.text-warning,
+.text-danger,
 .text-success {
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;
+}
+.text-caption {
   color: var(--muted-foreground);
-}
-.text-warning {
-  color: var(--danger-foreground);
-}
-.text-success {
-  color: var(--success-foreground);
 }
 
 /*
@@ -166,7 +153,7 @@ h6 {
 .card {
   background-color: var(--card);
   color: var(--card-foreground);
-  border: 2px solid var(--border);
+  border: 2px solid var(--muted);
   border-radius: 0.5rem;
   padding: 0.75rem;
 }
@@ -174,7 +161,7 @@ h6 {
 .overlay {
   background-color: var(--overlay);
   color: var(--overlay-foreground);
-  border: 2px solid var(--border);
+  border: 2px solid var(--muted);
   border-radius: 0.5rem;
   padding: 1rem;
   z-index: 40;
@@ -215,7 +202,7 @@ select {
   background-color: var(--card);
   color: var(--muted-foreground);
   font-family: var(--font-mono);
-  border: 2px solid var(--border);
+  border: 2px solid var(--muted);
   accent-color: var(--accent);
   border-radius: 0.25rem;
   padding: 0.5rem;
@@ -245,7 +232,7 @@ select:hover {
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  border: 2px solid var(--border);
+  border: 2px solid var(--muted);
   border-radius: 0.25rem;
   white-space: nowrap;
   user-select: none;
@@ -260,7 +247,7 @@ select:hover {
 .btn-success:hover {
   transform: scale(1.025);
   filter: brightness(0.8);
-  box-shadow: 0 0 0 0.5px var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .btn:active,
@@ -346,14 +333,6 @@ select:hover {
 .bg-muted {
   background-color: var(--muted);
   color: var(--muted-foreground);
-}
-.bg-danger {
-  background-color: var(--danger);
-  color: var(--danger-foreground);
-}
-.bg-success {
-  background-color: var(--success);
-  color: var(--success-foreground);
 }
 
 /*

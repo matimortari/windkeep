@@ -4,9 +4,9 @@
       <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs" @mousedown.self="closeDialog">
         <div class="overlay min-w-[400px] space-y-4">
           <header class="flex flex-row items-center justify-between gap-4 border-b py-2">
-            <h2>
+            <h3>
               {{ title }}
-            </h2>
+            </h3>
 
             <button aria-label="Close Dialog" class="flex items-center" @mousedown="closeDialog">
               <icon name="ph:x-bold" size="20" class="text-muted-foreground" />
