@@ -1,11 +1,15 @@
 <template>
-  <div class="flex w-full items-center justify-center">
-    <div class="card w-full max-w-md">
+  <div class="flex min-h-screen w-full items-center justify-center">
+    <div
+      v-motion class="card w-full max-w-md"
+      :initial="{ opacity: 0 }" :visible="{ opacity: 1 }"
+      :duration="800"
+    >
       <header class="my-4 flex flex-col items-center gap-2 text-center">
-        <h1>
+        <h1 class="font-display">
           Sign In
         </h1>
-        <p class="text-muted-foreground">
+        <p class="text-caption">
           Choose a provider to continue.
         </p>
       </header>
@@ -18,7 +22,7 @@
       </div>
 
       <footer class="mx-auto my-4 max-w-xs text-center">
-        <p class="text-muted-foreground text-center text-sm">
+        <p class="text-caption">
           By signing in, you agree to our
           <nuxt-link to="/legal/terms" class="hover:text-primary underline">
             Terms of Service
@@ -41,9 +45,5 @@ function signIn(provider: string) {
 useHead({
   title: "Sign In",
   meta: [{ name: "description", content: "SecretkeepR Sign In page" }],
-})
-
-definePageMeta({
-  layout: "fullscreen",
 })
 </script>

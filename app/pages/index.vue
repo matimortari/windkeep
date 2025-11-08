@@ -1,30 +1,14 @@
 <template>
-  <nav class="absolute top-4 right-0 left-0 z-50 flex items-center justify-end p-4 md:top-0">
-    <div class="absolute top-1/2 left-1/2 my-2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-2 select-none">
-      <Logo />
-    </div>
-
-    <div class="flex flex-row items-center gap-4" aria-label="User Actions">
-      <button aria-label="Toggle Theme" @click="toggleTheme()">
-        <icon :name="themeIcon" size="25" />
-      </button>
-      <nuxt-link to="/sign-in" class="hidden flex-row items-center gap-2 text-sm font-semibold whitespace-nowrap hover:underline md:flex">
-        <icon name="ph:sign-in-bold" size="25" />
-        <span>Sign In</span>
-      </nuxt-link>
-    </div>
-  </nav>
-
   <section
     id="hero" v-motion
     :initial="{ opacity: 0 }" :visible="{ opacity: 1 }"
-    :duration="800" class="hero-container flex min-h-screen flex-col items-center px-4 py-16 text-center md:p-32 2xl:min-h-[60vh]"
+    :duration="800" class="flex min-h-screen flex-col items-center justify-center px-4 py-36 text-center 2xl:min-h-[60vh]"
   >
-    <div class="hero-background" />
+    <div class="hero-backdrop" />
 
-    <header class="z-20 flex w-full max-w-2xl flex-col items-center gap-8 border-b py-20">
+    <header class="z-20 flex w-full max-w-2xl flex-col items-center gap-8">
       <div class="flex flex-col items-center gap-4">
-        <h1>
+        <h1 class="font-display md:text-6xl!">
           Your Secrets, Secured.
         </h1>
         <p class="text-muted-foreground max-w-lg leading-5">
@@ -33,29 +17,34 @@
         </p>
       </div>
 
-      <div class="flex w-full flex-row items-center justify-center gap-8 md:gap-12">
-        <nuxt-link to="/sign-in" class="btn-primary hero-btn group">
+      <div class="flex w-full flex-row items-center justify-center gap-4 md:gap-8">
+        <nuxt-link to="/sign-in" class="btn-primary hero-btn">
           <span>Get Started</span>
-          <icon name="dinkie-icons:heart-black-suit-circled" size="25" />
+          <icon name="dinkie-icons:heart-black-suit-circled" size="20" />
         </nuxt-link>
 
         <nuxt-link to="/cli" class="flex flex-row items-center gap-2 text-sm font-semibold whitespace-nowrap hover:underline">
           <span>SecretkeepR CLI</span>
-          <icon name="dinkie-icons:code-filled" size="25" />
+          <icon name="dinkie-icons:code-filled" size="20" />
         </nuxt-link>
       </div>
     </header>
+  </section>
 
-    <div class="flex flex-wrap justify-center gap-4 py-12 2xl:gap-8">
-      <div
-        v-for="(highlight, index) in HIGHLIGHTS" :key="index"
-        v-motion :initial="{ opacity: 0, y: 20 }"
-        :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="card flex max-w-sm flex-col items-center gap-2 text-center"
-      >
-        <span class="text-lg font-bold">{{ highlight.title }}</span>
-        <span class="text-muted-foreground px-4 text-sm">{{ highlight.description }}</span>
-      </div>
+  <section id="highlights" class="flex flex-wrap justify-center gap-4 py-12 2xl:gap-8">
+    <div
+      v-for="(highlight, index) in HIGHLIGHTS" :key="index"
+      v-motion :initial="{ opacity: 0, y: 20 }"
+      :visible="{ opacity: 1, y: 0 }" :duration="800"
+      :delay="200 * index" class="card flex max-w-sm flex-col items-center gap-2 text-center"
+    >
+      <h4>
+        {{ highlight.title
+        }}
+      </h4>
+      <p class="text-muted-foreground px-4 text-sm">
+        {{ highlight.description }}
+      </p>
     </div>
   </section>
 
@@ -124,7 +113,7 @@
             > Install the Go module:
           </p>
           <button
-            class="hover:scale-sm flex items-center transition-all" title="Copy to Clipboard"
+            class="flex items-center" title="Copy to Clipboard"
             aria-label="Copy Install Command" @click="copyIcon.triggerCopy(INSTALL_COMMAND)"
           >
             <icon :name="copyIcon.icon.value" size="20" />
@@ -155,7 +144,6 @@
 </template>
 
 <script setup lang="ts">
-const { toggleTheme, themeIcon } = useTheme()
 const { createActionHandler } = useActionIcon()
 const copyIcon = createActionHandler("ph:copy-bold")
 
@@ -177,7 +165,7 @@ definePageMeta({
 </script>
 
 <style scoped>
-.hero-background {
+.hero-backdrop {
   background: linear-gradient(360deg, var(--background) 20%, var(--primary) 80%, var(--secondary) 100%);
   position: absolute;
   top: 0;
@@ -201,11 +189,6 @@ definePageMeta({
     transform: scaleY(0.5);
     opacity: 0.1;
   }
-}
-
-.hero-container {
-  border-bottom-width: 1px;
-  box-shadow: 0 0 8px 2px var(--primary);
 }
 
 .hero-btn {
