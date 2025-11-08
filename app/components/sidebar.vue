@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="fixed inset-0 z-30 bg-black/50 transition-opacity md:hidden" @click="$emit('update:isOpen', false)" />
 
   <aside
-    class="bg-background fixed top-0 left-0 z-30 flex h-screen w-64 flex-col gap-2 overflow-y-auto border-r-2 p-4 transition-all md:static md:rounded-br-xl md:border-b-2 2xl:w-72 2xl:p-8"
+    class="bg-background fixed top-0 left-0 z-30 flex h-screen w-64 flex-col gap-2 overflow-y-auto border-r-2 p-4 md:static md:rounded-br-xl md:border-b-2 2xl:w-72 2xl:p-8"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <span class="font-semibold">Overview</span>
@@ -15,7 +15,7 @@
 
     <div class="navigation-group justify-between">
       <span class="font-semibold">Projects</span>
-      <button class="hover:scale-md hover:text-accent transition-all" aria-label="Create New Project" @click="isDialogOpen = true">
+      <button class="hover:text-accent" aria-label="Create New Project" @click="isDialogOpen = true">
         <icon name="ph:plus-bold" size="25" />
       </button>
     </div>
@@ -31,11 +31,11 @@
     </nav>
 
     <nuxt-link
-      to="https://github.com/matimortari/secretkeepr" class="navigation-group group border-t py-4"
+      to="https://github.com/matimortari/secretkeepr" class="navigation-group border-t py-4"
       rel="noopener" target="_blank"
       aria-label="GitHub Repository"
     >
-      <icon name="simple-icons:github" size="25" class="group-hover:scale-md group-hover:text-accent transition-all" />
+      <icon name="simple-icons:github" size="25" />
       <span class="text-muted-foreground text-sm font-semibold">
         Support This Project
       </span>

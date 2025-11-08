@@ -10,7 +10,7 @@
           </p>
 
           <nuxt-link to="https://github.com/matimortari/secretkeepr" target="_blank" aria-label="GitHub Repository">
-            <icon name="simple-icons:github" size="25" class="text-muted-foreground hover:scale-md hover:text-accent transition-all" />
+            <icon name="simple-icons:github" size="25" class="text-muted-foreground hover:text-accent" />
           </nuxt-link>
         </div>
       </div>

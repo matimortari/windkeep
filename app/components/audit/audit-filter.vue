@@ -15,7 +15,7 @@
           <icon name="ph:caret-down-bold" size="15" />
         </button>
         <transition name="dropdown">
-          <ul v-if="isUserDropdownOpen" class="dropdown scroll-area overflow-y-auto text-sm whitespace-nowrap">
+          <ul v-if="isUserDropdownOpen" class="dropdown-menu scroll-area overflow-y-auto text-sm whitespace-nowrap">
             <li class="hover:bg-muted rounded p-2" @click="setUserFilter('')">
               All Users
             </li>
@@ -32,7 +32,7 @@
           <icon name="ph:caret-down-bold" size="15" />
         </button>
         <transition name="dropdown">
-          <ul v-if="isActionDropdownOpen" class="dropdown scroll-area -left-8 overflow-y-auto text-sm whitespace-nowrap">
+          <ul v-if="isActionDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm whitespace-nowrap">
             <li class="hover:bg-muted rounded p-2" @click="setActionFilter('')">
               All Actions
             </li>
