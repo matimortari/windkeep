@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
+/*
+  Default theme (dark mode)
+*/
 :root {
   --background: #0a0b0c;
   --foreground: #cacaca;
   --card: #131313;
   --card-foreground: #cacaca;
-  --popover: #1b1b1b;
-  --popover-foreground: #cacaca;
+  --overlay: #1b1b1b;
+  --overlay-foreground: #cacaca;
   --primary: #d0d867;
   --primary-foreground: #222222;
   --secondary: #374f6b;
@@ -20,23 +23,28 @@
   --accent: #859260;
   --border: #333333;
 
+  /*
+    Base styles
+  */
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-default);
   overflow-x: hidden;
   scroll-behavior: smooth;
-  outline: none;
   margin: 0;
   padding: 0;
 }
 
+/*
+  Light theme overrides
+*/
 html.light {
   --background: #f4f2ee;
   --foreground: #0a0b0c;
   --card: #ebeaea;
   --card-foreground: #0a0b0c;
-  --popover: #ebecda;
-  --popover-foreground: #0a0b0c;
+  --overlay: #ebecda;
+  --overlay-foreground: #0a0b0c;
   --primary: #d0d867;
   --primary-foreground: #222222;
   --secondary: #374f6b;
@@ -51,13 +59,16 @@ html.light {
   --border: #c4c4c4;
 }
 
+/*
+  Color and font theme tokens
+*/
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
+  --color-overlay: var(--overlay);
+  --color-overlay-foreground: var(--overlay-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -77,6 +88,9 @@ html.light {
   --font-mono: "JetBrains Mono", monospace;
 }
 
+/*
+  Global resets and accessibility
+*/
 @layer base {
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -90,19 +104,25 @@ html.light {
   ::file-selector-button {
     border-color: var(--border);
   }
+
+  *:focus-visible {
+    outline: solid 2px var(--accent);
+    border-radius: 0.25rem;
+  }
 }
 
-/* Typography */
+/*
+  Typography
+*/
 h1 {
   font-size: 3rem;
   line-height: 3.5rem;
-  font-weight: 800;
-  font-family: var(--font-display);
+  font-weight: 700;
 }
 h2 {
   font-size: 1.75rem;
   line-height: 1.75rem;
-  font-weight: 800;
+  font-weight: 700;
 }
 h3 {
   font-size: 1.5rem;
@@ -140,7 +160,9 @@ h6 {
   color: var(--success-foreground);
 }
 
-/* UI components */
+/*
+  UI elements
+*/
 .card {
   background-color: var(--card);
   color: var(--card-foreground);
@@ -149,26 +171,27 @@ h6 {
   padding: 0.75rem;
 }
 
-.popover {
-  background-color: var(--popover);
-  color: var(--popover-foreground);
+.overlay {
+  background-color: var(--overlay);
+  color: var(--overlay-foreground);
   border: 2px solid var(--border);
   border-radius: 0.5rem;
   padding: 1rem;
+  z-index: 40;
   box-shadow: 4px 4px 8px 2px rgba(0, 0, 0, 0.4);
 }
 
-.dropdown {
+.dropdown-menu {
   position: absolute;
-  background-color: var(--popover);
-  color: var(--popover-foreground);
-  border-radius: 0.25rem;
+  background-color: var(--overlay);
+  color: var(--overlay-foreground);
+  border-radius: 0.5rem;
   padding: 0.5rem;
   margin: 0.5rem;
-  box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.4);
-  z-index: 40;
+  z-index: 30;
   cursor: pointer;
   max-height: 8rem;
+  box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.4);
 }
 
 .code-block {
@@ -180,6 +203,9 @@ h6 {
   overflow-x: auto;
 }
 
+/*
+  Form elements
+*/
 input,
 textarea,
 select {
@@ -202,21 +228,10 @@ textarea:hover,
 select:hover {
   box-shadow: 0 0 0 0.5px var(--accent);
 }
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
-  outline-offset: 2px;
-}
 
-.navigation-group {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-}
-
+/*
+  Buttons
+*/
 .btn,
 .btn-primary,
 .btn-secondary,
@@ -296,9 +311,14 @@ select:focus {
   color: var(--btn-fg);
 }
 
-::selection {
-  background: color-mix(in srgb, var(--secondary) 50%, transparent);
-  color: var(--secondary-foreground);
+/*
+  Utilities
+*/
+.navigation-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .scroll-area {
@@ -307,12 +327,14 @@ select:focus {
   padding: 0.5rem;
 }
 
-.gradient-mask {
-  background-color: var(--background);
-  box-shadow: 0px 0px 15px 10px var(--background);
+::selection {
+  background: color-mix(in srgb, var(--secondary) 50%, transparent);
+  color: var(--secondary-foreground);
 }
 
-/* Match background and foreground colors */
+/*
+  Background color utilities for matching themes
+*/
 .bg-primary {
   background-color: var(--primary);
   color: var(--primary-foreground);
@@ -334,13 +356,9 @@ select:focus {
   color: var(--success-foreground);
 }
 
-@utility scale-sm {
-  transform: scale(1.05);
-}
-@utility scale-md {
-  transform: scale(1.2);
-}
-
+/*
+  ?????
+*/
 @utility navigation-group {
   @apply flex flex-row items-center gap-2;
 }
