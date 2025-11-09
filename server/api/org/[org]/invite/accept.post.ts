@@ -1,7 +1,7 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
-import { acceptInviteSchema } from "#shared/lib/schemas/org-schema"
+import { acceptInviteSchema } from "#shared/schemas/org-schema"
 import z from "zod"
 
 export default defineEventHandler(async (event) => {
