@@ -1,7 +1,7 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
-import { updateProjectSchema } from "#shared/lib/schemas/project-schema"
+import { updateProjectSchema } from "#shared/schemas/project-schema"
 import z from "zod"
 
 export default defineEventHandler(async (event) => {

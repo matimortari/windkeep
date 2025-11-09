@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { createOrganizationSchema } from "#shared/lib/schemas/org-schema"
+import { createOrganizationSchema } from "#shared/schemas/org-schema"
 
 const { user, fetchUser } = useUserActions()
 const { createOrganization, errors } = useOrganizationActions()

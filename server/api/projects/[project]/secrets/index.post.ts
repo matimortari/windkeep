@@ -2,7 +2,7 @@ import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { decrypt, encrypt } from "#server/lib/encryption"
 import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
-import { createSecretSchema } from "#shared/lib/schemas/secret-schema"
+import { createSecretSchema } from "#shared/schemas/secret-schema"
 import z from "zod"
 
 export default defineEventHandler(async (event) => {

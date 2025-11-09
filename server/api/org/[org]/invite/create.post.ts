@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto"
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getInviteBaseUrl, getUserFromSession, requireOrgRole } from "#server/lib/utils"
-import { createInviteSchema } from "#shared/lib/schemas/org-schema"
+import { createInviteSchema } from "#shared/schemas/org-schema"
 import z from "zod"
 
 export default defineEventHandler(async (event) => {
