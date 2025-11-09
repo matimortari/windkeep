@@ -1,5 +1,5 @@
-import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/lib/schemas/project-schema"
-import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret-schema"
+import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/schemas/project-schema"
+import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 
 export const projectService = {
   /**

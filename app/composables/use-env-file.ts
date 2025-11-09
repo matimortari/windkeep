@@ -1,4 +1,4 @@
-import type { CreateSecretInput, UpdateSecretInput } from "#shared/lib/schemas/secret-schema"
+import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 
 export function useEnvFile(projectId: string) {
   const { currentProject, projectSecrets, updateSecret, createSecret, fetchSecrets } = useProjectActions()

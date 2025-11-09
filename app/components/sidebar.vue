@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CreateProjectInput } from "#shared/lib/schemas/project-schema"
+import type { CreateProjectInput } from "#shared/schemas/project-schema"
 
 const props = defineProps<{
   org?: Organization

@@ -1,4 +1,4 @@
-import type { UpdateUserInput } from "#shared/lib/schemas/user-schema"
+import type { UpdateUserInput } from "#shared/schemas/user-schema"
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null)
