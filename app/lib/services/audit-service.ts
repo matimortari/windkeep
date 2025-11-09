@@ -1,4 +1,4 @@
-import type { DeleteAuditLogsInput, GetAuditLogsInput } from "#shared/lib/schemas/audit-schema"
+import type { DeleteAuditLogsInput, GetAuditLogsInput } from "#shared/schemas/audit-schema"
 
 export const auditService = {
   /**

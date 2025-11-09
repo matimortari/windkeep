@@ -600,7 +600,7 @@ Update project details. Only project owners and admins can perform this action.
 **DELETE** `/projects/{project}`
 
 Delete a project. Only project owners can delete. All secrets, secret values, roles, and audit logs are cascade deleted.
-  
+
 **Route Parameters**:
 
 - `project`: Project ID.
@@ -661,7 +661,7 @@ Add a new member to a project. Only project owners and admins can add members.
 **PUT** `/projects/{project}/members/{member}`
 
 Update the role of a project member. Owners and admins can update roles, with restrictions: non-owners cannot promote to owner or demote an owner, and members cannot update their own role.
-  
+
 **Route Parameters**:
 
 - `project`: Project ID
@@ -705,7 +705,7 @@ Remove a member from a project. Members can remove themselves, but the last owne
 - `project`: Project ID.
 - `member`: Member ID to remove.
 
-**Response**: 
+**Response**:
 
 ```json
 {
@@ -799,7 +799,7 @@ Create a new secret in a project. Only project owners or admins can perform this
   ],
   "createdAt": "Date"
 }
-  ```
+```
 
 #### Update Secret
 
