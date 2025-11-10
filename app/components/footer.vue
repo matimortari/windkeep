@@ -1,6 +1,6 @@
 <template>
   <footer class="bg-card w-full">
-    <div class="container mx-auto flex flex-col-reverse px-8 py-4 md:flex-row md:justify-between">
+    <div class="container mx-auto flex flex-col-reverse px-8 py-2 md:flex-row md:justify-between">
       <div class="flex flex-col justify-end gap-2 border-t py-8 md:border-0">
         <img :src="themeTitle" alt="Wordmark" width="100">
 
@@ -10,7 +10,7 @@
           </p>
 
           <nuxt-link to="https://github.com/matimortari/secretkeepr" target="_blank" aria-label="GitHub Repository">
-            <icon name="simple-icons:github" size="25" class="text-muted-foreground hover:text-accent" />
+            <icon name="simple-icons:github" size="25" class="hover:text-accent transition-transform hover:scale-110" />
           </nuxt-link>
         </div>
       </div>

@@ -111,6 +111,6 @@ const sidebarOpen = ref(false)
 ::v-deep(.markdown) hr {
   border: none !important;
   border-top: 1px solid var(--color-border) !important;
-  margin: 2em 0 !important;
+  margin: 1em 0 !important;
 }
 </style>

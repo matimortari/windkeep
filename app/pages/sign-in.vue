@@ -1,11 +1,11 @@
 <template>
   <div class="flex min-h-screen w-full items-center justify-center">
     <div
-      v-motion class="card w-full max-w-md"
-      :initial="{ opacity: 0 }" :visible="{ opacity: 1 }"
-      :duration="800"
+      v-motion :initial="{ opacity: 0 }"
+      :visible="{ opacity: 1 }" :duration="800"
+      class="card w-full max-w-sm md:max-w-md 2xl:max-w-lg"
     >
-      <header class="my-4 flex flex-col items-center gap-2 text-center">
+      <header class="flex flex-col items-center gap-2 py-4 text-center 2xl:py-8">
         <h1 class="font-display">
           Sign In
         </h1>
@@ -14,14 +14,14 @@
         </p>
       </header>
 
-      <div class="flex flex-col justify-center gap-4 p-4">
+      <div class="flex flex-col justify-center gap-4 border-y p-4 2xl:p-8">
         <button v-for="provider in OAUTH_PROVIDERS" :key="provider.name" class="btn" @click="signIn(provider.name)">
           <icon :name="provider.icon" size="25" />
           <span>{{ provider.label }}</span>
         </button>
       </div>
 
-      <footer class="mx-auto my-4 max-w-xs text-center">
+      <footer class="mx-auto max-w-xs py-4 text-center 2xl:py-8">
         <p class="text-caption">
           By signing in, you agree to our
           <nuxt-link to="/legal/terms" class="hover:text-primary underline">

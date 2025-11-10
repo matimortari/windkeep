@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
+    <header class="navigation-group border-b py-4">
       <h2>
         My Projects
       </h2>
@@ -36,7 +36,7 @@
       No projects found. Create a new project to get started.
     </p>
 
-    <ul v-else class="scroll-area grid max-h-[80vh] gap-2 overflow-y-auto md:grid-cols-3">
+    <ul v-else class="scroll-area grid max-h-[80vh] gap-2 overflow-y-auto p-4! md:grid-cols-3">
       <li
         v-for="(project, index) in filteredProjects" :key="project.id"
         v-motion :initial="{ opacity: 0 }"
@@ -49,7 +49,7 @@
       <button
         v-motion :initial="{ opacity: 0 }"
         :enter="{ opacity: 1 }" :duration="600"
-        class="card group hover:border-accent! flex h-[180px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
+        class="card group flex h-[200px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
         aria-label="Add New Project" @click="isDialogOpen = true"
       >
         <icon name="ph:plus-bold" size="50" class="text-muted-foreground group-hover:text-accent transition-transform group-hover:scale-110" />
