@@ -1,10 +1,10 @@
 <template>
-  <div class="container mx-auto max-w-7xl px-4 py-16">
+  <div class="container mx-auto max-w-7xl px-4 py-24">
     <header class="flex flex-col items-center gap-2 border-b p-4 text-center md:items-start md:text-start">
       <h2>
         Brand & Assets
       </h2>
-      <p class="text-caption">
+      <p class="text-caption 2xl:text-lg!">
         Download SecretkeepR logos and explore our design colors.
       </p>
     </header>
@@ -25,21 +25,20 @@
     </div>
 
     <div class="flex w-full flex-col items-center gap-4 p-8">
-      <div class="flex w-full flex-col items-center gap-1 text-center">
+      <header class="flex w-full flex-col items-center gap-2 text-center">
         <h3>
           Brand Colors
         </h3>
-        <p class="text-caption">
+        <p class="text-caption 2xl:text-lg!">
           Tip: Switch between light and dark themes to explore the full palette.
         </p>
-      </div>
+      </header>
 
       <div class="m-4 grid w-full grid-cols-1 gap-4 md:grid-cols-5">
         <div v-for="color in brandColors" :key="color.name" class="flex flex-col items-center">
           <div
             class="group relative h-24 w-full cursor-pointer rounded-lg border-2 transition"
-            :style="{ backgroundColor: `var(${color.var})` }"
-            @click="handleCopyColor(color.var)"
+            :style="{ backgroundColor: `var(${color.var})` }" @click="handleCopyColor(color.var)"
           >
             <div class="absolute inset-0 flex items-center justify-center rounded-md bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
               <span class="text-sm font-semibold">

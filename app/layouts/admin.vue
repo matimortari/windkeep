@@ -6,7 +6,7 @@
 
     <div class="flex flex-1 pb-8">
       <Sidebar v-if="user?.activeOrgId" :org="orgs.find(o => o.id === user?.activeOrgId)" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
-      <main class="flex flex-1 flex-col overflow-x-hidden p-4">
+      <main class="flex flex-1 flex-col overflow-x-hidden p-4 2xl:p-8">
         <slot :active-org="user?.activeOrgId" />
       </main>
     </div>

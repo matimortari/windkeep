@@ -66,7 +66,7 @@
 
     <!-- Danger Zone -->
     <section class="flex flex-col">
-      <header class="flex flex-col items-start gap-1 border-b p-4 text-start">
+      <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
         <h3>
           Danger Zone
         </h3>

@@ -35,9 +35,7 @@
       class="navigation-group group border-t py-4 hover:underline" aria-label="GitHub Repository"
     >
       <icon name="simple-icons:github" size="25" class="group-hover:text-accent transition-transform group-hover:scale-110" />
-      <span class="text-caption">
-        Support This Project
-      </span>
+      <span class="text-caption">Support This Project</span>
     </nuxt-link>
   </aside>
 
