@@ -1,13 +1,29 @@
 <template>
-  <nav class="bg-card fixed top-0 left-0 z-50 flex w-full items-center justify-between border-b px-4 py-2">
+  <div class="navigation-group bg-card fixed top-0 left-0 z-50 w-full justify-between border-b-2 p-4">
     <Logo />
 
-    <button class="btn" aria-label="Toggle Theme" @click="toggleTheme">
-      <icon :name="themeIcon" size="25" />
-    </button>
-  </nav>
+    <nav class="navigation-group" aria-label="User Actions">
+      <button class="btn" aria-label="Toggle Theme" @click="toggleTheme">
+        <icon :name="themeIcon" size="20" />
+      </button>
+
+      <nuxt-link v-if="!loggedIn" to="/sign-in" class="btn" aria-label="Sign In">
+        <icon name="ph:sign-in-bold" size="20" />
+      </nuxt-link>
+
+      <button v-if="loggedIn" class="btn" aria-label="Sign Out" @click="signOut">
+        <icon name="ph:sign-out-bold" size="20" />
+      </button>
+    </nav>
+  </div>
 </template>
 
 <script setup lang="ts">
 const { toggleTheme, themeIcon } = useTheme()
+const { clear, loggedIn } = useUserSession()
+
+async function signOut() {
+  await clear()
+  return navigateTo("/")
+}
 </script>

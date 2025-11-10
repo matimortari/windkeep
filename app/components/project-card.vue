@@ -1,6 +1,6 @@
 <template>
   <nuxt-link :to="`/admin/${project.slug}`">
-    <div class="card group hover:border-accent! relative h-[180px] w-full overflow-hidden">
+    <div class="card group relative h-[200px] w-full overflow-hidden">
       <div class="flex flex-col gap-2 p-2">
         <h3 class="truncate">
           {{ project.name }}

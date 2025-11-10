@@ -86,8 +86,8 @@
 
         <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
           <li v-for="orgUser in orgMembers" :key="orgUser.id" class="card navigation-group w-full justify-between overflow-hidden">
-            <div class="flex min-w-0 flex-row items-center gap-2">
-              <img :src="orgUser.image ?? undefined" alt="Avatar" class="hidden size-10 rounded-full border-2 md:block">
+            <div class="flex min-w-0 flex-row items-center gap-4">
+              <img :src="orgUser.image ?? undefined" alt="Avatar" class="hidden size-12 rounded-full border-2 md:block">
 
               <div class="flex min-w-0 flex-col">
                 <span class="truncate">{{ orgUser?.name }}</span>
@@ -143,7 +143,7 @@
 
     <!-- Danger Zone -->
     <section class="flex flex-col">
-      <header class="flex flex-col items-start gap-1 border-b p-4 text-start">
+      <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
         <h3>
           Danger Zone
         </h3>
