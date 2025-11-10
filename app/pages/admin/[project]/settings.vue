@@ -1,8 +1,8 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
+    <header class="navigation-group border-b py-4">
       <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
-        <icon name="ph:arrow-left-bold" size="25" class="text-muted-foreground hover:text-accent" />
+        <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
       <h2 class="max-w-lg truncate">
         {{ project?.name }}
@@ -68,8 +68,8 @@
 
         <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
           <li v-for="member in project?.roles" :key="member.userId" class="card navigation-group w-full justify-between overflow-hidden">
-            <div class="flex min-w-0 flex-row items-center gap-2">
-              <img :src="member.user?.image ?? undefined" alt="Avatar" class="hidden size-10 rounded-full border-2 md:block">
+            <div class="flex min-w-0 flex-row items-center gap-4">
+              <img :src="member.user?.image ?? undefined" alt="Avatar" class="hidden size-12 rounded-full border-2 md:block">
 
               <div class="flex min-w-0 flex-col">
                 <span class="truncate">{{ member.user?.name }}</span>
@@ -135,7 +135,7 @@
 
     <!-- Danger Zone -->
     <section class="flex flex-col">
-      <header class="flex flex-col items-start gap-1 border-b p-4 text-start">
+      <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
         <h3>
           Danger Zone
         </h3>
