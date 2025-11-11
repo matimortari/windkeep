@@ -1,10 +1,10 @@
 <template>
-  <div v-if="user" class="navigation-group bg-card justify-between border-b-2 px-4 py-2">
+  <div v-if="user" class="navigation-group justify-between border-b-2 bg-card px-4 py-2">
     <div class="navigation-group">
       <Logo class="hidden md:flex" />
 
       <nav class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
-        <div class="md:navigation-group text-caption hidden">
+        <div class="text-caption hidden md:navigation-group">
           <span>/</span>
           <span>{{ user.name }}</span>
           <span>/</span>
@@ -13,21 +13,21 @@
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span class="text-caption">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
-            <icon name="ph:caret-down-bold" size="20" class="transition-transform" :class="[isDropdownOpen ? 'text-muted-foreground rotate-180' : 'rotate-0']" />
+            <icon name="ph:caret-down-bold" size="20" class="transition-transform" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
           </button>
 
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
               <li
                 v-for="org in orgs" :key="org.id"
-                role="menuitem" class="hover:bg-muted cursor-pointer truncate rounded p-2 whitespace-nowrap"
+                role="menuitem" class="cursor-pointer truncate rounded p-2 whitespace-nowrap hover:bg-muted"
                 :class="org.id === user.activeOrgId ? 'bg-muted' : ''" @click="org.id && setActiveOrg(org.id)"
               >
                 <span>{{ org.name }}</span>
               </li>
 
-              <li class="hover:bg-muted truncate rounded p-2">
-                <nuxt-link to="/onboarding/create-org" class="navigation-group group" role="menuitem">
+              <li class="truncate rounded p-2 hover:bg-muted">
+                <nuxt-link to="/onboarding/create-org" class="group navigation-group" role="menuitem">
                   <icon name="ph:plus-bold" size="20" class="text-accent transition-transform group-hover:scale-125" />
                   <span>Create Organization</span>
                 </nuxt-link>
@@ -36,7 +36,7 @@
           </transition>
         </div>
 
-        <div class="md:navigation-group text-caption hidden">
+        <div class="text-caption hidden md:navigation-group">
           <span>/</span>
           <span class="capitalize">{{ currentPage }}</span>
         </div>

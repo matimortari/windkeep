@@ -5,7 +5,7 @@
     </h2>
 
     <section class="flex flex-col">
-      <div class="md:navigation-group gap-2 border-b p-4">
+      <div class="gap-2 border-b p-4 md:navigation-group">
         <header class="flex flex-col gap-2">
           <h3>
             Organization Details
@@ -21,7 +21,7 @@
       </div>
 
       <!-- Organization Details -->
-      <div v-for="(field, index) in orgFields" :key="index" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10">
+      <div v-for="(field, index) in orgFields" :key="index" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
             {{ field.label }}
@@ -116,7 +116,7 @@
     </section>
 
     <!-- Invite Members -->
-    <section v-if="isOwner || isAdmin" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Invite Members">
+    <section v-if="isOwner || isAdmin" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Invite Members">
       <header class="flex flex-col gap-1">
         <h5>
           Invite Members
@@ -152,7 +152,7 @@
         </p>
       </header>
 
-      <nav class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Leave Organization">
+      <nav class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Leave Organization">
         <header class="flex flex-col gap-1">
           <h5>
             Leave Organization
@@ -174,7 +174,7 @@
         </div>
       </nav>
 
-      <nav v-if="isOwner" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Delete Organization">
+      <nav v-if="isOwner" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Organization">
         <header class="flex flex-col gap-1">
           <h5>
             Delete Organization
