@@ -1,5 +1,5 @@
 <template>
-  <div class="md:navigation-group flex flex-col items-start justify-between gap-2 border-b p-2">
+  <div class="flex flex-col items-start justify-between gap-2 border-b p-2 md:navigation-group">
     <nav class="navigation-group" aria-label="Filters">
       <input
         v-model="dateFilter"
@@ -16,10 +16,10 @@
         </button>
         <transition name="dropdown">
           <ul v-if="isUserDropdownOpen" class="dropdown-menu scroll-area overflow-y-auto text-sm whitespace-nowrap">
-            <li class="hover:bg-muted rounded p-2" @click="setUserFilter('')">
+            <li class="rounded p-2 hover:bg-muted" @click="setUserFilter('')">
               All Users
             </li>
-            <li v-for="user in availableUsers" :key="user.id" class="hover:bg-muted flex items-center gap-1 rounded p-2" @click="setUserFilter(user.id)">
+            <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded p-2 hover:bg-muted" @click="setUserFilter(user.id)">
               <span>{{ user.name || user.email }}</span>
             </li>
           </ul>
@@ -33,10 +33,10 @@
         </button>
         <transition name="dropdown">
           <ul v-if="isActionDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm whitespace-nowrap">
-            <li class="hover:bg-muted rounded p-2" @click="setActionFilter('')">
+            <li class="rounded p-2 hover:bg-muted" @click="setActionFilter('')">
               All Actions
             </li>
-            <li v-for="action in getActions" :key="action.value" class="hover:bg-muted rounded p-2" @click="setActionFilter(action.value)">
+            <li v-for="action in getActions" :key="action.value" class="rounded p-2 hover:bg-muted" @click="setActionFilter(action.value)">
               {{ action.label }}
             </li>
           </ul>

@@ -14,7 +14,7 @@
           class="w-full"
           :disabled="isUpdateMode"
         >
-        <span class="text-muted-foreground text-xs">
+        <span class="text-xs text-muted-foreground">
           The name for the secret.
         </span>
       </div>
@@ -22,7 +22,7 @@
       <div class="flex flex-col items-start gap-1">
         <label for="description" class="text-sm font-semibold">Description (optional)</label>
         <input id="description" v-model="form.description" type="text" class="w-full">
-        <span class="text-muted-foreground text-xs">
+        <span class="text-xs text-muted-foreground">
           An optional description for the secret usage.
         </span>
       </div>

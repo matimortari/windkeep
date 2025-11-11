@@ -5,7 +5,7 @@
     </h2>
 
     <section class="flex flex-col">
-      <div class="md:navigation-group gap-2 border-b p-4">
+      <div class="gap-2 border-b p-4 md:navigation-group">
         <header class="flex flex-col gap-2">
           <h3>
             User Information
@@ -21,7 +21,7 @@
       </div>
 
       <!-- User Details -->
-      <div v-for="(field, index) in userFields" :key="index" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10">
+      <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10">
         <header class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
             {{ field.label }}
@@ -75,7 +75,7 @@
         </p>
       </header>
 
-      <nav class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Delete Account">
+      <nav class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Account">
         <header class="flex flex-col gap-1">
           <h5>
             Delete Account

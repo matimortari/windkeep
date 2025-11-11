@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-4">
+    <header class="navigation-group border-b py-2">
       <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
         <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
@@ -10,7 +10,7 @@
     </header>
 
     <section class="flex flex-col">
-      <div class="md:navigation-group gap-2 border-b p-4">
+      <div class="gap-2 border-b p-4 md:navigation-group">
         <header class="flex flex-col gap-2">
           <h3>
             Project Details
@@ -25,7 +25,7 @@
         </p>
       </div>
 
-      <div v-for="(field, index) in projectFields" :key="index" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10">
+      <div v-for="(field, index) in projectFields" :key="index" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
             {{ field.label }}
@@ -98,7 +98,7 @@
     </section>
 
     <!-- Add New Member -->
-    <section v-if="isOwner || isAdmin" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Add New Member">
+    <section v-if="isOwner || isAdmin" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Add New Member">
       <header class="flex flex-col gap-1">
         <h5>
           Add New Member
@@ -108,7 +108,7 @@
         </p>
       </header>
 
-      <div class="md:navigation-group flex flex-col gap-1">
+      <div class="flex flex-col gap-1 md:navigation-group">
         <div class="flex flex-row items-center gap-2">
           <input v-model="newMemberId" type="text" placeholder="User ID" class="w-48">
           <select v-model="newMemberRole" class="md:min-w-[120px]">
@@ -144,7 +144,7 @@
         </p>
       </header>
 
-      <nav v-if="!isOwner" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Leave Project">
+      <nav v-if="!isOwner" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Leave Project">
         <header class="flex flex-col gap-1">
           <h5>
             Leave Project
@@ -166,7 +166,7 @@
         </div>
       </nav>
 
-      <nav v-if="isOwner" class="md:navigation-group flex flex-col justify-between gap-2 border-b p-4 md:px-10" aria-label="Delete Project">
+      <nav v-if="isOwner" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Project">
         <header class="flex flex-col gap-1">
           <h5>
             Delete Project
