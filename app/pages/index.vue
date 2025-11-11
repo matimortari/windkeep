@@ -11,7 +11,7 @@
         <h1 class="font-display md:text-6xl! 2xl:text-7xl!">
           Your Secrets, Secured.
         </h1>
-        <p class="text-muted-foreground max-w-xl leading-5 font-semibold md:text-lg 2xl:text-xl">
+        <p class="max-w-xl leading-5 font-semibold text-muted-foreground md:text-lg 2xl:text-xl">
           No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
         </p>
       </div>
@@ -115,7 +115,7 @@
         <Shiki lang="bash" :code="CLI_COMMANDS.join('\n')" class="code-block" />
       </article>
 
-      <div class="text-muted-foreground absolute right-8 bottom-8 z-10 hidden items-end gap-2 text-xs font-medium select-none md:flex">
+      <div class="absolute right-8 bottom-8 z-10 hidden items-end gap-2 text-xs font-medium text-muted-foreground select-none md:flex">
         <span>Powered by Go</span>
         <img src="/assets/gopher.png" alt="Gopher" width="35" height="35">
       </div>
@@ -133,13 +133,13 @@
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
     :duration="800" class="flex flex-col items-center gap-12 px-8 py-20 md:px-20"
   >
-    <h2 class="font-display text-center">
+    <h2 class="text-center font-display">
       Frequently Asked Questions
     </h2>
 
     <div class="flex w-full max-w-2xl flex-col divide-y">
       <div v-for="(item, index) in FAQS" :key="index" class="space-y-2 py-4">
-        <button class="hover:text-primary group flex w-full items-center justify-between text-start font-semibold" @click="toggleAccordion(index)">
+        <button class="group flex w-full items-center justify-between text-start font-semibold hover:text-primary" @click="toggleAccordion(index)">
           <span>{{ item.question }}</span>
           <icon name="ph:plus-bold" size="20" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
         </button>

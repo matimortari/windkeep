@@ -11,7 +11,7 @@
       </div>
 
       <nuxt-link :to="`/admin/${project.slug}/settings`" class="text-caption absolute top-4 right-4" title="Project Settings">
-        <icon name="ph:gear-bold" size="25" class="hover:text-accent transition-transform group-hover:scale-110 hover:scale-125" />
+        <icon name="ph:gear-bold" size="25" class="transition-transform group-hover:scale-110 hover:scale-125 hover:text-accent" />
       </nuxt-link>
 
       <div class="text-caption absolute bottom-4 left-4 flex flex-row items-center gap-1">
@@ -19,8 +19,8 @@
         <span>{{ props.project.secrets?.length }}</span>
       </div>
 
-      <div class="bg-muted absolute right-4 bottom-4 flex items-center justify-center rounded-full p-2">
-        <icon name="ph:arrow-right-bold" size="25" class="group-hover:text-accent transition-transform group-hover:scale-125" />
+      <div class="absolute right-4 bottom-4 flex items-center justify-center rounded-full bg-muted p-2">
+        <icon name="ph:arrow-right-bold" size="25" class="transition-transform group-hover:scale-125 group-hover:text-accent" />
       </div>
     </div>
   </nuxt-link>
