@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-4">
+    <header class="navigation-group border-b py-2">
       <h2>
         My Projects
       </h2>
@@ -12,7 +12,7 @@
             type="text" placeholder="Search projects..."
             class="w-full pr-10"
           >
-          <span class="text-muted-foreground absolute inset-y-0 right-0 flex flex-row items-center pr-4">
+          <span class="absolute inset-y-0 right-0 flex flex-row items-center pr-4 text-muted-foreground">
             <icon name="ph:magnifying-glass-bold" size="20" />
           </span>
         </div>
@@ -52,7 +52,7 @@
         class="card group flex h-[200px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
         aria-label="Add New Project" @click="isDialogOpen = true"
       >
-        <icon name="ph:plus-bold" size="50" class="text-muted-foreground group-hover:text-accent transition-transform group-hover:scale-110" />
+        <icon name="ph:plus-bold" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-accent" />
         <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
       </button>
     </ul>

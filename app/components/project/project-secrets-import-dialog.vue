@@ -14,7 +14,7 @@
             {{ env }}
           </option>
         </select>
-        <span class="text-muted-foreground text-xs">
+        <span class="text-xs text-muted-foreground">
           Select the environment for the imported secrets.
         </span>
       </div>

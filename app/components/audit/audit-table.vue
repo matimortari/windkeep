@@ -1,6 +1,6 @@
 <template>
   <div class="scroll-area w-full overflow-x-auto">
-    <table class="bg-card min-w-full table-auto rounded-t-lg border md:w-full md:overflow-hidden">
+    <table class="min-w-full table-auto rounded-t-lg border bg-card md:w-full md:overflow-hidden">
       <thead>
         <tr class="bg-muted text-sm font-semibold">
           <th v-for="header in getTableHeaders()" :key="header.value" class="border-x text-start">
@@ -31,7 +31,7 @@
           </td>
         </tr>
 
-        <tr v-for="log in auditLogs" v-else :key="log.id" class="hover:bg-muted border text-sm">
+        <tr v-for="log in auditLogs" v-else :key="log.id" class="border text-sm hover:bg-muted">
           <td class="border p-2" :title="getActionLabel(log.action)">
             <div class="navigation-group max-w-xs truncate">
               <icon :name="getResourceIcon(log.resource ?? null)" size="16" />

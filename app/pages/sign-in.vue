@@ -24,11 +24,11 @@
       <footer class="mx-auto max-w-xs py-4 text-center 2xl:py-8">
         <p class="text-caption">
           By signing in, you agree to our
-          <nuxt-link to="/legal/terms" class="hover:text-primary underline">
+          <nuxt-link to="/legal/terms" class="underline hover:text-primary">
             Terms of Service
           </nuxt-link>
           and
-          <nuxt-link to="/legal/privacy" class="hover:text-primary underline">
+          <nuxt-link to="/legal/privacy" class="underline hover:text-primary">
             Privacy Policy
           </nuxt-link>.
         </p>

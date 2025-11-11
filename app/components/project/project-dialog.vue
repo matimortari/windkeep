@@ -15,7 +15,7 @@
           class="w-full"
           :placeholder="suggestedSlug"
         >
-        <span class="text-muted-foreground text-xs">
+        <span class="text-xs text-muted-foreground">
           Used in project URL. Lowercase alphanumeric with hyphens only.
         </span>
       </div>
@@ -23,7 +23,7 @@
       <div class="flex flex-col items-start gap-1">
         <label for="description" class="text-sm font-semibold">Description</label>
         <input id="description" v-model="form.description" type="text" class="w-full">
-        <span class="text-muted-foreground text-xs">
+        <span class="text-xs text-muted-foreground">
           An optional description for your project.
         </span>
       </div>

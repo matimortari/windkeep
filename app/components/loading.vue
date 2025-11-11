@@ -1,6 +1,6 @@
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center gap-4">
-    <div class="bg-muted relative w-1/4">
+    <div class="relative w-1/4 bg-muted">
       <div class="progress-bar bg-primary" />
     </div>
   </div>

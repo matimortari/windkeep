@@ -1,6 +1,6 @@
 <template>
   <div class="scroll-area w-full overflow-x-auto">
-    <table class="bg-card min-w-full table-auto rounded-t-lg border md:w-full md:overflow-hidden">
+    <table class="min-w-full table-auto rounded-t-lg border bg-card md:w-full md:overflow-hidden">
       <thead>
         <tr class="bg-muted text-sm font-semibold">
           <th class="flex w-full flex-row items-center gap-2 p-2 text-start">
@@ -26,7 +26,7 @@
           :enter="{ opacity: 1 }" :duration="400"
           :delay="100 * index" class="border"
         >
-          <td class="text-muted-foreground flex flex-row items-center justify-between gap-4 p-2 font-mono text-sm font-semibold">
+          <td class="flex flex-row items-center justify-between gap-4 p-2 font-mono text-sm font-semibold text-muted-foreground">
             <div class="flex flex-row items-center gap-2">
               <span class="w-full truncate">{{ secret.key }}</span>
               <icon
@@ -37,28 +37,28 @@
             </div>
 
             <nav class="flex items-center justify-end gap-2 md:justify-start">
-              <button aria-label="Toggle Secret Value Visibility" class="hover:text-primary transition-colors" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
+              <button aria-label="Toggle Secret Value Visibility" class="transition-colors hover:text-primary" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
                 <icon :name="visibleKeys[secret.key] ? 'carbon:view' : 'carbon:view-off'" size="20" />
               </button>
-              <button aria-label="Edit Secret" class="hover:text-primary transition-colors" @click="handleUpdateSecret(secret.key)">
+              <button aria-label="Edit Secret" class="transition-colors hover:text-primary" @click="handleUpdateSecret(secret.key)">
                 <icon name="carbon:edit" size="20" />
               </button>
-              <button aria-label="Delete Secret" class="hover:text-danger transition-colors" @click="handleDeleteSecret(secret.key)">
+              <button aria-label="Delete Secret" class="transition-colors hover:text-danger" @click="handleDeleteSecret(secret.key)">
                 <icon name="carbon:delete" size="20" />
               </button>
             </nav>
           </td>
 
-          <td v-for="env in environments" :key="env" class="text-muted-foreground w-[150px] max-w-[150px] overflow-hidden border p-2 font-mono text-sm">
+          <td v-for="env in environments" :key="env" class="w-[150px] max-w-[150px] overflow-hidden border p-2 font-mono text-sm text-muted-foreground">
             <div class="flex flex-row items-center justify-between gap-4">
               <span
-                class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, env) ? 'bg-muted hover:text-accent! cursor-pointer rounded px-1 transition-colors' : '']"
+                class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors hover:text-accent!' : '']"
                 @click="copyToClipboard(getSecretValue(secret.key, env))"
               >
                 {{ renderValue(secret.key, env) }}
               </span>
 
-              <button aria-label="Copy Secret Value" class="hover:text-primary transition-colors" @click="copyToClipboard(getSecretValue(secret.key, env))">
+              <button aria-label="Copy Secret Value" class="transition-colors hover:text-primary" @click="copyToClipboard(getSecretValue(secret.key, env))">
                 <icon name="carbon:copy" size="20" />
               </button>
             </div>
