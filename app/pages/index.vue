@@ -51,14 +51,9 @@
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
     :duration="800" class="flex flex-col items-center gap-12 px-8 py-20 md:px-20"
   >
-    <header class="flex flex-col items-center gap-4 text-center">
-      <h2 class="font-display">
-        Features
-      </h2>
-      <p class="text-caption max-w-sm text-center leading-5 2xl:text-lg!">
-        Discover what makes SecretkeepR the ultimate solution for managing your secrets.
-      </p>
-    </header>
+    <h2 class="text-center font-display">
+      Features
+    </h2>
 
     <div class="flex flex-col flex-wrap items-center justify-center gap-4 md:flex-row md:gap-8 2xl:flex-row 2xl:flex-nowrap">
       <div

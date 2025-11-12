@@ -211,6 +211,7 @@ select {
   border-radius: 0.25rem;
   padding: 0.5rem;
   font-size: 0.875rem;
+  width: 100%;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

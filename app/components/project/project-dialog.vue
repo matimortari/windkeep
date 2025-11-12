@@ -3,26 +3,20 @@
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="name" class="text-sm font-semibold">Project Name</label>
-        <input id="name" v-model="form.name" type="text" class="w-full">
+        <input id="name" v-model="form.name" type="text">
       </div>
 
       <div class="flex flex-col items-start gap-1">
         <label for="slug" class="text-sm font-semibold">Project Slug</label>
-        <input
-          id="slug"
-          v-model="form.slug"
-          type="text"
-          class="w-full"
-          :placeholder="suggestedSlug"
-        >
+        <input id="slug" v-model="form.slug" type="text" :placeholder="suggestedSlug">
         <span class="text-xs text-muted-foreground">
-          Used in project URL. Lowercase alphanumeric with hyphens only.
+          Lowercase alphanumeric with hyphens only.
         </span>
       </div>
 
       <div class="flex flex-col items-start gap-1">
         <label for="description" class="text-sm font-semibold">Description</label>
-        <input id="description" v-model="form.description" type="text" class="w-full">
+        <input id="description" v-model="form.description" type="text">
         <span class="text-xs text-muted-foreground">
           An optional description for your project.
         </span>

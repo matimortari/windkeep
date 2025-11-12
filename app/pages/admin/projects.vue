@@ -1,17 +1,13 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
+    <header class="navigation-group border-b py-4">
       <h2>
         My Projects
       </h2>
 
       <nav class="navigation-group w-full flex-1 justify-end">
         <div class="relative hidden md:block">
-          <input
-            id="search" v-model="searchQuery"
-            type="text" placeholder="Search projects..."
-            class="w-full pr-10"
-          >
+          <input id="search" v-model="searchQuery" type="text" placeholder="Search projects...">
           <span class="absolute inset-y-0 right-0 flex flex-row items-center pr-4 text-muted-foreground">
             <icon name="ph:magnifying-glass-bold" size="20" />
           </span>

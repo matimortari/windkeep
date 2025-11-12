@@ -1,5 +1,5 @@
 <template>
-  <div class="scroll-area w-full overflow-x-auto">
+  <div class="scroll-area w-full overflow-x-auto p-4!">
     <table class="min-w-full table-auto rounded-t-lg border bg-card md:w-full md:overflow-hidden">
       <thead>
         <tr class="bg-muted text-sm font-semibold">
