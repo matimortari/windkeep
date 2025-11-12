@@ -1,13 +1,13 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-30 bg-black/50 transition-opacity md:hidden" @click="$emit('update:isOpen', false)" />
+  <div v-if="isOpen" class="fixed inset-0 z-30 bg-black/50 transition-opacity ease-in-out md:hidden" @click="$emit('update:isOpen', false)" />
 
   <aside
-    class="fixed top-0 left-0 z-30 flex h-screen w-64 flex-col gap-2 overflow-y-auto border-r-2 bg-background p-4 md:static md:rounded-br-xl md:border-b-2 2xl:w-72 2xl:p-8"
+    class="fixed top-0 left-0 z-30 flex h-screen w-64 transform flex-col gap-2 overflow-y-auto border-r-2 bg-background p-4 transition-transform ease-in-out md:static md:rounded-br-xl md:border-b-2 2xl:w-72 2xl:p-8"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <span class="font-semibold">Overview</span>
     <nav class="text-caption flex flex-col gap-1 py-2" aria-label="Main Navigation">
-      <nuxt-link v-for="link in SIDEBAR_NAV_LINKS" :key="link.url" :to="link.url" class="group navigation-group rounded p-2 hover:bg-muted">
+      <nuxt-link v-for="link in SIDEBAR_NAV_LINKS" :key="link.url" :to="link.url" class="group navigation-group rounded p-2 transition-colors hover:bg-muted">
         <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />
         <span>{{ link.label }}</span>
       </nuxt-link>
@@ -32,7 +32,7 @@
 
     <nuxt-link
       to="https://github.com/matimortari/secretkeepr" target="_blank"
-      class="group navigation-group border-t py-4 hover:underline" aria-label="GitHub Repository"
+      class="group navigation-group border-t py-4 transition-colors hover:underline" aria-label="GitHub Repository"
     >
       <icon name="simple-icons:github" size="25" class="transition-transform group-hover:scale-110 group-hover:text-accent" />
       <span class="text-caption">Support This Project</span>

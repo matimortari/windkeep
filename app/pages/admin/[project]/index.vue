@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
+    <header class="navigation-group border-b py-4">
       <nuxt-link to="/admin/projects" aria-label="Go back" class="flex items-center">
         <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
