@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
+    <header class="navigation-group border-b py-4">
       <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
         <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
@@ -46,12 +46,7 @@
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
-          <input
-            class="w-full"
-            type="text"
-            :value="field.model?.value"
-            @input="field.update?.(($event.target as HTMLInputElement).value)"
-          >
+          <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
@@ -110,7 +105,7 @@
 
       <div class="flex flex-col gap-1 md:navigation-group">
         <div class="flex flex-row items-center gap-2">
-          <input v-model="newMemberId" type="text" placeholder="User ID" class="w-48">
+          <input v-model="newMemberId" type="text" placeholder="User ID">
           <select v-model="newMemberRole" class="md:min-w-[120px]">
             <option v-for="role in [...ROLES].reverse().filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
               {{ capitalizeFirst(role.label) }}

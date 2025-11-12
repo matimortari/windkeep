@@ -1,11 +1,9 @@
 <template>
-  <div class="flex flex-col items-start justify-between gap-2 border-b p-2 md:navigation-group">
+  <div class="flex flex-col items-start justify-between gap-2 pt-4 md:navigation-group">
     <nav class="navigation-group" aria-label="Filters">
       <input
-        v-model="dateFilter"
-        type="date"
-        title="Filter by date"
-        class="hidden md:block"
+        v-model="dateFilter" type="date"
+        title="Filter by date" class="hidden md:block"
         @change="updateDateFilter"
       >
 
@@ -50,10 +48,8 @@
 
     <nav v-if="pagination && pagination.totalPages > 0" class="navigation-group" aria-label="Pagination">
       <input
-        v-model="dateFilter"
-        type="date"
-        class="md:hidden"
-        title="Filter by date"
+        v-model="dateFilter" type="date"
+        title="Filter by date" class="md:hidden"
         @change="updateDateFilter"
       >
 

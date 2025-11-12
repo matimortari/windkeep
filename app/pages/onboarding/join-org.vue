@@ -18,11 +18,8 @@
       :initial="{ opacity: 0 }" :visible="{ opacity: 1 }"
       :duration="800" @submit.prevent="handleAcceptInvite"
     >
-      <input
-        v-model="token" placeholder="Invite Token"
-        class="w-full" type="text"
-        autofocus
-      >
+      <input v-model="token" placeholder="Invite Token" type="text" autofocus>
+
       <button class="btn-primary w-full" type="submit" aria-label="Join Organization">
         Accept Invite
       </button>
