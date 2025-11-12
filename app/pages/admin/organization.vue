@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <h2 class="border-b py-2">
+    <h2 class="border-b py-4">
       Organization
     </h2>
 
@@ -42,7 +42,7 @@
         </div>
 
         <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
-          <input class="w-full" type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
+          <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
