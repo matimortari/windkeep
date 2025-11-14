@@ -130,7 +130,8 @@ async function setActionFilter(action: string) {
 
 const logsSummary = computed(() => {
   const count = auditLogs.value.length
-  return count ? `${count} ${count === 1 ? "log" : "logs"}` : "no matching logs"
+  const label = count === 1 ? "log" : "logs"
+  return count ? `${count} ${label}` : "no matching logs"
 })
 
 async function handleDeleteLogs() {

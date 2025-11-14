@@ -18,16 +18,14 @@
 
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
-              <li
-                v-for="org in orgs" :key="org.id"
-                role="menuitem" class="cursor-pointer truncate rounded p-2 whitespace-nowrap hover:bg-muted"
-                :class="org.id === user.activeOrgId ? 'bg-muted' : ''" @click="org.id && setActiveOrg(org.id)"
-              >
-                <span>{{ org.name }}</span>
+              <li v-for="org in orgs" :key="org.id" class="truncate whitespace-nowrap">
+                <button type="button" class="w-full cursor-pointer truncate rounded p-2 text-left hover:bg-muted" :class="org.id === user.activeOrgId ? 'bg-muted' : ''" @click="org.id && setActiveOrg(org.id)">
+                  {{ org.name }}
+                </button>
               </li>
 
-              <li class="truncate rounded p-2 hover:bg-muted">
-                <nuxt-link to="/onboarding/create-org" class="group navigation-group" role="menuitem">
+              <li class="truncate whitespace-nowrap">
+                <nuxt-link to="/onboarding/create-org" class="group navigation-group block rounded p-2 hover:bg-muted" role="menuitem">
                   <icon name="ph:plus-bold" size="20" class="text-accent transition-transform group-hover:scale-125" />
                   <span>Create Organization</span>
                 </nuxt-link>
@@ -83,7 +81,8 @@ useClickOutside(dropdownRef, () => {
 const currentPage = computed(() => {
   const segments = route.path.split("/").filter(Boolean)
   let page = segments.length ? segments[segments.length - 1] : "home"
-  page = (page ?? "home").replace(/-/g, " ")
+  page = (page ?? "home").replaceAll("-", " ")
+
   return page.replace(/\b\w/g, l => l.toUpperCase())
 })
 

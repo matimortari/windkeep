@@ -27,12 +27,10 @@
 
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
-              <li
-                v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env"
-                role="menuitem" class="rounded p-2 capitalize hover:bg-muted"
-                @click="handleExport(env)"
-              >
-                {{ env }}
+              <li v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env" class="rounded capitalize">
+                <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="handleExport(env)">
+                  {{ env }}
+                </button>
               </li>
             </ul>
           </transition>

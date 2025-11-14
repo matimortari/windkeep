@@ -20,7 +20,7 @@
     >
       <input v-model="token" placeholder="Invite Token" type="text" autofocus>
 
-      <button class="btn-primary w-full" type="submit" aria-label="Join Organization">
+      <button class="btn-primary w-full" type="submit">
         Accept Invite
       </button>
     </form>

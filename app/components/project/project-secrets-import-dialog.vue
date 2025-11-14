@@ -83,15 +83,6 @@ function parseEnv(text: string): Record<string, string> {
   return parsed
 }
 
-function normalizeKey(key: string): string {
-  return key
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9_]/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_|_$/g, "")
-}
-
 function handleSubmit() {
   validationError.value = null
 
