@@ -9,12 +9,13 @@ export const auditService = {
   getAuditLogs: async (orgId: string, params?: GetAuditLogsInput) => {
     const queryParams = new URLSearchParams()
     if (params) {
-      Object.entries(params).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(params)) {
         if (value !== undefined && value !== null) {
           queryParams.append(key, String(value))
         }
-      })
+      }
     }
+
     const res = await $fetch(`${API_URL}/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, {
       method: "GET",
       credentials: "include",

@@ -33,7 +33,7 @@ export function useUserActions() {
   const setCurrentOrganization = async (orgId: string) => {
     await userStore.setActiveOrg(orgId)
     if (import.meta.client) {
-      window.location.reload()
+      globalThis.location.reload()
     }
   }
 
