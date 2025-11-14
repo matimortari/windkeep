@@ -5,12 +5,13 @@
         <tr class="bg-muted text-sm font-semibold">
           <th class="flex w-full flex-row items-center gap-2 p-2 text-start">
             <span>Key</span>
-            <icon
-              name="ph:arrow-down-bold" size="15"
-              aria-label="Sort by Key" role="button"
-              class="hover:text-accent" title="Sort by Key"
-              :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'"
-            />
+            <button
+              type="button" title="Sort by Key"
+              aria-label="Sort by Key" class="flex items-center hover:text-accent"
+              @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'"
+            >
+              <icon name="ph:arrow-down-bold" size="15" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
+            </button>
           </th>
 
           <th v-for="env in environments" :key="env" class="border-x p-2 text-start md:w-1/6">

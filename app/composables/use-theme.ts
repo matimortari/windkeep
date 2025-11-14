@@ -6,26 +6,27 @@ export function useTheme() {
   const storageKey = "nuxt-color-mode"
 
   const updateHtmlClass = () => {
-    const html = document.documentElement
+    const html = globalThis.document.documentElement
     html.classList.remove("dark", "light")
     html.classList.add(colorMode.value)
   }
 
   const syncThemeFromLocalStorage = () => {
-    const saved = localStorage.getItem(storageKey)
+    const saved = globalThis.localStorage.getItem(storageKey)
     if (saved === "light" || saved === "dark") {
       colorMode.value = saved
     }
     else {
-      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches
+      const prefersLight = globalThis.matchMedia("(prefers-color-scheme: light)").matches
       colorMode.value = prefersLight ? "light" : "dark"
     }
+
     updateHtmlClass()
   }
 
   const toggleTheme = () => {
     colorMode.value = colorMode.value === "light" ? "dark" : "light"
-    localStorage.setItem(storageKey, colorMode.value)
+    globalThis.localStorage.setItem(storageKey, colorMode.value)
     updateHtmlClass()
   }
 

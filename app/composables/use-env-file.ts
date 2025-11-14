@@ -3,102 +3,87 @@ import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secre
 export function useEnvFile(projectId: string) {
   const { currentProject, projectSecrets, updateSecret, createSecret, fetchSecrets } = useProjectActions()
 
-  const handleImportFromEnv = async (importedSecrets: Secret[]): Promise<{ success: number, failed: number, errors: string[] }> => {
-    if (!importedSecrets || importedSecrets.length === 0) {
-      return { success: 0, failed: 0, errors: ["No secrets to import"] }
+  const mergeValues = (existingValues: SecretValue[], newValues: SecretValue[]): SecretValue[] => {
+    const merged = [...existingValues]
+    for (const newValue of newValues) {
+      const idx = merged.findIndex((v: SecretValue) => v.environment === newValue.environment)
+      if (idx >= 0)
+        merged[idx] = { ...merged[idx], value: newValue.value } as SecretValue
+      else merged.push(newValue)
     }
+    return merged
+  }
 
-    const errors: string[] = []
+  const importSingleSecret = async (secret: Secret) => {
+    if (!secret.key)
+      throw new Error("Secret key is required")
+
+    const existing = projectSecrets.value.find(s => s.key === secret.key && s.projectId === projectId)
+    if (existing) {
+      const mergedValues = mergeValues(existing.values ?? [], secret.values ?? [])
+      const payload: UpdateSecretInput = { values: mergedValues }
+      if (secret.description !== undefined)
+        payload.description = secret.description
+      return await updateSecret(projectId, existing.id!, payload)
+    }
+    else {
+      const payload: CreateSecretInput = {
+        key: secret.key,
+        description: secret.description ?? "",
+        projectId,
+        values: secret.values ?? [],
+      }
+      return await createSecret(projectId, payload)
+    }
+  }
+
+  const handleImportFromEnv = async (importedSecrets: Secret[]): Promise<{ success: number, failed: number, errors: string[] }> => {
+    if (!importedSecrets?.length)
+      return { success: 0, failed: 0, errors: ["No secrets to import"] }
+
+    const results = await Promise.allSettled(importedSecrets.map(importSingleSecret))
+
     let successCount = 0
     let failedCount = 0
+    const errors: string[] = []
 
-    const results = await Promise.allSettled(importedSecrets.map(async (secret) => {
-      if (!secret.key) {
-        throw new Error("Secret key is required")
-      }
-
-      const existing = projectSecrets.value.find((s: Secret) => s.key === secret.key && s.projectId === projectId)
-      if (existing) {
-        const existingValues = existing.values ?? []
-        const newValues = secret.values ?? []
-
-        const mergedValues = [...existingValues]
-        newValues.forEach((newValue: SecretValue) => {
-          const existingIndex = mergedValues.findIndex((v: SecretValue) => v.environment === newValue.environment)
-          if (existingIndex >= 0) {
-            mergedValues[existingIndex] = { ...mergedValues[existingIndex], value: newValue.value }
-          }
-          else {
-            mergedValues.push(newValue)
-          }
-        })
-
-        const updatePayload: UpdateSecretInput = {}
-        if (secret.description !== undefined) {
-          updatePayload.description = secret.description
-        }
-        updatePayload.values = mergedValues
-
-        return await updateSecret(projectId, existing.id!, updatePayload)
-      }
-      else {
-        const createPayload: CreateSecretInput = {
-          key: secret.key,
-          description: secret.description ?? "",
-          projectId,
-        }
-        createPayload.values = secret.values ?? []
-
-        return await createSecret(projectId, createPayload)
-      }
-    }))
-
-    results.forEach((result, index) => {
+    for (const [i, result] of results.entries()) {
       if (result.status === "rejected") {
         failedCount++
-        errors.push(`Failed to import "${importedSecrets[index]?.key}": ${result.reason?.message || "Unknown error"}`)
+        errors.push(`Failed to import "${importedSecrets[i]?.key}": ${result.reason?.message || "Unknown error"}`)
       }
       else {
         successCount++
       }
-    })
+    }
 
     await fetchSecrets(projectId)
-
     return { success: successCount, failed: failedCount, errors }
   }
 
   const handleExportToEnv = (env: string | null | undefined): { success: boolean, error?: string } => {
-    if (!env) {
+    if (!env)
       return { success: false, error: "Environment not specified" }
-    }
 
     const filteredSecrets = projectSecrets.value
-      .filter((s: Secret) => s.projectId === projectId)
-      .map((s: Secret) => {
+      .filter(s => s.projectId === projectId)
+      .map((s) => {
         const value = s.values?.find((v: SecretValue) => v.environment === env)?.value
         return value ? `${s.key}="${value}"` : null
       })
       .filter(Boolean)
       .join("\n")
 
-    if (!filteredSecrets) {
+    if (!filteredSecrets)
       return { success: false, error: "No secrets found for this environment" }
-    }
 
     try {
       const blob = new Blob([filteredSecrets], { type: "text/plain" })
       const projectName = currentProject.value?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "")
       const fileName = `.env.${projectName}.${env.toLowerCase()}`
-      const url = URL.createObjectURL(blob)
-      const a = Object.assign(document.createElement("a"), {
-        href: url,
-        download: fileName,
-      })
+      const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: fileName })
       a.click()
-
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000)
       return { success: true }
     }
     catch (error: any) {
