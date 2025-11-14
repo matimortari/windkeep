@@ -29,3 +29,12 @@ export function getBaseUrl(): string {
 
   return url
 }
+
+export function normalizeKey(key: string): string {
+  return key
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "")
+}

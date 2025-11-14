@@ -76,10 +76,17 @@ const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
 function resetForm() {
   if (props.selectedSecret) {
-    const mappedValues: Record<Environment, string> = { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" }
-    props.selectedSecret.values?.forEach((sv) => {
-      mappedValues[sv.environment] = sv.value
-    })
+    const mappedValues: Record<Environment, string> = {
+      DEVELOPMENT: "",
+      STAGING: "",
+      PRODUCTION: "",
+    }
+    if (props.selectedSecret.values) {
+      for (const sv of props.selectedSecret.values) {
+        mappedValues[sv.environment] = sv.value
+      }
+    }
+
     form.value = {
       key: props.selectedSecret.key,
       description: props.selectedSecret.description || "",
@@ -90,20 +97,15 @@ function resetForm() {
     form.value = {
       key: "",
       description: "",
-      values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
+      values: {
+        DEVELOPMENT: "",
+        STAGING: "",
+        PRODUCTION: "",
+      },
     }
   }
 
   validationError.value = null
-}
-
-function normalizeKey(key: string): string {
-  return key
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9_]/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_|_$/g, "")
 }
 
 async function handleSubmit() {
