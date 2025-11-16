@@ -196,7 +196,6 @@ const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, 
 const addMemberSuccess = ref<string | null>(null)
 const newMemberId = ref("")
 const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
-
 const localProjectName = ref("")
 const localProjectSlug = ref("")
 const localProjectDescription = ref("")
@@ -280,8 +279,7 @@ async function handleUpdateMemberRole(memberId: string, newRole: Role) {
   if (!project.value?.id)
     return
 
-  const success = await updateMemberRole(project.value.id, memberId, { role: newRole })
-  if (success)
+  if (await updateMemberRole(project.value.id, memberId, { role: newRole }))
     await fetchProjects()
 }
 
@@ -338,33 +336,30 @@ async function handleLeaveProject() {
   await navigateTo("/admin/projects")
 }
 
-// Redirect if user is not a member of the project
 watch([project, allProjects], ([proj, projects]) => {
   if (projects.length > 0 && !proj) {
     navigateTo("/admin/projects", { replace: true })
   }
 }, { immediate: true })
 
-// Initialize local state when project loads
 watch(() => project.value, (proj) => {
-  if (proj) {
-    localProjectName.value = proj.name
-    localProjectSlug.value = proj.slug
-    localProjectDescription.value = proj.description || ""
-  }
-}, { immediate: true })
+  if (!proj)
+    return
 
-watch(() => project.value?.id, (id) => {
-  if (id) {
-    setCurrentProject(id)
+  localProjectName.value = proj.name
+  localProjectSlug.value = proj.slug
+  localProjectDescription.value = proj.description || ""
+
+  if (proj.id) {
+    setCurrentProject(proj.id)
   }
 }, { immediate: true })
 
 watch([project, activeOrg], ([proj, org]) => {
-  if (proj && org && proj.organizationId && proj.organizationId !== org.id) {
+  if (proj && org && proj.organizationId !== org.id) {
     navigateTo("/admin/projects")
   }
-}, { immediate: false })
+})
 
 watch(() => project.value?.id, async (id: string | undefined) => {
   const projectTitle = allProjects.value?.find(p => p.id === id)?.name
