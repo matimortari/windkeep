@@ -37,7 +37,7 @@ export function useEnvFile(projectId: string) {
     }
   }
 
-  const handleImportFromEnv = async (importedSecrets: Secret[]): Promise<{ success: number, failed: number, errors: string[] }> => {
+  const importFromEnv = async (importedSecrets: Secret[]): Promise<{ success: number, failed: number, errors: string[] }> => {
     if (!importedSecrets?.length)
       return { success: 0, failed: 0, errors: ["No secrets to import"] }
 
@@ -61,7 +61,7 @@ export function useEnvFile(projectId: string) {
     return { success: successCount, failed: failedCount, errors }
   }
 
-  const handleExportToEnv = (env: string | null | undefined): { success: boolean, error?: string } => {
+  const exportToEnv = (env: string | null | undefined): { success: boolean, error?: string } => {
     if (!env)
       return { success: false, error: "Environment not specified" }
 
@@ -91,5 +91,5 @@ export function useEnvFile(projectId: string) {
     }
   }
 
-  return { handleImportFromEnv, handleExportToEnv }
+  return { importFromEnv, exportToEnv }
 }
