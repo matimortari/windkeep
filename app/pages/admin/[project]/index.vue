@@ -27,9 +27,9 @@
 
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
-              <li v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env" class="rounded capitalize">
-                <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="handleExport(env)">
-                  {{ env }}
+              <li v-for="env in environments" :key="env" class="rounded capitalize">
+                <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="exportToEnv(env); isDropdownOpen = false">
+                  {{ capitalizeFirst(env) }}
                 </button>
               </li>
             </ul>
@@ -42,12 +42,12 @@
       </nav>
     </header>
 
-    <p v-if="!secrets.length" class="text-caption my-8 h-[80vh] text-center">
+    <p v-if="!projectSecrets.length" class="text-caption my-8 h-[80vh] text-center">
       No secrets found for this project. Add a new secret or import from an .env file to get started.
     </p>
 
     <ProjectSecretsTable
-      v-if="secrets.length" :secrets="secrets"
+      v-if="projectSecrets.length" :secrets="projectSecrets"
       :project-id="project?.id" @edit="(secret: Secret) => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = secret }"
     />
 
@@ -59,8 +59,8 @@
 
     <ProjectSecretsImportDialog
       :is-open="isDialogOpen && dialogType === 'env'" :project-id="project?.id ?? ''"
-      :secrets="secrets" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
-      @save="handleImportFromEnv"
+      :secrets="projectSecrets" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
+      @save="(secrets) => { importFromEnv(secrets); isDialogOpen = false }"
     />
   </div>
 </template>
@@ -70,10 +70,11 @@ const route = useRoute()
 const slug = route.params.project
 const { activeOrg } = useUserActions()
 const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets } = useProjectActions()
+const { importFromEnv, exportToEnv } = useEnvFile(allProjects.value.find(p => p.slug === slug)?.id)
+
+const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 
 const project = computed(() => allProjects.value.find(p => p.slug === slug))
-const { handleImportFromEnv: importFromEnv, handleExportToEnv: exportToEnv } = useEnvFile(project.value?.id)
-const secrets = projectSecrets
 
 const selectedSecret = ref<Secret | null>(null)
 const dropdownRef = ref<HTMLElement | null>(null)
@@ -84,16 +85,6 @@ const isDropdownOpen = ref(false)
 useClickOutside(dropdownRef, () => {
   isDropdownOpen.value = false
 }, { escapeKey: true })
-
-async function handleImportFromEnv(importedSecrets: Secret[]) {
-  await importFromEnv(importedSecrets)
-  isDialogOpen.value = false
-}
-
-function handleExport(env: string) {
-  exportToEnv(env)
-  isDropdownOpen.value = false
-}
 
 async function handleSubmit(secret: any) {
   isDialogOpen.value = false
@@ -117,7 +108,6 @@ async function handleSubmit(secret: any) {
     await fetchSecrets(project.value.id)
 }
 
-// Redirect if user is not a member of the project
 watch([project, allProjects], ([proj, projects]) => {
   if (projects.length > 0 && !proj) {
     navigateTo("/admin/projects", { replace: true })

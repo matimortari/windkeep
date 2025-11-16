@@ -10,8 +10,8 @@
       <div class="flex flex-col items-start gap-1">
         <span class="text-sm font-semibold">Environment</span>
         <select v-model="selectedEnv" class="w-full capitalize">
-          <option v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env" :value="env" class="capitalize">
-            {{ env }}
+          <option v-for="env in environments" :key="env" :value="env" class="capitalize">
+            {{ capitalizeFirst(env) }}
           </option>
         </select>
         <span class="text-xs text-muted-foreground">
@@ -50,6 +50,8 @@ const emit = defineEmits<{
 }>()
 
 const { errors } = useProjectActions()
+
+const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 
 const envContent = ref("")
 const selectedEnv = ref<Environment>("DEVELOPMENT")
