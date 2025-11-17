@@ -24,14 +24,14 @@
         </div>
 
         <div class="navigation-group">
-          <nuxt-link :to="`/admin/${project.slug}/settings`" title="Project Settings" class="group navigation-group rounded-full bg-muted p-2 md:px-2.5">
-            <icon name="ph:gear-bold" size="25" class="transition-transform group-hover:scale-125 group-hover:text-accent" />
-            <span class="text-caption hidden md:block whitespace-nowrap">Settings</span>
+          <nuxt-link :to="`/admin/${project.slug}/settings`" title="Project Settings" class="group navigation-group rounded-full p-2 text-muted-foreground hover:bg-muted">
+            <icon name="ph:gear-bold" size="25" class="transition-transform group-hover:scale-110 group-hover:text-accent" />
+            <span class="text-caption hidden whitespace-nowrap 2xl:block">Settings</span>
           </nuxt-link>
 
-          <div class="group navigation-group rounded-full bg-muted p-2 md:px-2.5">
-            <span class="text-caption hidden md:block whitespace-nowrap">View Project</span>
-            <icon name="ph:arrow-right-bold" size="25" class="transition-transform group-hover:scale-125 group-hover:text-accent" />
+          <div class="group navigation-group rounded-full p-2 text-muted-foreground hover:bg-muted">
+            <span class="text-caption hidden whitespace-nowrap 2xl:block">View Project</span>
+            <icon name="ph:arrow-right-bold" size="25" class="transition-transform group-hover:scale-110 group-hover:text-accent" />
           </div>
         </div>
       </div>

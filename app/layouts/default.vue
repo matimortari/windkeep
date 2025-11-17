@@ -3,7 +3,7 @@
 
   <Loading v-if="isLoading" />
 
-  <main v-show="!isLoading" class="relative min-h-screen w-full overflow-hidden">
+  <main v-show="!isLoading" class="relative">
     <div class="grid-backdrop" />
     <slot />
   </main>

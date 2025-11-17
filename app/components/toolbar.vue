@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user" class="navigation-group justify-between border-b-2 bg-card px-4 py-2">
+  <div v-if="user" class="fixed top-0 left-0 z-30 navigation-group w-full justify-between border-b-2 bg-card p-2">
     <div class="navigation-group">
       <Logo class="hidden md:flex" />
 
