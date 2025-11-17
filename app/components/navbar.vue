@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-0 z-50 navigation-group w-full justify-between border-b-2 bg-card p-4">
+  <div class="fixed top-0 left-0 z-50 navigation-group w-full justify-between border-b-2 bg-card p-2">
     <Logo />
 
     <nav class="navigation-group" aria-label="User Actions">
