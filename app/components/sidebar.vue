@@ -1,13 +1,17 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-30 bg-black/50 transition-opacity ease-in-out md:hidden" @click="$emit('update:isOpen', false)" />
+  <div v-if="isOpen" class="fixed inset-0 z-40 bg-black/50 transition-opacity ease-in-out md:hidden" @click="$emit('update:isOpen', false)" />
 
   <aside
-    class="fixed top-0 left-0 z-30 flex h-screen w-64 transform flex-col gap-2 overflow-y-auto border-r-2 bg-background p-4 transition-transform ease-in-out md:static md:rounded-br-xl md:border-b-2 2xl:w-72 2xl:p-8"
+    class="fixed top-0 left-0 z-50 flex h-screen w-64 transform flex-col gap-2 overflow-y-auto border-r-2 bg-background px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-xl md:border-b-2 2xl:w-72"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <span class="font-semibold">Overview</span>
     <nav class="text-caption flex flex-col gap-1 py-2" aria-label="Main Navigation">
-      <nuxt-link v-for="link in SIDEBAR_NAV_LINKS" :key="link.url" :to="link.url" class="group navigation-group rounded p-2 transition-colors hover:bg-muted">
+      <nuxt-link
+        v-for="link in SIDEBAR_NAV_LINKS" :key="link.url"
+        :to="link.url" class="group navigation-group rounded p-2 transition-colors hover:bg-muted"
+        @click="$emit('update:isOpen', false)"
+      >
         <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />
         <span>{{ link.label }}</span>
       </nuxt-link>
@@ -25,7 +29,11 @@
     </p>
 
     <nav v-else aria-label="Projects Navigation" class="scroll-area text-caption flex max-h-64 flex-col gap-2 overflow-x-hidden">
-      <nuxt-link v-for="project in activeOrgProjects" :key="project.id" :to="`/admin/${project.slug}`" class="truncate hover:underline">
+      <nuxt-link
+        v-for="project in activeOrgProjects" :key="project.id"
+        :to="`/admin/${project.slug}`" class="truncate hover:underline"
+        @click="$emit('update:isOpen', false)"
+      >
         {{ project.name }}
       </nuxt-link>
     </nav>
