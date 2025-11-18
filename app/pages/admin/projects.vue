@@ -13,15 +13,15 @@
           </span>
         </div>
 
-        <button aria-label="Sort by Name" class="btn" @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'">
-          <icon
-            name="ph:arrow-down-bold" size="20"
-            title="Sort by Name" class="transition-transform"
-            :class="[sort.direction === 'asc' ? 'rotate-180' : 'rotate-0']"
-          />
+        <button class="btn" @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'">
+          <icon name="ph:arrow-down-bold" size="20" :class="[sort.direction === 'asc' ? 'rotate-180' : 'rotate-0']" class="transition-transform" />
         </button>
 
-        <button class="btn-primary" aria-label="Add New Project" @click="isDialogOpen = true">
+        <button aria-label="Toggle Layout" class="btn" @click="layout = layout === 'grid' ? 'list' : 'grid'">
+          <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
+        </button>
+
+        <button class="btn-primary" @click="isDialogOpen = true">
           <span class="hidden md:inline">Add New Project</span>
           <icon name="ph:plus-bold" size="20" />
         </button>
@@ -31,6 +31,8 @@
     <p v-if="!filteredProjects.length" class="text-caption my-8 h-[80vh] text-center">
       No projects found. Create a new project to get started.
     </p>
+
+    <ProjectTable v-else-if="layout === 'list'" :projects="filteredProjects" />
 
     <ul v-else class="scroll-area grid max-h-[80vh] gap-2 overflow-y-auto p-4! md:grid-cols-3">
       <li
@@ -45,8 +47,7 @@
       <button
         v-motion :initial="{ opacity: 0 }"
         :enter="{ opacity: 1 }" :duration="600"
-        class="card group flex h-[200px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!"
-        aria-label="Add New Project" @click="isDialogOpen = true"
+        class="card group flex h-[200px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!" @click="isDialogOpen = true"
       >
         <icon name="ph:plus-bold" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-accent" />
         <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
@@ -63,6 +64,7 @@ const { activeOrgProjects, createProject, fetchProjects } = useProjectActions()
 
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
+const layout = ref<"grid" | "list">("grid")
 const sort = ref<{ key: string, direction: "asc" | "desc" }>({
   key: "name",
   direction: "asc",

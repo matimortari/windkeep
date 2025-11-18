@@ -7,9 +7,7 @@
   --background: #0a0b0c;
   --foreground: #cacaca;
   --card: #131313;
-  --card-foreground: #cacaca;
   --overlay: #1b1b1b;
-  --overlay-foreground: #cacaca;
   --primary: #d0d867;
   --primary-foreground: #222222;
   --secondary: #374f6b;
@@ -39,9 +37,7 @@ html.light {
   --background: #f4f2ee;
   --foreground: #0a0b0c;
   --card: #ebeaea;
-  --card-foreground: #0a0b0c;
   --overlay: #ebecda;
-  --overlay-foreground: #0a0b0c;
   --primary: #d0d867;
   --primary-foreground: #222222;
   --secondary: #374f6b;
@@ -60,9 +56,7 @@ html.light {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
   --color-overlay: var(--overlay);
-  --color-overlay-foreground: var(--overlay-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -152,7 +146,6 @@ h6 {
 */
 .card {
   background-color: var(--card);
-  color: var(--card-foreground);
   border: 2px solid var(--muted);
   border-radius: 0.5rem;
   padding: 1.25rem;
@@ -164,7 +157,6 @@ h6 {
 
 .overlay {
   background-color: var(--overlay);
-  color: var(--overlay-foreground);
   border: 2px solid var(--muted);
   border-radius: 0.5rem;
   padding: 1.5rem;
@@ -175,7 +167,6 @@ h6 {
 .dropdown-menu {
   position: absolute;
   background-color: var(--overlay);
-  color: var(--overlay-foreground);
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin: 0.5rem;
@@ -275,7 +266,7 @@ select:hover {
 
 .btn {
   --btn-bg: var(--card);
-  --btn-fg: var(--card-foreground);
+  --btn-fg: var(--foreground);
 }
 .btn-primary {
   --btn-bg: var(--primary);

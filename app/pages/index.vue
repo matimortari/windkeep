@@ -2,7 +2,7 @@
   <div
     v-motion :initial="{ opacity: 0 }"
     :visible="{ opacity: 1 }" :duration="800"
-    class="relative flex min-h-screen flex-col items-center justify-center px-8 py-24 text-center"
+    class="relative flex min-h-screen w-full flex-col items-center justify-center px-8 py-24 text-center"
   >
     <div class="hero-backdrop" />
 
@@ -49,7 +49,7 @@
   <section
     id="features" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex flex-col items-center gap-12 px-8 py-20 md:px-20"
+    :duration="800" class="flex w-full flex-col items-center gap-12 px-8 py-20 md:px-20"
   >
     <h2 class="text-center font-display">
       Features
@@ -76,7 +76,7 @@
   <section
     id="cli" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex flex-col items-center gap-12 px-8 py-20 md:px-20"
+    :duration="800" class="flex w-full flex-col items-center gap-12 px-8 py-20 md:px-20"
   >
     <header class="flex flex-col items-center gap-4 text-center">
       <h2 class="font-display">
@@ -126,7 +126,7 @@
   <section
     id="faq" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex flex-col items-center gap-12 px-8 py-20 md:px-20"
+    :duration="800" class="flex w-full flex-col items-center gap-12 px-8 py-20 md:px-20"
   >
     <h2 class="text-center font-display">
       Frequently Asked Questions
