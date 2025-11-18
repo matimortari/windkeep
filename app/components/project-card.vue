@@ -12,12 +12,12 @@
 
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-4">
-          <div class="flex flex-row items-center gap-1 text-muted-foreground">
+          <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">
             <icon name="ph:key-bold" size="20" />
             <span>{{ props.project.secrets?.length }}</span>
           </div>
 
-          <div class="flex flex-row items-center gap-1 text-muted-foreground">
+          <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">
             <icon name="ph:users-bold" size="20" />
             <span>{{ project.roles?.length }}</span>
           </div>
