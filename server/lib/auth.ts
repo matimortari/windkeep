@@ -41,17 +41,17 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
 
   // 5. Check if user needs active org set
   if (!user.activeOrgId) {
-    const membership = await db.organizationMembership.findFirst({
+    const membership = await db.orgMembership.findFirst({
       where: { userId: user.id },
-      include: { organization: true },
+      include: { org: true },
     })
 
-    if (membership?.organization) {
+    if (membership?.org) {
       await db.user.update({
         where: { id: user.id },
-        data: { activeOrgId: membership.organization.id },
+        data: { activeOrgId: membership.org.id },
       })
-      user.activeOrgId = membership.organization.id
+      user.activeOrgId = membership.org.id
     }
   }
 
@@ -67,7 +67,7 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
     id: user.id,
     email: user.email,
     name: user.name,
-    image: user.image,
+    image: user.image ?? undefined,
     apiToken,
   }
 

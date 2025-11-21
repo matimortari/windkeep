@@ -17,12 +17,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await requireRole(user.id, { type: "organization", orgId: result.data.organizationId }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "organization", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
 
   // Check if project with same name or slug already exists in this organization
   const conflictingProject = await db.project.findFirst({
     where: {
-      orgId: result.data.organizationId,
+      orgId: result.data.orgId,
       OR: [
         { name: result.data.name },
         { slug: result.data.slug },
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
       name: result.data.name,
       slug: result.data.slug,
       description: result.data.description,
-      orgId: result.data.organizationId,
+      orgId: result.data.orgId,
       memberships: {
         create: {
           userId: user.id,
@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: project.orgId,
+    orgId: project.orgId,
     projectId: project.id,
     action: "project.created",
     resource: "project",

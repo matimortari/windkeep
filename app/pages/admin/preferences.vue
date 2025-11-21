@@ -136,7 +136,7 @@ const userFields = [
     label: "Active Organization Role",
     description: "Your role within the active organization.",
     value: computed(() => {
-      const membership = user.value?.memberships?.find(m => m.organizationId === user.value?.activeOrgId)
+      const membership = user.value?.orgMemberships?.find(m => m.orgId === user.value?.activeOrgId)
       return capitalizeFirst(membership?.role || "N/A")
     }),
   },

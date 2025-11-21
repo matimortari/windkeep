@@ -24,7 +24,7 @@ export const updateMemberRoleSchema = z.object({
 })
 
 export const createInviteSchema = z.object({
-  organizationId: z.cuid(),
+  orgId: z.cuid(),
 })
 
 export const acceptInviteSchema = z.object({

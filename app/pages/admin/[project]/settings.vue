@@ -356,7 +356,7 @@ watch(() => project.value, (proj) => {
 }, { immediate: true })
 
 watch([project, activeOrg], ([proj, org]) => {
-  if (proj && org && proj.organizationId !== org.id) {
+  if (proj && org && proj.orgId !== org.id) {
     navigateTo("/admin/projects")
   }
 })

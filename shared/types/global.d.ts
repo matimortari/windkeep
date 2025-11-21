@@ -8,8 +8,8 @@ interface User {
   image?: string
   apiToken?: string
   activeOrgId?: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   orgMemberships?: OrgMembership[]
   projectMemberships?: ProjectMembership[]
   invitations?: Invitation[]
@@ -19,8 +19,8 @@ interface User {
 interface Organization {
   id: string
   name: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   memberships?: OrgMembership[]
   projects?: Project[]
   invitations?: Invitation[]
@@ -31,8 +31,8 @@ interface OrgMembership {
   userId: string
   orgId: string
   role: Role
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: User
   org: Organization
 }
@@ -43,8 +43,8 @@ interface Project {
   slug: string
   description?: string
   orgId: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   org: Organization
   secrets?: Secret[]
   memberships?: ProjectMembership[]
@@ -55,8 +55,8 @@ interface ProjectMembership {
   userId: string
   projectId: string
   role: Role
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: User
   project: Project
 }
@@ -66,8 +66,8 @@ interface Secret {
   key: string
   description?: string
   projectId: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   project: Project
   values?: SecretValue[]
 }
@@ -77,8 +77,8 @@ interface SecretValue {
   secretId: string
   environment: Environment
   value: string
-  createdAt: Date | string
-  updatedAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   secret: Secret
 }
 
@@ -87,7 +87,7 @@ interface Invitation {
   orgId: string
   token: string
   expiresAt: Date | string
-  createdAt: Date | string
+  createdAt?: Date | string
   org: Organization
   invitedById: string
   invitedBy: User

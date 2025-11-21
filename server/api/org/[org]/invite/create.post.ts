@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = createInviteSchema.safeParse({
     ...body,
-    organizationId: org,
+    orgId: org,
   })
   if (!result.success) {
     throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: org,
+    orgId: org,
     action: "organization.invite.created",
     resource: "organization_invite",
     metadata: {
