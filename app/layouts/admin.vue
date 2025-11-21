@@ -22,9 +22,9 @@ const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
 const orgs = computed(() =>
-  user.value?.memberships?.map(m => ({
-    id: m.organization?.id ?? m.organizationId,
-    name: m.organization?.name ?? "",
+  user.value?.orgMemberships?.map(m => ({
+    id: m.org?.id ?? m.orgId,
+    name: m.org?.name ?? "",
     role: m.role,
   })) ?? [],
 )

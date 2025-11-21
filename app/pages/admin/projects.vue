@@ -85,7 +85,7 @@ async function handleCreateProject(payload: { name: string, slug: string, descri
     name: payload.name,
     slug: payload.slug,
     description: payload.description || undefined,
-    organizationId: activeOrg.value!.id,
+    orgId: activeOrg.value!.id,
   })
   if (activeOrg.value?.id) {
     await fetchProjects()

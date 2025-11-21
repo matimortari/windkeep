@@ -19,7 +19,7 @@ export function useProjectActions() {
     if (!activeOrgId) {
       return []
     }
-    return projectStore.projects.filter((project: any) => project.organizationId === activeOrgId)
+    return projectStore.projects.filter((project: any) => project.orgId === activeOrgId)
   })
 
   /**
@@ -31,7 +31,7 @@ export function useProjectActions() {
 
   /**
    * Create a new project
-   * @param data Project creation data (name, organizationId)
+   * @param data Project creation data (name, orgId)
    */
   const createProject = async (data: CreateProjectInput) => {
     return await projectStore.createProject(data)

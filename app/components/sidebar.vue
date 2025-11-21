@@ -62,12 +62,12 @@ const { activeOrgProjects, createProject, fetchProjects } = useProjectActions()
 
 const isDialogOpen = ref(false)
 
-async function handleCreateProject(project: Omit<CreateProjectInput, "organizationId">) {
+async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {
   await createProject({
     name: project.name,
     slug: project.slug,
     description: project.description || undefined,
-    organizationId: props.org!.id,
+    orgId: props.org!.id,
   })
   if (props.org?.id) {
     await fetchProjects()

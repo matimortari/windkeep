@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   const endDate = query.endDate as string | undefined
 
   const where: any = {
-    organizationId: org,
+    orgId: org,
   }
 
   if (projectId) {

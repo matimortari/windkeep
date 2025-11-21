@@ -12,26 +12,23 @@ export default defineEventHandler(async (event) => {
           role: true,
           orgId: true,
           org: {
-            include: {
-              memberships: {
-                include: {
-                  user: {
-                    select: {
-                      id: true,
-                      name: true,
-                      email: true,
-                      image: true,
-                    },
-                  },
-                },
-              },
+            select: {
+              id: true,
+              name: true,
             },
           },
         },
       },
       projectMemberships: {
         select: {
-          project: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              orgId: true,
+            },
+          },
         },
       },
     },

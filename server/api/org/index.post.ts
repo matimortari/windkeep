@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: organization.id,
+    orgId: organization.id,
     action: "organization.created",
     resource: "organization",
     metadata: {

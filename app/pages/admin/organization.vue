@@ -207,7 +207,7 @@ const { allProjects } = useProjectActions()
 
 const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
-const orgProjects = computed(() => allProjects.value.filter(p => p.organizationId === activeOrg.value?.id))
+const orgProjects = computed(() => allProjects.value.filter(p => p.orgId === activeOrg.value?.id))
 const orgMembers = computed(() => {
   return ((activeOrg.value)?.memberships || []).map((m: any) => ({
     id: m.user?.id,
@@ -258,7 +258,7 @@ async function handleCreateInvite() {
     return
 
   const result = await inviteMember(activeOrg.value.id, {
-    organizationId: activeOrg.value.id,
+    orgId: activeOrg.value.id,
   })
 
   if (result?.inviteUrl) {

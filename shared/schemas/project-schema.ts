@@ -24,7 +24,7 @@ export const createProjectSchema = z.object({
     .max(500, "Description must be at most 500 characters")
     .transform(val => val.trim())
     .optional(),
-  organizationId: z.cuid(),
+  orgId: z.cuid(),
 })
 
 export const updateProjectSchema = z.object({

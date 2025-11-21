@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const { olderThan, projectId, userId, action } = body as Record<string, string | undefined>
 
-  const where: any = { organizationId: org }
+  const where: any = { orgId: org }
 
   if (olderThan) {
     const date = new Date(olderThan)
