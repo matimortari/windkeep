@@ -4,7 +4,10 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null)
   const activeOrg = ref<Organization | null>(null)
   const loading = ref(false)
-  const errors = ref<Record<"getUser" | "setActiveOrg" | "updateUser" | "updateUserImage" | "deleteUser", string | null>>({
+  const errors = ref<Record<
+    "getUser" | "setActiveOrg" | "updateUser" | "updateUserImage" | "deleteUser",
+    string | null
+  >>({
     getUser: null,
     setActiveOrg: null,
     updateUser: null,
@@ -17,20 +20,19 @@ export const useUserStore = defineStore("user", () => {
     errors.value.getUser = null
 
     try {
-      const userData = await userService.getUser()
+      const userData = await $fetch(`${API_URL}/user`, {
+        method: "GET",
+        credentials: "include",
+      })
       user.value = userData as User
+
       if (user.value?.activeOrgId) {
-        const membership = user.value.memberships?.find(m => m.organizationId === user.value?.activeOrgId)
-        if (membership?.organization) {
-          // Ensure we have the full organization data with all memberships
-          activeOrg.value = {
-            ...membership.organization,
-            memberships: membership.organization.memberships || [],
-          }
-        }
-        else {
-          activeOrg.value = null
-        }
+        const membership = user.value.orgMemberships?.find(
+          m => m.orgId === user.value?.activeOrgId,
+        )
+        activeOrg.value = membership?.org
+          ? { ...membership.org, memberships: membership.org.memberships || [] }
+          : null
       }
       else {
         activeOrg.value = null
@@ -53,18 +55,16 @@ export const useUserStore = defineStore("user", () => {
     errors.value.setActiveOrg = null
 
     try {
-      await userService.updateUser({ activeOrgId: orgId })
-      const membership = user.value.memberships?.find(org => org.organizationId === orgId)
-      if (membership?.organization) {
-        // Ensure we have the full organization data with all memberships
-        activeOrg.value = {
-          ...membership.organization,
-          memberships: membership.organization.memberships || [],
-        }
-      }
-      else {
-        activeOrg.value = null
-      }
+      await $fetch(`${API_URL}/user`, {
+        method: "PUT",
+        body: { activeOrgId: orgId },
+        credentials: "include",
+      })
+
+      const membership = user.value.orgMemberships?.find(m => m.orgId === orgId)
+      activeOrg.value = membership?.org
+        ? { ...membership.org, memberships: membership.org.memberships || [] }
+        : null
     }
     catch (err: any) {
       errors.value.setActiveOrg = err?.message || "Failed to set active organization"
@@ -80,10 +80,13 @@ export const useUserStore = defineStore("user", () => {
     errors.value.updateUser = null
 
     try {
-      await userService.updateUser(data)
-      if (user.value) {
+      await $fetch(`${API_URL}/user`, {
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      })
+      if (user.value)
         Object.assign(user.value, data)
-      }
     }
     catch (err: any) {
       errors.value.updateUser = err?.message || "Failed to update user"
@@ -99,10 +102,17 @@ export const useUserStore = defineStore("user", () => {
     errors.value.updateUserImage = null
 
     try {
-      const res = await userService.updateUserImage(file)
-      if (user.value && res.imageUrl) {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const res = await $fetch<{ imageUrl: string }>(`${API_URL}/user/image-upload`, {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      })
+
+      if (user.value && res.imageUrl)
         user.value.image = res.imageUrl
-      }
       return res
     }
     catch (err: any) {
@@ -119,7 +129,10 @@ export const useUserStore = defineStore("user", () => {
     errors.value.deleteUser = null
 
     try {
-      await userService.deleteUser()
+      await $fetch(`${API_URL}/user`, {
+        method: "DELETE",
+        credentials: "include",
+      })
       user.value = null
       activeOrg.value = null
     }
