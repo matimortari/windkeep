@@ -7,11 +7,11 @@ export default defineEventHandler(async (event) => {
   const userData = await db.user.findUnique({
     where: { id: user.id },
     include: {
-      memberships: {
+      orgMemberships: {
         select: {
           role: true,
-          organizationId: true,
-          organization: {
+          orgId: true,
+          org: {
             include: {
               memberships: {
                 include: {
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-      projectRoles: {
+      projectMemberships: {
         select: {
           project: true,
         },

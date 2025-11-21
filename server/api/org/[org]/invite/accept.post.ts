@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const invitation = await db.invitation.findUnique({
     where: { token: result.data.token },
     include: {
-      organization: {
+      org: {
         select: {
           id: true,
           name: true,
@@ -31,11 +31,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 410, statusMessage: "Invitation has expired" })
   }
 
-  const existingMembership = await db.organizationMembership.findUnique({
+  const existingMembership = await db.orgMembership.findUnique({
     where: {
-      userId_organizationId: {
+      userId_orgId: {
         userId: user.id,
-        organizationId: invitation.organizationId,
+        orgId: invitation.orgId,
       },
     },
   })
@@ -47,14 +47,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const [membership] = await db.$transaction([
-    db.organizationMembership.create({
+    db.orgMembership.create({
       data: {
         userId: user.id,
-        organizationId: invitation.organizationId,
+        orgId: invitation.orgId,
         role: "MEMBER",
       },
       include: {
-        organization: {
+        org: {
           select: {
             id: true,
             name: true,
@@ -77,15 +77,15 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: invitation.organizationId,
+    organizationId: invitation.orgId,
     action: "organization.invite.accepted",
     resource: "organization_invite",
     metadata: {
-      organizationName: membership.organization.name,
+      organizationName: membership.org.name,
       userName: membership.user.name,
       userEmail: membership.user.email,
     },
-    description: `${membership.user.name} (${membership.user.email}) joined organization "${membership.organization.name}" via invite link`,
+    description: `${membership.user.name} (${membership.user.email}) joined organization "${membership.org.name}" via invite link`,
     event,
   })
 

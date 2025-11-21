@@ -1,6 +1,6 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Secret ID are required" })
   }
 
-  await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN"])
 
   const secretData = await db.secret.findUnique({
     where: { id: secret },
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       project: {
         select: {
           name: true,
-          organizationId: true,
+          orgId: true,
         },
       },
       _count: {
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: secretData.project.organizationId,
+    organizationId: secretData.project.orgId,
     projectId: project,
     action: "secret.deleted",
     resource: "secret",

@@ -1,6 +1,6 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 import { updateProjectMemberSchema } from "#shared/schemas/project-schema"
 import z from "zod"
 
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
   }
 
-  const userRole = await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
+  const userRole = await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateProjectMemberSchema.safeParse(body)
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
-  const targetRole = await db.projectRole.findUnique({
+  const targetRole = await db.projectMembership.findUnique({
     where: { userId_projectId: { userId: member, projectId: project } },
   })
   if (!targetRole) {
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (targetRole.role === "OWNER" && result.data.role !== "OWNER") {
-    const ownerCount = await db.projectRole.count({
+    const ownerCount = await db.projectMembership.count({
       where: {
         projectId: project,
         role: "OWNER",
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const updatedRole = await db.projectRole.update({
+  const updatedRole = await db.projectMembership.update({
     where: { userId_projectId: { userId: member, projectId: project } },
     data: { role: result.data.role },
     include: {
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
-          organizationId: true,
+          orgId: true,
         },
       },
     },
@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: updatedRole.project.organizationId,
+    organizationId: updatedRole.project.orgId,
     projectId: project,
     action: "project.member.role_updated",
     resource: "project_member",

@@ -1,6 +1,6 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 import { updateProjectSchema } from "#shared/schemas/project-schema"
 import z from "zod"
 
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER"])
 
   const body = await readBody(event)
   const result = updateProjectSchema.safeParse(body)
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   const existingProject = await db.project.findUnique({
     where: { id: project },
     select: {
-      organizationId: true,
+      orgId: true,
       name: true,
       slug: true,
       description: true,
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
   if (result.data.name || result.data.slug) {
     const conflictingProject = await db.project.findFirst({
       where: {
-        organizationId: existingProject.organizationId,
+        orgId: existingProject.orgId,
         OR: [
           result.data.name ? { name: result.data.name } : {},
           result.data.slug ? { slug: result.data.slug } : {},
@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
       description: result.data.description,
     },
     include: {
-      organization: true,
+      org: true,
     },
   })
 
@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: updatedProject.organizationId,
+    organizationId: updatedProject.orgId,
     projectId: project,
     action: "project.updated",
     resource: "project",

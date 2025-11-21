@@ -1,6 +1,6 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -10,8 +10,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Organization ID and Member ID are required" })
   }
 
-  const targetMembership = await db.organizationMembership.findUnique({
-    where: { userId_organizationId: { userId: member, organizationId: org } },
+  const targetMembership = await db.orgMembership.findUnique({
+    where: { userId_orgId: { userId: member, orgId: org } },
     include: {
       user: {
         select: {
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
           name: true,
         },
       },
-      organization: {
+      org: {
         select: {
           name: true,
         },
@@ -33,12 +33,12 @@ export default defineEventHandler(async (event) => {
 
   // Allow self-removal (unless user is last owner)
   if (member === user.id) {
-    const membership = await db.organizationMembership.findUnique({
-      where: { userId_organizationId: { userId: user.id, organizationId: org } },
+    const membership = await db.orgMembership.findUnique({
+      where: { userId_orgId: { userId: user.id, orgId: org } },
     })
     if (membership?.role === "OWNER") {
-      const ownerCount = await db.organizationMembership.count({
-        where: { organizationId: org, role: "OWNER" },
+      const ownerCount = await db.orgMembership.count({
+        where: { orgId: org, role: "OWNER" },
       })
       if (ownerCount === 1) {
         throw createError({ statusCode: 400, statusMessage: "Cannot leave organization as the last owner." })
@@ -46,14 +46,14 @@ export default defineEventHandler(async (event) => {
     }
   }
   else {
-    const userRole = await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
+    const userRole = await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER", "ADMIN"])
     if (targetMembership.role === "OWNER" && userRole.role !== "OWNER") {
       throw createError({ statusCode: 403, statusMessage: "Organization owners cannot be removed." })
     }
   }
 
-  await db.organizationMembership.delete({
-    where: { userId_organizationId: { userId: member, organizationId: org } },
+  await db.orgMembership.delete({
+    where: { userId_orgId: { userId: member, orgId: org } },
   })
 
   await createAuditLog({
@@ -66,12 +66,12 @@ export default defineEventHandler(async (event) => {
       targetUserEmail: targetMembership.user.email,
       targetUserName: targetMembership.user.name,
       role: targetMembership.role,
-      organizationName: targetMembership.organization.name,
+      organizationName: targetMembership.org.name,
       selfRemoval: member === user.id,
     },
     description: member === user.id
-      ? `${targetMembership.user.name} (${targetMembership.user.email}) left organization "${targetMembership.organization.name}"`
-      : `Removed ${targetMembership.user.name} (${targetMembership.user.email}) from organization "${targetMembership.organization.name}"`,
+      ? `${targetMembership.user.name} (${targetMembership.user.email}) left organization "${targetMembership.org.name}"`
+      : `Removed ${targetMembership.user.name} (${targetMembership.user.email}) from organization "${targetMembership.org.name}"`,
     event,
   })
 

@@ -14,11 +14,11 @@ export default defineEventHandler(async (event) => {
 
   // If activeOrgId is being updated, verify user is a member of that organization
   if (result.data.activeOrgId !== undefined && result.data.activeOrgId !== null) {
-    const membership = await db.organizationMembership.findUnique({
+    const membership = await db.orgMembership.findUnique({
       where: {
-        userId_organizationId: {
+        userId_orgId: {
           userId: user.id,
-          organizationId: result.data.activeOrgId,
+          orgId: result.data.activeOrgId,
         },
       },
     })
