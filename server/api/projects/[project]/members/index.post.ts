@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: project.orgId,
+    orgId: project.orgId,
     projectId,
     action: "project.member.added",
     resource: "project_member",

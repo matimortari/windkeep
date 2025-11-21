@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: invitation.orgId,
+    orgId: invitation.orgId,
     action: "organization.invite.accepted",
     resource: "organization_invite",
     metadata: {

@@ -3,7 +3,7 @@ import db from "#server/lib/db"
 
 export default async function createAuditLog({
   userId,
-  organizationId,
+  orgId,
   projectId,
   action,
   resource,
@@ -12,7 +12,7 @@ export default async function createAuditLog({
   event,
 }: {
   userId: string
-  organizationId?: string
+  orgId?: string
   projectId?: string
   action: string
   resource?: string
@@ -28,7 +28,7 @@ export default async function createAuditLog({
   await db.auditLog.create({
     data: {
       userId,
-      organizationId,
+      orgId,
       projectId,
       action,
       resource,
