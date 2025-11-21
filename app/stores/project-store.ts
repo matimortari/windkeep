@@ -5,7 +5,7 @@ export const useProjectStore = defineStore("project", () => {
   const projects = ref<any[]>([])
   const currentProject = ref<any | null>(null)
   const secrets = ref<any[]>([])
-  const loading = ref<boolean>(false)
+  const loading = ref(false)
   const errors = ref<Record<
     | "getProjects"
     | "createProject"
@@ -36,26 +36,22 @@ export const useProjectStore = defineStore("project", () => {
   async function getProjects() {
     loading.value = true
     errors.value.getProjects = null
-
     try {
-      const res = await projectService.getProjects()
+      const res = await $fetch(`${API_URL}/projects`, { method: "GET", credentials: "include" })
       projects.value = res.projects || []
     }
     catch (err: any) {
       errors.value.getProjects = err?.message || "Failed to get projects"
       console.error("getProjects error:", err)
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function createProject(data: CreateProjectInput) {
     loading.value = true
     errors.value.createProject = null
-
     try {
-      const res = await projectService.createProject(data)
+      const res = await $fetch(`${API_URL}/projects`, { method: "POST", body: data, credentials: "include" })
       projects.value.push(res)
       return res
     }
@@ -63,86 +59,69 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.createProject = err?.message || "Failed to create project"
       console.error("createProject error:", err)
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function updateProject(projectId: string, data: UpdateProjectInput) {
     loading.value = true
     errors.value.updateProject = null
-
     try {
-      const res = await projectService.updateProject(projectId, data)
+      const res = await $fetch(`${API_URL}/projects/${projectId}`, { method: "PUT", body: data, credentials: "include" })
       const index = projects.value.findIndex(p => p.id === projectId)
-      if (index !== -1) {
+      if (index !== -1)
         projects.value[index] = res
-      }
-      if (currentProject.value?.id === projectId) {
+      if (currentProject.value?.id === projectId)
         currentProject.value = { ...currentProject.value, ...res }
-      }
       return res
     }
     catch (err: any) {
       errors.value.updateProject = err?.message || "Failed to update project"
       console.error("updateProject error:", err)
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function deleteProject(projectId: string) {
     loading.value = true
     errors.value.deleteProject = null
-
     try {
-      await projectService.deleteProject(projectId)
+      await $fetch(`${API_URL}/projects/${projectId}`, { method: "DELETE", credentials: "include" })
       projects.value = projects.value.filter(p => p.id !== projectId)
-      if (currentProject.value?.id === projectId) {
+      if (currentProject.value?.id === projectId)
         currentProject.value = null
-      }
     }
     catch (err: any) {
       errors.value.deleteProject = err?.message || "Failed to delete project"
       console.error("deleteProject error:", err)
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function addProjectMember(projectId: string, data: AddProjectMemberInput) {
     loading.value = true
     errors.value.addProjectMember = null
-
     try {
-      const res = await projectService.addProjectMember(projectId, data)
-      if (currentProject.value?.id === projectId && currentProject.value.members) {
+      const res = await $fetch(`${API_URL}/projects/${projectId}/members`, { method: "POST", body: data, credentials: "include" })
+      if (currentProject.value?.id === projectId && currentProject.value.members)
         currentProject.value.members.push(res)
-      }
       return res
     }
     catch (err: any) {
       errors.value.addProjectMember = err?.message || "Failed to add project member"
       console.error("addProjectMember error:", err)
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function updateProjectMember(projectId: string, memberId: string, data: UpdateProjectMemberInput) {
     loading.value = true
     errors.value.updateProjectMember = null
-
     try {
-      const res = await projectService.updateProjectMember(projectId, memberId, data)
+      const res = await $fetch(`${API_URL}/projects/${projectId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
       if (currentProject.value?.id === projectId && currentProject.value.members) {
-        const index = currentProject.value.members.findIndex((m: any) => m.userId === memberId)
-        if (index !== -1) {
-          currentProject.value.members[index] = res
-        }
+        const idx = currentProject.value.members.findIndex((m: any) => m.userId === memberId)
+        if (idx !== -1)
+          currentProject.value.members[idx] = res
       }
       return res
     }
@@ -150,17 +129,14 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.updateProjectMember = err?.message || "Failed to update project member"
       console.error("updateProjectMember error:", err)
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function removeProjectMember(projectId: string, memberId: string) {
     loading.value = true
     errors.value.removeProjectMember = null
-
     try {
-      await projectService.removeProjectMember(projectId, memberId)
+      await $fetch(`${API_URL}/projects/${projectId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
       if (currentProject.value?.id === projectId && currentProject.value.members) {
         currentProject.value.members = currentProject.value.members.filter((m: any) => m.userId !== memberId)
       }
@@ -169,22 +145,18 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.removeProjectMember = err?.message || "Failed to remove project member"
       console.error("removeProjectMember error:", err)
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function getProjectSecrets(projectId: string) {
     loading.value = true
     errors.value.getProjectSecrets = null
-
     try {
-      const res = await projectService.getProjectSecrets(projectId)
+      const res = await $fetch(`${API_URL}/projects/${projectId}/secrets`, { method: "GET", credentials: "include" })
       const fetchedSecrets = Array.isArray(res) ? res : []
       secrets.value = fetchedSecrets
-      if (currentProject.value?.id === projectId) {
+      if (currentProject.value?.id === projectId)
         currentProject.value.secrets = fetchedSecrets
-      }
       return fetchedSecrets
     }
     catch (err: any) {
@@ -192,26 +164,19 @@ export const useProjectStore = defineStore("project", () => {
       console.error("getProjectSecrets error:", err)
       return []
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function createProjectSecret(projectId: string, data: CreateSecretInput) {
     loading.value = true
     errors.value.createProjectSecret = null
-
     try {
-      const res = await projectService.createProjectSecret(projectId, data)
-
+      const res = await $fetch(`${API_URL}/projects/${projectId}/secrets`, { method: "POST", body: data, credentials: "include" })
       secrets.value.push(res)
       if (currentProject.value?.id === projectId) {
-        if (!currentProject.value.secrets) {
-          currentProject.value.secrets = []
-        }
+        currentProject.value.secrets = currentProject.value.secrets || []
         currentProject.value.secrets.push(res)
       }
-
       return res
     }
     catch (err: any) {
@@ -219,30 +184,22 @@ export const useProjectStore = defineStore("project", () => {
       console.error("createProjectSecret error:", err)
       throw err
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function updateProjectSecret(projectId: string, secretId: string, data: UpdateSecretInput) {
     loading.value = true
     errors.value.updateProjectSecret = null
-
     try {
-      const res = await projectService.updateProjectSecret(projectId, secretId, data)
-
-      const secretsIndex = secrets.value.findIndex((s: any) => s.id === secretId)
-      if (secretsIndex !== -1) {
-        secrets.value[secretsIndex] = res
-      }
-
+      const res = await $fetch(`${API_URL}/projects/${projectId}/secrets/${secretId}`, { method: "PUT", body: data, credentials: "include" })
+      const idx = secrets.value.findIndex((s: any) => s.id === secretId)
+      if (idx !== -1)
+        secrets.value[idx] = res
       if (currentProject.value?.id === projectId && currentProject.value.secrets) {
-        const currentIndex = currentProject.value.secrets.findIndex((s: any) => s.id === secretId)
-        if (currentIndex !== -1) {
-          currentProject.value.secrets[currentIndex] = res
-        }
+        const currIdx = currentProject.value.secrets.findIndex((s: any) => s.id === secretId)
+        if (currIdx !== -1)
+          currentProject.value.secrets[currIdx] = res
       }
-
       return res
     }
     catch (err: any) {
@@ -250,19 +207,14 @@ export const useProjectStore = defineStore("project", () => {
       console.error("updateProjectSecret error:", err)
       throw err
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   async function deleteProjectSecret(projectId: string, secretId: string) {
     loading.value = true
     errors.value.deleteProjectSecret = null
-
     try {
-      await projectService.deleteProjectSecret(projectId, secretId)
-
-      // Update both secrets array and currentProject.secrets
+      await $fetch(`${API_URL}/projects/${projectId}/secrets/${secretId}`, { method: "DELETE", credentials: "include" })
       secrets.value = secrets.value.filter((s: any) => s.id !== secretId)
       if (currentProject.value?.id === projectId && currentProject.value.secrets) {
         currentProject.value.secrets = currentProject.value.secrets.filter((s: any) => s.id !== secretId)
@@ -273,20 +225,11 @@ export const useProjectStore = defineStore("project", () => {
       console.error("deleteProjectSecret error:", err)
       throw err
     }
-    finally {
-      loading.value = false
-    }
+    finally { loading.value = false }
   }
 
   function setCurrentProject(projectId: string | null) {
-    if (projectId === null) {
-      currentProject.value = null
-      return
-    }
-    const project = projects.value.find(p => p.id === projectId)
-    if (project) {
-      currentProject.value = project
-    }
+    currentProject.value = projectId ? projects.value.find(p => p.id === projectId) || null : null
   }
 
   return {
