@@ -68,10 +68,10 @@ export const CLI_COMMANDS = [
 ]
 
 export const SIDEBAR_NAV_LINKS = [
-  { url: "/admin/projects", icon: "ph:folder-open", label: "Projects" },
-  { url: "/admin/organization", icon: "ph:building-office", label: "Organization" },
-  { url: "/admin/audit-logs", icon: "ph:clipboard-text", label: "Audit Logs" },
-  { url: "/admin/preferences", icon: "ph:user-gear", label: "Preferences" },
+  { url: "/admin/projects", icon: "ph:folder-open-bold", label: "Projects" },
+  { url: "/admin/organization", icon: "ph:building-office-bold", label: "Organization" },
+  { url: "/admin/audit-logs", icon: "ph:clipboard-text-bold", label: "Audit Logs" },
+  { url: "/admin/preferences", icon: "ph:user-gear-bold", label: "Preferences" },
 ]
 
 export const ROLES = [

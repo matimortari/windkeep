@@ -22,12 +22,9 @@
           </td>
         </tr>
 
-        <tr v-else-if="auditLogs.length === 0">
+        <tr v-else-if="!auditLogs.length">
           <td :colspan="getTableHeaders().length" class="text-caption border p-8 text-center">
-            <div class="navigation-group">
-              <icon name="material-symbols:search-off" size="30" />
-              <span>No audit logs found.</span>
-            </div>
+            <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus-bold" :icon-size="30" />
           </td>
         </tr>
 

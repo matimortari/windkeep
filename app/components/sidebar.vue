@@ -24,9 +24,7 @@
       </button>
     </div>
 
-    <p v-if="!activeOrgProjects.length" class="text-caption py-2">
-      No projects yet.
-    </p>
+    <Empty v-if="!activeOrgProjects.length" message="No projects yet." icon-name="ph:folder-simple-minus-bold" :icon-size="30" />
 
     <nav v-else aria-label="Projects Navigation" class="scroll-area text-caption flex max-h-64 flex-col gap-2 overflow-x-hidden">
       <nuxt-link
