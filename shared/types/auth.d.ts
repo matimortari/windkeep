@@ -3,8 +3,9 @@ declare module "#auth-utils" {
     id: string
     email: string
     name: string
-    image?: string | null
-    apiToken?: string | null
+    image?: string
+    apiToken?: string
+    activeOrgId?: string
   }
 
   interface UserSession {

@@ -1,5 +1,5 @@
 import db from "#server/lib/db"
-import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER", "ADMIN"])
 
   const query = getQuery(event)
   const page = Number(query.page) || 1
@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
     where: {
       auditLogs: {
         some: {
-          organizationId: org,
+          orgId: org,
         },
       },
     },
@@ -97,7 +97,7 @@ export default defineEventHandler(async (event) => {
   // Get projects in this organization
   const projects = await db.project.findMany({
     where: {
-      organizationId: org,
+      orgId: org,
     },
     select: {
       id: true,
@@ -111,7 +111,7 @@ export default defineEventHandler(async (event) => {
   // Get unique actions
   const actionsResult = await db.auditLog.findMany({
     where: {
-      organizationId: org,
+      orgId: org,
     },
     select: {
       action: true,

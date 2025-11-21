@@ -16,33 +16,34 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
   return session.user
 }
 
-export async function requireOrgRole(userId: string, organizationId: string, roles: string[]) {
-  const membership = await db.organizationMembership.findUnique({
-    where: { userId_organizationId: { userId, organizationId } },
-    select: { role: true },
-  })
-
-  if (!membership) {
-    throw createError({ statusCode: 403, message: "Access denied: not an organization member" })
-  }
-  if (!roles.includes(membership.role)) {
-    throw createError({ statusCode: 403, message: "Access denied: insufficient permissions" })
+export async function requireRole(userId: string, scope: { type: "organization", orgId: string } | { type: "project", projectId: string }, roles: Role[]) {
+  if (!userId) {
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" })
   }
 
-  return membership
-}
-
-export async function requireProjectRole(userId: string, projectId: string, roles: string[]) {
-  const membership = await db.projectRole.findUnique({
-    where: { userId_projectId: { userId, projectId } },
-    select: { role: true },
-  })
-
-  if (!membership) {
-    throw createError({ statusCode: 403, message: "Access denied: not a project member" })
+  let membership
+  if (scope.type === "organization") {
+    membership = await db.orgMembership.findUnique({
+      where: {
+        userId_orgId: {
+          userId,
+          orgId: scope.orgId,
+        },
+      },
+    })
   }
-  if (!roles.includes(membership.role)) {
-    throw createError({ statusCode: 403, message: "Access denied: insufficient permissions" })
+  else {
+    membership = await db.projectMembership.findUnique({
+      where: {
+        userId_projectId: {
+          userId,
+          projectId: scope.projectId,
+        },
+      },
+    })
+  }
+  if (!membership || !roles.includes(membership.role)) {
+    throw createError({ statusCode: 403, statusMessage: "Forbidden: insufficient permissions" })
   }
 
   return membership
