@@ -28,9 +28,7 @@
       </nav>
     </header>
 
-    <p v-if="!filteredProjects.length" class="text-caption my-8 h-[80vh] text-center">
-      No projects found. Create a new project to get started.
-    </p>
+    <Empty v-if="!activeOrgProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus-bold" :icon-size="60" />
 
     <ProjectTable v-else-if="layout === 'list'" :projects="filteredProjects" />
 

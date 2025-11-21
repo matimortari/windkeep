@@ -42,9 +42,7 @@
       </nav>
     </header>
 
-    <p v-if="!projectSecrets.length" class="text-caption my-8 h-[80vh] text-center">
-      No secrets found for this project. Add a new secret or import from an .env file to get started.
-    </p>
+    <Empty v-if="!projectSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus-bold" :icon-size="60" />
 
     <ProjectSecretsTable
       v-if="projectSecrets.length" :secrets="projectSecrets"
