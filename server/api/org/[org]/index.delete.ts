@@ -1,5 +1,5 @@
 import db from "#server/lib/db"
-import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -8,14 +8,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireOrgRole(user.id, org, ["OWNER"])
+  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER"])
 
   // Delete all pending invitations
   await db.invitation.deleteMany({
-    where: { organizationId: org },
+    where: { orgId: org },
   })
 
-  // Delete the organization (cascade will handle projects, memberships and audit logs)
   await db.organization.delete({
     where: { id: org },
   })

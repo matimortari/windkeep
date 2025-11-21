@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto"
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getInviteBaseUrl, getUserFromSession, requireOrgRole } from "#server/lib/utils"
+import { getInviteBaseUrl, getUserFromSession, requireRole } from "#server/lib/utils"
 import { createInviteSchema } from "#shared/schemas/org-schema"
 import z from "zod"
 
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireOrgRole(user.id, org, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = createInviteSchema.safeParse({
@@ -30,13 +30,13 @@ export default defineEventHandler(async (event) => {
 
   const invitation = await db.invitation.create({
     data: {
-      organizationId: org,
+      orgId: org,
       token,
       expiresAt,
       invitedById: user.id,
     },
     include: {
-      organization: {
+      org: {
         select: {
           id: true,
           name: true,
@@ -60,11 +60,11 @@ export default defineEventHandler(async (event) => {
     action: "organization.invite.created",
     resource: "organization_invite",
     metadata: {
-      organizationName: invitation.organization.name,
+      orgName: invitation.org.name,
       expiresAt: invitation.expiresAt.toISOString(),
       tokenPrefix: token.substring(0, 8),
     },
-    description: `Created invite link for organization "${invitation.organization.name}"`,
+    description: `Created invite link for organization "${invitation.org.name}"`,
     event,
   })
 

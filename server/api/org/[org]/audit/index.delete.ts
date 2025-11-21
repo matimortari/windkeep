@@ -1,13 +1,14 @@
 import db from "#server/lib/db"
-import { getUserFromSession, requireOrgRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const org = getRouterParam(event, "org")
-  if (!org)
+  if (!org) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
+  }
 
-  await requireOrgRole(user.id, org, ["OWNER"])
+  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER"])
 
   const body = (await readBody(event).catch(() => ({}))) || {}
 

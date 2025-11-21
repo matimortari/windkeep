@@ -1,6 +1,6 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 import { addProjectMemberSchema } from "#shared/schemas/project-schema"
 import z from "zod"
 
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, projectId, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = addProjectMemberSchema.safeParse(body)
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     where: { id: projectId },
     select: {
       id: true,
-      organizationId: true,
+      orgId: true,
     },
   })
   if (!project) {
@@ -44,11 +44,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "User not found" })
   }
 
-  const orgMembership = await db.organizationMembership.findUnique({
+  const orgMembership = await db.orgMembership.findUnique({
     where: {
-      userId_organizationId: {
+      userId_orgId: {
         userId: result.data.userId,
-        organizationId: project.organizationId,
+        orgId: project.orgId,
       },
     },
   })
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: "User must be a member of the organization first" })
   }
 
-  const existingRole = await db.projectRole.findUnique({
+  const existingRole = await db.projectMembership.findUnique({
     where: {
       userId_projectId: {
         userId: result.data.userId,
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 409, statusMessage: "User is already a member of this project" })
   }
 
-  const projectRole = await db.projectRole.create({
+  const projectRole = await db.projectMembership.create({
     data: {
       userId: result.data.userId,
       projectId,
@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: project.organizationId,
+    organizationId: project.orgId,
     projectId,
     action: "project.member.added",
     resource: "project_member",

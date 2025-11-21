@@ -1,6 +1,6 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, project, ["OWNER"])
+  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER"])
 
   const projectData = await db.project.findUnique({
     where: { id: project },
@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
       id: true,
       name: true,
       slug: true,
-      organizationId: true,
-      organization: {
+      orgId: true,
+      org: {
         select: {
           name: true,
         },
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
       _count: {
         select: {
           secrets: true,
-          roles: true,
+          memberships: true,
         },
       },
     },
@@ -35,25 +35,24 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
-  // Create audit log before deletion (since cascade will delete project audit logs)
+  // Create audit log before deletion
   await createAuditLog({
     userId: user.id,
-    organizationId: projectData.organizationId,
+    organizationId: projectData.orgId,
     projectId: project,
     action: "project.deleted",
     resource: "project",
     metadata: {
       projectName: projectData.name,
       projectSlug: projectData.slug,
-      organizationName: projectData.organization.name,
+      organizationName: projectData.org.name,
       secretsDeleted: projectData._count.secrets,
-      membersRemoved: projectData._count.roles,
+      membersRemoved: projectData._count.memberships,
     },
-    description: `Deleted project "${projectData.name}" (${projectData.slug}) from organization "${projectData.organization.name}" (${projectData._count.secrets} secret(s), ${projectData._count.roles} member(s))`,
+    description: `Deleted project "${projectData.name}" (${projectData.slug}) from organization "${projectData.org.name}" (${projectData._count.secrets} secret(s), ${projectData._count.memberships} member(s))`,
     event,
   })
 
-  // Delete the project (cascade will handle secrets, secret values, roles, and audit logs)
   await db.project.delete({
     where: { id: project },
   })
