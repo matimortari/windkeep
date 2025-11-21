@@ -1,7 +1,7 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { decrypt, encrypt } from "#server/lib/encryption"
-import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 import { createSecretSchema } from "#shared/schemas/secret-schema"
 import z from "zod"
 
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, project, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = createSecretSchema.safeParse({
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
-          organizationId: true,
+          orgId: true,
         },
       },
     },
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     userId: user.id,
-    organizationId: secret.project.organizationId,
+    organizationId: secret.project.orgId,
     projectId: project,
     action: "secret.created",
     resource: "secret",

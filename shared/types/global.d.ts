@@ -5,14 +5,13 @@ interface User {
   id: string
   email: string
   name: string
-  image?: string | null
-  apiToken?: string | null
-  activeOrgId?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  accounts?: Account[]
-  memberships?: OrganizationMembership[]
-  projectRoles?: ProjectRole[]
+  image?: string
+  apiToken?: string
+  activeOrgId?: string
+  createdAt: Date | string
+  updatedAt: Date | string
+  orgMemberships?: OrgMembership[]
+  projectMemberships?: ProjectMembership[]
   invitations?: Invitation[]
   auditLogs?: AuditLog[]
 }
@@ -20,56 +19,56 @@ interface User {
 interface Organization {
   id: string
   name: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  memberships?: OrganizationMembership[]
+  createdAt: Date | string
+  updatedAt: Date | string
+  memberships?: OrgMembership[]
   projects?: Project[]
   invitations?: Invitation[]
   auditLogs?: AuditLog[]
 }
 
-interface OrganizationMembership {
+interface OrgMembership {
   userId: string
-  organizationId: string
+  orgId: string
   role: Role
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user?: User
-  organization?: Organization
+  createdAt: Date | string
+  updatedAt: Date | string
+  user: User
+  org: Organization
 }
 
 interface Project {
   id: string
   name: string
   slug: string
-  description?: string | null
-  organizationId: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  organization?: Organization
+  description?: string
+  orgId: string
+  createdAt: Date | string
+  updatedAt: Date | string
+  org: Organization
   secrets?: Secret[]
-  roles?: ProjectRole[]
+  memberships?: ProjectMembership[]
   auditLogs?: AuditLog[]
 }
 
-interface ProjectRole {
+interface ProjectMembership {
   userId: string
   projectId: string
   role: Role
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user?: User
-  project?: Project
+  createdAt: Date | string
+  updatedAt: Date | string
+  user: User
+  project: Project
 }
 
 interface Secret {
   id: string
   key: string
-  description?: string | null
+  description?: string
   projectId: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  project?: Project
+  createdAt: Date | string
+  updatedAt: Date | string
+  project: Project
   values?: SecretValue[]
 }
 
@@ -78,37 +77,35 @@ interface SecretValue {
   secretId: string
   environment: Environment
   value: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  secret?: Secret
+  createdAt: Date | string
+  updatedAt: Date | string
+  secret: Secret
 }
 
 interface Invitation {
   id: string
-  email: string
-  organizationId: string
-  role: Role
+  orgId: string
   token: string
   expiresAt: Date | string
-  createdAt?: Date | string
-  organization?: Organization
+  createdAt: Date | string
+  org: Organization
   invitedById: string
-  invitedBy?: User
+  invitedBy: User
 }
 
 interface AuditLog {
   id: string
   userId: string
-  organizationId?: string | null
-  projectId?: string | null
+  orgId?: string
+  projectId?: string
   action: string
   resource?: string | null
-  metadata?: any
+  metadata?: Record<string, any> | null
   description?: string | null
   createdAt?: Date | string
   user?: User
-  organization?: Organization | null
-  project?: Project | null
+  org?: Organization
+  project?: Project
 }
 
 interface AuditLogsPagination {

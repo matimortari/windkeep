@@ -1,6 +1,6 @@
 import db from "#server/lib/db"
 import { decrypt } from "#server/lib/encryption"
-import { getUserFromSession, requireProjectRole } from "#server/lib/utils"
+import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireProjectRole(user.id, project, ["OWNER", "ADMIN", "MEMBER"])
+  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN", "MEMBER"])
 
   const secrets = await db.secret.findMany({
     where: { projectId: project },

@@ -6,13 +6,13 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Find organizations where user is the sole owner and delete them
-  const ownedOrgs = await db.organizationMembership.findMany({
+  const ownedOrgs = await db.orgMembership.findMany({
     where: {
       userId: user.id,
       role: "OWNER",
     },
     include: {
-      organization: {
+      org: {
         include: {
           memberships: true,
         },
@@ -21,10 +21,10 @@ export default defineEventHandler(async (event) => {
   })
 
   for (const membership of ownedOrgs) {
-    const ownerCount = membership.organization.memberships.filter(m => m.role === "OWNER").length
+    const ownerCount = membership.org.memberships.filter(m => m.role === "OWNER").length
     if (ownerCount === 1) {
       await db.organization.delete({
-        where: { id: membership.organization.id },
+        where: { id: membership.org.id },
       })
     }
   }
