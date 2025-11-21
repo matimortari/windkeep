@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
   // Create audit log before deletion
   await createAuditLog({
     userId: user.id,
-    organizationId: projectData.orgId,
+    orgId: projectData.orgId,
     projectId: project,
     action: "project.deleted",
     resource: "project",
