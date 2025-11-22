@@ -8,9 +8,9 @@
   --foreground: #cacaca;
   --card: #131313;
   --overlay: #1b1b1b;
-  --primary: #d0d867;
+  --primary: #eff976;
   --primary-foreground: #222222;
-  --secondary: #374f6b;
+  --secondary: #455f7e;
   --secondary-foreground: #f4f2ee;
   --muted: #2c2b2b;
   --muted-foreground: #8a8a8a;
@@ -34,19 +34,19 @@
   Light theme overrides
 */
 html.light {
-  --background: #f4f2ee;
+  --background: #f9fafa;
   --foreground: #0a0b0c;
-  --card: #ebeaea;
-  --overlay: #ebecda;
-  --primary: #d0d867;
+  --card: #f6f6f7;
+  --overlay: #e6e8e9;
+  --primary: #eff976;
   --primary-foreground: #222222;
-  --secondary: #374f6b;
+  --secondary: #455f7e;
   --secondary-foreground: #f4f2ee;
-  --muted: #d5d6c3;
+  --muted: #e1e3e4;
   --muted-foreground: #6b6363;
   --danger: #c54d38;
   --success: #2b5e3c;
-  --accent: #404b3d;
+  --accent: #859260;
 }
 
 /*
@@ -196,7 +196,6 @@ select {
   -moz-appearance: none;
   background-color: var(--card);
   color: var(--muted-foreground);
-  font-family: var(--font-mono);
   border: 2px solid var(--muted);
   accent-color: var(--accent);
   border-radius: 0.25rem;
@@ -210,6 +209,11 @@ input:hover,
 textarea:hover,
 select:hover {
   border-color: var(--accent);
+}
+
+.cell {
+  padding-inline: 0.5rem;
+  padding-block: 0.25rem;
 }
 
 /*
@@ -242,7 +246,7 @@ select:hover {
 .btn-danger:hover,
 .btn-success:hover {
   transform: scale(1.025);
-  filter: brightness(0.8);
+  filter: brightness(0.9);
   border-color: var(--accent);
 }
 
@@ -252,7 +256,7 @@ select:hover {
 .btn-danger:active,
 .btn-success:active {
   transform: scale(1);
-  filter: brightness(0.4);
+  filter: brightness(0.6);
 }
 
 .btn:disabled,
@@ -260,7 +264,7 @@ select:hover {
 .btn-secondary:disabled,
 .btn-danger:disabled,
 .btn-success:disabled {
-  filter: brightness(0.4);
+  filter: brightness(0.6);
   cursor: not-allowed;
 }
 

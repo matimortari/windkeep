@@ -13,7 +13,7 @@
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span class="text-caption">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
-            <icon name="ph:caret-down-bold" size="20" class="transition-transform" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
+            <icon name="ph:caret-down" size="20" class="transition-transform" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
           </button>
 
           <transition name="dropdown" mode="out-in">
@@ -26,7 +26,7 @@
 
               <li class="truncate whitespace-nowrap">
                 <nuxt-link to="/onboarding/create-org" class="group navigation-group block rounded p-2 hover:bg-muted" role="menuitem">
-                  <icon name="ph:plus-bold" size="20" class="text-accent transition-transform group-hover:scale-125" />
+                  <icon name="ph:plus" size="20" class="text-accent transition-transform group-hover:scale-125" />
                   <span>Create Organization</span>
                 </nuxt-link>
               </li>
@@ -43,16 +43,16 @@
 
     <nav class="navigation-group" aria-label="User Actions">
       <nuxt-link to="/admin/preferences" title="User Preferences" aria-label="User Preferences" class="btn hidden! md:block!">
-        <icon name="ph:user-bold" size="20" />
+        <icon name="ph:user" size="20" />
       </nuxt-link>
       <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
         <icon :name="themeIcon" size="20" />
       </button>
       <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="$emit('toggleSidebar')">
-        <icon :name="props.isSidebarOpen ? 'ph:x-bold' : 'ph:list-bold'" size="20" />
+        <icon :name="props.isSidebarOpen ? 'ph:x' : 'ph:list'" size="20" />
       </button>
       <button class="btn" aria-label="Sign Out" @click="signOut">
-        <icon name="ph:sign-out-bold" size="20" />
+        <icon name="ph:sign-out" size="20" />
       </button>
     </nav>
   </div>

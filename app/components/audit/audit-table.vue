@@ -14,11 +14,8 @@
 
       <tbody>
         <tr v-if="loading">
-          <td :colspan="getTableHeaders().length" class="border p-8 text-center">
-            <div class="navigation-group">
-              <icon name="material-symbols:hourglass-empty" size="20" class="animate-spin" />
-              <span>Loading audit logs...</span>
-            </div>
+          <td :colspan="getTableHeaders().length" class="text-caption border p-8 text-center">
+            <span>Loading audit logs...</span>
           </td>
         </tr>
 

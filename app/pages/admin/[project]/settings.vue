@@ -2,7 +2,7 @@
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <header class="navigation-group border-b py-4">
       <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
-        <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-accent" />
+        <icon name="ph:arrow-left" size="30" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
       <h2 class="max-w-lg truncate">
         {{ project?.name }}
@@ -41,14 +41,14 @@
             class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
-            <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
+            <icon :name="copyIcon[index]?.icon.value || 'ph:copy'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
-            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
+            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk'" size="20" />
           </button>
         </div>
 
@@ -81,10 +81,10 @@
               </select>
 
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(member.userId, member.role)">
-                <icon name="ph:floppy-disk-bold" size="15" />
+                <icon name="ph:floppy-disk" size="15" />
               </button>
               <button v-if="isOwner && String(member.role) !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(member.userId)">
-                <icon name="ph:x-bold" size="15" />
+                <icon name="ph:x" size="15" />
               </button>
             </nav>
           </li>
@@ -121,7 +121,7 @@
             {{ addMemberSuccess }}
           </p>
           <button class="btn-primary" aria-label="Add Member" @click.prevent="handleAddMember">
-            <icon name="ph:plus-circle-bold" size="20" />
+            <icon name="ph:plus-circle" size="20" />
             <span>Add Member</span>
           </button>
         </div>
@@ -155,7 +155,7 @@
           </p>
 
           <button class="btn-danger" aria-label="Leave Project" @click="handleLeaveProject">
-            <icon name="ph:sign-out-bold" size="20" />
+            <icon name="ph:sign-out" size="20" />
             <span>Confirm</span>
           </button>
         </div>
@@ -177,7 +177,7 @@
           </p>
 
           <button class="btn-danger" aria-label="Delete Project" @click="handleDeleteProject">
-            <icon name="ph:trash-bold" size="20" />
+            <icon name="ph:trash" size="20" />
             <span>Confirm</span>
           </button>
         </div>
@@ -254,8 +254,8 @@ const projectFields = [
   },
 ]
 
-const copyIcon = projectFields.map(() => createActionHandler("ph:copy-bold"))
-const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk-bold"))
+const copyIcon = projectFields.map(() => createActionHandler("ph:copy"))
+const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk"))
 
 async function handleAddMember() {
   addMemberSuccess.value = null

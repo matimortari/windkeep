@@ -9,26 +9,26 @@
         <div class="relative hidden md:block">
           <input id="search" v-model="searchQuery" type="text" placeholder="Search projects...">
           <span class="absolute inset-y-0 right-0 flex flex-row items-center pr-4 text-muted-foreground">
-            <icon name="ph:magnifying-glass-bold" size="20" />
+            <icon name="ph:magnifying-glass" size="20" />
           </span>
         </div>
 
         <button class="btn" @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'">
-          <icon name="ph:arrow-down-bold" size="20" :class="[sort.direction === 'asc' ? 'rotate-180' : 'rotate-0']" class="transition-transform" />
+          <icon name="ph:arrow-down" size="20" :class="[sort.direction === 'asc' ? 'rotate-180' : 'rotate-0']" class="transition-transform" />
         </button>
 
         <button aria-label="Toggle Layout" class="btn" @click="layout = layout === 'grid' ? 'list' : 'grid'">
-          <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
+          <icon :name="layout === 'grid' ? 'ph:list-bullets' : 'ph:squares-four'" size="20" />
         </button>
 
         <button class="btn-primary" @click="isDialogOpen = true">
           <span class="hidden md:inline">Add New Project</span>
-          <icon name="ph:plus-bold" size="20" />
+          <icon name="ph:plus" size="20" />
         </button>
       </nav>
     </header>
 
-    <Empty v-if="!activeOrgProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus-bold" :icon-size="60" />
+    <Empty v-if="!activeOrgProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" :icon-size="60" />
 
     <ProjectTable v-else-if="layout === 'list'" :projects="filteredProjects" />
 
@@ -47,7 +47,7 @@
         :enter="{ opacity: 1 }" :duration="600"
         class="card group flex h-[200px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!" @click="isDialogOpen = true"
       >
-        <icon name="ph:plus-bold" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-accent" />
+        <icon name="ph:plus" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-accent" />
         <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
       </button>
     </ul>
