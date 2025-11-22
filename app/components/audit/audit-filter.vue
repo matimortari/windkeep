@@ -10,7 +10,7 @@
       <div ref="userDropdownRef" class="relative">
         <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
           <span class="capitalize">{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
-          <icon name="ph:caret-down-bold" size="15" />
+          <icon name="ph:caret-down" size="15" />
         </button>
         <transition name="dropdown">
           <ul v-if="isUserDropdownOpen" class="dropdown-menu scroll-area overflow-y-auto text-sm whitespace-nowrap">
@@ -27,7 +27,7 @@
       <div ref="actionDropdownRef" class="relative">
         <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
           <span>{{ getActions.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
-          <icon name="ph:caret-down-bold" size="15" />
+          <icon name="ph:caret-down" size="15" />
         </button>
         <transition name="dropdown">
           <ul v-if="isActionDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm whitespace-nowrap">
@@ -42,7 +42,7 @@
       </div>
 
       <button class="btn" title="Show/Hide Sensitive Info" @click="showSensitiveInfo = !showSensitiveInfo">
-        <icon :name="showSensitiveInfo ? 'ph:eye-slash-bold' : 'ph:eye-bold'" size="20" />
+        <icon :name="showSensitiveInfo ? 'ph:eye-slash' : 'ph:eye'" size="20" />
       </button>
     </nav>
 
@@ -54,18 +54,18 @@
       >
 
       <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="prevPage(activeOrg!.id)">
-        <icon name="ph:arrow-left-bold" size="20" />
+        <icon name="ph:arrow-left" size="20" />
       </button>
       <div class="text-caption flex flex-col items-center justify-center gap-1 whitespace-nowrap md:mx-4">
         <span>{{ pagination.page }} / {{ pagination.totalPages }}</span>
         <span v-if="auditLogs.length" class="text-xs italic">{{ logsSummary }}</span>
       </div>
       <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="nextPage(activeOrg!.id)">
-        <icon name="ph:arrow-right-bold" size="20" />
+        <icon name="ph:arrow-right" size="20" />
       </button>
 
       <button class="btn-danger" :disabled="!auditLogs.length" title="Delete Logs" @click="handleDeleteLogs">
-        <icon name="ph:trash-bold" size="20" />
+        <icon name="ph:trash" size="20" />
       </button>
     </nav>
   </div>

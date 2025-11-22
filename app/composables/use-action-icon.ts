@@ -3,7 +3,7 @@ export function useActionIcon() {
     const success = ref(false)
 
     const icon = computed(() =>
-      success.value ? "ph:check-bold" : defaultIcon,
+      success.value ? "ph:check" : defaultIcon,
     )
 
     function triggerSuccess() {

@@ -10,7 +10,7 @@
               aria-label="Sort by Key" class="flex items-center hover:text-accent"
               @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'"
             >
-              <icon name="ph:arrow-down-bold" size="15" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
+              <icon name="ph:arrow-down" size="15" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
             </button>
           </th>
 
