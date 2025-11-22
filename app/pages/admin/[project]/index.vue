@@ -2,7 +2,7 @@
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <header class="navigation-group border-b py-4">
       <nuxt-link to="/admin/projects" aria-label="Go back" class="flex items-center">
-        <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-accent" />
+        <icon name="ph:arrow-left" size="30" class="text-muted-foreground hover:text-accent" />
       </nuxt-link>
       <h2 class="max-w-lg truncate">
         {{ project?.name }}
@@ -11,18 +11,18 @@
       <nav class="navigation-group w-full flex-1 justify-end" aria-label="Project Actions">
         <button class="btn-primary" aria-label="Add New Secret" @click="() => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = null }">
           <span class="hidden md:inline">Add New Secret</span>
-          <icon name="ph:plus-bold" size="20" />
+          <icon name="ph:plus" size="20" />
         </button>
 
         <button class="btn-secondary" aria-label="Import Secrets from .env File" @click="() => { isDialogOpen = true; dialogType = 'env'; selectedSecret = null }">
           <span class="hidden md:block">Import</span>
-          <icon name="ph:upload-bold" size="20" />
+          <icon name="ph:upload" size="20" />
         </button>
 
         <div ref="dropdownRef" class="relative">
           <button class="btn" aria-label="Export Secrets to .env File" @click="isDropdownOpen = !isDropdownOpen">
             <span class="hidden md:block">Export</span>
-            <icon name="ph:download-bold" size="20" />
+            <icon name="ph:download" size="20" />
           </button>
 
           <transition name="dropdown" mode="out-in">
@@ -37,12 +37,12 @@
         </div>
 
         <nuxt-link :to="`/admin/${project?.slug}/settings`" class="btn">
-          <icon name="ph:gear-bold" size="20" />
+          <icon name="ph:gear" size="20" />
         </nuxt-link>
       </nav>
     </header>
 
-    <Empty v-if="!projectSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus-bold" :icon-size="60" />
+    <Empty v-if="!projectSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" :icon-size="60" />
 
     <ProjectSecretsTable
       v-if="projectSecrets.length" :secrets="projectSecrets"

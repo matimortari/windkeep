@@ -37,14 +37,14 @@
             class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
-            <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
+            <icon :name="copyIcon[index]?.icon.value || 'ph:copy'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
-            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
+            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk'" size="20" />
           </button>
         </div>
 
@@ -68,10 +68,10 @@
 
             <nav class="navigation-group justify-end" aria-label="Organization Project Actions">
               <nuxt-link :to="`/admin/${project?.slug}`" class="btn">
-                <icon name="ph:eye-bold" size="15" />
+                <icon name="ph:eye" size="15" />
               </nuxt-link>
               <nuxt-link v-if="isOwner || isAdmin" :to="`/admin/${project?.slug}/settings`" class="btn">
-                <icon name="ph:gear-bold" size="15" />
+                <icon name="ph:gear" size="15" />
               </nuxt-link>
             </nav>
           </li>
@@ -104,10 +104,10 @@
               </select>
 
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(orgUser.id || '', userRoles[String(orgUser.id)] || 'MEMBER')">
-                <icon name="ph:floppy-disk-bold" size="15" />
+                <icon name="ph:floppy-disk" size="15" />
               </button>
               <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.id || '')">
-                <icon name="ph:x-bold" size="15" />
+                <icon name="ph:x" size="15" />
               </button>
             </nav>
           </li>
@@ -135,7 +135,7 @@
         </p>
 
         <button class="btn-primary" aria-label="Create Invite Link" @click="handleCreateInvite">
-          <icon name="ph:link-bold" size="20" />
+          <icon name="ph:link" size="20" />
           <span>Copy Invite Link</span>
         </button>
       </div>
@@ -168,7 +168,7 @@
           </p>
 
           <button class="btn-danger" aria-label="Leave Organization" @click="handleLeaveOrg">
-            <icon name="ph:sign-out-bold" size="20" />
+            <icon name="ph:sign-out" size="20" />
             <span>Confirm</span>
           </button>
         </div>
@@ -190,7 +190,7 @@
           </p>
 
           <button class="btn-danger" aria-label="Delete Organization" @click="handleDeleteOrg">
-            <icon name="ph:network-x-bold" size="20" />
+            <icon name="ph:network-x" size="20" />
             <span>Confirm</span>
           </button>
         </div>
@@ -249,8 +249,8 @@ const orgFields = [
   },
 ]
 
-const copyIcon = orgFields.map(() => createActionHandler("ph:copy-bold"))
-const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk-bold"))
+const copyIcon = orgFields.map(() => createActionHandler("ph:copy"))
+const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk"))
 
 async function handleCreateInvite() {
   inviteSuccess.value = null

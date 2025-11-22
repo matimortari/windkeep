@@ -35,7 +35,7 @@ export function useTheme() {
   })
 
   const themeIcon = computed(() =>
-    colorMode.value === "light" ? "ph:moon-stars-bold" : "ph:sun-horizon-bold",
+    colorMode.value === "light" ? "ph:moon-stars" : "ph:sun-horizon",
   )
 
   const themeTitle = computed(() =>
