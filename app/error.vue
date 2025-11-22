@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto grid min-h-screen grid-cols-1 items-center gap-6 p-24 md:grid-cols-2 md:gap-12">
     <div class="flex flex-col items-center gap-4 text-center md:items-start md:text-start">
-      <p class="text-siga-700 text-4xl font-bold md:text-5xl md:whitespace-nowrap">
+      <p class="text-4xl font-semibold md:text-5xl md:whitespace-nowrap">
         {{ error.statusCode }} - {{ error.statusMessage || "An unexpected error has occurred." }}
       </p>
 
@@ -15,7 +15,7 @@
       </p>
 
       <button class="flex flex-row items-center gap-4 font-semibold" @click="() => clearError({ redirect: '/' })">
-        <icon name="ph:arrow-left-bold" size="25" />
+        <icon name="ph:arrow-left" size="25" />
         <span>Go Back</span>
       </button>
     </div>

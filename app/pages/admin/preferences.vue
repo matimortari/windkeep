@@ -37,14 +37,14 @@
             class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
-            <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
+            <icon :name="copyIcon[index]?.icon.value || 'ph:copy'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
-            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
+            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk'" size="20" />
           </button>
         </div>
 
@@ -56,7 +56,7 @@
             @change="field.onUpload"
           >
           <label for="image" class="btn">
-            <icon name="ph:image-bold" size="20" />
+            <icon name="ph:image" size="20" />
           </label>
         </div>
 
@@ -91,7 +91,7 @@
           </p>
 
           <button class="btn-danger" aria-label="Delete Account" @click="handleDeleteUser">
-            <icon name="ph:user-minus-bold" size="20" />
+            <icon name="ph:user-minus" size="20" />
             <span>Confirm</span>
           </button>
         </div>
@@ -160,8 +160,8 @@ const userFields = [
   },
 ]
 
-const copyIcon = userFields.map(() => createActionHandler("ph:copy-bold"))
-const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk-bold"))
+const copyIcon = userFields.map(() => createActionHandler("ph:copy"))
+const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk"))
 
 async function handleUpdateImage(event: Event) {
   const input = event.target as HTMLInputElement

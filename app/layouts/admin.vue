@@ -3,7 +3,7 @@
 
   <Loading v-if="isLoading" />
 
-  <div v-show="!isLoading" class="flex min-h-screen overflow-hidden pt-12">
+  <div v-show="!isLoading" class="flex min-h-screen overflow-hidden py-12">
     <Sidebar v-if="user?.activeOrgId" :org="orgs.find(o => o.id === user?.activeOrgId)" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
 
     <main class="flex flex-1 flex-col overflow-x-hidden p-4">

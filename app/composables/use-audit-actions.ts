@@ -68,10 +68,10 @@ export function useAuditActions() {
 
   function getTableHeaders() {
     return [
-      { label: "Action", value: "action", icon: "ph:lightning-bold" },
-      { label: "Description", value: "description", icon: "ph:text-align-left-bold" },
-      { label: "User", value: "user", icon: "ph:user-bold" },
-      { label: "Date", value: "createdAt", icon: "ph:calendar-bold" },
+      { label: "Action", value: "action", icon: "ph:lightning" },
+      { label: "Description", value: "description", icon: "ph:text-align-left" },
+      { label: "User", value: "user", icon: "ph:user" },
+      { label: "Date", value: "createdAt", icon: "ph:calendar" },
     ]
   }
 
@@ -82,18 +82,18 @@ export function useAuditActions() {
 
   function getResourceIcon(resource: string | null): string {
     if (!resource)
-      return "ph:cube-bold"
+      return "ph:cube"
 
     const resourceMap: Record<string, string> = {
-      organization: "ph:buildings-bold",
-      organization_invite: "ph:envelope-bold",
-      organization_member: "ph:users-three-bold",
-      project: "ph:folder-bold",
-      project_member: "ph:user-plus-bold",
-      secret: "ph:key-bold",
+      organization: "ph:buildings",
+      organization_invite: "ph:envelope",
+      organization_member: "ph:users-three",
+      project: "ph:folder",
+      project_member: "ph:user-plus",
+      secret: "ph:key",
     }
 
-    return resourceMap[resource] || "ph:cube-bold"
+    return resourceMap[resource] || "ph:cube"
   }
 
   return {

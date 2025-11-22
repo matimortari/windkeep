@@ -62,7 +62,7 @@
         :visible="{ opacity: 1, y: 0 }" :duration="800"
         :delay="200 * index" class="flex max-w-sm min-w-[350px] grow-0 flex-col items-center gap-4 p-4 text-center"
       >
-        <icon :name="feature.icon" class="text-primary" size="70" />
+        <icon :name="feature.icon" class="text-secondary" size="70" />
         <h3 class="font-display-alt tracking-tighter whitespace-nowrap">
           {{ feature.title }}
         </h3>
@@ -136,7 +136,7 @@
       <div v-for="(item, index) in FAQS" :key="index" class="space-y-2 py-4">
         <button class="group flex w-full items-center justify-between text-start font-semibold hover:text-primary" @click="toggleAccordion(index)">
           <span>{{ item.question }}</span>
-          <icon name="ph:plus-bold" size="20" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
+          <icon name="ph:plus" size="20" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
         </button>
 
         <transition name="accordion">
@@ -151,7 +151,7 @@
 
 <script setup lang="ts">
 const { createActionHandler } = useActionIcon()
-const copyIcon = createActionHandler("ph:copy-bold")
+const copyIcon = createActionHandler("ph:copy")
 
 const openIndex = ref<number | null>(null)
 
