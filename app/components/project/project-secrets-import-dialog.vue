@@ -49,7 +49,7 @@ const emit = defineEmits<{
   (e: "save", secrets: Secret[]): void
 }>()
 
-const { errors } = useProjectActions()
+const { errors } = storeToRefs(useProjectStore())
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 

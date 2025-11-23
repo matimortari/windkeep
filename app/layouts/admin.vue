@@ -15,9 +15,15 @@
 </template>
 
 <script setup lang="ts">
-const { user, fetchUser } = useUserActions()
-const { activeOrg, setActiveOrg, activeMembership } = useOrgActions()
-const { fetchProjects } = useProjectActions()
+const userStore = useUserStore()
+const orgStore = useOrgStore()
+const projectStore = useProjectStore()
+const { user } = storeToRefs(userStore)
+const { activeOrg } = storeToRefs(orgStore)
+
+const activeMembership = computed(() =>
+  userStore.user?.orgMemberships?.find(m => m.isActive),
+)
 
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
@@ -32,14 +38,14 @@ const orgs = computed(() =>
 
 async function getUserData() {
   try {
-    await fetchUser()
+    await userStore.getUser()
     if (!activeMembership.value) {
       return navigateTo("/onboarding/create-org")
     }
 
-    await setActiveOrg(activeMembership.value.orgId)
+    orgStore.setActiveOrg(activeMembership.value.orgId)
 
-    await fetchProjects()
+    await projectStore.getProjects()
   }
   catch {
     await navigateTo("/sign-in")

@@ -102,8 +102,9 @@
 
 <script setup lang="ts">
 const { createActionHandler } = useActionIcon()
-const { user, updateProfile, updateProfileImage, deleteAccount, errors } = useUserActions()
-const { activeOrg } = useOrgActions()
+const userStore = useUserStore()
+const { user, errors } = storeToRefs(userStore)
+const { activeOrg } = storeToRefs(useOrgStore())
 
 const userFields = [
   {
@@ -168,7 +169,7 @@ async function handleUpdateImage(event: Event) {
   if (!file)
     return
 
-  const res = await updateProfileImage(file)
+  const res = await userStore.updateUserImage(file)
   if (res?.imageUrl && user.value) {
     user.value.image = res.imageUrl
   }
@@ -178,7 +179,7 @@ async function handleSubmit(index: number) {
   if (!user.value?.id || !user.value?.name)
     return
 
-  await updateProfile({
+  await userStore.updateUser({
     name: user.value.name,
   })
   saveIcon[index]?.triggerSuccess()
@@ -188,7 +189,7 @@ async function handleDeleteUser() {
   if (!confirm("Are you sure you want to delete your account? This action cannot be undone."))
     return
 
-  await deleteAccount()
+  await userStore.deleteUser()
 }
 
 useHead({
