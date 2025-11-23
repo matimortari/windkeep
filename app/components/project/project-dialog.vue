@@ -50,7 +50,7 @@ const emit = defineEmits<{
   (e: "save", payload: { name: string, slug: string, description: string }): void
 }>()
 
-const { errors } = useProjectActions()
+const { errors } = storeToRefs(useProjectStore())
 
 const form = ref<{ name: string, slug: string, description: string }>({
   name: "",

@@ -1,6 +1,8 @@
 import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/schemas/org-schema"
 
 export const useOrgStore = defineStore("org", () => {
+  const userStore = useUserStore()
+
   const organizations = ref<Organization[]>([])
   const activeOrg = ref<Organization | null>(null)
   const loading = ref(false)
@@ -14,6 +16,9 @@ export const useOrgStore = defineStore("org", () => {
     createInvite: null,
     acceptInvite: null,
   } as Record<string, string | null>)
+
+  const isOwner = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "OWNER")
+  const isAdmin = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "ADMIN")
 
   async function getOrg(orgId: string) {
     loading.value = true
@@ -40,8 +45,8 @@ export const useOrgStore = defineStore("org", () => {
     }
   }
 
-  function setActiveOrg(org: Organization | null) {
-    activeOrg.value = org
+  function setActiveOrg(orgId: string | null) {
+    activeOrg.value = organizations.value.find(o => o.id === orgId) || null
   }
 
   async function createOrg(data: CreateOrgInput) {
@@ -157,6 +162,8 @@ export const useOrgStore = defineStore("org", () => {
     errors,
     organizations,
     activeOrg,
+    isOwner,
+    isAdmin,
     setActiveOrg,
     getOrg,
     createOrg,

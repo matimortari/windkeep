@@ -66,14 +66,14 @@
 <script setup lang="ts">
 const route = useRoute()
 const slug = route.params.project
-const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets } = useProjectActions()
-const { activeOrg } = useOrgActions()
-const { importFromEnv, exportToEnv } = useEnvFile(allProjects.value.find(p => p.slug === slug)?.id ?? "")
+const projectStore = useProjectStore()
+const { activeOrg } = storeToRefs(useOrgStore())
+const { importFromEnv, exportToEnv } = useEnvFile(projectStore.projects.find(p => p.slug === slug)?.id ?? "")
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 
-const project = computed(() => allProjects.value.find(p => p.slug === slug))
-
+const project = computed(() => projectStore.projects.find(p => p.slug === slug))
+const projectSecrets = computed(() => projectStore.secrets)
 const selectedSecret = ref<Secret | null>(null)
 const dropdownRef = ref<HTMLElement | null>(null)
 const dialogType = ref<"secret" | "env" | null>(null)
@@ -93,19 +93,19 @@ async function handleSubmit(secret: any) {
     return
 
   const success = secret.id
-    ? await updateSecret(project.value.id, secret.id, {
+    ? await projectStore.updateProjectSecret(project.value.id, secret.id, {
         description: secret.description ?? "",
       })
-    : await createSecret(project.value.id, {
+    : await projectStore.createProjectSecret(project.value.id, {
         key: secret.key,
         description: secret.description ?? "",
         projectId: project.value.id,
       })
   if (success)
-    await fetchSecrets(project.value.id)
+    await projectStore.getProjectSecrets(project.value.id)
 }
 
-watch([project, allProjects], ([proj, projects]) => {
+watch([project, projectStore.projects], ([proj, projects]) => {
   if (projects.length > 0 && !proj) {
     navigateTo("/admin/projects", { replace: true })
   }
@@ -121,8 +121,8 @@ watch(() => project.value?.id, async (id: string | undefined) => {
   if (!id)
     return
 
-  await fetchSecrets(id)
-  const projectTitle = allProjects.value?.find(p => p.id === id)?.name
+  await projectStore.getProjectSecrets(id)
+  const projectTitle = projectStore.projects.find(p => p.id === id)?.name
 
   useHead({
     title: `${projectTitle}`,

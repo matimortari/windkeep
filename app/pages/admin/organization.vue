@@ -15,8 +15,8 @@
           </p>
         </header>
 
-        <p v-if="Object.values(orgErrors).some(Boolean)" class="text-danger">
-          {{ Object.values(orgErrors).find(Boolean) }}
+        <p v-if="Object.values(errors).some(Boolean)" class="text-danger">
+          {{ Object.values(errors).find(Boolean) }}
         </p>
       </div>
 
@@ -127,8 +127,8 @@
       </header>
 
       <div class="navigation-group self-end">
-        <p v-if="orgErrors.createInvite" class="text-danger">
-          {{ orgErrors.createInvite }}
+        <p v-if="errors.createInvite" class="text-danger">
+          {{ errors.createInvite }}
         </p>
         <p v-if="inviteSuccess" class="text-success">
           {{ inviteSuccess }}
@@ -163,8 +163,8 @@
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="orgErrors.removeOrgMember" class="text-danger">
-            {{ orgErrors.removeOrgMember }}
+          <p v-if="errors.removeOrgMember" class="text-danger">
+            {{ errors.removeOrgMember }}
           </p>
 
           <button class="btn-danger" aria-label="Leave Organization" @click="handleLeaveOrg">
@@ -185,8 +185,8 @@
         </header>
 
         <div class="navigation-group self-end">
-          <p v-if="orgErrors.deleteOrg" class="text-danger">
-            {{ orgErrors.deleteOrg }}
+          <p v-if="errors.deleteOrg" class="text-danger">
+            {{ errors.deleteOrg }}
           </p>
 
           <button class="btn-danger" aria-label="Delete Organization" @click="handleDeleteOrg">
@@ -201,17 +201,18 @@
 
 <script setup lang="ts">
 const { createActionHandler } = useActionIcon()
-const { user, fetchUser } = useUserActions()
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
 
-const { updateOrg, deleteOrg, updateMemberRole, removeMember, inviteMember, isOwner, activeOrg, isAdmin, errors: orgErrors } = useOrgActions()
-
-const { allProjects } = useProjectActions()
+const orgStore = useOrgStore()
+const projectStore = useProjectStore()
+const { activeOrg, isOwner, isAdmin, errors } = storeToRefs(orgStore)
 
 const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
 
 const orgProjects = computed(() =>
-  allProjects.value.filter(p => p.orgId === activeOrg.value?.id),
+  projectStore.projects.filter(p => p.orgId === activeOrg.value?.id),
 )
 
 // Members of current organization
@@ -264,7 +265,7 @@ async function handleCreateInvite() {
   if (!activeOrg.value?.id)
     return
 
-  const result = await inviteMember(activeOrg.value.id, {
+  const result = await orgStore.createInvite(activeOrg.value.id, {
     orgId: activeOrg.value.id,
   })
 
@@ -278,11 +279,11 @@ async function handleUpdateMemberRole(memberId: string, newRole: Role) {
   if (!activeOrg.value?.id)
     return
 
-  const success = await updateMemberRole(activeOrg.value.id, memberId, {
+  const success = await orgStore.updateOrgMember(activeOrg.value.id, memberId, {
     role: newRole,
   })
   if (success)
-    await fetchUser()
+    await userStore.getUser()
 }
 
 async function handleRemoveMember(memberId: string) {
@@ -291,20 +292,20 @@ async function handleRemoveMember(memberId: string) {
   if (!confirm("Are you sure you want to remove this member?"))
     return
 
-  await removeMember(activeOrg.value.id, memberId)
-  await fetchUser()
+  await orgStore.removeOrgMember(activeOrg.value.id, memberId)
+  await userStore.getUser()
 }
 
 async function handleSubmit(index: number) {
   if (!activeOrg.value?.id)
     return
 
-  const success = await updateOrg(activeOrg.value.id, {
+  const success = await orgStore.updateOrg(activeOrg.value.id, {
     name: activeOrg.value.name || "",
   })
 
   if (success) {
-    await fetchUser()
+    await userStore.getUser()
     saveIcon[index]?.triggerSuccess()
   }
 }
@@ -315,7 +316,7 @@ async function handleLeaveOrg() {
   if (!confirm("Are you sure you want to leave this organization? This action cannot be undone."))
     return
 
-  await removeMember(activeOrg.value.id, user.value.id)
+  await orgStore.removeOrgMember(activeOrg.value.id, user.value.id)
   await navigateTo("/onboarding/create-org")
 }
 
@@ -325,7 +326,7 @@ async function handleDeleteOrg() {
   if (!confirm("Are you sure you want to delete this organization? This action cannot be undone."))
     return
 
-  await deleteOrg(activeOrg.value.id)
+  await orgStore.deleteOrg(activeOrg.value.id)
 }
 
 watch(orgMembers, (users: Array<{ id?: string, role: string }>) => {

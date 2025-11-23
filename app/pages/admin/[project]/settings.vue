@@ -190,9 +190,10 @@
 const route = useRoute()
 const slug = route.params.project
 const { createActionHandler } = useActionIcon()
-const { activeOrg } = useOrgActions()
-const { user } = useUserActions()
-const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, removeMember, fetchProjects, isOwner, isAdmin, errors } = useProjectActions()
+const { activeOrg } = storeToRefs(useOrgStore())
+const { user } = storeToRefs(useUserStore())
+const projectStore = useProjectStore()
+const { projects, isOwner, isAdmin, errors } = storeToRefs(projectStore)
 
 const addMemberSuccess = ref<string | null>(null)
 const newMemberId = ref("")
@@ -201,7 +202,7 @@ const localProjectName = ref("")
 const localProjectSlug = ref("")
 const localProjectDescription = ref("")
 
-const project = computed(() => allProjects.value.find(p => p.slug === slug))
+const project = computed(() => projects.value.find(p => p.slug === slug))
 
 const projectFields = [
   {
@@ -263,13 +264,13 @@ async function handleAddMember() {
   if (!project.value?.id || !newMemberId.value.trim())
     return
 
-  const success = await addMember(project.value.id, {
+  const success = await projectStore.addProjectMember(project.value.id, {
     userId: newMemberId.value.trim(),
     role: newMemberRole.value as Role,
   })
 
   if (success) {
-    await fetchProjects()
+    await projectStore.getProjects()
     addMemberSuccess.value = "Member added successfully."
     newMemberId.value = ""
     newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
@@ -280,8 +281,8 @@ async function handleUpdateMemberRole(memberId: string, newRole: Role) {
   if (!project.value?.id)
     return
 
-  if (await updateMemberRole(project.value.id, memberId, { role: newRole }))
-    await fetchProjects()
+  if (await projectStore.updateProjectMember(project.value.id, memberId, { role: newRole }))
+    await projectStore.getProjects()
 }
 
 async function handleRemoveMember(memberId: string) {
@@ -290,8 +291,8 @@ async function handleRemoveMember(memberId: string) {
   if (!confirm("Are you sure you want to remove this member?"))
     return
 
-  await removeMember(project.value.id, memberId)
-  await fetchProjects()
+  await projectStore.removeProjectMember(project.value.id, memberId)
+  await projectStore.getProjects()
 }
 
 async function handleSubmit(index: number) {
@@ -301,14 +302,14 @@ async function handleSubmit(index: number) {
   const oldSlug = project.value.slug
   const newSlug = localProjectSlug.value
 
-  const success = await updateProject(project.value.id, {
+  const success = await projectStore.updateProject(project.value.id, {
     name: localProjectName.value,
     slug: localProjectSlug.value,
     description: localProjectDescription.value,
   })
 
   if (success) {
-    await fetchProjects()
+    await projectStore.getProjects()
     saveIcon[index]?.triggerSuccess()
 
     // If slug was changed, navigate to the new URL
@@ -324,7 +325,7 @@ async function handleDeleteProject() {
   if (!confirm("Are you sure you want to delete this project? This action cannot be undone."))
     return
 
-  await deleteProject(project.value.id)
+  await projectStore.deleteProject(project.value.id)
 }
 
 async function handleLeaveProject() {
@@ -333,11 +334,11 @@ async function handleLeaveProject() {
   if (!confirm("Are you sure you want to leave this project? This action cannot be undone."))
     return
 
-  await removeMember(project.value.id, user.value.id)
+  await projectStore.removeProjectMember(project.value.id, user.value.id)
   await navigateTo("/admin/projects")
 }
 
-watch([project, allProjects], ([proj, projects]) => {
+watch([project, projects], ([proj, projects]) => {
   if (projects.length > 0 && !proj) {
     navigateTo("/admin/projects", { replace: true })
   }
@@ -359,7 +360,7 @@ watch([project, activeOrg], ([proj, org]) => {
 })
 
 watch(() => project.value?.id, async (id: string | undefined) => {
-  const projectTitle = allProjects.value?.find(p => p.id === id)?.name
+  const projectTitle = projects.value.find(p => p.id === id)?.name
 
   useHead({
     title: `${projectTitle} settings`,
