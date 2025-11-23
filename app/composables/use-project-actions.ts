@@ -6,29 +6,27 @@ export function useProjectActions() {
   const userStore = useUserStore()
   const orgStore = useOrgStore()
 
-  const activeProject = computed(() => projectStore.activeProject)
   const allProjects = computed(() => projectStore.projects)
   const projectSecrets = computed(() => projectStore.secrets)
   const loading = computed(() => projectStore.loading)
   const errors = computed(() => projectStore.errors)
 
   const activeOrgProjects = computed(() => {
-    const activeOrgId = orgStore.activeOrg?.id
-    if (!activeOrgId)
+    if (!orgStore.activeOrg?.id)
       return []
 
-    return projectStore.projects.filter(
-      (project: any) => project.orgId === activeOrgId,
-    )
+    return projectStore.projects.filter((project: any) => project.orgId === orgStore.activeOrg?.id)
   })
 
-  const isOwner = computed(() => {
-    return activeProject.value?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "OWNER"
-  })
+  const isOwner = (projectId: string) => {
+    const project = projectStore.projects.find(p => p.id === projectId)
+    return project?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "OWNER") ?? false
+  }
 
-  const isAdmin = computed(() => {
-    return activeProject.value?.roles?.find((r: any) => r.userId === userStore.user?.id)?.role === "ADMIN"
-  })
+  const isAdmin = (projectId: string) => {
+    const project = projectStore.projects.find(p => p.id === projectId)
+    return project?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "ADMIN") ?? false
+  }
 
   const fetchProjects = async () => {
     await projectStore.getProjects()
@@ -75,7 +73,6 @@ export function useProjectActions() {
     await projectStore.deleteProjectSecret(projectId, secretId)
   }
   return {
-    activeProject,
     allProjects,
     activeOrgProjects,
     projectSecrets,

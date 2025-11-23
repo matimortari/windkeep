@@ -46,7 +46,7 @@
 
     <ProjectSecretsTable
       v-if="projectSecrets.length" :secrets="projectSecrets"
-      :project-id="project?.id" @edit="(secret: Secret) => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = secret }"
+      :project-id="project?.id ?? ''" @edit="(secret: Secret) => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = secret }"
     />
 
     <ProjectSecretsDialog
@@ -68,7 +68,7 @@ const route = useRoute()
 const slug = route.params.project
 const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets } = useProjectActions()
 const { activeOrg } = useOrgActions()
-const { importFromEnv, exportToEnv } = useEnvFile(allProjects.value.find(p => p.slug === slug)?.id)
+const { importFromEnv, exportToEnv } = useEnvFile(allProjects.value.find(p => p.slug === slug)?.id ?? "")
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 

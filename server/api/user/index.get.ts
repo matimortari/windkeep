@@ -12,6 +12,8 @@ export default defineEventHandler(async (event) => {
       },
       projectMemberships: {
         select: {
+          role: true,
+          projectId: true,
           project: {
             select: {
               id: true,
@@ -22,6 +24,7 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
+
     },
   })
   if (!userData) {

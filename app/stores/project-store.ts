@@ -2,8 +2,7 @@ import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, Upd
 import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 
 export const useProjectStore = defineStore("project", () => {
-  const projects = ref<any[]>([])
-  const activeProject = ref<any | null>(null)
+  const projects = ref<Project[]>([])
   const secrets = ref<any[]>([])
   const loading = ref(false)
   const errors = ref<Record<
@@ -38,7 +37,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.getProjects = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects`, { method: "GET", credentials: "include" })
+      const res = await $fetch<{ projects: Project[] }>(`${API_URL}/projects`, { method: "GET", credentials: "include" })
       projects.value = res.projects || []
     }
     catch (err: any) {
@@ -53,7 +52,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.createProject = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<Project>(`${API_URL}/projects`, { method: "POST", body: data, credentials: "include" })
       projects.value.push(res)
       return res
     }
@@ -71,10 +70,9 @@ export const useProjectStore = defineStore("project", () => {
     try {
       const res = await $fetch(`${API_URL}/projects/${projectId}`, { method: "PUT", body: data, credentials: "include" })
       const index = projects.value.findIndex(p => p.id === projectId)
-      if (index !== -1)
-        projects.value[index] = res
-      if (activeProject.value?.id === projectId)
-        activeProject.value = { ...activeProject.value, ...res }
+      if (index !== -1) {
+        projects.value[index] = { ...res, description: res.description === null ? undefined : res.description }
+      }
       return res
     }
     catch (err: any) {
@@ -91,8 +89,6 @@ export const useProjectStore = defineStore("project", () => {
     try {
       await $fetch(`${API_URL}/projects/${projectId}`, { method: "DELETE", credentials: "include" })
       projects.value = projects.value.filter(p => p.id !== projectId)
-      if (activeProject.value?.id === projectId)
-        activeProject.value = null
     }
     catch (err: any) {
       errors.value.deleteProject = err?.message || "Failed to delete project"
@@ -107,8 +103,6 @@ export const useProjectStore = defineStore("project", () => {
 
     try {
       const res = await $fetch(`${API_URL}/projects/${projectId}/members`, { method: "POST", body: data, credentials: "include" })
-      if (activeProject.value?.id === projectId && activeProject.value.members)
-        activeProject.value.members.push(res)
       return res
     }
     catch (err: any) {
@@ -124,11 +118,6 @@ export const useProjectStore = defineStore("project", () => {
 
     try {
       const res = await $fetch(`${API_URL}/projects/${projectId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
-      if (activeProject.value?.id === projectId && activeProject.value.members) {
-        const idx = activeProject.value.members.findIndex((m: any) => m.userId === memberId)
-        if (idx !== -1)
-          activeProject.value.members[idx] = res
-      }
       return res
     }
     catch (err: any) {
@@ -144,9 +133,6 @@ export const useProjectStore = defineStore("project", () => {
 
     try {
       await $fetch(`${API_URL}/projects/${projectId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
-      if (activeProject.value?.id === projectId && activeProject.value.members) {
-        activeProject.value.members = activeProject.value.members.filter((m: any) => m.userId !== memberId)
-      }
     }
     catch (err: any) {
       errors.value.removeProjectMember = err?.message || "Failed to remove project member"
@@ -163,8 +149,6 @@ export const useProjectStore = defineStore("project", () => {
       const res = await $fetch(`${API_URL}/projects/${projectId}/secrets`, { method: "GET", credentials: "include" })
       const fetchedSecrets = Array.isArray(res) ? res : []
       secrets.value = fetchedSecrets
-      if (activeProject.value?.id === projectId)
-        activeProject.value.secrets = fetchedSecrets
       return fetchedSecrets
     }
     catch (err: any) {
@@ -182,10 +166,6 @@ export const useProjectStore = defineStore("project", () => {
     try {
       const res = await $fetch(`${API_URL}/projects/${projectId}/secrets`, { method: "POST", body: data, credentials: "include" })
       secrets.value.push(res)
-      if (activeProject.value?.id === projectId) {
-        activeProject.value.secrets = activeProject.value.secrets || []
-        activeProject.value.secrets.push(res)
-      }
       return res
     }
     catch (err: any) {
@@ -205,11 +185,6 @@ export const useProjectStore = defineStore("project", () => {
       const idx = secrets.value.findIndex((s: any) => s.id === secretId)
       if (idx !== -1)
         secrets.value[idx] = res
-      if (activeProject.value?.id === projectId && activeProject.value.secrets) {
-        const currIdx = activeProject.value.secrets.findIndex((s: any) => s.id === secretId)
-        if (currIdx !== -1)
-          activeProject.value.secrets[currIdx] = res
-      }
       return res
     }
     catch (err: any) {
@@ -227,9 +202,6 @@ export const useProjectStore = defineStore("project", () => {
     try {
       await $fetch(`${API_URL}/projects/${projectId}/secrets/${secretId}`, { method: "DELETE", credentials: "include" })
       secrets.value = secrets.value.filter((s: any) => s.id !== secretId)
-      if (activeProject.value?.id === projectId && activeProject.value.secrets) {
-        activeProject.value.secrets = activeProject.value.secrets.filter((s: any) => s.id !== secretId)
-      }
     }
     catch (err: any) {
       errors.value.deleteProjectSecret = err?.message || "Failed to delete project secret"
@@ -243,7 +215,6 @@ export const useProjectStore = defineStore("project", () => {
     loading,
     errors,
     projects,
-    activeProject,
     secrets,
     getProjects,
     createProject,
