@@ -4,15 +4,9 @@ export const useAuditStore = defineStore("audit", () => {
   const auditLogs = ref<AuditLog[]>([])
   const pagination = ref<AuditLogsPagination | null>(null)
   const filters = ref<AuditFilters | null>(null)
-  const currentFilters = ref<GetAuditLogsInput>({
-    page: 1,
-    limit: 20,
-  })
+  const currentFilters = ref<GetAuditLogsInput>({ page: 1, limit: 20 })
   const loading = ref(false)
-  const errors = ref<Record<"getAuditLogs" | "deleteAuditLogs", string | null>>({
-    getAuditLogs: null,
-    deleteAuditLogs: null,
-  })
+  const errors = ref<Record<"getAuditLogs" | "deleteAuditLogs", string | null>>({ getAuditLogs: null, deleteAuditLogs: null })
 
   async function getAuditLogs(orgId: string, params?: GetAuditLogsInput) {
     loading.value = true

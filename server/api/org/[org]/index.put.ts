@@ -1,7 +1,7 @@
 import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
 import { getUserFromSession, requireRole } from "#server/lib/utils"
-import { updateOrganizationSchema } from "#shared/schemas/org-schema"
+import { updateOrgSchema } from "#shared/schemas/org-schema"
 import z from "zod"
 
 export default defineEventHandler(async (event) => {
@@ -11,17 +11,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER"])
 
   const body = await readBody(event)
-  const result = updateOrganizationSchema.safeParse(body)
-
+  const result = updateOrgSchema.safeParse(body)
   if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid input",
-      data: z.treeifyError(result.error),
-    })
+    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
   const existingOrg = await db.organization.findUnique({
