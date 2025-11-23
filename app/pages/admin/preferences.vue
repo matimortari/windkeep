@@ -102,7 +102,8 @@
 
 <script setup lang="ts">
 const { createActionHandler } = useActionIcon()
-const { user, activeOrg, updateProfile, updateProfileImage, deleteAccount, errors } = useUserActions()
+const { user, updateProfile, updateProfileImage, deleteAccount, errors } = useUserActions()
+const { activeOrg } = useOrgActions()
 
 const userFields = [
   {
@@ -128,18 +129,16 @@ const userFields = [
     value: computed(() => user.value?.email),
   },
   {
-    label: "Active Organization",
+    label: "Current Organization",
     description: "The organization you are currently working in.",
     value: computed(() => activeOrg.value?.name || "N/A"),
   },
   {
-    label: "Active Organization Role",
-    description: "Your role within the active organization.",
-    value: computed(() => {
-      const membership = user.value?.orgMemberships?.find(m => m.orgId === user.value?.activeOrgId)
-      return capitalizeFirst(membership?.role || "N/A")
-    }),
+    label: "Current Organization Role",
+    description: "Your role within the current organization.",
+    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find(m => m.userId === user.value?.id)?.role || "N/A")),
   },
+
   {
     label: "Joined On",
     description: "The date you joined SecretkeepR.",

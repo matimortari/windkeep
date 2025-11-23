@@ -12,14 +12,14 @@
 
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
-            <span class="text-caption">{{ orgs.find(org => org.id === user?.activeOrgId)?.name }}</span>
+            <span class="text-caption">{{ activeOrg?.name }}</span>
             <icon name="ph:caret-down" size="20" class="transition-transform" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
           </button>
 
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
               <li v-for="org in orgs" :key="org.id" class="truncate whitespace-nowrap">
-                <button type="button" class="w-full cursor-pointer truncate rounded p-2 text-left hover:bg-muted" :class="org.id === user.activeOrgId ? 'bg-muted' : ''" @click="org.id && setActiveOrg(org.id)">
+                <button type="button" class="w-full cursor-pointer truncate rounded p-2 text-left hover:bg-muted" :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && setActiveOrg(org.id)">
                   {{ org.name }}
                 </button>
               </li>
@@ -69,7 +69,8 @@ defineEmits<(e: "toggleSidebar") => void>()
 const { toggleTheme, themeIcon } = useTheme()
 const { clear } = useUserSession()
 const route = useRoute()
-const { user, setCurrentOrganization, errors } = useUserActions()
+const { user } = useUserActions()
+const { activeOrg } = useOrgActions()
 
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
@@ -92,10 +93,22 @@ async function setActiveOrg(orgId: string) {
 
   try {
     isDropdownOpen.value = false
-    await setCurrentOrganization(orgId)
+
+    const orgStore = useOrgStore()
+    const org = orgStore.organizations.find(o => o.id === orgId)
+
+    // fallback: fetch if org isn't loaded yet
+    if (!org) {
+      const res = await orgStore.getOrg(orgId)
+      if (res)
+        orgStore.setActiveOrg(res)
+      return
+    }
+
+    orgStore.setActiveOrg(org)
   }
-  catch (err: any) {
-    errors.value.setActiveOrg = err.message
+  catch {
+    // errors.value.setActiveOrg = err.message
   }
 }
 

@@ -13,30 +13,17 @@ export default defineEventHandler(async (event) => {
   const targetMembership = await db.orgMembership.findUnique({
     where: { userId_orgId: { userId: member, orgId: org } },
     include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        },
-      },
-      org: {
-        select: {
-          name: true,
-        },
-      },
+      user: { select: { id: true, email: true, name: true } },
+      org: { select: { name: true } },
     },
   })
   if (!targetMembership) {
     throw createError({ statusCode: 404, statusMessage: "Member not found in organization" })
   }
 
-  // Allow self-removal (unless user is last owner)
+  // Self-removal logic
   if (member === user.id) {
-    const membership = await db.orgMembership.findUnique({
-      where: { userId_orgId: { userId: user.id, orgId: org } },
-    })
-    if (membership?.role === "OWNER") {
+    if (targetMembership.role === "OWNER") {
       const ownerCount = await db.orgMembership.count({
         where: { orgId: org, role: "OWNER" },
       })
@@ -49,6 +36,27 @@ export default defineEventHandler(async (event) => {
     const userRole = await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER", "ADMIN"])
     if (targetMembership.role === "OWNER" && userRole.role !== "OWNER") {
       throw createError({ statusCode: 403, statusMessage: "Organization owners cannot be removed." })
+    }
+  }
+
+  // Ensure no dangling active org
+  if (targetMembership.isActive) {
+    await db.orgMembership.update({
+      where: { userId_orgId: { userId: member, orgId: org } },
+      data: { isActive: false },
+    })
+
+    // Switch to another org if possible
+    const next = await db.orgMembership.findFirst({
+      where: { userId: member, orgId: { not: org } },
+      orderBy: { createdAt: "asc" },
+    })
+
+    if (next) {
+      await db.orgMembership.update({
+        where: { userId_orgId: { userId: member, orgId: next.orgId } },
+        data: { isActive: true },
+      })
     }
   }
 
@@ -69,9 +77,10 @@ export default defineEventHandler(async (event) => {
       organizationName: targetMembership.org.name,
       selfRemoval: member === user.id,
     },
-    description: member === user.id
-      ? `${targetMembership.user.name} (${targetMembership.user.email}) left organization "${targetMembership.org.name}"`
-      : `Removed ${targetMembership.user.name} (${targetMembership.user.email}) from organization "${targetMembership.org.name}"`,
+    description:
+      member === user.id
+        ? `${targetMembership.user.name} left organization "${targetMembership.org.name}"`
+        : `Removed ${targetMembership.user.name} from organization "${targetMembership.org.name}"`,
     event,
   })
 
