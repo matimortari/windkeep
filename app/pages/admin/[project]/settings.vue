@@ -62,7 +62,7 @@
         </h5>
 
         <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
-          <li v-for="member in project?.roles" :key="member.userId" class="card navigation-group w-full justify-between overflow-hidden">
+          <li v-for="member in project?.memberships" :key="member.userId" class="card navigation-group w-full justify-between overflow-hidden">
             <div class="flex min-w-0 flex-row items-center gap-4">
               <img :src="member.user?.image ?? undefined" alt="Avatar" class="hidden size-12 rounded-full border-2 md:block">
 
@@ -93,7 +93,7 @@
     </section>
 
     <!-- Add New Member -->
-    <section v-if="isOwner || isAdmin" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Add New Member">
+    <section v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Add New Member">
       <header class="flex flex-col gap-1">
         <h5>
           Add New Member
@@ -161,7 +161,7 @@
         </div>
       </nav>
 
-      <nav v-if="isOwner" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Project">
+      <nav v-if="isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Project">
         <header class="flex flex-col gap-1">
           <h5>
             Delete Project
@@ -246,12 +246,12 @@ const projectFields = [
   {
     label: "Created At",
     description: "When your project was created.",
-    value: computed(() => formatDate(project.value?.createdAt)),
+    value: computed(() => formatDate(project.value?.createdAt ? new Date(project.value.createdAt) : undefined)),
   },
   {
     label: "Updated At",
     description: "When your project was last updated.",
-    value: computed(() => formatDate(project.value?.updatedAt)),
+    value: computed(() => formatDate(project.value?.updatedAt ? new Date(project.value.updatedAt) : undefined)),
   },
 ]
 
