@@ -78,7 +78,7 @@ const props = defineProps<{
 
 const emit = defineEmits(["edit", "deleted", "update"])
 
-const { deleteSecret } = useProjectActions()
+const projectStore = useProjectStore()
 
 const visibleKeys = ref<Record<string, boolean>>({})
 const environments = ref(["DEVELOPMENT", "STAGING", "PRODUCTION"])
@@ -132,7 +132,7 @@ async function handleDeleteSecret(key: string) {
 
   const secret = props.secrets.find(s => s.key === key)
   if (secret?.id) {
-    await deleteSecret(props.projectId, secret.id)
+    await projectStore.deleteProjectSecret(props.projectId, secret.id)
     emit("deleted", key)
   }
 }

@@ -62,7 +62,8 @@ const emit = defineEmits<{
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 
-const { createSecret, updateSecret, errors, loading } = useProjectActions()
+const projectStore = useProjectStore()
+const { errors, loading } = storeToRefs(projectStore)
 
 const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({
   key: "",
@@ -128,13 +129,13 @@ async function handleSubmit() {
     }))
 
   if (isUpdateMode.value) {
-    await updateSecret(props.projectId, props.selectedSecret!.id, {
+    await projectStore.updateProjectSecret(props.projectId, props.selectedSecret!.id, {
       description: form.value.description.trim(),
       values,
     })
   }
   else {
-    await createSecret(props.projectId, {
+    await projectStore.createProjectSecret(props.projectId, {
       key: normalizeKey(form.value.key),
       description: form.value.description.trim(),
       projectId: props.projectId,

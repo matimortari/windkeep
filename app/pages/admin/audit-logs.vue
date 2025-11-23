@@ -15,14 +15,15 @@
 </template>
 
 <script setup lang="ts">
-const { activeOrg } = useOrgActions()
-const { fetchAuditLogs, loading } = useAuditActions()
+const { activeOrg } = storeToRefs(useOrgStore())
+const auditStore = useAuditStore()
+const { loading } = storeToRefs(auditStore)
 
 const showSensitiveInfo = ref(false)
 
 watch(activeOrg, async (org) => {
   if (org?.id) {
-    await fetchAuditLogs(org.id)
+    await auditStore.getAuditLogs(org.id)
   }
 }, { immediate: true })
 

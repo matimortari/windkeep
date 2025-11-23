@@ -39,8 +39,10 @@
 <script setup lang="ts">
 import { createOrgSchema } from "#shared/schemas/org-schema"
 
-const { user, fetchUser } = useUserActions()
-const { createOrg, setActiveOrg, errors } = useOrgActions()
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
+const orgStore = useOrgStore()
+const { errors } = storeToRefs(orgStore)
 
 const localOrg = ref({
   name: `${user.value?.name || user.value?.email}'s Organization`,
@@ -55,16 +57,16 @@ async function handleCreateOrg() {
     return
   }
 
-  const org = await createOrg(result.data)
+  const org = await orgStore.createOrg(result.data)
   if (!org)
     return
 
-  setActiveOrg(org.id)
+  orgStore.setActiveOrg(org.id)
   navigateTo("/admin/projects")
 }
 
 onMounted(async () => {
-  await fetchUser()
+  await userStore.getUser()
   localOrg.value.name = `${user.value?.name || user.value?.email}'s Organization` || "My Organization"
 })
 

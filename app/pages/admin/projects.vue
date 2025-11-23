@@ -57,8 +57,9 @@
 </template>
 
 <script setup lang="ts">
-const { activeOrgProjects, createProject, fetchProjects } = useProjectActions()
-const { activeOrg } = useOrgActions()
+const projectStore = useProjectStore()
+const { activeOrgProjects } = storeToRefs(projectStore)
+const { activeOrg } = storeToRefs(useOrgStore())
 
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
@@ -84,20 +85,20 @@ async function handleCreateProject(payload: { name: string, slug: string, descri
   if (!activeOrg.value)
     return
 
-  await createProject({
+  await projectStore.createProject({
     name: payload.name,
     slug: payload.slug,
     description: payload.description || undefined,
     orgId: activeOrg.value.id,
   })
 
-  await fetchProjects()
+  await projectStore.getProjects()
   isDialogOpen.value = false
 }
 
 watch(() => activeOrg.value?.id, async (orgId) => {
   if (orgId)
-    await fetchProjects()
+    await projectStore.getProjects()
 }, { immediate: true })
 
 useHead({

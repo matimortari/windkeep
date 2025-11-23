@@ -2,6 +2,9 @@ import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, Upd
 import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 
 export const useProjectStore = defineStore("project", () => {
+  const userStore = useUserStore()
+  const orgStore = useOrgStore()
+
   const projects = ref<Project[]>([])
   const secrets = ref<any[]>([])
   const loading = ref(false)
@@ -30,6 +33,27 @@ export const useProjectStore = defineStore("project", () => {
     createProjectSecret: null,
     updateProjectSecret: null,
     deleteProjectSecret: null,
+  })
+
+  const activeOrgProjects = computed(() => {
+    if (!orgStore.activeOrg?.id)
+      return []
+
+    return projects.value.filter((project: any) => project.orgId === orgStore.activeOrg?.id)
+  })
+
+  const isOwner = computed(() => {
+    return (projectId: string) => {
+      const project = projects.value.find(p => p.id === projectId)
+      return project?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "OWNER") ?? false
+    }
+  })
+
+  const isAdmin = computed(() => {
+    return (projectId: string) => {
+      const project = projects.value.find(p => p.id === projectId)
+      return project?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "ADMIN") ?? false
+    }
   })
 
   async function getProjects() {
@@ -216,6 +240,9 @@ export const useProjectStore = defineStore("project", () => {
     errors,
     projects,
     secrets,
+    activeOrgProjects,
+    isOwner,
+    isAdmin,
     getProjects,
     createProject,
     updateProject,
