@@ -53,14 +53,14 @@
         @change="updateDateFilter"
       >
 
-      <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="prevPage(activeOrg!.id)">
+      <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="prevPage()">
         <icon name="ph:arrow-left" size="20" />
       </button>
       <div class="text-caption flex flex-col items-center justify-center gap-1 whitespace-nowrap md:mx-4">
         <span>{{ pagination.page }} / {{ pagination.totalPages }}</span>
         <span v-if="auditLogs.length" class="text-xs italic">{{ logsSummary }}</span>
       </div>
-      <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="nextPage(activeOrg!.id)">
+      <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="nextPage()">
         <icon name="ph:arrow-right" size="20" />
       </button>
 
@@ -80,9 +80,9 @@ const emit = defineEmits<{
   "update:modelValue": [value: boolean]
 }>()
 
-const { auditLogs, pagination, filters, currentFilters, getActions, applyFilters, nextPage, prevPage, deleteLogs } = useAuditActions()
-const { activeOrg } = useUserActions()
-
+const auditStore = useAuditStore()
+const { auditLogs, pagination, filters, currentFilters, getActions } = storeToRefs(auditStore)
+const { activeOrg } = storeToRefs(useOrgStore())
 const dateFilter = ref("")
 const isUserDropdownOpen = ref(false)
 const isActionDropdownOpen = ref(false)
@@ -113,19 +113,29 @@ function getUserDisplayName(userId?: string) {
   return user?.name || user?.email
 }
 
-async function updateDateFilter() {
+function updateDateFilter() {
   const newFilters = { ...currentFilters.value, startDate: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined }
-  await applyFilters(activeOrg.value!.id, newFilters)
+  auditStore.updateFilters(newFilters)
 }
 
-async function setUserFilter(userId: string) {
-  await applyFilters(activeOrg.value!.id, { ...currentFilters.value, userId })
+function setUserFilter(userId: string) {
+  auditStore.updateFilters({ ...currentFilters.value, userId })
   isUserDropdownOpen.value = false
 }
 
-async function setActionFilter(action: string) {
-  await applyFilters(activeOrg.value!.id, { ...currentFilters.value, action })
+function setActionFilter(action: string) {
+  auditStore.updateFilters({ ...currentFilters.value, action })
   isActionDropdownOpen.value = false
+}
+
+function prevPage() {
+  if (activeOrg.value)
+    auditStore.prevPage(activeOrg.value.id)
+}
+
+function nextPage() {
+  if (activeOrg.value)
+    auditStore.nextPage(activeOrg.value.id)
 }
 
 const logsSummary = computed(() => {
@@ -138,7 +148,7 @@ async function handleDeleteLogs() {
   if (!confirm(`Are you sure you want to delete ${logsSummary.value}? This action cannot be undone.`))
     return
 
-  await deleteLogs(activeOrg.value!.id, {
+  await auditStore.deleteAuditLogs(activeOrg.value!.id, {
     olderThan: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined,
     action: currentFilters.value.action,
     userId: currentFilters.value.userId,

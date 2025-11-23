@@ -1,7 +1,8 @@
 import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 
 export function useEnvFile(projectId: string) {
-  const { currentProject, projectSecrets, updateSecret, createSecret, fetchSecrets } = useProjectActions()
+  const projectStore = useProjectStore()
+  const projectSecrets = computed(() => projectStore.secrets)
 
   const mergeValues = (existingValues: SecretValue[], newValues: SecretValue[]): SecretValue[] => {
     const merged = [...existingValues]
@@ -24,7 +25,7 @@ export function useEnvFile(projectId: string) {
       const payload: UpdateSecretInput = { values: mergedValues }
       if (secret.description !== undefined)
         payload.description = secret.description
-      return await updateSecret(projectId, existing.id!, payload)
+      return await projectStore.updateProjectSecret(projectId, existing.id!, payload)
     }
     else {
       const payload: CreateSecretInput = {
@@ -33,7 +34,7 @@ export function useEnvFile(projectId: string) {
         projectId,
         values: secret.values ?? [],
       }
-      return await createSecret(projectId, payload)
+      return await projectStore.createProjectSecret(projectId, payload)
     }
   }
 
@@ -57,7 +58,7 @@ export function useEnvFile(projectId: string) {
       }
     }
 
-    await fetchSecrets(projectId)
+    await projectStore.getProjectSecrets(projectId)
     return { success: successCount, failed: failedCount, errors }
   }
 
@@ -79,7 +80,7 @@ export function useEnvFile(projectId: string) {
 
     try {
       const blob = new Blob([filteredSecrets], { type: "text/plain" })
-      const projectName = currentProject.value?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "")
+      const projectName = projectStore.projects.find(p => p.id === projectId)?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "")
       const fileName = `.env.${projectName}.${env.toLowerCase()}`
       const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: fileName })
       a.click()
