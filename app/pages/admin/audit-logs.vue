@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-const { activeOrg } = useUserActions()
+const { activeOrg } = useOrgActions()
 const { fetchAuditLogs, loading } = useAuditActions()
 
 const showSensitiveInfo = ref(false)

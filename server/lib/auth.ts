@@ -17,7 +17,6 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
   if (!user) {
     user = await db.user.findUnique({ where: { email } }) ?? undefined
 
-    // 3. If still no user, create the user
     if (!user) {
       user = await db.user.create({
         data: {
@@ -28,7 +27,6 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
       })
     }
 
-    // 4. Link provider account
     account = await db.account.upsert({
       where: { provider_providerAccountId: { provider, providerAccountId } },
       update: {},
@@ -39,42 +37,38 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
     user = account.user
   }
 
-  // 5. Check if user needs active org set
-  if (!user.activeOrgId) {
-    const membership = await db.orgMembership.findFirst({
-      where: { userId: user.id },
-      include: { org: true },
-    })
+  // 3. Determine user's active organization
+  const activeMembership = await db.orgMembership.findFirst({
+    where: { userId: user.id, isActive: true },
+    include: { org: true },
+  })
 
-    if (membership?.org) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { activeOrgId: membership.org.id },
-      })
-      user.activeOrgId = membership.org.id
-    }
-  }
+  const activeOrgId = activeMembership?.org?.id ?? null
 
-  // 6. Generate API token
+  const hasActiveOrg = Boolean(activeMembership?.org)
+
+  // 4. Generate API token
   const apiToken = randomBytes(16).toString("hex")
+
   await db.user.update({
     where: { id: user.id },
     data: { apiToken },
   })
 
-  // 7. Build session object
+  // 5. Build session object
   const sessionUser = {
     id: user.id,
     email: user.email,
     name: user.name,
     image: user.image ?? undefined,
     apiToken,
+    activeOrgId,
   }
 
   await setUserSession(event, { user: sessionUser, loggedInAt: new Date() })
 
-  // 8. Redirect based on onboarding status
-  if (!user.activeOrgId) {
+  // 6. Redirect based on onboarding status
+  if (!hasActiveOrg) {
     return sendRedirect(event, "/onboarding/create-org")
   }
 

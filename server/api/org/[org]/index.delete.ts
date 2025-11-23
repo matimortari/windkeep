@@ -10,7 +10,13 @@ export default defineEventHandler(async (event) => {
 
   await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER"])
 
-  // Delete all pending invitations
+  // Clear active memberships for users who had this org active
+  await db.orgMembership.updateMany({
+    where: { orgId: org, isActive: true },
+    data: { isActive: false },
+  })
+
+  // Delete invitations
   await db.invitation.deleteMany({
     where: { orgId: org },
   })

@@ -190,8 +190,9 @@
 const route = useRoute()
 const slug = route.params.project
 const { createActionHandler } = useActionIcon()
-const { user, activeOrg } = useUserActions()
-const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, removeMember, fetchProjects, isOwner, isAdmin, errors, setCurrentProject } = useProjectActions()
+const { activeOrg } = useOrgActions()
+const { user } = useUserActions()
+const { allProjects, updateProject, deleteProject, addMember, updateMemberRole, removeMember, fetchProjects, isOwner, isAdmin, errors } = useProjectActions()
 
 const addMemberSuccess = ref<string | null>(null)
 const newMemberId = ref("")
@@ -349,10 +350,6 @@ watch(() => project.value, (proj) => {
   localProjectName.value = proj.name
   localProjectSlug.value = proj.slug
   localProjectDescription.value = proj.description || ""
-
-  if (proj.id) {
-    setCurrentProject(proj.id)
-  }
 }, { immediate: true })
 
 watch([project, activeOrg], ([proj, org]) => {
