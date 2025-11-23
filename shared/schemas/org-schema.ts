@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const createOrganizationSchema = z.object({
+export const createOrgSchema = z.object({
   name: z
     .string()
     .min(2, "Organization name must be at least 2 characters")
@@ -9,7 +9,7 @@ export const createOrganizationSchema = z.object({
     .refine(val => val.length >= 2, { message: "Organization name cannot be empty or only whitespace" }),
 })
 
-export const updateOrganizationSchema = z.object({
+export const updateOrgSchema = z.object({
   name: z
     .string()
     .min(2, "Organization name must be at least 2 characters")
@@ -34,8 +34,8 @@ export const acceptInviteSchema = z.object({
     .transform(val => val.trim()),
 })
 
-export type CreateOrgInput = z.infer<typeof createOrganizationSchema>
-export type UpdateOrgInput = z.infer<typeof updateOrganizationSchema>
+export type CreateOrgInput = z.infer<typeof createOrgSchema>
+export type UpdateOrgInput = z.infer<typeof updateOrgSchema>
 export type UpdateOrgMemberInput = z.infer<typeof updateMemberRoleSchema>
 export type CreateInviteInput = z.infer<typeof createInviteSchema>
 export type AcceptInviteInput = z.infer<typeof acceptInviteSchema>

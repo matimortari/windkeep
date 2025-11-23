@@ -25,7 +25,6 @@ model User {
   name               String
   image              String?
   apiToken           String?             @unique
-  activeOrgId        String?
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   accounts           Account[]
@@ -62,6 +61,7 @@ model OrgMembership {
   userId    String
   orgId     String
   role      Role         @default(MEMBER)
+  isActive  Boolean      @default(false)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)

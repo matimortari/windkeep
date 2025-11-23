@@ -1,13 +1,13 @@
 <template>
-  <Toolbar :orgs="orgs ?? []" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+  <Toolbar :orgs="orgs" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
   <Loading v-if="isLoading" />
 
   <div v-show="!isLoading" class="flex min-h-screen overflow-hidden py-12">
-    <Sidebar v-if="user?.activeOrgId" :org="orgs.find(o => o.id === user?.activeOrgId)" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
+    <Sidebar v-if="activeOrg" :org="activeOrg" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
 
     <main class="flex flex-1 flex-col overflow-x-hidden p-4">
-      <slot :active-org="user?.activeOrgId" />
+      <slot :active-org="activeOrg" />
     </main>
   </div>
 
@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 const { user, fetchUser } = useUserActions()
+const { activeOrg, setActiveOrg, activeMembership } = useOrgActions()
 const { fetchProjects } = useProjectActions()
 
 const isSidebarOpen = ref(false)
@@ -32,12 +33,13 @@ const orgs = computed(() =>
 async function getUserData() {
   try {
     await fetchUser()
-    if (user.value?.activeOrgId) {
-      await fetchProjects()
+    if (!activeMembership.value) {
+      return navigateTo("/onboarding/create-org")
     }
-    else {
-      await navigateTo("/onboarding/create-org")
-    }
+
+    await setActiveOrg(activeMembership.value.orgId)
+
+    await fetchProjects()
   }
   catch {
     await navigateTo("/sign-in")
@@ -47,12 +49,5 @@ async function getUserData() {
   }
 }
 
-onMounted(() => {
-  if (document.readyState === "complete") {
-    getUserData()
-  }
-  else {
-    window.addEventListener("load", getUserData)
-  }
-})
+onMounted(getUserData)
 </script>

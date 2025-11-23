@@ -7,7 +7,6 @@ interface User {
   name: string
   image?: string
   apiToken?: string
-  activeOrgId?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   orgMemberships?: OrgMembership[]
@@ -31,6 +30,7 @@ interface OrgMembership {
   userId: string
   orgId: string
   role: Role
+  isActive: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   user: User

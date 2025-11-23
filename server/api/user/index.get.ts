@@ -8,16 +8,7 @@ export default defineEventHandler(async (event) => {
     where: { id: user.id },
     include: {
       orgMemberships: {
-        select: {
-          role: true,
-          orgId: true,
-          org: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
+        include: { org: true },
       },
       projectMemberships: {
         select: {

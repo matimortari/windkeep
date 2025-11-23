@@ -201,15 +201,22 @@
 
 <script setup lang="ts">
 const { createActionHandler } = useActionIcon()
-const { user, activeOrg, fetchUser } = useUserActions()
-const { updateOrganization, deleteOrganization, updateMemberRole, removeMember, inviteMember, isOwner, isAdmin, errors: orgErrors } = useOrganizationActions()
+const { user, fetchUser } = useUserActions()
+
+const { updateOrg, deleteOrg, updateMemberRole, removeMember, inviteMember, isOwner, activeOrg, isAdmin, errors: orgErrors } = useOrgActions()
+
 const { allProjects } = useProjectActions()
 
 const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
-const orgProjects = computed(() => allProjects.value.filter(p => p.orgId === activeOrg.value?.id))
+
+const orgProjects = computed(() =>
+  allProjects.value.filter(p => p.orgId === activeOrg.value?.id),
+)
+
+// Members of current organization
 const orgMembers = computed(() => {
-  return ((activeOrg.value)?.memberships || []).map((m: any) => ({
+  return (activeOrg.value?.memberships || []).map((m: any) => ({
     id: m.user?.id,
     name: m.user?.name,
     email: m.user?.email,
@@ -240,12 +247,12 @@ const orgFields = [
   {
     label: "Created At",
     description: "When your organization was created.",
-    value: computed(() => formatDate((activeOrg.value as any)?.createdAt ? new Date((activeOrg.value as any).createdAt) : null)),
+    value: computed(() => formatDate(activeOrg.value?.createdAt ? new Date(activeOrg.value.createdAt) : null)),
   },
   {
     label: "Updated At",
     description: "When your organization was last updated.",
-    value: computed(() => formatDate((activeOrg.value as any)?.updatedAt ? new Date((activeOrg.value as any).updatedAt) : null)),
+    value: computed(() => formatDate(activeOrg.value?.updatedAt ? new Date(activeOrg.value.updatedAt) : null)),
   },
 ]
 
@@ -271,7 +278,9 @@ async function handleUpdateMemberRole(memberId: string, newRole: Role) {
   if (!activeOrg.value?.id)
     return
 
-  const success = await updateMemberRole(activeOrg.value.id, memberId, { role: newRole })
+  const success = await updateMemberRole(activeOrg.value.id, memberId, {
+    role: newRole,
+  })
   if (success)
     await fetchUser()
 }
@@ -290,7 +299,7 @@ async function handleSubmit(index: number) {
   if (!activeOrg.value?.id)
     return
 
-  const success = await updateOrganization(activeOrg.value.id, {
+  const success = await updateOrg(activeOrg.value.id, {
     name: activeOrg.value.name || "",
   })
 
@@ -316,7 +325,7 @@ async function handleDeleteOrg() {
   if (!confirm("Are you sure you want to delete this organization? This action cannot be undone."))
     return
 
-  await deleteOrganization(activeOrg.value.id)
+  await deleteOrg(activeOrg.value.id)
 }
 
 watch(orgMembers, (users: Array<{ id?: string, role: string }>) => {

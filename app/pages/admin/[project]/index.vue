@@ -66,8 +66,8 @@
 <script setup lang="ts">
 const route = useRoute()
 const slug = route.params.project
-const { activeOrg } = useUserActions()
 const { allProjects, projectSecrets, createSecret, updateSecret, fetchSecrets } = useProjectActions()
+const { activeOrg } = useOrgActions()
 const { importFromEnv, exportToEnv } = useEnvFile(allProjects.value.find(p => p.slug === slug)?.id)
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
@@ -101,7 +101,6 @@ async function handleSubmit(secret: any) {
         description: secret.description ?? "",
         projectId: project.value.id,
       })
-
   if (success)
     await fetchSecrets(project.value.id)
 }

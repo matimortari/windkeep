@@ -12,7 +12,6 @@ export const updateUserSchema = z.object({
     .union([z.url(), z.literal(""), z.null()])
     .transform(val => (val === "" ? null : val))
     .optional(),
-  activeOrgId: z.cuid().nullable().optional(),
   apiToken: z
     .string()
     .length(32, "API token must be exactly 32 characters")

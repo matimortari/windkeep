@@ -37,10 +37,10 @@
 </template>
 
 <script setup lang="ts">
-import { createOrganizationSchema } from "#shared/schemas/org-schema"
+import { createOrgSchema } from "#shared/schemas/org-schema"
 
 const { user, fetchUser } = useUserActions()
-const { createOrganization, errors } = useOrganizationActions()
+const { createOrg, setActiveOrg, errors } = useOrgActions()
 
 const localOrg = ref({
   name: `${user.value?.name || user.value?.email}'s Organization`,
@@ -49,13 +49,17 @@ const localOrg = ref({
 async function handleCreateOrg() {
   errors.value.createOrg = null
 
-  const result = createOrganizationSchema.safeParse(localOrg.value)
+  const result = createOrgSchema.safeParse(localOrg.value)
   if (!result.success) {
     errors.value.createOrg = "Organization name must be at least 2 characters long."
     return
   }
 
-  await createOrganization(result.data)
+  const org = await createOrg(result.data)
+  if (!org)
+    return
+
+  setActiveOrg(org.id)
   navigateTo("/admin/projects")
 }
 

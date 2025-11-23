@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 const route = useRoute()
-const { acceptInvite, errors } = useOrganizationActions()
+const { acceptInvite, errors } = useOrgActions()
 
 const token = ref(route.query.token as string || "")
 const joinOrgSuccess = ref<string | null>(null)

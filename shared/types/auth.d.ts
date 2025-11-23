@@ -5,7 +5,6 @@ declare module "#auth-utils" {
     name: string
     image?: string
     apiToken?: string
-    activeOrgId?: string
   }
 
   interface UserSession {
