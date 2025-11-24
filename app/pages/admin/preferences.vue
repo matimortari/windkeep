@@ -137,13 +137,13 @@ const userFields = [
   {
     label: "Current Organization Role",
     description: "Your role within the current organization.",
-    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find(m => m.userId === user.value?.id)?.role || "N/A")),
+    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find((m: OrgMembership) => m.userId === user.value?.id)?.role || "N/A")),
   },
 
   {
     label: "Joined On",
     description: "The date you joined SecretkeepR.",
-    value: computed(() => formatDate(user.value?.createdAt ? new Date(user.value.createdAt) : undefined)),
+    value: computed(() => formatDate(user.value?.createdAt)),
   },
   {
     label: "CLI Token",

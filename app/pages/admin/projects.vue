@@ -70,10 +70,7 @@ const searchQuery = ref("")
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
 const layout = ref<"grid" | "list">("grid")
-const sort = ref<{ key: string, direction: "asc" | "desc" }>({
-  key: "name",
-  direction: "asc",
-})
+const sort = ref<{ key: string, direction: "asc" | "desc" }>({ key: "name", direction: "asc" })
 
 // Projects in the active organization that the user has access to
 const activeOrgProjects = computed(() => {
@@ -94,19 +91,15 @@ const allProjects = computed(() => {
   )
 })
 
-const filteredProjects = computed(() => {
-  const source = showAllProjects.value ? allProjects : activeOrgProjects
-
-  const filtered = source.value.filter(project =>
-    project.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
-  )
-
-  return [...filtered].sort((a, b) => {
+// Projects filtered by search query and sorted by name (asc/desc)
+const filteredProjects = computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)
+  .filter(project => project.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
+  .sort((a, b) => {
     const nameA = a.name.toLowerCase()
     const nameB = b.name.toLowerCase()
     return sort.value.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
-  })
-})
+  }),
+)
 
 async function handleCreateProject(payload: { name: string, slug: string, description: string }) {
   if (!activeOrg.value)
