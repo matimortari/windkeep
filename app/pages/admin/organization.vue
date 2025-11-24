@@ -85,28 +85,28 @@
         </h5>
 
         <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
-          <li v-for="orgUser in orgMembers" :key="orgUser.id" class="card navigation-group w-full justify-between overflow-hidden">
+          <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="card navigation-group w-full justify-between overflow-hidden">
             <div class="flex min-w-0 flex-row items-center gap-4">
-              <img :src="orgUser.image ?? undefined" alt="Avatar" class="hidden size-12 rounded-full border-2 md:block">
+              <img :src="orgUser.user.image ?? undefined" alt="Avatar" class="hidden size-12 rounded-full border-2 md:block">
 
               <div class="flex min-w-0 flex-col">
-                <span class="truncate">{{ orgUser?.name }}</span>
-                <span class="text-caption truncate">Role: {{ capitalizeFirst(orgUser?.role) }}</span>
-                <span class="text-caption truncate">{{ orgUser?.id }}</span>
+                <span class="truncate">{{ orgUser.user.name }}</span>
+                <span class="text-caption truncate">Role: {{ capitalizeFirst(orgUser.role) }}</span>
+                <span class="text-caption truncate">{{ orgUser.user.id }}</span>
               </div>
             </div>
 
-            <nav v-if="isOwner && orgUser.id !== user?.id" class="navigation-group justify-end" aria-label="Organization Member Actions">
-              <select v-model="userRoles[orgUser.id as string]">
+            <nav v-if="isOwner && orgUser.user.id !== user?.id" class="navigation-group justify-end" aria-label="Organization Member Actions">
+              <select v-model="userRoles[orgUser.user.id as string]">
                 <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value" class="capitalize">
                   {{ capitalizeFirst(role.label) }}
                 </option>
               </select>
 
-              <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(orgUser.id || '', userRoles[String(orgUser.id)] || 'MEMBER')">
+              <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(orgUser.user.id || '', userRoles[String(orgUser.user.id)] || 'MEMBER')">
                 <icon name="ph:floppy-disk" size="15" />
               </button>
-              <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.id || '')">
+              <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.user.id || '')">
                 <icon name="ph:x" size="15" />
               </button>
             </nav>
@@ -203,7 +203,6 @@
 const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
-
 const orgStore = useOrgStore()
 const projectStore = useProjectStore()
 const { activeOrg, isOwner, isAdmin, errors } = storeToRefs(orgStore)
@@ -211,20 +210,8 @@ const { activeOrg, isOwner, isAdmin, errors } = storeToRefs(orgStore)
 const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
 
-const orgProjects = computed(() =>
-  projectStore.projects.filter(p => p.orgId === activeOrg.value?.id),
-)
-
-// Members of current organization
-const orgMembers = computed(() => {
-  return (activeOrg.value?.memberships || []).map((m: any) => ({
-    id: m.user?.id,
-    name: m.user?.name,
-    email: m.user?.email,
-    image: m.user?.image,
-    role: m.role || "MEMBER",
-  }))
-})
+const orgMembers = computed(() => activeOrg.value?.memberships)
+const orgProjects = computed(() => projectStore.projects.filter(p => p.orgId === activeOrg.value?.id))
 
 const orgFields = [
   {
@@ -248,12 +235,12 @@ const orgFields = [
   {
     label: "Created At",
     description: "When your organization was created.",
-    value: computed(() => formatDate(activeOrg.value?.createdAt ? new Date(activeOrg.value.createdAt) : null)),
+    value: computed(() => formatDate(activeOrg.value?.createdAt)),
   },
   {
     label: "Updated At",
     description: "When your organization was last updated.",
-    value: computed(() => formatDate(activeOrg.value?.updatedAt ? new Date(activeOrg.value.updatedAt) : null)),
+    value: computed(() => formatDate(activeOrg.value?.updatedAt)),
   },
 ]
 
@@ -329,8 +316,8 @@ async function handleDeleteOrg() {
   await orgStore.deleteOrg(activeOrg.value.id)
 }
 
-watch(orgMembers, (users: Array<{ id?: string, role: string }>) => {
-  userRoles.value = Object.fromEntries(users.map((u: { id?: string, role: string }) => [u.id, u.role]))
+watch(() => orgMembers.value, (memberships: OrgMembership[] = []) => {
+  userRoles.value = Object.fromEntries(memberships.map(m => [m.userId, m.role]))
 }, { immediate: true })
 
 useHead({
