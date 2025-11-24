@@ -21,10 +21,6 @@ const projectStore = useProjectStore()
 const { user } = storeToRefs(userStore)
 const { activeOrg } = storeToRefs(orgStore)
 
-const activeMembership = computed(() =>
-  userStore.user?.orgMemberships?.find(m => m.isActive),
-)
-
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
@@ -39,11 +35,13 @@ const orgs = computed(() =>
 async function getUserData() {
   try {
     await userStore.getUser()
-    if (!activeMembership.value) {
+    const activeMembership = userStore.user?.orgMemberships?.find(m => m.isActive)
+    if (!activeMembership) {
       return navigateTo("/onboarding/create-org")
     }
 
-    orgStore.setActiveOrg(activeMembership.value.orgId)
+    await orgStore.getOrg(activeMembership.orgId)
+    orgStore.setActiveOrg(activeMembership.orgId)
 
     await projectStore.getProjects()
   }

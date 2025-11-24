@@ -3,12 +3,7 @@ import type { UpdateUserInput } from "#shared/schemas/user-schema"
 export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null)
   const loading = ref(false)
-  const errors = ref<Record<"getUser" | "updateUser" | "updateUserImage" | "deleteUser", string | null>>({
-    getUser: null,
-    updateUser: null,
-    updateUserImage: null,
-    deleteUser: null,
-  })
+  const errors = ref<Record<string, string | null>>({ getUser: null, updateUser: null, updateUserImage: null, deleteUser: null })
 
   async function getUser() {
     loading.value = true

@@ -19,7 +19,10 @@
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
               <li v-for="org in orgs" :key="org.id" class="truncate whitespace-nowrap">
-                <button type="button" class="w-full cursor-pointer truncate rounded p-2 text-left hover:bg-muted" :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && setActiveOrg(org.id)">
+                <button
+                  type="button" class="w-full cursor-pointer truncate rounded p-2 text-left hover:bg-muted"
+                  :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)"
+                >
                   {{ org.name }}
                 </button>
               </li>
@@ -64,12 +67,12 @@ const props = defineProps<{
   isSidebarOpen: boolean
 }>()
 
-defineEmits<(e: "toggleSidebar") => void>()
+defineEmits<{ (e: "toggleSidebar"): void }>()
 
 const { toggleTheme, themeIcon } = useTheme()
 const { clear } = useUserSession()
 const { user } = storeToRefs(useUserStore())
-const { activeOrg } = storeToRefs(useOrgStore())
+const { activeOrg, errors } = storeToRefs(useOrgStore())
 const route = useRoute()
 
 const isDropdownOpen = ref(false)
@@ -87,7 +90,7 @@ const currentPage = computed(() => {
   return page.replace(/\b\w/g, l => l.toUpperCase())
 })
 
-async function setActiveOrg(orgId: string) {
+async function handleSetActiveOrg(orgId: string) {
   if (!orgId)
     return
 
@@ -95,9 +98,7 @@ async function setActiveOrg(orgId: string) {
     isDropdownOpen.value = false
 
     const orgStore = useOrgStore()
-    const org = orgStore.organizations.find(o => o.id === orgId)
-
-    // fallback: fetch if org isn't loaded yet
+    const org = orgStore.organizations.find((o: Organization) => o.id === orgId)
     if (!org) {
       const res = await orgStore.getOrg(orgId)
       if (res)
@@ -107,8 +108,8 @@ async function setActiveOrg(orgId: string) {
 
     orgStore.setActiveOrg(org.id)
   }
-  catch {
-    // errors.value.setActiveOrg = err.message
+  catch (err: any) {
+    errors.value.setActiveOrg = err.message
   }
 }
 

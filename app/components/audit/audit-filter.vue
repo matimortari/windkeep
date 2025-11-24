@@ -76,9 +76,7 @@ const props = defineProps<{
   modelValue?: boolean
 }>()
 
-const emit = defineEmits<{
-  "update:modelValue": [value: boolean]
-}>()
+const emit = defineEmits<{ "update:modelValue": [value: boolean] }>()
 
 const auditStore = useAuditStore()
 const { auditLogs, pagination, filters, currentFilters, getActions } = storeToRefs(auditStore)

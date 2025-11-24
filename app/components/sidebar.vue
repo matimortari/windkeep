@@ -19,17 +19,22 @@
 
     <div class="flex items-center justify-between">
       <span class="font-semibold">Projects</span>
-      <button class="transition-transform hover:scale-125 hover:text-accent" aria-label="Create New Project" @click="isDialogOpen = true">
-        <icon name="ph:plus" size="25" />
-      </button>
+      <div class="flex gap-2">
+        <button class="btn" @click="showAllProjects = !showAllProjects">
+          {{ showAllProjects ? "Organization Projects" : "All Projects" }}
+        </button>
+        <button class="transition-transform hover:scale-125 hover:text-accent" aria-label="Create New Project" @click="isDialogOpen = true">
+          <icon name="ph:plus" size="25" />
+        </button>
+      </div>
     </div>
 
     <div class="scroll-area flex-1 overflow-y-auto">
-      <Empty v-if="!activeOrgProjects.length" message="No projects yet." icon-name="ph:folder-simple-minus" :icon-size="30" />
+      <Empty v-if="!filteredProjects.length" message="No projects yet." icon-name="ph:folder-simple-minus" :icon-size="30" />
 
       <nav v-else aria-label="Projects Navigation" class="text-caption flex flex-col gap-2">
         <nuxt-link
-          v-for="project in activeOrgProjects" :key="project.id"
+          v-for="project in filteredProjects" :key="project.id"
           :to="`/admin/${project.slug}`" class="truncate hover:underline"
           @click="$emit('update:isOpen', false)"
         >
@@ -37,11 +42,6 @@
         </nuxt-link>
       </nav>
     </div>
-
-    <nuxt-link to="https://github.com/matimortari/secretkeepr" target="_blank" class="group navigation-group border-t pt-4 transition-colors hover:underline">
-      <icon name="simple-icons:github" size="25" class="transition-transform group-hover:scale-110 group-hover:text-accent" />
-      <span class="text-caption">Support This Project</span>
-    </nuxt-link>
   </aside>
 
   <ProjectDialog :is-open="isDialogOpen" @close="isDialogOpen = false" @save="handleCreateProject" />
@@ -55,23 +55,50 @@ const props = defineProps<{
   isOpen: boolean
 }>()
 
-defineEmits(["update:isOpen"])
+defineEmits<{ (e: "update:isOpen", value: boolean): void }>()
 
 const projectStore = useProjectStore()
-const { activeOrgProjects } = storeToRefs(projectStore)
+const userStore = useUserStore()
+const { activeOrg } = storeToRefs(useOrgStore())
+const { projects } = storeToRefs(projectStore)
 
 const isDialogOpen = ref(false)
+const showAllProjects = ref(false)
+
+// Projects in the active organization that the user has access to
+const activeOrgProjects = computed(() => {
+  if (!activeOrg.value?.id)
+    return []
+
+  return projects.value.filter(
+    project =>
+      project.orgId === activeOrg.value?.id
+      && project.memberships?.some(m => m.userId === userStore.user?.id),
+  )
+})
+
+// All projects the user has access to, across all orgs
+const allProjects = computed(() => {
+  return projects.value.filter(project =>
+    project.memberships?.some(m => m.userId === userStore.user?.id),
+  )
+})
+
+// Choose source based on toggle
+const filteredProjects = computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value))
 
 async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {
+  if (!props.org?.id)
+    return
+
   await projectStore.createProject({
     name: project.name,
     slug: project.slug,
     description: project.description || undefined,
-    orgId: props.org!.id,
+    orgId: props.org.id,
   })
-  if (props.org?.id) {
-    await projectStore.getProjects()
-  }
+
+  await projectStore.getProjects()
   isDialogOpen.value = false
 }
 </script>
