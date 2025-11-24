@@ -2,6 +2,7 @@ import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInp
 
 export const useOrgStore = defineStore("org", () => {
   const userStore = useUserStore()
+  const projectStore = useProjectStore()
 
   const organizations = ref<Organization[]>([])
   const activeOrg = ref<Organization | null>(null)
@@ -16,6 +17,9 @@ export const useOrgStore = defineStore("org", () => {
     createInvite: null,
     acceptInvite: null,
   })
+
+  const orgMembers = computed(() => activeOrg.value?.memberships ?? [])
+  const orgProjects = computed(() => projectStore.projects.filter(p => p.orgId === activeOrg.value?.id) ?? [])
 
   const isOwner = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "OWNER")
   const isAdmin = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "ADMIN")
@@ -170,6 +174,8 @@ export const useOrgStore = defineStore("org", () => {
     errors,
     organizations,
     activeOrg,
+    orgMembers,
+    orgProjects,
     isOwner,
     isAdmin,
     setActiveOrg,
