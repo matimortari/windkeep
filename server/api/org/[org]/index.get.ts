@@ -27,7 +27,6 @@ export default defineEventHandler(async (event) => {
       },
     },
   })
-
   if (!membership) {
     throw createError({ statusCode: 404, statusMessage: "Organization not found" })
   }

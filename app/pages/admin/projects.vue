@@ -21,6 +21,10 @@
           <icon :name="layout === 'grid' ? 'ph:list-bullets' : 'ph:squares-four'" size="20" />
         </button>
 
+        <button class="btn" @click="showAllProjects = !showAllProjects">
+          {{ showAllProjects ? "Organization Projects" : "All Projects" }}
+        </button>
+
         <button class="btn-primary" @click="isDialogOpen = true">
           <span class="hidden md:inline">Add New Project</span>
           <icon name="ph:plus" size="20" />
@@ -28,7 +32,7 @@
       </nav>
     </header>
 
-    <Empty v-if="!activeOrgProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" :icon-size="60" />
+    <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" :icon-size="60" />
 
     <ProjectTable v-else-if="layout === 'list'" :projects="filteredProjects" />
 
@@ -58,20 +62,43 @@
 
 <script setup lang="ts">
 const projectStore = useProjectStore()
-const { activeOrgProjects } = storeToRefs(projectStore)
 const { activeOrg } = storeToRefs(useOrgStore())
+const userStore = useUserStore()
+const { projects } = storeToRefs(projectStore)
 
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
+const showAllProjects = ref(false)
 const layout = ref<"grid" | "list">("grid")
 const sort = ref<{ key: string, direction: "asc" | "desc" }>({
   key: "name",
   direction: "asc",
 })
 
+// Projects in the active organization that the user has access to
+const activeOrgProjects = computed(() => {
+  if (!activeOrg.value?.id)
+    return []
+
+  return projects.value.filter(
+    project =>
+      project.orgId === activeOrg.value?.id
+      && project.memberships?.some(m => m.userId === userStore.user?.id),
+  )
+})
+
+// All projects the user has access to, across all orgs
+const allProjects = computed(() => {
+  return projects.value.filter(project =>
+    project.memberships?.some(m => m.userId === userStore.user?.id),
+  )
+})
+
 const filteredProjects = computed(() => {
-  const filtered = activeOrgProjects.value.filter(project =>
-    typeof project.name === "string" && project.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  const source = showAllProjects.value ? allProjects : activeOrgProjects
+
+  const filtered = source.value.filter(project =>
+    project.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 
   return [...filtered].sort((a, b) => {
