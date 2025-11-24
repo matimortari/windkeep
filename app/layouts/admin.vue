@@ -1,5 +1,5 @@
 <template>
-  <Toolbar :orgs="orgs" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+  <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
   <Loading v-if="isLoading" />
 
@@ -20,17 +20,8 @@ const orgStore = useOrgStore()
 const projectStore = useProjectStore()
 const { user } = storeToRefs(userStore)
 const { activeOrg } = storeToRefs(orgStore)
-
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
-
-const orgs = computed(() =>
-  user.value?.orgMemberships?.map(m => ({
-    id: m.org?.id ?? m.orgId,
-    name: m.org?.name ?? "",
-    role: m.role,
-  })) ?? [],
-)
 
 async function getUserData() {
   try {

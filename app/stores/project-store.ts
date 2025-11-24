@@ -47,7 +47,9 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.getProjects = err.data.message || "Failed to get projects"
       console.error("getProjects error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function createProject(data: CreateProjectInput) {
@@ -63,7 +65,9 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.createProject = err.data.message || "Failed to create project"
       console.error("createProject error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function updateProject(projectId: string, data: UpdateProjectInput) {
@@ -82,7 +86,9 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.updateProject = err.data.message || "Failed to update project"
       console.error("updateProject error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function deleteProject(projectId: string) {
@@ -97,7 +103,9 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.deleteProject = err.data.message || "Failed to delete project"
       console.error("deleteProject error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function addProjectMember(projectId: string, data: AddProjectMemberInput) {
@@ -112,7 +120,9 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.addProjectMember = err.data.message || "Failed to add project member"
       console.error("addProjectMember error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function updateProjectMember(projectId: string, memberId: string, data: UpdateProjectMemberInput) {
@@ -127,7 +137,9 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.updateProjectMember = err.data.message || "Failed to update project member"
       console.error("updateProjectMember error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function removeProjectMember(projectId: string, memberId: string) {
@@ -141,7 +153,9 @@ export const useProjectStore = defineStore("project", () => {
       errors.value.removeProjectMember = err.data.message || "Failed to remove project member"
       console.error("removeProjectMember error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function getProjectSecrets(projectId: string) {
@@ -159,7 +173,9 @@ export const useProjectStore = defineStore("project", () => {
       console.error("getProjectSecrets error:", err)
       return []
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function createProjectSecret(projectId: string, data: CreateSecretInput) {
@@ -176,7 +192,9 @@ export const useProjectStore = defineStore("project", () => {
       console.error("createProjectSecret error:", err)
       throw err
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function updateProjectSecret(projectId: string, secretId: string, data: UpdateSecretInput) {
@@ -195,7 +213,9 @@ export const useProjectStore = defineStore("project", () => {
       console.error("updateProjectSecret error:", err)
       throw err
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function deleteProjectSecret(projectId: string, secretId: string) {
@@ -211,7 +231,9 @@ export const useProjectStore = defineStore("project", () => {
       console.error("deleteProjectSecret error:", err)
       throw err
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   return {

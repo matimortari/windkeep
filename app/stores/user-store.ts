@@ -10,8 +10,8 @@ export const useUserStore = defineStore("user", () => {
     errors.value.getUser = null
 
     try {
-      const userData = await $fetch<User>(`${API_URL}/user`, { method: "GET", credentials: "include" })
-      user.value = userData
+      const res = await $fetch<User>(`${API_URL}/user`, { method: "GET", credentials: "include" })
+      user.value = res
     }
     catch (err: any) {
       errors.value.getUser = err.data.message || "Failed to get user"
@@ -28,8 +28,9 @@ export const useUserStore = defineStore("user", () => {
 
     try {
       await $fetch(`${API_URL}/user`, { method: "PUT", body: data, credentials: "include" })
-      if (user.value)
+      if (user.value) {
         Object.assign(user.value, data)
+      }
     }
     catch (err: any) {
       errors.value.updateUser = err.data.message || "Failed to update user"

@@ -152,7 +152,6 @@
 <script setup lang="ts">
 const { createActionHandler } = useActionIcon()
 const copyIcon = createActionHandler("ph:copy")
-
 const openIndex = ref<number | null>(null)
 
 function toggleAccordion(index: number) {
