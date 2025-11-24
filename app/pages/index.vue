@@ -200,9 +200,6 @@ definePageMeta({
   box-shadow: 0 0 0 2px var(--primary);
   border-radius: 5rem;
 }
-.hero-btn:hover {
-  box-shadow: 0 0 8px 2px var(--accent);
-}
 
 .accordion-enter-active,
 .accordion-leave-active {
