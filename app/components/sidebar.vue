@@ -23,7 +23,7 @@
         <button class="btn" @click="showAllProjects = !showAllProjects">
           {{ showAllProjects ? "Organization Projects" : "All Projects" }}
         </button>
-        <button class="transition-transform hover:scale-125 hover:text-accent" aria-label="Create New Project" @click="isDialogOpen = true">
+        <button class="transition-transform hover:scale-125 hover:text-primary" aria-label="Create New Project" @click="isDialogOpen = true">
           <icon name="ph:plus" size="25" />
         </button>
       </div>
