@@ -13,7 +13,7 @@
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span class="text-caption">{{ activeOrg?.name }}</span>
-            <icon name="ph:caret-down" size="20" class="transition-transform" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
+            <icon name="ph:caret-down" size="20" class="transition-transform hover:scale-125 hover:text-primary" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
           </button>
 
           <transition name="dropdown" mode="out-in">
@@ -67,7 +67,7 @@ const props = defineProps<{
   isSidebarOpen: boolean
 }>()
 
-defineEmits<{ (e: "toggleSidebar"): void }>()
+defineEmits<(e: "toggleSidebar") => void>()
 
 const { toggleTheme, themeIcon } = useTheme()
 const { clear } = useUserSession()

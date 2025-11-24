@@ -4,20 +4,26 @@ export function useEnvFile(projectId: string) {
   const projectStore = useProjectStore()
   const projectSecrets = computed(() => projectStore.secrets)
 
-  const mergeValues = (existingValues: SecretValue[], newValues: SecretValue[]): SecretValue[] => {
-    const merged = [...existingValues]
-    for (const newValue of newValues) {
-      const idx = merged.findIndex((v: SecretValue) => v.environment === newValue.environment)
-      if (idx >= 0)
-        merged[idx] = { ...merged[idx], value: newValue.value } as SecretValue
-      else merged.push(newValue)
+  const mergeValues = (existing: SecretValue[], incoming: { environment: Environment, value: string }[]): { environment: Environment, value: string }[] => {
+    const map = new Map<Environment, string>()
+
+    for (const v of existing) {
+      map.set(v.environment, v.value)
     }
-    return merged
+    for (const v of incoming) {
+      map.set(v.environment, v.value)
+    }
+
+    return Array.from(map.entries()).map(([environment, value]) => ({
+      environment,
+      value,
+    }))
   }
 
-  const importSingleSecret = async (secret: Secret) => {
-    if (!secret.key)
+  const importSingleSecret = async (secret: CreateSecretInput) => {
+    if (!secret.key) {
       throw new Error("Secret key is required")
+    }
 
     const existing = projectSecrets.value.find(s => s.key === secret.key && s.projectId === projectId)
     if (existing) {
@@ -38,12 +44,12 @@ export function useEnvFile(projectId: string) {
     }
   }
 
-  const importFromEnv = async (importedSecrets: Secret[]): Promise<{ success: number, failed: number, errors: string[] }> => {
-    if (!importedSecrets?.length)
+  const importFromEnv = async (importedSecrets: CreateSecretInput[]): Promise<{ success: number, failed: number, errors: string[] }> => {
+    if (!importedSecrets?.length) {
       return { success: 0, failed: 0, errors: ["No secrets to import"] }
+    }
 
     const results = await Promise.allSettled(importedSecrets.map(importSingleSecret))
-
     let successCount = 0
     let failedCount = 0
     const errors: string[] = []
@@ -63,8 +69,9 @@ export function useEnvFile(projectId: string) {
   }
 
   const exportToEnv = (env: string | null | undefined): { success: boolean, error?: string } => {
-    if (!env)
+    if (!env) {
       return { success: false, error: "Environment not specified" }
+    }
 
     const filteredSecrets = projectSecrets.value
       .filter(s => s.projectId === projectId)
@@ -80,7 +87,7 @@ export function useEnvFile(projectId: string) {
 
     try {
       const blob = new Blob([filteredSecrets], { type: "text/plain" })
-      const projectName = projectStore.projects.find(p => p.id === projectId)?.name?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w.-]/g, "")
+      const projectName = projectStore.projects.find(p => p.id === projectId)?.name?.toLowerCase().replaceAll(/\s+/g, "-").replaceAll(/[^\w.-]/g, "")
       const fileName = `.env.${projectName}.${env.toLowerCase()}`
       const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: fileName })
       a.click()

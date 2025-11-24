@@ -38,6 +38,9 @@
 </template>
 
 <script setup lang="ts">
+import type { CreateSecretInput } from "#shared/schemas/secret-schema"
+import { createSecretSchema } from "#shared/schemas/secret-schema"
+
 const props = defineProps<{
   isOpen: boolean
   projectId: string
@@ -46,7 +49,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void
-  (e: "save", secrets: Secret[]): void
+  (e: "save", secrets: CreateSecretInput[]): void
 }>()
 
 const { errors } = storeToRefs(useProjectStore())
@@ -89,52 +92,40 @@ function handleSubmit() {
   validationError.value = null
 
   const parsed = parseEnv(envContent.value)
-  if (!Object.entries(parsed).length) {
+  if (!Object.keys(parsed).length) {
     validationError.value = "No valid key-value pairs found."
     return
   }
 
-  // Normalize keys to match backend requirements
-  const normalizedParsed: Record<string, string> = {}
-  for (const [key, value] of Object.entries(parsed)) {
-    const normalizedKey = normalizeKey(key)
-    if (normalizedKey) {
-      normalizedParsed[normalizedKey] = value
-    }
-  }
+  const normalized = Object.fromEntries(
+    Object.entries(parsed)
+      .map(([key, value]) => [normalizeKey(key), value])
+      .filter(([key]) => Boolean(key)),
+  )
 
-  const duplicateKeys: string[] = []
-  for (const [key] of Object.entries(normalizedParsed)) {
-    const existing = props.secrets.find(secret => secret.key === key)
-    if (existing?.values?.some(v => v.environment === selectedEnv.value)) {
-      duplicateKeys.push(key)
-    }
-  }
-  if (duplicateKeys.length > 0) {
-    validationError.value = `The following keys already exist: ${duplicateKeys.join(", ")}`
+  const duplicates = Object.keys(normalized).filter((key) => {
+    const existing = props.secrets.find(s => s.key === key)
+    return existing?.values?.some(v => v.environment === selectedEnv.value)
+  })
+
+  if (duplicates.length) {
+    validationError.value = `The following keys already exist: ${duplicates.join(", ")}`
     return
   }
 
-  const payload = Object.entries(normalizedParsed).map(([key, value]) => {
-    const secretId = crypto.randomUUID()
-    return {
-      id: secretId,
+  const payload = Object.entries(normalized).map(([key, value]) =>
+    createSecretSchema.parse({
       key,
+      description: "",
       projectId: props.projectId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
       values: [
         {
-          id: crypto.randomUUID(),
-          secretId,
           environment: selectedEnv.value,
           value,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
       ],
-    } as Secret
-  })
+    }),
+  )
 
   emit("save", payload)
   emit("close")

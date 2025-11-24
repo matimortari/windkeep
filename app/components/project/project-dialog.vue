@@ -89,6 +89,7 @@ watch(() => props.isOpen, (open) => {
     form.value.name = ""
     form.value.slug = ""
     form.value.description = ""
+    errors.value.createProject = null
   }
 }, { immediate: true })
 </script>
