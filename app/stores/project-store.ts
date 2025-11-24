@@ -3,25 +3,11 @@ import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secre
 
 export const useProjectStore = defineStore("project", () => {
   const userStore = useUserStore()
-  const orgStore = useOrgStore()
 
   const projects = ref<Project[]>([])
   const secrets = ref<any[]>([])
   const loading = ref(false)
-  const errors = ref<Record<
-    | "getProjects"
-    | "createProject"
-    | "updateProject"
-    | "deleteProject"
-    | "addProjectMember"
-    | "updateProjectMember"
-    | "removeProjectMember"
-    | "getProjectSecrets"
-    | "createProjectSecret"
-    | "updateProjectSecret"
-    | "deleteProjectSecret",
-    string | null
-  >>({
+  const errors = ref<Record<string, string | null>>({
     getProjects: null,
     createProject: null,
     updateProject: null,
@@ -33,13 +19,6 @@ export const useProjectStore = defineStore("project", () => {
     createProjectSecret: null,
     updateProjectSecret: null,
     deleteProjectSecret: null,
-  })
-
-  const activeOrgProjects = computed(() => {
-    if (!orgStore.activeOrg?.id)
-      return []
-
-    return projects.value.filter((project: any) => project.orgId === orgStore.activeOrg?.id)
   })
 
   const isOwner = computed(() => {
@@ -240,7 +219,6 @@ export const useProjectStore = defineStore("project", () => {
     errors,
     projects,
     secrets,
-    activeOrgProjects,
     isOwner,
     isAdmin,
     getProjects,
