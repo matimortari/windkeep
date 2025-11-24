@@ -205,7 +205,6 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, orgMembers, orgProjects, isOwner, isAdmin, errors } = storeToRefs(orgStore)
-
 const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
 
@@ -262,9 +261,7 @@ async function handleUpdateMemberRole(memberId: string, newRole: Role) {
   if (!activeOrg.value?.id)
     return
 
-  const success = await orgStore.updateOrgMember(activeOrg.value.id, memberId, {
-    role: newRole,
-  })
+  const success = await orgStore.updateOrgMember(activeOrg.value.id, memberId, { role: newRole })
   if (success)
     await userStore.getUser()
 }

@@ -11,6 +11,7 @@ export const useAuditStore = defineStore("audit", () => {
   async function getAuditLogs(orgId: string, params?: GetAuditLogsInput) {
     loading.value = true
     errors.value.getAuditLogs = null
+
     try {
       const queryParams = new URLSearchParams()
       const effectiveParams = params || currentFilters.value
@@ -19,44 +20,39 @@ export const useAuditStore = defineStore("audit", () => {
           queryParams.append(key, String(value))
       }
 
-      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`${API_URL}/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, {
-        method: "GET",
-        credentials: "include",
-      })
-
+      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`${API_URL}/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
       auditLogs.value = res.auditLogs as AuditLog[]
       pagination.value = res.pagination
       filters.value = res.filters
-      if (params)
+      if (params) {
         currentFilters.value = { ...currentFilters.value, ...params }
+      }
 
       return res
     }
     catch (err: any) {
-      errors.value.getAuditLogs = err?.message || "Failed to fetch audit logs"
+      errors.value.getAuditLogs = err.data.message || "Failed to fetch audit logs"
       console.error("getAuditLogs error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   async function deleteAuditLogs(orgId: string, data: DeleteAuditLogsInput) {
     loading.value = true
     errors.value.deleteAuditLogs = null
-    try {
-      const res = await $fetch(`${API_URL}/org/${orgId}/audit`, {
-        method: "DELETE",
-        body: data,
-        credentials: "include",
-      })
 
-      await getAuditLogs(orgId, currentFilters.value)
-      return res
+    try {
+      await $fetch(`${API_URL}/org/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
     }
     catch (err: any) {
-      errors.value.deleteAuditLogs = err?.message || "Failed to delete audit logs"
+      errors.value.deleteAuditLogs = err.data.message || "Failed to delete audit logs"
       console.error("deleteAuditLogs error:", err)
     }
-    finally { loading.value = false }
+    finally {
+      loading.value = false
+    }
   }
 
   function updateFilters(newFilters: Partial<GetAuditLogsInput>) {

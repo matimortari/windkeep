@@ -190,28 +190,25 @@
 const route = useRoute()
 const slug = route.params.project
 const { createActionHandler } = useActionIcon()
-const { activeOrg } = storeToRefs(useOrgStore())
 const { user } = storeToRefs(useUserStore())
 const projectStore = useProjectStore()
 const { projects, isOwner, isAdmin, errors } = storeToRefs(projectStore)
-
+const project = computed(() => projects.value.find(p => p.slug === slug))
 const addMemberSuccess = ref<string | null>(null)
 const newMemberId = ref("")
 const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
-const localProjectName = ref("")
-const localProjectSlug = ref("")
-const localProjectDescription = ref("")
-
-const project = computed(() => projects.value.find(p => p.slug === slug))
+const localProject = ref<Project | null>(null)
 
 const projectFields = [
   {
     label: "Project Name",
     description: "The name of your project.",
     type: "input",
-    model: computed(() => localProjectName.value),
+    model: computed(() => localProject.value?.name ?? ""),
     update: (value: string) => {
-      localProjectName.value = value
+      if (localProject.value) {
+        localProject.value.name = value
+      }
     },
     onSave: handleSubmit,
     editable: isOwner,
@@ -226,9 +223,11 @@ const projectFields = [
     label: "Project Slug",
     description: "This slug is used in the URL to access your project. Lowercase alphanumeric with hyphens only.",
     type: "input",
-    model: computed(() => localProjectSlug.value),
+    model: computed(() => localProject.value?.slug ?? ""),
     update: (value: string) => {
-      localProjectSlug.value = value
+      if (localProject.value) {
+        localProject.value.slug = value
+      }
     },
     onSave: handleSubmit,
     editable: isOwner,
@@ -237,9 +236,11 @@ const projectFields = [
     label: "Project Description",
     description: "Briefly describe the purpose or content of this project.",
     type: "input",
-    model: computed(() => localProjectDescription.value),
+    model: computed(() => localProject.value?.description ?? ""),
     update: (value: string) => {
-      localProjectDescription.value = value
+      if (localProject.value) {
+        localProject.value.description = value
+      }
     },
     onSave: handleSubmit,
     editable: isOwner,
@@ -300,21 +301,19 @@ async function handleSubmit(index: number) {
     return
 
   const oldSlug = project.value.slug
-  const newSlug = localProjectSlug.value
+  const newSlug = localProject.value?.slug ?? ""
 
   const success = await projectStore.updateProject(project.value.id, {
-    name: localProjectName.value,
-    slug: localProjectSlug.value,
-    description: localProjectDescription.value,
+    name: localProject.value?.name ?? "",
+    slug: localProject.value?.slug ?? "",
+    description: localProject.value?.description ?? "",
   })
 
   if (success) {
     await projectStore.getProjects()
     saveIcon[index]?.triggerSuccess()
-
-    // If slug was changed, navigate to the new URL
     if (oldSlug !== newSlug) {
-      await navigateTo(`/admin/${newSlug}/settings`)
+      await navigateTo(`/admin/${newSlug}/settings`) // Redirect to new slug URL
     }
   }
 }
@@ -338,26 +337,19 @@ async function handleLeaveProject() {
   await navigateTo("/admin/projects")
 }
 
-watch([project, projects], ([proj, projects]) => {
-  if (projects.length > 0 && !proj) {
-    navigateTo("/admin/projects", { replace: true })
-  }
-}, { immediate: true })
-
 watch(() => project.value, (proj) => {
   if (!proj)
     return
 
-  localProjectName.value = proj.name
-  localProjectSlug.value = proj.slug
-  localProjectDescription.value = proj.description || ""
-}, { immediate: true })
-
-watch([project, activeOrg], ([proj, org]) => {
-  if (proj && org && proj.orgId !== org.id) {
-    navigateTo("/admin/projects")
+  if (localProject.value) {
+    localProject.value.name = proj.name
+    localProject.value.slug = proj.slug
+    localProject.value.description = proj.description || ""
   }
-})
+  else {
+    localProject.value = { ...proj }
+  }
+}, { immediate: true })
 
 watch(() => project.value?.id, async (id: string | undefined) => {
   const projectTitle = projects.value.find(p => p.id === id)?.name

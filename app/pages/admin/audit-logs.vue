@@ -18,7 +18,6 @@
 const { activeOrg } = storeToRefs(useOrgStore())
 const auditStore = useAuditStore()
 const { loading } = storeToRefs(auditStore)
-
 const showSensitiveInfo = ref(false)
 
 watch(activeOrg, async (org) => {
