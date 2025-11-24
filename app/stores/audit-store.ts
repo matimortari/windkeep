@@ -33,7 +33,7 @@ export const useAuditStore = defineStore("audit", () => {
       return res
     }
     catch (err: any) {
-      errors.value.getAuditLogs = err?.message || "Failed to fetch audit logs"
+      errors.value.getAuditLogs = err.data.message || "Failed to fetch audit logs"
       console.error("getAuditLogs error:", err)
     }
     finally { loading.value = false }
@@ -53,7 +53,7 @@ export const useAuditStore = defineStore("audit", () => {
       return res
     }
     catch (err: any) {
-      errors.value.deleteAuditLogs = err?.message || "Failed to delete audit logs"
+      errors.value.deleteAuditLogs = err.data.message || "Failed to delete audit logs"
       console.error("deleteAuditLogs error:", err)
     }
     finally { loading.value = false }

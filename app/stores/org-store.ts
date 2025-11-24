@@ -42,7 +42,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.getOrg = err?.message || "Failed to get organization"
+      errors.value.getOrg = err.data.message || "Failed to get organization"
       console.error("getOrg error:", err)
     }
     finally {
@@ -66,7 +66,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.createOrg = err?.message || "Failed to create organization"
+      errors.value.createOrg = err.data.message || "Failed to create organization"
       console.error("createOrg error:", err)
     }
     finally {
@@ -86,7 +86,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.updateOrg = err?.message || "Failed to update organization"
+      errors.value.updateOrg = err.data.message || "Failed to update organization"
       console.error("updateOrg error:", err)
     }
     finally { loading.value = false }
@@ -101,7 +101,7 @@ export const useOrgStore = defineStore("org", () => {
       organizations.value = organizations.value.filter(o => o.id !== orgId)
     }
     catch (err: any) {
-      errors.value.deleteOrg = err?.message || "Failed to delete organization"
+      errors.value.deleteOrg = err.data.message || "Failed to delete organization"
       console.error("deleteOrg error:", err)
     }
     finally { loading.value = false }
@@ -116,7 +116,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.updateOrgMember = err?.message || "Failed to update organization member"
+      errors.value.updateOrgMember = err.data.message || "Failed to update organization member"
       console.error("updateOrgMember error:", err)
     }
     finally { loading.value = false }
@@ -130,7 +130,7 @@ export const useOrgStore = defineStore("org", () => {
       await $fetch(`${API_URL}/org/${orgId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
     }
     catch (err: any) {
-      errors.value.removeOrgMember = err?.message || "Failed to remove organization member"
+      errors.value.removeOrgMember = err.data.message || "Failed to remove organization member"
       console.error("removeOrgMember error:", err)
     }
     finally { loading.value = false }
@@ -145,7 +145,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.createInvite = err?.message || "Failed to create organization invite"
+      errors.value.createInvite = err.data.message || "Failed to create organization invite"
       console.error("createInvite error:", err)
     }
     finally { loading.value = false }
@@ -163,7 +163,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.acceptInvite = err?.message || "Failed to accept organization invite"
+      errors.value.acceptInvite = err.data.message || "Failed to accept organization invite"
       console.error("acceptInvite error:", err)
     }
     finally { loading.value = false }

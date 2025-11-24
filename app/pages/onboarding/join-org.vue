@@ -54,7 +54,7 @@ async function handleAcceptInvite() {
     }
   }
   catch (err: any) {
-    errors.value.acceptInvite = err.message
+    errors.value.acceptInvite = err.data.message
   }
 }
 

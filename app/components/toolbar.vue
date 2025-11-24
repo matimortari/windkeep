@@ -109,7 +109,7 @@ async function handleSetActiveOrg(orgId: string) {
     orgStore.setActiveOrg(org.id)
   }
   catch (err: any) {
-    errors.value.setActiveOrg = err.message
+    errors.value.setActiveOrg = err.data.message
   }
 }
 

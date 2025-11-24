@@ -44,7 +44,7 @@ export const useProjectStore = defineStore("project", () => {
       projects.value = res.projects || []
     }
     catch (err: any) {
-      errors.value.getProjects = err?.message || "Failed to get projects"
+      errors.value.getProjects = err.data.message || "Failed to get projects"
       console.error("getProjects error:", err)
     }
     finally { loading.value = false }
@@ -60,7 +60,7 @@ export const useProjectStore = defineStore("project", () => {
       return res
     }
     catch (err: any) {
-      errors.value.createProject = err?.message || "Failed to create project"
+      errors.value.createProject = err.data.message || "Failed to create project"
       console.error("createProject error:", err)
     }
     finally { loading.value = false }
@@ -79,7 +79,7 @@ export const useProjectStore = defineStore("project", () => {
       return res
     }
     catch (err: any) {
-      errors.value.updateProject = err?.message || "Failed to update project"
+      errors.value.updateProject = err.data.message || "Failed to update project"
       console.error("updateProject error:", err)
     }
     finally { loading.value = false }
@@ -94,7 +94,7 @@ export const useProjectStore = defineStore("project", () => {
       projects.value = projects.value.filter(p => p.id !== projectId)
     }
     catch (err: any) {
-      errors.value.deleteProject = err?.message || "Failed to delete project"
+      errors.value.deleteProject = err.data.message || "Failed to delete project"
       console.error("deleteProject error:", err)
     }
     finally { loading.value = false }
@@ -109,7 +109,7 @@ export const useProjectStore = defineStore("project", () => {
       return res
     }
     catch (err: any) {
-      errors.value.addProjectMember = err?.message || "Failed to add project member"
+      errors.value.addProjectMember = err.data.message || "Failed to add project member"
       console.error("addProjectMember error:", err)
     }
     finally { loading.value = false }
@@ -124,7 +124,7 @@ export const useProjectStore = defineStore("project", () => {
       return res
     }
     catch (err: any) {
-      errors.value.updateProjectMember = err?.message || "Failed to update project member"
+      errors.value.updateProjectMember = err.data.message || "Failed to update project member"
       console.error("updateProjectMember error:", err)
     }
     finally { loading.value = false }
@@ -138,7 +138,7 @@ export const useProjectStore = defineStore("project", () => {
       await $fetch(`${API_URL}/projects/${projectId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
     }
     catch (err: any) {
-      errors.value.removeProjectMember = err?.message || "Failed to remove project member"
+      errors.value.removeProjectMember = err.data.message || "Failed to remove project member"
       console.error("removeProjectMember error:", err)
     }
     finally { loading.value = false }
@@ -155,7 +155,7 @@ export const useProjectStore = defineStore("project", () => {
       return fetchedSecrets
     }
     catch (err: any) {
-      errors.value.getProjectSecrets = err?.message || "Failed to get project secrets"
+      errors.value.getProjectSecrets = err.data.message || "Failed to get project secrets"
       console.error("getProjectSecrets error:", err)
       return []
     }
@@ -172,7 +172,7 @@ export const useProjectStore = defineStore("project", () => {
       return res
     }
     catch (err: any) {
-      errors.value.createProjectSecret = err?.message || "Failed to create project secret"
+      errors.value.createProjectSecret = err.data.message || "Failed to create project secret"
       console.error("createProjectSecret error:", err)
       throw err
     }
@@ -191,7 +191,7 @@ export const useProjectStore = defineStore("project", () => {
       return res
     }
     catch (err: any) {
-      errors.value.updateProjectSecret = err?.message || "Failed to update project secret"
+      errors.value.updateProjectSecret = err.data.message || "Failed to update project secret"
       console.error("updateProjectSecret error:", err)
       throw err
     }
@@ -207,7 +207,7 @@ export const useProjectStore = defineStore("project", () => {
       secrets.value = secrets.value.filter((s: any) => s.id !== secretId)
     }
     catch (err: any) {
-      errors.value.deleteProjectSecret = err?.message || "Failed to delete project secret"
+      errors.value.deleteProjectSecret = err.data.message || "Failed to delete project secret"
       console.error("deleteProjectSecret error:", err)
       throw err
     }
