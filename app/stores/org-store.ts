@@ -34,10 +34,10 @@ export const useOrgStore = defineStore("org", () => {
       const res = await $fetch<Organization>(`${API_URL}/org/${orgId}`, { method: "GET", credentials: "include" })
       activeOrg.value = res
       const index = organizations.value.findIndex(o => o.id === orgId)
-      if (index !== -1)
-        organizations.value[index] = res
-      else
+      if (index === -1)
         organizations.value.push(res)
+      else
+        organizations.value[index] = res
 
       return res
     }
@@ -167,7 +167,7 @@ export const useOrgStore = defineStore("org", () => {
 
     try {
       const res = await $fetch<{ organization: Organization }>(`${API_URL}/org/${orgId}/invite/accept`, { method: "POST", body: data, credentials: "include" })
-      if (!organizations.value.find(o => o.id === orgId) && res.organization) {
+      if (!organizations.value.some(o => o.id === orgId) && res.organization) {
         organizations.value.push(res.organization)
       }
       return res
