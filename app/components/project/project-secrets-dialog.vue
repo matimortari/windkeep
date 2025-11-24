@@ -147,8 +147,9 @@ async function handleSubmit() {
 }
 
 watch(() => props.isOpen, (open) => {
-  if (open)
+  if (open) {
     resetForm()
+  }
 }, { immediate: true })
 
 watch(() => props.selectedSecret, () => {

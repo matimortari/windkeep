@@ -89,11 +89,8 @@ async function handleSubmit(secret: any) {
 
   const success = secret.id
     ? await projectStore.updateProjectSecret(project.value.id, secret.id, { description: secret.description ?? "" })
-    : await projectStore.createProjectSecret(project.value.id, {
-        key: secret.key,
-        description: secret.description ?? "",
-        projectId: project.value.id,
-      })
+    : await projectStore.createProjectSecret(project.value.id, { key: secret.key, description: secret.description ?? "", projectId: project.value.id })
+
   if (success) {
     await projectStore.getProjectSecrets(project.value.id)
   }
