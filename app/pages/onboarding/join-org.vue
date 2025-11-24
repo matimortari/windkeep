@@ -36,9 +36,9 @@
 
 <script setup lang="ts">
 const route = useRoute()
+const userStore = useUserStore()
 const orgStore = useOrgStore()
 const { errors } = storeToRefs(orgStore)
-
 const token = ref(route.query.token as string || "")
 const joinOrgSuccess = ref<string | null>(null)
 
@@ -54,9 +54,13 @@ async function handleAcceptInvite() {
     }
   }
   catch (err: any) {
-    errors.value.acceptInvite = err.message
+    errors.value.acceptInvite = err.data.message
   }
 }
+
+onMounted(async () => {
+  await userStore.getUser()
+})
 
 useHead({
   title: "Join Organization",

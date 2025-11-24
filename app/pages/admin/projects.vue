@@ -65,7 +65,6 @@ const projectStore = useProjectStore()
 const { activeOrg } = storeToRefs(useOrgStore())
 const userStore = useUserStore()
 const { projects } = storeToRefs(projectStore)
-
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
