@@ -51,7 +51,7 @@
         :enter="{ opacity: 1 }" :duration="600"
         class="card group flex h-[200px] flex-col items-center justify-center gap-4 border-dashed! bg-transparent!" @click="isDialogOpen = true"
       >
-        <icon name="ph:plus" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-accent" />
+        <icon name="ph:plus" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-primary" />
         <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
       </button>
     </ul>

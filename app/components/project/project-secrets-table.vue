@@ -7,7 +7,7 @@
             <span>Key</span>
             <button
               type="button" title="Sort by Key"
-              aria-label="Sort by Key" class="flex items-center hover:text-accent"
+              aria-label="Sort by Key" class="flex items-center hover:text-primary"
               @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'"
             >
               <icon name="ph:arrow-down" size="15" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
@@ -53,7 +53,7 @@
           <td v-for="env in environments" :key="env" class="w-[150px] max-w-[150px] overflow-hidden border p-2 font-mono text-sm text-muted-foreground">
             <div class="flex flex-row items-center justify-between gap-4">
               <span
-                class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors hover:text-accent!' : '']"
+                class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors hover:text-secondary!' : '']"
                 @click="copyToClipboard(getSecretValue(secret.key, env))"
               >
                 {{ renderValue(secret.key, env) }}

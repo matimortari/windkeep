@@ -29,7 +29,7 @@
 
               <li class="truncate whitespace-nowrap">
                 <nuxt-link to="/onboarding/create-org" class="group navigation-group block rounded p-2 hover:bg-muted" role="menuitem">
-                  <icon name="ph:plus" size="20" class="text-accent transition-transform group-hover:scale-125" />
+                  <icon name="ph:plus" size="20" class="text-primary transition-transform group-hover:scale-125" />
                   <span>Create Organization</span>
                 </nuxt-link>
               </li>
