@@ -55,7 +55,7 @@ const props = defineProps<{
   isOpen: boolean
 }>()
 
-defineEmits<{ (e: "update:isOpen", value: boolean): void }>()
+defineEmits<(e: "update:isOpen", value: boolean) => void>()
 
 const projectStore = useProjectStore()
 const userStore = useUserStore()
