@@ -1,14 +1,15 @@
-export function formatDate(dateString: Date | undefined | null): string {
-  if (!dateString)
+export function formatDate(date?: string | Date | null): string {
+  if (!date)
     return "-"
 
-  const formattedDate = new Date(dateString).toLocaleDateString("en-US", {
+  const dt = typeof date === "string" ? new Date(date) : date
+  const formatted = dt.toLocaleDateString("en-US", {
     year: "2-digit",
     month: "short",
     day: "numeric",
   })
 
-  return formattedDate.charAt(0).toLowerCase() + formattedDate.slice(1)
+  return formatted.charAt(0).toLowerCase() + formatted.slice(1)
 }
 
 export function copyToClipboard(val: string) {

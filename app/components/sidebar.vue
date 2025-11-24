@@ -84,7 +84,6 @@ const allProjects = computed(() => {
   )
 })
 
-// Choose source based on toggle
 const filteredProjects = computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value))
 
 async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {

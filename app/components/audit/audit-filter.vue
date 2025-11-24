@@ -112,7 +112,7 @@ function getUserDisplayName(userId?: string) {
 }
 
 function updateDateFilter() {
-  const newFilters = { ...currentFilters.value, startDate: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined }
+  const newFilters = { ...currentFilters.value, startDate: dateFilter.value }
   auditStore.updateFilters(newFilters)
 }
 

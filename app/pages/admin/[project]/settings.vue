@@ -247,12 +247,12 @@ const projectFields = [
   {
     label: "Created At",
     description: "When your project was created.",
-    value: computed(() => formatDate(project.value?.createdAt ? new Date(project.value.createdAt) : undefined)),
+    value: computed(() => formatDate(project.value?.createdAt)),
   },
   {
     label: "Updated At",
     description: "When your project was last updated.",
-    value: computed(() => formatDate(project.value?.updatedAt ? new Date(project.value.updatedAt) : undefined)),
+    value: computed(() => formatDate(project.value?.updatedAt)),
   },
 ]
 
