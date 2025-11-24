@@ -204,14 +204,10 @@ const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
-const projectStore = useProjectStore()
-const { activeOrg, isOwner, isAdmin, errors } = storeToRefs(orgStore)
+const { activeOrg, orgMembers, orgProjects, isOwner, isAdmin, errors } = storeToRefs(orgStore)
 
 const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
-
-const orgMembers = computed(() => activeOrg.value?.memberships)
-const orgProjects = computed(() => projectStore.projects.filter(p => p.orgId === activeOrg.value?.id))
 
 const orgFields = [
   {
