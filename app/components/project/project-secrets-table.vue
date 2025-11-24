@@ -76,7 +76,11 @@ const props = defineProps<{
   projectId: string
 }>()
 
-const emit = defineEmits(["edit", "deleted", "update"])
+const emit = defineEmits<{
+  (e: "edit", secret: Secret): void
+  (e: "deleted", key: string): void
+  (e: "update"): void
+}>()
 
 const projectStore = useProjectStore()
 

@@ -14,7 +14,7 @@
         <div class="flex flex-row items-center gap-4">
           <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">
             <icon name="ph:key" size="20" />
-            <span>{{ props.project.secrets?.length }}</span>
+            <span>{{ project.secrets?.length }}</span>
           </div>
 
           <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   project: Project
 }>()
 </script>
