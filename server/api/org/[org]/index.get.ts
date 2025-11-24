@@ -21,12 +21,26 @@ export default defineEventHandler(async (event) => {
           name: true,
           createdAt: true,
           updatedAt: true,
-          memberships: true,
+          memberships: {
+            select: {
+              userId: true,
+              role: true,
+              isActive: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+          },
           projects: true,
         },
       },
     },
   })
+
   if (!membership) {
     throw createError({ statusCode: 404, statusMessage: "Organization not found" })
   }
