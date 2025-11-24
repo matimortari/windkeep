@@ -43,10 +43,7 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { errors } = storeToRefs(orgStore)
-
-const localOrg = ref({
-  name: `${user.value?.name || user.value?.email}'s Organization`,
-})
+const localOrg = ref({ name: `${user.value?.name || user.value?.email}'s Organization` })
 
 async function handleCreateOrg() {
   errors.value.createOrg = null

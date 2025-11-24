@@ -151,6 +151,8 @@ async function handleDeleteLogs() {
     action: currentFilters.value.action,
     userId: currentFilters.value.userId,
   })
+
+  auditStore.getAuditLogs(activeOrg.value!.id, currentFilters.value)
 }
 </script>
 

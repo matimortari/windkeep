@@ -182,6 +182,7 @@ async function handleSubmit(index: number) {
   await userStore.updateUser({
     name: user.value.name,
   })
+
   saveIcon[index]?.triggerSuccess()
 }
 

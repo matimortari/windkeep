@@ -27,9 +27,9 @@
 
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
-              <li v-for="env in environments" :key="env" class="rounded capitalize">
-                <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="exportToEnv(env); isDropdownOpen = false">
-                  {{ capitalizeFirst(env) }}
+              <li v-for="env in ENVIRONMENTS" :key="env.value" class="rounded capitalize">
+                <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="exportToEnv(env.value); isDropdownOpen = false">
+                  {{ capitalizeFirst(env.label) }}
                 </button>
               </li>
             </ul>
@@ -42,10 +42,10 @@
       </nav>
     </header>
 
-    <Empty v-if="!projectSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" :icon-size="60" />
+    <Empty v-if="!secrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" :icon-size="60" />
 
     <ProjectSecretsTable
-      v-if="projectSecrets.length" :secrets="projectSecrets"
+      v-if="secrets.length" :secrets="secrets"
       :project-id="project?.id ?? ''" @edit="(secret: Secret) => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = secret }"
     />
 
@@ -57,7 +57,7 @@
 
     <ProjectSecretsImportDialog
       :is-open="isDialogOpen && dialogType === 'env'" :project-id="project?.id ?? ''"
-      :secrets="projectSecrets" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
+      :secrets="secrets" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
       @save="(secrets) => { importFromEnv(secrets); isDialogOpen = false }"
     />
   </div>
@@ -67,13 +67,9 @@
 const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()
-const { activeOrg } = storeToRefs(useOrgStore())
-const { importFromEnv, exportToEnv } = useEnvFile(projectStore.projects.find(p => p.slug === slug)?.id ?? "")
-
-const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
-
+const { secrets } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
-const projectSecrets = computed(() => projectStore.secrets)
+const { importFromEnv, exportToEnv } = useEnvFile(project?.value?.id ?? "")
 const selectedSecret = ref<Secret | null>(null)
 const dropdownRef = ref<HTMLElement | null>(null)
 const dialogType = ref<"secret" | "env" | null>(null)
@@ -88,34 +84,20 @@ async function handleSubmit(secret: any) {
   isDialogOpen.value = false
   dialogType.value = null
   selectedSecret.value = null
-
   if (!project.value?.id)
     return
 
   const success = secret.id
-    ? await projectStore.updateProjectSecret(project.value.id, secret.id, {
-        description: secret.description ?? "",
-      })
+    ? await projectStore.updateProjectSecret(project.value.id, secret.id, { description: secret.description ?? "" })
     : await projectStore.createProjectSecret(project.value.id, {
         key: secret.key,
         description: secret.description ?? "",
         projectId: project.value.id,
       })
-  if (success)
+  if (success) {
     await projectStore.getProjectSecrets(project.value.id)
+  }
 }
-
-watch([project, projectStore.projects], ([proj, projects]) => {
-  if (projects.length > 0 && !proj) {
-    navigateTo("/admin/projects", { replace: true })
-  }
-}, { immediate: true })
-
-watch([project, activeOrg], ([proj, org]) => {
-  if (proj && org && proj.orgId && proj.orgId !== org.id) {
-    navigateTo("/admin/projects")
-  }
-}, { immediate: false })
 
 watch(() => project.value?.id, async (id: string | undefined) => {
   if (!id)
