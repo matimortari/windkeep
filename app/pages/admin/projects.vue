@@ -68,7 +68,7 @@ const { projects } = storeToRefs(projectStore)
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
-const layout = ref<"grid" | "list">("grid")
+const layout = ref<"list" | "grid">((import.meta.client && localStorage.getItem("layoutMode") as "list" | "grid") || "grid")
 const sort = ref<{ key: string, direction: "asc" | "desc" }>({ key: "name", direction: "asc" })
 
 // Projects in the active organization that the user has access to
@@ -119,6 +119,11 @@ watch(() => activeOrg.value?.id, async (orgId) => {
   if (orgId)
     await projectStore.getProjects()
 }, { immediate: true })
+
+watch(layout, (newLayout) => {
+  if (import.meta.client)
+    localStorage.setItem("layoutMode", newLayout)
+})
 
 useHead({
   title: "Projects",
