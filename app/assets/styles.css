@@ -177,6 +177,8 @@ h6 {
   font-size: 0.875rem;
   text-align: start;
   overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) transparent;
 }
 
 /*
