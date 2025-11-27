@@ -18,6 +18,8 @@ export const updateUserSchema = z.object({
     .regex(/^[a-f0-9]{32}$/, "API token must be a valid hex string")
     .nullable()
     .optional(),
+  regenerateApiToken: z.boolean().optional(),
+
 })
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>

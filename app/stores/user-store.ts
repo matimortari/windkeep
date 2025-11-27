@@ -27,13 +27,19 @@ export const useUserStore = defineStore("user", () => {
     errors.value.updateUser = null
 
     try {
-      await $fetch(`${API_URL}/user`, { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch<User & { apiToken?: string }>(
+        `${API_URL}/user`,
+        { method: "PUT", body: data, credentials: "include" },
+      )
+
       if (user.value) {
-        Object.assign(user.value, data)
+        Object.assign(user.value, res)
       }
+
+      return res
     }
     catch (err: any) {
-      errors.value.updateUser = err.data.message || "Failed to update user"
+      errors.value.updateUser = err.data?.message || "Failed to update user"
       console.error("updateUser error:", err)
     }
     finally {
