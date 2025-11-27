@@ -39,6 +39,14 @@
           >
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy'" size="20" />
           </button>
+
+          <button
+            v-if="field.onRegenerate" class="btn"
+            title="Regenerate Token" aria-label="Regenerate API Token"
+            @click="field.onRegenerate()"
+          >
+            <icon name="ph:arrows-clockwise" size="20" />
+          </button>
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
@@ -149,6 +157,7 @@ const userFields = [
     label: "CLI Token",
     description: "This token is used for CLI access. Keep it secret and secure.",
     value: computed(() => user.value?.apiToken),
+    onRegenerate: handleRegenerateToken,
     copyable: true,
   },
   {
@@ -172,6 +181,16 @@ async function handleUpdateImage(event: Event) {
   const res = await userStore.updateUserImage(file)
   if (res?.imageUrl && user.value) {
     user.value.image = res.imageUrl
+  }
+}
+
+async function handleRegenerateToken() {
+  if (!user.value?.id)
+    return
+
+  const res = await userStore.updateUser({ regenerateApiToken: true })
+  if (res?.apiToken && user.value) {
+    user.value.apiToken = res.apiToken
   }
 }
 
