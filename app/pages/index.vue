@@ -2,16 +2,14 @@
   <div
     v-motion :initial="{ opacity: 0 }"
     :visible="{ opacity: 1 }" :duration="800"
-    class="relative flex min-h-screen w-full flex-col items-center justify-center px-8 py-24 text-center"
+    class="relative flex w-full flex-col items-center justify-center py-24 text-center md:pb-0"
   >
-    <div class="hero-backdrop" />
-
-    <header id="hero" class="z-20 flex w-full max-w-2xl flex-col items-center justify-center gap-8 border-b py-16 2xl:gap-12">
-      <div class="flex flex-col items-center gap-4 text-center 2xl:gap-12">
+    <header id="hero" class="z-20 flex min-h-[70vh] w-full max-w-2xl flex-col items-center justify-center gap-8 px-4 py-20 2xl:gap-12">
+      <div class="flex flex-col items-center gap-4 text-center 2xl:gap-8">
         <h1 class="font-display md:text-6xl! 2xl:text-7xl!">
           Your Secrets, Secured.
         </h1>
-        <p class="max-w-xl leading-5 font-semibold text-muted-foreground md:text-lg 2xl:text-xl">
+        <p class="max-w-xl leading-6 font-semibold text-muted-foreground md:text-lg 2xl:text-xl">
           No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
         </p>
       </div>
@@ -29,19 +27,19 @@
       </div>
     </header>
 
-    <section id="highlights" class="flex flex-wrap justify-center gap-4 py-16 2xl:gap-8">
-      <div
-        v-for="(highlight, index) in HIGHLIGHTS" :key="index"
-        v-motion :initial="{ opacity: 0, y: 20 }"
-        :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="card flex max-w-sm flex-col items-center gap-4 text-center"
-      >
-        <h4>
-          {{ highlight.title }}
-        </h4>
-        <p class="text-caption">
-          {{ highlight.description }}
-        </p>
+    <section id="highlights" class="w-full border-y-2 bg-card py-12 md:py-20">
+      <div class="flex flex-wrap items-center justify-center gap-4 px-4 md:flex-row md:gap-8">
+        <div
+          v-for="(highlight, index) in HIGHLIGHTS" :key="index"
+          v-motion :initial="{ opacity: 0, y: 20 }"
+          :visible="{ opacity: 1, y: 0 }" :duration="800"
+          :delay="200 * index" class="card flex max-w-sm flex-col items-center gap-4 text-center"
+        >
+          <h4>{{ highlight.title }}</h4>
+          <p class="text-caption">
+            {{ highlight.description }}
+          </p>
+        </div>
       </div>
     </section>
   </div>
@@ -49,18 +47,18 @@
   <section
     id="features" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-12 px-8 py-20 md:px-20"
+    :duration="800" class="flex w-full flex-col items-center gap-12 px-4 py-12 md:px-20 md:py-20 2xl:px-32 2xl:py-32"
   >
     <h2 class="text-center font-display">
       Features
     </h2>
 
-    <div class="flex flex-col flex-wrap items-center justify-center gap-4 md:flex-row md:gap-8 2xl:flex-row 2xl:flex-nowrap">
+    <div class="flex flex-wrap items-center justify-center gap-4 md:flex-row md:gap-8 2xl:flex-nowrap">
       <div
         v-for="(feature, index) in FEATURES" :key="index"
         v-motion :initial="{ opacity: 0, y: -20 }"
         :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="flex max-w-sm min-w-[350px] grow-0 flex-col items-center gap-4 p-4 text-center"
+        :delay="200 * index" class="flex max-w-sm min-w-[350px] flex-col items-center gap-4 p-4 text-center"
       >
         <icon :name="feature.icon" class="text-secondary" size="70" />
         <h3 class="font-display-alt tracking-tighter whitespace-nowrap">
@@ -76,57 +74,74 @@
   <section
     id="cli" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-12 px-8 py-20 md:px-20"
+    :duration="800" class="w-full border-y-2 bg-card py-12 md:py-20"
   >
-    <header class="flex flex-col items-center gap-4 text-center">
-      <h2 class="font-display">
-        Command Line Interface
-      </h2>
-      <p class="text-caption max-w-sm text-center leading-5 2xl:text-lg!">
-        Manage secrets and projects directly from your terminal. Fast, secure, and open-source.
-      </p>
-    </header>
+    <div class="container mx-auto flex flex-col items-center justify-center gap-8 px-4 md:flex-row md:gap-20 2xl:gap-32">
+      <header class="flex flex-col items-center gap-8 text-center md:items-start md:text-start">
+        <h2 class="font-display">
+          Command Line Interface
+        </h2>
+        <p class="max-w-lg font-semibold text-muted-foreground">
+          Manage secrets and projects directly from your terminal. Fast, secure, and open-source.
+          Read the
+          <nuxt-link to="/cli" class="text-primary hover:underline">
+            documentation
+          </nuxt-link>
+          for more details.
+        </p>
 
-    <div class="relative flex w-full max-w-2xl flex-col gap-4 2xl:gap-8">
-      <article class="card flex flex-col p-0">
-        <div class="text-caption flex items-center justify-between p-2">
-          <p>
-            > Install the Go module:
+        <div class="flex w-full flex-col items-center gap-4 md:items-start">
+          <ul class="text-caption flex flex-col items-start gap-2">
+            <li class="navigation-group">
+              <Icon name="ph:lock-key" size="20" class="text-secondary" /> Lorem Lorem Lorem.
+            </li>
+            <li class="navigation-group">
+              <Icon name="ph:rocket" size="20" class="text-secondary" /> Ipsum Ipsum Ipsum.
+            </li>
+            <li class="navigation-group">
+              <Icon name="ph:gear" size="20" class="text-secondary" /> Dolor Sit Amet.
+            </li>
+          </ul>
+
+          <p class="text-caption flex flex-row items-center gap-4 self-end select-none">
+            <span>Powered by Go</span>
+            <img src="/assets/gopher.png" alt="Gopher" width="30" height="30">
           </p>
+        </div>
+      </header>
+
+      <div class="w-full max-w-xl flex-1 px-2 md:min-w-[300px] md:px-0">
+        <div class="my-2 flex flex-row gap-1">
           <button
-            class="transition-transform hover:scale-110" title="Copy to Clipboard"
-            aria-label="Copy Install Command" @click="copyIcon.triggerCopy(INSTALL_COMMAND)"
+            v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
+            class="text-caption flex-1 rounded-t-lg border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
+            @click="activeTab = (tab.key as 'install' | 'commands')"
           >
-            <icon :name="copyIcon.icon.value" size="20" />
+            {{ tab.label }}
           </button>
         </div>
-        <Shiki lang="bash" :code="INSTALL_COMMAND" class="code-block" />
-      </article>
 
-      <article class="card flex flex-col p-0">
-        <p class="text-caption flex items-center justify-between p-2">
-          > After installing, run the following commands to get started:
-        </p>
-        <Shiki lang="bash" :code="CLI_COMMANDS.join('\n')" class="code-block" />
-      </article>
+        <article v-if="activeTab === 'install'" class="card p-4">
+          <p class="text-caption">
+            > Install the Go module:
+          </p>
+          <Shiki lang="bash" :code="INSTALL_COMMAND" class="code-block" />
+        </article>
 
-      <div class="absolute right-8 bottom-8 z-10 hidden items-end gap-2 text-xs font-medium text-muted-foreground select-none md:flex">
-        <span>Powered by Go</span>
-        <img src="/assets/gopher.png" alt="Gopher" width="35" height="35">
+        <article v-if="activeTab === 'commands'" class="card p-4">
+          <p class="text-caption">
+            > After installing, run the following commands to get started:
+          </p>
+          <Shiki lang="bash" :code="CLI_COMMANDS.join('\n')" class="code-block" />
+        </article>
       </div>
     </div>
-
-    <p class="text-caption max-w-sm border-b pb-2 text-center leading-5">
-      Read the <nuxt-link to="/cli" class="text-primary hover:underline">
-        documentation
-      </nuxt-link> for more details.
-    </p>
   </section>
 
   <section
     id="faq" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-12 px-8 py-20 md:px-20"
+    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 py-12 md:px-20 md:py-20 2xl:px-32 2xl:py-32"
   >
     <h2 class="text-center font-display">
       Frequently Asked Questions
@@ -150,9 +165,8 @@
 </template>
 
 <script setup lang="ts">
-const { createActionHandler } = useActionIcon()
-const copyIcon = createActionHandler("ph:copy")
 const openIndex = ref<number | null>(null)
+const activeTab = ref<"install" | "commands">("install")
 
 function toggleAccordion(index: number) {
   openIndex.value = openIndex.value === index ? null : index
@@ -170,32 +184,6 @@ definePageMeta({
 </script>
 
 <style scoped>
-.hero-backdrop {
-  background: linear-gradient(360deg, var(--background) 20%, var(--primary) 80%, var(--secondary) 100%);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform-origin: top;
-  animation: gradientGrow 10s ease-in-out infinite;
-}
-
-@keyframes gradientGrow {
-  0% {
-    transform: scaleY(0.5);
-    opacity: 0.1;
-  }
-  50% {
-    transform: scaleY(1);
-    opacity: 0.2;
-  }
-  100% {
-    transform: scaleY(0.5);
-    opacity: 0.1;
-  }
-}
-
 .hero-btn {
   box-shadow: 0 0 0 2px var(--primary);
   border-radius: 5rem;
