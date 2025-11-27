@@ -101,8 +101,9 @@ async function handleSetActiveOrg(orgId: string) {
     const org = orgStore.organizations.find((o: Organization) => o.id === orgId)
     if (!org) {
       const res = await orgStore.getOrg(orgId)
-      if (res)
+      if (res) {
         orgStore.setActiveOrg(res.id)
+      }
       return
     }
 
