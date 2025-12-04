@@ -40,7 +40,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.getProjects = null
 
     try {
-      const res = await $fetch<{ projects: Project[] }>(`${API_URL}/projects`, { method: "GET", credentials: "include" })
+      const res = await $fetch<{ projects: Project[] }>("/api/projects", { method: "GET", credentials: "include" })
       projects.value = res.projects || []
     }
     catch (err: any) {
@@ -57,7 +57,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.createProject = null
 
     try {
-      const res = await $fetch<Project>(`${API_URL}/projects`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<Project>("/api/projects", { method: "POST", body: data, credentials: "include" })
       projects.value.push(res)
       return res
     }
@@ -75,7 +75,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.updateProject = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects/${projectId}`, { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch(`/api/projects/${projectId}`, { method: "PUT", body: data, credentials: "include" })
       const index = projects.value.findIndex(p => p.id === projectId)
       if (index !== -1) {
         projects.value[index] = { ...res, description: res.description === null ? undefined : res.description }
@@ -96,7 +96,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.deleteProject = null
 
     try {
-      await $fetch(`${API_URL}/projects/${projectId}`, { method: "DELETE", credentials: "include" })
+      await $fetch(`/api/projects/${projectId}`, { method: "DELETE", credentials: "include" })
       projects.value = projects.value.filter(p => p.id !== projectId)
     }
     catch (err: any) {
@@ -113,7 +113,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.addProjectMember = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects/${projectId}/members`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch(`/api/projects/${projectId}/members`, { method: "POST", body: data, credentials: "include" })
       return res
     }
     catch (err: any) {
@@ -130,7 +130,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.updateProjectMember = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects/${projectId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch(`/api/projects/${projectId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
       return res
     }
     catch (err: any) {
@@ -147,7 +147,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.removeProjectMember = null
 
     try {
-      await $fetch(`${API_URL}/projects/${projectId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
+      await $fetch(`/api/projects/${projectId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
     }
     catch (err: any) {
       errors.value.removeProjectMember = err.data.message || "Failed to remove project member"
@@ -163,7 +163,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.getProjectSecrets = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects/${projectId}/secrets`, { method: "GET", credentials: "include" })
+      const res = await $fetch(`/api/projects/${projectId}/secrets`, { method: "GET", credentials: "include" })
       const fetchedSecrets = Array.isArray(res) ? res : []
       secrets.value = fetchedSecrets
       return fetchedSecrets
@@ -183,7 +183,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.createProjectSecret = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects/${projectId}/secrets`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch(`/api/projects/${projectId}/secrets`, { method: "POST", body: data, credentials: "include" })
       secrets.value.push(res)
       return res
     }
@@ -202,7 +202,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.updateProjectSecret = null
 
     try {
-      const res = await $fetch(`${API_URL}/projects/${projectId}/secrets/${secretId}`, { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch(`/api/projects/${projectId}/secrets/${secretId}`, { method: "PUT", body: data, credentials: "include" })
       const idx = secrets.value.findIndex((s: any) => s.id === secretId)
       if (idx !== -1)
         secrets.value[idx] = res
@@ -223,7 +223,7 @@ export const useProjectStore = defineStore("project", () => {
     errors.value.deleteProjectSecret = null
 
     try {
-      await $fetch(`${API_URL}/projects/${projectId}/secrets/${secretId}`, { method: "DELETE", credentials: "include" })
+      await $fetch(`/api/projects/${projectId}/secrets/${secretId}`, { method: "DELETE", credentials: "include" })
       secrets.value = secrets.value.filter((s: any) => s.id !== secretId)
     }
     catch (err: any) {

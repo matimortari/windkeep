@@ -1,51 +1,51 @@
 <template>
-  <div class="scroll-area overflow-y-auto p-4!">
-    <table class="min-w-full table-auto border-spacing-y-2 rounded-t-lg md:w-full md:overflow-hidden">
-      <thead class="bg-muted text-left text-sm text-muted-foreground">
+  <div class="w-full overflow-x-auto">
+    <table class="min-w-full table-auto rounded-t-lg border bg-card md:w-full md:overflow-hidden">
+      <thead>
         <tr>
-          <th class="cell">
+          <th class="header-cell">
             Name
           </th>
-          <th class="cell">
+          <th class="header-cell">
             Description
           </th>
-          <th class="cell">
+          <th class="header-cell">
             Secrets
           </th>
-          <th class="cell">
+          <th class="header-cell">
             Members
           </th>
-          <th class="cell text-end">
+          <th class="header-cell">
             Actions
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="project in projects" :key="project.id" class="cursor-pointer transition-all hover:bg-muted" @click="$router.push(`/admin/${project.slug}`)">
-          <td class="cell">
+        <tr v-for="project in projects" :key="project.id" class="cursor-pointer border text-sm hover:bg-muted" @click="$router.push(`/admin/${project.slug}`)">
+          <td class="border p-2">
             {{ project.name }}
           </td>
 
-          <td class="cell max-w-[250px] truncate text-muted-foreground">
+          <td class="max-w-[250px] truncate border p-2 text-muted-foreground">
             {{ project.description || 'No description provided.' }}
           </td>
 
-          <td class="cell">
+          <td class="border p-2">
             <div class="flex flex-row items-center gap-1 text-muted-foreground">
               <icon name="ph:key" size="20" />
               <span>{{ project.secrets?.length }}</span>
             </div>
           </td>
 
-          <td class="cell">
+          <td class="border p-2">
             <div class="flex flex-row items-center gap-1 text-muted-foreground">
               <icon name="ph:users" size="20" />
               <span>{{ project.memberships?.length }}</span>
             </div>
           </td>
 
-          <td class="cell">
+          <td class="border p-2">
             <div class="flex justify-end gap-2">
               <nuxt-link :to="`/admin/${project.slug}/settings`" class="rounded-full p-2 text-muted-foreground hover:bg-muted" title="Settings" @click.stop>
                 <icon name="ph:gear" size="20" />
