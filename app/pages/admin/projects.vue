@@ -21,8 +21,8 @@
           <icon :name="layout === 'grid' ? 'ph:list-bullets' : 'ph:squares-four'" size="20" />
         </button>
 
-        <button class="btn" @click="showAllProjects = !showAllProjects">
-          {{ showAllProjects ? "Organization Projects" : "All Projects" }}
+        <button class="btn" :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
+          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" />
         </button>
 
         <button class="btn-primary" @click="isDialogOpen = true">
@@ -34,9 +34,11 @@
 
     <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" :icon-size="60" />
 
-    <ProjectTable v-else-if="layout === 'list'" :projects="filteredProjects" />
+    <div v-else-if="layout === 'list'" class="scroll-area max-h-[80vh] overflow-y-auto">
+      <ProjectTable :projects="filteredProjects" />
+    </div>
 
-    <ul v-else class="scroll-area grid max-h-[80vh] gap-2 overflow-y-auto p-4! md:grid-cols-3">
+    <ul v-else class="scroll-area grid max-h-[80vh] gap-2 overflow-y-auto md:grid-cols-3">
       <li
         v-for="(project, index) in filteredProjects" :key="project.id"
         v-motion :initial="{ opacity: 0 }"

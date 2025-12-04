@@ -19,9 +19,10 @@
 
     <div class="flex items-center justify-between">
       <span class="font-semibold">Projects</span>
-      <div class="flex gap-2">
-        <button class="btn" @click="showAllProjects = !showAllProjects">
-          {{ showAllProjects ? "Organization Projects" : "All Projects" }}
+
+      <div class="navigation-group">
+        <button class="transition-transform hover:scale-125 hover:text-primary" :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
+          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" />
         </button>
         <button class="transition-transform hover:scale-125 hover:text-primary" aria-label="Create New Project" @click="isDialogOpen = true">
           <icon name="ph:plus" size="25" />

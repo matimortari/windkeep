@@ -8,8 +8,8 @@
               {{ title }}
             </h3>
 
-            <button aria-label="Close Dialog" class="flex items-center" @mousedown="closeDialog">
-              <icon name="ph:x" size="20" class="text-muted-foreground" />
+            <button aria-label="Close Dialog" @mousedown="closeDialog">
+              <icon name="ph:x" size="20" class="text-muted-foreground transition-transform hover:scale-110" />
             </button>
           </header>
 

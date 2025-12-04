@@ -1,17 +1,14 @@
 <template>
-  <div class="flex flex-col items-start justify-between gap-2 pt-4 md:navigation-group">
+  <div class="flex flex-col items-start justify-between gap-2 py-4 md:navigation-group">
     <nav class="navigation-group" aria-label="Filters">
-      <input
-        v-model="dateFilter" type="date"
-        title="Filter by date" class="hidden md:block"
-        @change="updateDateFilter"
-      >
+      <input v-model="dateFilter" type="date" title="Filter by date" @change="updateDateFilter">
 
       <div ref="userDropdownRef" class="relative">
         <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
           <span class="capitalize">{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
           <icon name="ph:caret-down" size="15" />
         </button>
+
         <transition name="dropdown">
           <ul v-if="isUserDropdownOpen" class="dropdown-menu scroll-area overflow-y-auto text-sm whitespace-nowrap">
             <li class="rounded p-2 hover:bg-muted" @click="setUserFilter('')">
@@ -26,9 +23,10 @@
 
       <div ref="actionDropdownRef" class="relative">
         <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
-          <span>{{ getActions.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
+          <span>{{ getActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
           <icon name="ph:caret-down" size="15" />
         </button>
+
         <transition name="dropdown">
           <ul v-if="isActionDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm whitespace-nowrap">
             <li class="rounded p-2 hover:bg-muted" @click="setActionFilter('')">
@@ -40,26 +38,18 @@
           </ul>
         </transition>
       </div>
-
-      <button class="btn" title="Show/Hide Sensitive Info" @click="showSensitiveInfo = !showSensitiveInfo">
-        <icon :name="showSensitiveInfo ? 'ph:eye-slash' : 'ph:eye'" size="20" />
-      </button>
     </nav>
 
     <nav v-if="pagination && pagination.totalPages > 0" class="navigation-group" aria-label="Pagination">
-      <input
-        v-model="dateFilter" type="date"
-        title="Filter by date" class="md:hidden"
-        @change="updateDateFilter"
-      >
-
       <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="prevPage()">
         <icon name="ph:arrow-left" size="20" />
       </button>
+
       <div class="text-caption flex flex-col items-center justify-center gap-1 whitespace-nowrap md:mx-4">
         <span>{{ pagination.page }} / {{ pagination.totalPages }}</span>
         <span v-if="auditLogs.length" class="text-xs italic">{{ logsSummary }}</span>
       </div>
+
       <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="nextPage()">
         <icon name="ph:arrow-right" size="20" />
       </button>
@@ -72,11 +62,9 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   modelValue?: boolean
 }>()
-
-const emit = defineEmits<{ "update:modelValue": [value: boolean] }>()
 
 const auditStore = useAuditStore()
 const { auditLogs, pagination, filters, currentFilters, getActions } = storeToRefs(auditStore)
@@ -86,10 +74,6 @@ const isUserDropdownOpen = ref(false)
 const isActionDropdownOpen = ref(false)
 const userDropdownRef = ref<HTMLElement | null>(null)
 const actionDropdownRef = ref<HTMLElement | null>(null)
-const showSensitiveInfo = computed({
-  get: () => props.modelValue ?? false,
-  set: value => emit("update:modelValue", value),
-})
 
 const availableUsers = computed(() => {
   return filters.value?.users || []

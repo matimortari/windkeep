@@ -46,7 +46,7 @@
 
     <nav class="navigation-group" aria-label="User Actions">
       <nuxt-link to="/admin/preferences" title="User Preferences" aria-label="User Preferences" class="btn hidden! md:block!">
-        <icon name="ph:user" size="20" />
+        <icon name="ph:user-circle-gear" size="20" />
       </nuxt-link>
       <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
         <icon :name="themeIcon" size="20" />

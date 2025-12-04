@@ -1,20 +1,20 @@
 <template>
-  <div class="scroll-area w-full overflow-x-auto p-4!">
+  <div class="w-full overflow-x-auto">
     <table class="min-w-full table-auto rounded-t-lg border bg-card md:w-full md:overflow-hidden">
       <thead>
-        <tr class="bg-muted text-sm font-semibold">
-          <th class="flex w-full flex-row items-center gap-2 p-2 text-start">
+        <tr>
+          <th class="header-cell flex w-full flex-row items-center gap-2">
             <span>Key</span>
             <button
               type="button" title="Sort by Key"
               aria-label="Sort by Key" class="flex items-center hover:text-primary"
               @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'"
             >
-              <icon name="ph:arrow-down" size="15" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
+              <icon name="ph:arrow-down" size="20" class="transition-transform" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
             </button>
           </th>
 
-          <th v-for="env in environments" :key="env" class="border-x p-2 text-start md:w-1/6">
+          <th v-for="env in environments" :key="env" class="header-cell md:w-1/6">
             <span>{{ capitalizeFirst(env) }}</span>
           </th>
         </tr>
@@ -59,7 +59,7 @@
                 {{ renderValue(secret.key, env) }}
               </span>
 
-              <button aria-label="Copy Secret Value" class="transition-colors hover:text-primary" @click="copyToClipboard(getSecretValue(secret.key, env))">
+              <button v-if="getSecretValue(secret.key, env)" aria-label="Copy Secret Value" class="transition-colors hover:text-primary" @click="copyToClipboard(getSecretValue(secret.key, env))">
                 <icon name="carbon:copy" size="20" />
               </button>
             </div>

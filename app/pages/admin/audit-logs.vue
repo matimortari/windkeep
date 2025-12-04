@@ -4,13 +4,15 @@
       Audit Logs
     </h2>
 
-    <AuditFilter v-model="showSensitiveInfo" />
+    <AuditFilter />
 
     <p v-if="loading" class="text-caption my-8 h-[80vh] text-center">
       Loading audit logs...
     </p>
 
-    <AuditTable v-else />
+    <div v-else class="scroll-area max-h-[80vh] overflow-y-auto">
+      <AuditTable />
+    </div>
   </div>
 </template>
 
@@ -18,7 +20,6 @@
 const { activeOrg } = storeToRefs(useOrgStore())
 const auditStore = useAuditStore()
 const { loading } = storeToRefs(auditStore)
-const showSensitiveInfo = ref(false)
 
 watch(activeOrg, async (org) => {
   if (org?.id) {
