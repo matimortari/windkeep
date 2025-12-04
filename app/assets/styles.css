@@ -99,7 +99,7 @@ h1 {
   font-weight: 700;
 }
 h2 {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   line-height: 2.5rem;
   font-weight: 700;
 }
@@ -174,7 +174,7 @@ h6 {
   background-color: #272822;
   padding: 1.25rem;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-align: start;
   overflow-x: auto;
   scrollbar-width: thin;
@@ -210,6 +210,16 @@ select:hover {
 .cell {
   padding-inline: 0.5rem;
   padding-block: 0.25rem;
+}
+
+.header-cell {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  padding: 0.5rem;
+  text-align: start;
+  font-weight: 700;
+  border-inline-style: solid;
+  z-index: 10;
 }
 
 /*
