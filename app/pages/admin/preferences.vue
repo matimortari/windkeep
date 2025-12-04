@@ -109,6 +109,7 @@
 </template>
 
 <script setup lang="ts">
+const { clear } = useUserSession()
 const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
 const { user, errors } = storeToRefs(userStore)
@@ -209,7 +210,13 @@ async function handleDeleteUser() {
   if (!confirm("Are you sure you want to delete your account? This action cannot be undone."))
     return
 
-  await userStore.deleteUser()
+  const success = await userStore.deleteUser()
+  if (!success) {
+    return
+  }
+
+  await clear()
+  await navigateTo("/sign-in", { replace: true })
 }
 
 useHead({

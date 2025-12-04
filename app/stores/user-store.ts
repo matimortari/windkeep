@@ -10,7 +10,7 @@ export const useUserStore = defineStore("user", () => {
     errors.value.getUser = null
 
     try {
-      const res = await $fetch<User>(`${API_URL}/user`, { method: "GET", credentials: "include" })
+      const res = await $fetch<User>("/api/user", { method: "GET", credentials: "include" })
       user.value = res
     }
     catch (err: any) {
@@ -27,11 +27,7 @@ export const useUserStore = defineStore("user", () => {
     errors.value.updateUser = null
 
     try {
-      const res = await $fetch<User & { apiToken?: string }>(
-        `${API_URL}/user`,
-        { method: "PUT", body: data, credentials: "include" },
-      )
-
+      const res = await $fetch<User & { apiToken?: string }>("/api/user", { method: "PUT", body: data, credentials: "include" })
       if (user.value) {
         Object.assign(user.value, res)
       }
@@ -39,7 +35,7 @@ export const useUserStore = defineStore("user", () => {
       return res
     }
     catch (err: any) {
-      errors.value.updateUser = err.data?.message || "Failed to update user"
+      errors.value.updateUser = err.data.message || "Failed to update user"
       console.error("updateUser error:", err)
     }
     finally {
@@ -55,7 +51,7 @@ export const useUserStore = defineStore("user", () => {
       const formData = new FormData()
       formData.append("file", file)
 
-      const res = await $fetch<{ imageUrl: string }>(`${API_URL}/user/image-upload`, { method: "PUT", body: formData, credentials: "include" })
+      const res = await $fetch<{ imageUrl: string }>("/api/user/image-upload", { method: "PUT", body: formData, credentials: "include" })
       if (user.value && res.imageUrl) {
         user.value.image = res.imageUrl
       }
@@ -76,12 +72,14 @@ export const useUserStore = defineStore("user", () => {
     errors.value.deleteUser = null
 
     try {
-      await $fetch(`${API_URL}/user`, { method: "DELETE", credentials: "include" })
+      await $fetch("/api/user", { method: "DELETE", credentials: "include" })
       user.value = null
+      return true
     }
     catch (err: any) {
       errors.value.deleteUser = err.data.message || "Failed to delete user"
       console.error("deleteUser error:", err)
+      return false
     }
     finally {
       loading.value = false

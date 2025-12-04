@@ -1,7 +1,5 @@
 export const BASE_URL = "https://secretkeepr.vercel.app"
 
-export const API_URL = "/api"
-
 export const HIGHLIGHTS = [
   {
     title: "Rapid Onboarding",

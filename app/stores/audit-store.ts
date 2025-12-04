@@ -4,7 +4,7 @@ export const useAuditStore = defineStore("audit", () => {
   const auditLogs = ref<AuditLog[]>([])
   const pagination = ref<AuditLogsPagination | null>(null)
   const filters = ref<AuditFilters | null>(null)
-  const currentFilters = ref<GetAuditLogsInput>({ page: 1, limit: 20 })
+  const currentFilters = ref<GetAuditLogsInput>({ page: 1, limit: 25 })
   const loading = ref(false)
   const errors = ref<Record<string, string | null>>({ getAuditLogs: null, deleteAuditLogs: null })
 
@@ -20,7 +20,7 @@ export const useAuditStore = defineStore("audit", () => {
           queryParams.append(key, String(value))
       }
 
-      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`${API_URL}/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
+      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`/api/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
       auditLogs.value = res.auditLogs as AuditLog[]
       pagination.value = res.pagination
       filters.value = res.filters
@@ -44,7 +44,7 @@ export const useAuditStore = defineStore("audit", () => {
     errors.value.deleteAuditLogs = null
 
     try {
-      await $fetch(`${API_URL}/org/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
+      await $fetch(`/api/org/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
     }
     catch (err: any) {
       errors.value.deleteAuditLogs = err.data.message || "Failed to delete audit logs"
@@ -79,7 +79,7 @@ export const useAuditStore = defineStore("audit", () => {
     return getAuditLogs(orgId, { ...currentFilters.value, page })
   }
 
-  const getActions = [
+  const getActions = computed(() => [
     { label: "Organization Created", value: "organization.created" },
     { label: "Organization Updated", value: "organization.updated" },
     { label: "Organization Deleted", value: "organization.deleted" },
@@ -97,7 +97,7 @@ export const useAuditStore = defineStore("audit", () => {
     { label: "Secret Created", value: "secret.created" },
     { label: "Secret Updated", value: "secret.updated" },
     { label: "Secret Deleted", value: "secret.deleted" },
-  ]
+  ])
 
   function getTableHeaders() {
     return [
@@ -109,7 +109,7 @@ export const useAuditStore = defineStore("audit", () => {
   }
 
   function getActionLabel(action: string): string {
-    const actionItem = getActions.find(a => a.value === action)
+    const actionItem = getActions.value.find(a => a.value === action)
     return actionItem?.label || action
   }
 
