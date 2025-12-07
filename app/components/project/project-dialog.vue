@@ -59,8 +59,9 @@ const form = ref<{ name: string, slug: string, description: string }>({
 })
 
 const suggestedSlug = computed(() => {
-  if (!form.value.name)
+  if (!form.value.name) {
     return "my-project"
+  }
 
   return form.value.name
     .trim()

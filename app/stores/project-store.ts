@@ -204,8 +204,9 @@ export const useProjectStore = defineStore("project", () => {
     try {
       const res = await $fetch(`/api/projects/${projectId}/secrets/${secretId}`, { method: "PUT", body: data, credentials: "include" })
       const idx = secrets.value.findIndex((s: any) => s.id === secretId)
-      if (idx !== -1)
+      if (idx !== -1) {
         secrets.value[idx] = res
+      }
       return res
     }
     catch (err: any) {

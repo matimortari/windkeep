@@ -75,8 +75,9 @@ const sort = ref<{ key: string, direction: "asc" | "desc" }>({ key: "name", dire
 
 // Projects in the active organization that the user has access to
 const activeOrgProjects = computed(() => {
-  if (!activeOrg.value?.id)
+  if (!activeOrg.value?.id) {
     return []
+  }
 
   return projects.value.filter(
     project =>
@@ -103,8 +104,9 @@ const filteredProjects = computed(() => (showAllProjects.value ? allProjects.val
 )
 
 async function handleCreateProject(payload: { name: string, slug: string, description: string }) {
-  if (!activeOrg.value)
+  if (!activeOrg.value) {
     return
+  }
 
   await projectStore.createProject({
     name: payload.name,
@@ -118,13 +120,15 @@ async function handleCreateProject(payload: { name: string, slug: string, descri
 }
 
 watch(() => activeOrg.value?.id, async (orgId) => {
-  if (orgId)
+  if (orgId) {
     await projectStore.getProjects()
+  }
 }, { immediate: true })
 
 watch(layout, (newLayout) => {
-  if (import.meta.client)
+  if (import.meta.client) {
     localStorage.setItem("layoutMode", newLayout)
+  }
 })
 
 useHead({

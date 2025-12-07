@@ -215,8 +215,9 @@ const orgFields = [
     type: "input",
     model: computed(() => activeOrg.value?.name || ""),
     update: (value: string) => {
-      if (activeOrg.value)
+      if (activeOrg.value) {
         activeOrg.value.name = value
+      }
     },
     onSave: handleSubmit,
     editable: isOwner,
@@ -244,8 +245,9 @@ const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk"))
 
 async function handleCreateInvite() {
   inviteSuccess.value = null
-  if (!activeOrg.value?.id)
+  if (!activeOrg.value?.id) {
     return
+  }
 
   const result = await orgStore.createInvite(activeOrg.value.id, {
     orgId: activeOrg.value.id,
@@ -258,27 +260,32 @@ async function handleCreateInvite() {
 }
 
 async function handleUpdateMemberRole(memberId: string, newRole: Role) {
-  if (!activeOrg.value?.id)
+  if (!activeOrg.value?.id) {
     return
+  }
 
   const success = await orgStore.updateOrgMember(activeOrg.value.id, memberId, { role: newRole })
-  if (success)
+  if (success) {
     await userStore.getUser()
+  }
 }
 
 async function handleRemoveMember(memberId: string) {
-  if (!activeOrg.value?.id)
+  if (!activeOrg.value?.id) {
     return
-  if (!confirm("Are you sure you want to remove this member?"))
+  }
+  if (!confirm("Are you sure you want to remove this member?")) {
     return
+  }
 
   await orgStore.removeOrgMember(activeOrg.value.id, memberId)
   await userStore.getUser()
 }
 
 async function handleSubmit(index: number) {
-  if (!activeOrg.value?.id)
+  if (!activeOrg.value?.id) {
     return
+  }
 
   const success = await orgStore.updateOrg(activeOrg.value.id, {
     name: activeOrg.value.name || "",
@@ -291,20 +298,24 @@ async function handleSubmit(index: number) {
 }
 
 async function handleLeaveOrg() {
-  if (!activeOrg.value?.id || !user.value?.id)
+  if (!activeOrg.value?.id || !user.value?.id) {
     return
-  if (!confirm("Are you sure you want to leave this organization? This action cannot be undone."))
+  }
+  if (!confirm("Are you sure you want to leave this organization? This action cannot be undone.")) {
     return
+  }
 
   await orgStore.removeOrgMember(activeOrg.value.id, user.value.id)
   await navigateTo("/onboarding/create-org")
 }
 
 async function handleDeleteOrg() {
-  if (!activeOrg.value?.id)
+  if (!activeOrg.value?.id) {
     return
-  if (!confirm("Are you sure you want to delete this organization? This action cannot be undone."))
+  }
+  if (!confirm("Are you sure you want to delete this organization? This action cannot be undone.")) {
     return
+  }
 
   await orgStore.deleteOrg(activeOrg.value.id)
 }

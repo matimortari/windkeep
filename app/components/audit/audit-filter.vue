@@ -88,8 +88,9 @@ useClickOutside(actionDropdownRef, () => {
 }, { escapeKey: true })
 
 function getUserDisplayName(userId?: string) {
-  if (!userId)
+  if (!userId) {
     return "All Users"
+  }
 
   const user = availableUsers.value.find((u: { id: string, name: string | null, email: string }) => u.id === userId)
   return user?.name || user?.email
@@ -111,13 +112,15 @@ function setActionFilter(action: string) {
 }
 
 function prevPage() {
-  if (activeOrg.value)
+  if (activeOrg.value) {
     auditStore.prevPage(activeOrg.value.id)
+  }
 }
 
 function nextPage() {
-  if (activeOrg.value)
+  if (activeOrg.value) {
     auditStore.nextPage(activeOrg.value.id)
+  }
 }
 
 const logsSummary = computed(() => {
@@ -127,8 +130,9 @@ const logsSummary = computed(() => {
 })
 
 async function handleDeleteLogs() {
-  if (!confirm(`Are you sure you want to delete ${logsSummary.value}? This action cannot be undone.`))
+  if (!confirm(`Are you sure you want to delete ${logsSummary.value}? This action cannot be undone.`)) {
     return
+  }
 
   await auditStore.deleteAuditLogs(activeOrg.value!.id, {
     olderThan: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined,

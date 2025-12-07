@@ -1,6 +1,7 @@
 export function formatDate(date?: string | Date | null): string {
-  if (!date)
+  if (!date) {
     return "-"
+  }
 
   const dt = typeof date === "string" ? new Date(date) : date
   const formatted = dt.toLocaleDateString("en-US", {
@@ -13,8 +14,9 @@ export function formatDate(date?: string | Date | null): string {
 }
 
 export function copyToClipboard(val: string) {
-  if (val)
+  if (val) {
     navigator.clipboard.writeText(val)
+  }
 }
 
 export function capitalizeFirst(str: string) {
