@@ -3,8 +3,9 @@ import crypto from "node:crypto"
 
 const algorithm = "aes-256-gcm"
 const secret = process.env.ENCRYPTION_KEY
-if (!secret)
+if (!secret) {
   throw new Error("Encryption key is missing")
+}
 
 // Derive a 32-byte key from the secret
 const key = crypto.createHash("sha256").update(secret).digest()
@@ -26,8 +27,9 @@ export function encrypt(input: string): string {
 export function decrypt(encryptedData: string): string {
   try {
     const [ivHex, authTagHex, encryptedHex] = encryptedData.split(":")
-    if (!ivHex || !authTagHex || !encryptedHex)
+    if (!ivHex || !authTagHex || !encryptedHex) {
       throw new Error("Invalid encrypted input format")
+    }
 
     const iv = Buffer.from(ivHex, "hex")
     const authTag = Buffer.from(authTagHex, "hex")

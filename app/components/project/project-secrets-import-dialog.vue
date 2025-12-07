@@ -66,12 +66,14 @@ function parseEnv(text: string): Record<string, string> {
 
   for (const line of lines) {
     const trimmed = line.trim()
-    if (!trimmed || trimmed.startsWith("#"))
+    if (!trimmed || trimmed.startsWith("#")) {
       continue
+    }
 
     const match = trimmed.match(/^([^=]+)=(.*)$/)
-    if (!match)
+    if (!match) {
       continue
+    }
 
     const key = match && match[1] ? match[1].trim() : ""
     let value = match && match[2] ? match[2].trim() : ""

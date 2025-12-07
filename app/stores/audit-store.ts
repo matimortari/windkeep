@@ -16,8 +16,9 @@ export const useAuditStore = defineStore("audit", () => {
       const queryParams = new URLSearchParams()
       const effectiveParams = params || currentFilters.value
       for (const [key, value] of Object.entries(effectiveParams)) {
-        if (value !== undefined && value !== null)
+        if (value !== undefined && value !== null) {
           queryParams.append(key, String(value))
+        }
       }
 
       const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`/api/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
@@ -114,8 +115,9 @@ export const useAuditStore = defineStore("audit", () => {
   }
 
   function getResourceIcon(resource: string | null): string {
-    if (!resource)
+    if (!resource) {
       return "ph:cube"
+    }
 
     const resourceMap: Record<string, string> = {
       organization: "ph:buildings",

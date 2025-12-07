@@ -122,8 +122,9 @@ const userFields = [
     type: "input",
     model: computed(() => user.value?.name),
     update: (value: string) => {
-      if (user.value)
+      if (user.value) {
         user.value.name = value
+      }
     },
     onSave: handleSubmit,
   },
@@ -176,8 +177,9 @@ const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk"))
 async function handleUpdateImage(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input?.files?.[0]
-  if (!file)
+  if (!file) {
     return
+  }
 
   const res = await userStore.updateUserImage(file)
   if (res?.imageUrl && user.value) {
@@ -186,8 +188,9 @@ async function handleUpdateImage(event: Event) {
 }
 
 async function handleRegenerateToken() {
-  if (!user.value?.id)
+  if (!user.value?.id) {
     return
+  }
 
   const res = await userStore.updateUser({ regenerateApiToken: true })
   if (res?.apiToken && user.value) {
@@ -196,8 +199,9 @@ async function handleRegenerateToken() {
 }
 
 async function handleSubmit(index: number) {
-  if (!user.value?.id || !user.value?.name)
+  if (!user.value?.id || !user.value?.name) {
     return
+  }
 
   await userStore.updateUser({
     name: user.value.name,
@@ -207,8 +211,9 @@ async function handleSubmit(index: number) {
 }
 
 async function handleDeleteUser() {
-  if (!confirm("Are you sure you want to delete your account? This action cannot be undone."))
+  if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
     return
+  }
 
   const success = await userStore.deleteUser()
   if (!success) {
