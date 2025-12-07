@@ -86,8 +86,9 @@ async function handleSubmit(secret: any) {
   isDialogOpen.value = false
   dialogType.value = null
   selectedSecret.value = null
-  if (!project.value?.id)
+  if (!project.value?.id) {
     return
+  }
 
   const success = secret.id
     ? await projectStore.updateProjectSecret(project.value.id, secret.id, { description: secret.description ?? "" })
@@ -99,8 +100,9 @@ async function handleSubmit(secret: any) {
 }
 
 watch(() => project.value?.id, async (id: string | undefined) => {
-  if (!id)
+  if (!id) {
     return
+  }
 
   await projectStore.getProjectSecrets(id)
   const projectTitle = projectStore.projects.find(p => p.id === id)?.name

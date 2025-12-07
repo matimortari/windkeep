@@ -262,8 +262,9 @@ const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk"))
 
 async function handleAddMember() {
   addMemberSuccess.value = null
-  if (!project.value?.id || !newMemberId.value.trim())
+  if (!project.value?.id || !newMemberId.value.trim()) {
     return
+  }
 
   const success = await projectStore.addProjectMember(project.value.id, {
     userId: newMemberId.value.trim(),
@@ -279,26 +280,31 @@ async function handleAddMember() {
 }
 
 async function handleUpdateMemberRole(memberId: string, newRole: Role) {
-  if (!project.value?.id)
+  if (!project.value?.id) {
     return
+  }
 
-  if (await projectStore.updateProjectMember(project.value.id, memberId, { role: newRole }))
+  if (await projectStore.updateProjectMember(project.value.id, memberId, { role: newRole })) {
     await projectStore.getProjects()
+  }
 }
 
 async function handleRemoveMember(memberId: string) {
-  if (!project.value?.id)
+  if (!project.value?.id) {
     return
-  if (!confirm("Are you sure you want to remove this member?"))
+  }
+  if (!confirm("Are you sure you want to remove this member?")) {
     return
+  }
 
   await projectStore.removeProjectMember(project.value.id, memberId)
   await projectStore.getProjects()
 }
 
 async function handleSubmit(index: number) {
-  if (!project.value?.id)
+  if (!project.value?.id) {
     return
+  }
 
   const oldSlug = project.value.slug
   const newSlug = localProject.value?.slug ?? ""
@@ -319,27 +325,32 @@ async function handleSubmit(index: number) {
 }
 
 async function handleDeleteProject() {
-  if (!project.value?.id)
+  if (!project.value?.id) {
     return
-  if (!confirm("Are you sure you want to delete this project? This action cannot be undone."))
+  }
+  if (!confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
     return
+  }
 
   await projectStore.deleteProject(project.value.id)
 }
 
 async function handleLeaveProject() {
-  if (!project.value?.id || !user.value?.id)
+  if (!project.value?.id || !user.value?.id) {
     return
-  if (!confirm("Are you sure you want to leave this project? This action cannot be undone."))
+  }
+  if (!confirm("Are you sure you want to leave this project? This action cannot be undone.")) {
     return
+  }
 
   await projectStore.removeProjectMember(project.value.id, user.value.id)
   await navigateTo("/admin/projects")
 }
 
 watch(() => project.value, (proj) => {
-  if (!proj)
+  if (!proj) {
     return
+  }
 
   if (localProject.value) {
     localProject.value.name = proj.name

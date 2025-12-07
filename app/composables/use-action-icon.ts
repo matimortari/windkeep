@@ -12,8 +12,9 @@ export function useActionIcon() {
     }
 
     async function triggerCopy(text: string) {
-      if (!text)
+      if (!text) {
         return
+      }
 
       await navigator.clipboard.writeText(text)
       triggerSuccess()

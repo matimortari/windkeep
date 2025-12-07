@@ -131,8 +131,9 @@ function handleUpdateSecret(key: string) {
 }
 
 async function handleDeleteSecret(key: string) {
-  if (!confirm(`Are you sure you want to delete the secret "${key}"?`))
+  if (!confirm(`Are you sure you want to delete the secret "${key}"?`)) {
     return
+  }
 
   const secret = props.secrets.find(s => s.key === key)
   if (secret?.id) {

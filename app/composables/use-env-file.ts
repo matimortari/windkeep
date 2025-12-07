@@ -29,8 +29,9 @@ export function useEnvFile(projectId: string) {
     if (existing) {
       const mergedValues = mergeValues(existing.values ?? [], secret.values ?? [])
       const payload: UpdateSecretInput = { values: mergedValues }
-      if (secret.description !== undefined)
+      if (secret.description !== undefined) {
         payload.description = secret.description
+      }
       return await projectStore.updateProjectSecret(projectId, existing.id!, payload)
     }
     else {
@@ -82,8 +83,9 @@ export function useEnvFile(projectId: string) {
       .filter(Boolean)
       .join("\n")
 
-    if (!filteredSecrets)
+    if (!filteredSecrets) {
       return { success: false, error: "No secrets found for this environment" }
+    }
 
     try {
       const blob = new Blob([filteredSecrets], { type: "text/plain" })

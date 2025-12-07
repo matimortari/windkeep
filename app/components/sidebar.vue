@@ -68,8 +68,9 @@ const showAllProjects = ref(false)
 
 // Projects in the active organization that the user has access to
 const activeOrgProjects = computed(() => {
-  if (!activeOrg.value?.id)
+  if (!activeOrg.value?.id) {
     return []
+  }
 
   return projects.value.filter(
     project =>
@@ -88,8 +89,9 @@ const allProjects = computed(() => {
 const filteredProjects = computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value))
 
 async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {
-  if (!props.org?.id)
+  if (!props.org?.id) {
     return
+  }
 
   await projectStore.createProject({
     name: project.name,

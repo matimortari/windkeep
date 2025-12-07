@@ -34,10 +34,10 @@ export const useOrgStore = defineStore("org", () => {
       const res = await $fetch<Organization>(`/api/org/${orgId}`, { method: "GET", credentials: "include" })
       activeOrg.value = res
       const index = organizations.value.findIndex(o => o.id === orgId)
-      if (index === -1)
+      if (index === -1) {
         organizations.value.push(res)
-      else
-        organizations.value[index] = res
+      }
+      else { organizations.value[index] = res }
 
       return res
     }
@@ -81,8 +81,9 @@ export const useOrgStore = defineStore("org", () => {
     try {
       const res = await $fetch<Organization>(`/api/org/${orgId}`, { method: "PUT", body: data, credentials: "include" })
       const index = organizations.value.findIndex(o => o.id === orgId)
-      if (index !== -1)
+      if (index !== -1) {
         organizations.value[index] = res
+      }
       return res
     }
     catch (err: any) {
