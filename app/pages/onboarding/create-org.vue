@@ -55,8 +55,9 @@ async function handleCreateOrg() {
   }
 
   const org = await orgStore.createOrg(result.data)
-  if (!org)
+  if (!org) {
     return
+  }
 
   orgStore.setActiveOrg(org.id)
   navigateTo("/admin/projects")

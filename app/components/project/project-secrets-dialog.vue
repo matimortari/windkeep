@@ -153,7 +153,8 @@ watch(() => props.isOpen, (open) => {
 }, { immediate: true })
 
 watch(() => props.selectedSecret, () => {
-  if (props.isOpen)
+  if (props.isOpen) {
     resetForm()
+  }
 }, { deep: true })
 </script>

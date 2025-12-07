@@ -91,8 +91,9 @@ const currentPage = computed(() => {
 })
 
 async function handleSetActiveOrg(orgId: string) {
-  if (!orgId)
+  if (!orgId) {
     return
+  }
 
   try {
     isDropdownOpen.value = false

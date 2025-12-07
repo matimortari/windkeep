@@ -24,12 +24,15 @@ export default defineEventHandler(async (event) => {
     where.createdAt = { lt: date }
   }
 
-  if (projectId)
+  if (projectId) {
     where.projectId = projectId
-  if (userId)
+  }
+  if (userId) {
     where.userId = userId
-  if (action)
+  }
+  if (action) {
     where.action = { contains: action, mode: "insensitive" }
+  }
 
   const result = await db.auditLog.deleteMany({ where })
 
