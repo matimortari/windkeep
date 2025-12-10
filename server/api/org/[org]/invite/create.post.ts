@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto"
-import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getInviteBaseUrl, getUserFromSession, requireRole } from "#server/lib/utils"
+import { createAuditLog, getInviteBaseUrl, getUserFromSession, requireRole } from "#server/lib/utils"
 import { createInviteSchema } from "#shared/schemas/org-schema"
 import z from "zod"
 
