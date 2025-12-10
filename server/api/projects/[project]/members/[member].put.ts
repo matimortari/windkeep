@@ -1,6 +1,5 @@
-import createAuditLog from "#server/lib/audit"
 import db from "#server/lib/db"
-import { getUserFromSession, requireRole } from "#server/lib/utils"
+import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/utils"
 import { updateProjectMemberSchema } from "#shared/schemas/project-schema"
 import z from "zod"
 
