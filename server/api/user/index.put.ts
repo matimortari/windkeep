@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
   }
 
-  let apiTokenToUpdate = result.data.apiToken
+  // Only regenerate when the boolean is explicitly sent and true
+  let apiTokenToUpdate: string | undefined
   if (result.data.regenerateApiToken) {
     apiTokenToUpdate = randomBytes(16).toString("hex")
   }
@@ -30,14 +31,13 @@ export default defineEventHandler(async (event) => {
       email: true,
       name: true,
       image: true,
-      apiToken: apiTokenToUpdate !== undefined,
+      apiToken: true,
       createdAt: true,
       updatedAt: true,
     },
   })
-
-  if (apiTokenToUpdate !== undefined && !result.data.name && !result.data.image) {
-    return { message: "API token updated successfully", apiToken: updatedUser.apiToken }
+  if (apiTokenToUpdate) {
+    return { message: "API token updated successfully", apiToken: apiTokenToUpdate }
   }
 
   return updatedUser
