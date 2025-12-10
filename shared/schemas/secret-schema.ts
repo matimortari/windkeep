@@ -4,7 +4,7 @@ export const createSecretSchema = z.object({
   key: z
     .string()
     .min(1, "Secret key is required")
-    .max(100, "Secret key must be at most 100 characters")
+    .max(50, "Secret key must be at most 50 characters")
     .regex(/^[A-Z0-9_]+$/, "Secret key must contain only uppercase letters, numbers, and underscores")
     .transform(val => val.trim()),
   description: z
