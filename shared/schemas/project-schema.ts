@@ -3,14 +3,14 @@ import { z } from "zod"
 export const createProjectSchema = z.object({
   name: z
     .string()
-    .min(2, "Project name must be at least 2 characters")
-    .max(100, "Project name must be at most 100 characters")
+    .min(3, "Project name must be at least 3 characters")
+    .max(50, "Project name must be at most 50 characters")
     .transform(val => val.trim())
-    .refine(val => val.length >= 2, { message: "Project name cannot be empty or only whitespace" }),
+    .refine(val => val.length >= 3, { message: "Project name cannot be empty" }),
   slug: z
     .string()
     .min(3, "Slug must be at least 3 characters")
-    .max(100, "Slug must be at most 100 characters")
+    .max(50, "Slug must be at most 50 characters")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase, alphanumeric, and can contain hyphens")
     .refine(val => !val.startsWith("-") && !val.endsWith("-"), {
       message: "Slug cannot start or end with a hyphen",
@@ -21,7 +21,7 @@ export const createProjectSchema = z.object({
     .transform(val => val.trim()),
   description: z
     .string()
-    .max(500, "Description must be at most 500 characters")
+    .max(255, "Description must be at most 255 characters")
     .transform(val => val.trim())
     .optional(),
   orgId: z.cuid(),
@@ -30,15 +30,15 @@ export const createProjectSchema = z.object({
 export const updateProjectSchema = z.object({
   name: z
     .string()
-    .min(2, "Project name must be at least 2 characters")
-    .max(100, "Project name must be at most 100 characters")
+    .min(3, "Project name must be at least 3 characters")
+    .max(50, "Project name must be at most 50 characters")
     .transform(val => val.trim())
-    .refine(val => val.length >= 2, { message: "Project name cannot be empty or only whitespace" })
+    .refine(val => val.length >= 3, { message: "Project name cannot be empty" })
     .optional(),
   slug: z
     .string()
     .min(3, "Slug must be at least 3 characters")
-    .max(100, "Slug must be at most 100 characters")
+    .max(50, "Slug must be at most 50 characters")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase, alphanumeric, and can contain hyphens")
     .refine(val => !val.startsWith("-") && !val.endsWith("-"), {
       message: "Slug cannot start or end with a hyphen",
@@ -50,7 +50,7 @@ export const updateProjectSchema = z.object({
     .optional(),
   description: z
     .string()
-    .max(500, "Description must be at most 500 characters")
+    .max(255, "Description must be at most 255 characters")
     .transform(val => val.trim())
     .optional(),
 })

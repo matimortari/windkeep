@@ -3,23 +3,16 @@ import { z } from "zod"
 export const updateUserSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required")
-    .max(100, "Name must be at most 100 characters")
+    .min(3, "Name must be at least 3 characters")
+    .max(50, "Name must be at most 50 characters")
     .transform(val => val.trim())
-    .refine(val => val.length > 0, { message: "Name cannot be empty or only whitespace" })
+    .refine(val => val.length > 0, { message: "Name cannot be empty" })
     .optional(),
   image: z
     .union([z.url(), z.literal(""), z.null()])
     .transform(val => (val === "" ? null : val))
     .optional(),
-  apiToken: z
-    .string()
-    .length(32, "API token must be exactly 32 characters")
-    .regex(/^[a-f0-9]{32}$/, "API token must be a valid hex string")
-    .nullable()
-    .optional(),
   regenerateApiToken: z.boolean().optional(),
-
 })
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
