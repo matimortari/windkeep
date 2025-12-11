@@ -56,10 +56,10 @@ export default defineNuxtConfig({
     },
   },
   shiki: {
-    bundledLangs: ["bash", "html", "javascript", "json", "markdown", "typescript", "vue"],
-    bundledThemes: ["monokai"],
+    bundledLangs: ["bash", "go", "html", "javascript", "json", "markdown", "typescript", "vue"],
+    bundledThemes: ["kanagawa-wave"],
     highlightOptions: {
-      theme: "monokai",
+      theme: "kanagawa-wave",
     },
   },
 })
