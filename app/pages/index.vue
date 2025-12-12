@@ -58,7 +58,7 @@
         v-for="(feature, index) in FEATURES" :key="index"
         v-motion :initial="{ opacity: 0, y: -20 }"
         :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="flex max-w-sm min-w-[350px] flex-col items-center gap-4 p-4 text-center"
+        :delay="200 * index" class="flex max-w-sm min-w-80 flex-col items-center gap-4 p-4 text-center"
       >
         <icon :name="feature.icon" class="text-secondary" size="70" />
         <h3 class="font-display-alt tracking-tighter whitespace-nowrap">
@@ -110,7 +110,7 @@
         </div>
       </header>
 
-      <div class="w-full max-w-xl flex-1 px-2 md:min-w-[300px] md:px-0">
+      <div class="w-full max-w-xl flex-1 px-2 md:min-w-80 md:px-0">
         <div class="my-2 flex flex-row gap-1">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"

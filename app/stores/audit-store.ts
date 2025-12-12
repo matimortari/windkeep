@@ -60,10 +60,6 @@ export const useAuditStore = defineStore("audit", () => {
     currentFilters.value = { ...currentFilters.value, ...newFilters }
   }
 
-  function resetFilters() {
-    currentFilters.value = { page: 1, limit: 20 }
-  }
-
   function nextPage(orgId: string) {
     if (pagination.value?.hasNext) {
       return getAuditLogs(orgId, { ...currentFilters.value, page: currentFilters.value.page! + 1 })
@@ -74,10 +70,6 @@ export const useAuditStore = defineStore("audit", () => {
     if (pagination.value?.hasPrev) {
       return getAuditLogs(orgId, { ...currentFilters.value, page: Math.max(1, currentFilters.value.page! - 1) })
     }
-  }
-
-  function goToPage(orgId: string, page: number) {
-    return getAuditLogs(orgId, { ...currentFilters.value, page })
   }
 
   const getActions = computed(() => [
@@ -102,6 +94,7 @@ export const useAuditStore = defineStore("audit", () => {
 
   function getTableHeaders() {
     return [
+      { label: "", value: "expand", icon: "ph:eye" },
       { label: "Action", value: "action", icon: "ph:lightning" },
       { label: "Description", value: "description", icon: "ph:text-align-left" },
       { label: "User", value: "user", icon: "ph:user" },
@@ -152,10 +145,8 @@ export const useAuditStore = defineStore("audit", () => {
     getAuditLogs,
     deleteAuditLogs,
     updateFilters,
-    resetFilters,
     nextPage,
     prevPage,
-    goToPage,
     getActions,
     getTableHeaders,
     getActionLabel,
