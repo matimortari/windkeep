@@ -114,7 +114,7 @@
         <div class="my-2 flex flex-row gap-1">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
-            class="text-caption flex-1 rounded-t-lg border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
+            class="text-caption flex-1 rounded-t-sm border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
             @click="activeTab = (tab.key as 'install' | 'commands')"
           >
             {{ tab.label }}

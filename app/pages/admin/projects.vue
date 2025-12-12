@@ -13,8 +13,8 @@
           </span>
         </div>
 
-        <button class="btn" @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'">
-          <icon name="ph:arrow-down" size="20" :class="[sort.direction === 'asc' ? 'rotate-180' : 'rotate-0']" class="transition-transform" />
+        <button class="btn" @click="toggleSort('name')">
+          <icon name="ph:arrow-down" size="20" :class="[sortDirection === 'asc' ? 'rotate-180' : 'rotate-0']" class="transition-transform" />
         </button>
 
         <button aria-label="Toggle Layout" class="btn" @click="layout = layout === 'grid' ? 'list' : 'grid'">
@@ -51,7 +51,7 @@
       <button
         v-motion :initial="{ opacity: 0 }"
         :enter="{ opacity: 1 }" :duration="600"
-        class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent!" @click="isDialogOpen = true"
+        class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! hover:border-primary!" @click="isDialogOpen = true"
       >
         <icon name="ph:plus" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-primary" />
         <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
@@ -70,7 +70,6 @@ const { projects } = storeToRefs(projectStore)
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
-const sort = ref<{ key: string, direction: "asc" | "desc" }>({ key: "key", direction: "asc" })
 const layout = ref<"list" | "grid">((import.meta.client && localStorage.getItem("layoutMode") as "list" | "grid") || "grid")
 
 // Projects in the active organization that the user has access to
@@ -93,15 +92,12 @@ const allProjects = computed(() => {
   )
 })
 
-// Projects filtered by search query and sorted by name (asc/desc)
-const filteredProjects = computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)
-  .filter(project => project.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
-  .sort((a, b) => {
-    const nameA = a.name.toLowerCase()
-    const nameB = b.name.toLowerCase()
-    return sort.value.direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
-  }),
+const { sortedData: sortedProjects, toggleSort, sortDirection } = useTableSort<Project>(
+  computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)),
+  { key: "name", direction: "asc" }, // default sort
 )
+
+const filteredProjects = computed(() => sortedProjects.value.filter(project => project.name.toLowerCase().includes(searchQuery.value.toLowerCase())))
 
 async function handleCreateProject(payload: { name: string, slug: string, description: string }) {
   if (!activeOrg.value) {

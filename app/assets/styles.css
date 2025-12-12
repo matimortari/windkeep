@@ -141,7 +141,7 @@ h6 {
 .card {
   background-color: var(--card);
   border: 2px solid var(--muted);
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   padding: 1.25rem;
   transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -149,7 +149,7 @@ h6 {
 .overlay {
   background-color: var(--overlay);
   border: 2px solid var(--muted);
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   padding: 1.5rem;
   z-index: 40;
   box-shadow: 4px 4px 8px 2px rgba(0, 0, 0, 0.4);
@@ -158,7 +158,7 @@ h6 {
 .dropdown-menu {
   position: absolute;
   background-color: var(--overlay);
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   padding: 0.5rem;
   margin: 0.5rem;
   z-index: 30;
@@ -170,8 +170,8 @@ h6 {
 .code-block {
   background-color: #1f1f28;
   padding: 1.25rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
   text-align: start;
   overflow-x: auto;
   scrollbar-width: thin;
@@ -204,15 +204,33 @@ select:hover {
   border-color: var(--muted);
 }
 
-.cell {
-  padding-inline: 0.5rem;
-  padding-block: 0.25rem;
+/*
+  Table elements
+*/
+table {
+  background-color: var(--card);
+  border: 2px solid var(--muted);
+  min-width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+@media (min-width: 768px) {
+  table {
+    overflow: hidden;
+  }
 }
 
-.header-cell {
+td,
+th {
+  border-block: 1px solid var(--muted);
+  padding: 0.5rem;
+}
+
+th {
   background-color: var(--muted);
   color: var(--muted-foreground);
-  padding: 0.5rem;
   text-align: start;
   font-weight: 700;
   border-inline-style: solid;
