@@ -1,6 +1,6 @@
 <template>
   <nuxt-link :to="`/admin/${project.slug}`">
-    <div class="card group relative flex h-[200px] w-full flex-col justify-between overflow-hidden">
+    <div class="card group relative flex h-50 w-full flex-col justify-between overflow-hidden">
       <div class="flex flex-col gap-2">
         <h3 class="truncate">
           {{ project.name }}
