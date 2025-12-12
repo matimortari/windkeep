@@ -21,11 +21,11 @@
       <span class="font-semibold">Projects</span>
 
       <div class="navigation-group">
-        <button class="transition-transform hover:scale-125 hover:text-primary" :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
-          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" />
+        <button :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
+          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" class="hover:text-primary" />
         </button>
-        <button class="transition-transform hover:scale-125 hover:text-primary" aria-label="Create New Project" @click="isDialogOpen = true">
-          <icon name="ph:plus" size="25" />
+        <button aria-label="Create New Project" @click="isDialogOpen = true">
+          <icon name="ph:plus" size="25" class="hover:text-primary" />
         </button>
       </div>
     </div>

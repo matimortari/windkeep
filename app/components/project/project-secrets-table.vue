@@ -15,7 +15,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="secret in sortedSecrets" :key="secret.key">
+        <tr v-for="secret in sortedSecrets" :key="secret.key" class="hover:bg-muted">
           <td v-for="col in columns" :key="col.key" :class="col.class">
             <div v-if="col.key === 'key'" class="flex items-center gap-2 font-mono text-sm font-semibold text-muted-foreground">
               <span class="truncate">{{ secret.key }}</span>
@@ -36,19 +36,19 @@
               </span>
 
               <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copyToClipboard(getSecretValue(secret.key, col.env))">
-                <icon name="carbon:copy" size="20" class="transition-transform hover:scale-110 hover:text-primary" />
+                <icon name="carbon:copy" size="20" class="hover:text-primary" />
               </button>
             </div>
 
             <div v-else-if="col.key === 'actions'" class="navigation-group text-muted-foreground">
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
-                <icon :name="visibleKeys[secret.key] ? 'carbon:view' : 'carbon:view-off'" size="20" class="transition-transform hover:scale-110 hover:text-primary" />
+                <icon :name="visibleKeys[secret.key] ? 'carbon:view' : 'carbon:view-off'" size="20" class="hover:text-primary" />
               </button>
               <button aria-label="Edit Secret" @click="handleUpdateSecret(secret.key)">
-                <icon name="carbon:edit" size="20" class="transition-transform hover:scale-110 hover:text-primary" />
+                <icon name="carbon:edit" size="20" class="hover:text-primary" />
               </button>
               <button aria-label="Delete Secret" @click="handleDeleteSecret(secret.key)">
-                <icon name="carbon:delete" size="20" class="transition-transform hover:scale-110 hover:text-danger" />
+                <icon name="carbon:delete" size="20" class="hover:text-danger" />
               </button>
             </div>
           </td>
@@ -73,7 +73,7 @@ const emit = defineEmits<{
 const projectStore = useProjectStore()
 const visibleKeys = ref<Record<string, boolean>>({})
 const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
-const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"), { key: "key", direction: "asc" })
+const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
 
 const columns = computed<Record<string, any>[]>(() => {
   const base = [{ key: "key", label: "Key", class: "w-full", type: "base", sortable: true }]

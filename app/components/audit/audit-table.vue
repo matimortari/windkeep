@@ -29,9 +29,9 @@
         </tr>
 
         <template v-for="log in sortedLogs" v-else :key="log.id">
-          <tr class="cursor-pointer border text-sm hover:bg-muted" @click="toggleRow(log.id)">
+          <tr class="cursor-pointer hover:bg-muted" @click="toggleRow(log.id)">
             <td>
-              <icon name="ph:caret-right" size="15" class="transition-transform" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
+              <icon name="ph:caret-right" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
 
             <td :title="actionLabel(log.action)">
@@ -70,7 +70,7 @@ const auditStore = useAuditStore()
 const { auditLogs, auditActions, loading } = storeToRefs(auditStore)
 const expandedRows = ref<Set<string>>(new Set())
 
-const { sortedData: sortedLogs, toggleSort, getSortIconName } = useTableSort(auditLogs, { key: "action", direction: "asc" })
+const { sortedData: sortedLogs, toggleSort, getSortIconName } = useTableSort(auditLogs)
 
 const columns = [
   { key: "expand", label: "", icon: "ph:eye", class: "w-10", sortable: false },
@@ -99,13 +99,13 @@ function actionLabel(action: string) {
 }
 
 function formatAuditDate(date: string | Date) {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("en-GB", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true,
+    hour12: false,
   }).format(new Date(date))
 }
 

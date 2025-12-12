@@ -15,24 +15,24 @@
       </thead>
 
       <tbody>
-        <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer border text-sm hover:bg-muted" @click="$router.push(`/admin/${project.slug}`)">
-          <td>
+        <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted" @click="$router.push(`/admin/${project.slug}`)">
+          <td class="text-caption">
             {{ project.name }}
           </td>
 
-          <td class="max-w-60 truncate text-muted-foreground">
+          <td class="text-caption line-clamp-3" :title="project.description || 'No description provided.'">
             {{ project.description || 'No description provided.' }}
           </td>
 
           <td>
-            <div class="flex flex-row items-center gap-1 text-muted-foreground">
+            <div class="text-caption navigation-group">
               <icon name="ph:key" size="20" />
               <span>{{ project.secrets?.length }}</span>
             </div>
           </td>
 
           <td>
-            <div class="flex flex-row items-center gap-1 text-muted-foreground">
+            <div class="text-caption navigation-group">
               <icon name="ph:users" size="20" />
               <span>{{ project.memberships?.length }}</span>
             </div>
@@ -41,10 +41,10 @@
           <td>
             <div class="navigation-group text-muted-foreground">
               <nuxt-link :to="`/admin/${project.slug}/settings`" title="Settings">
-                <icon name="ph:gear" size="20" class="transition-transform hover:scale-110 hover:text-primary" />
+                <icon name="ph:gear" size="20" class="hover:text-primary" />
               </nuxt-link>
               <nuxt-link :to="`/admin/${project.slug}`" title="Open">
-                <icon name="ph:arrow-right" size="20" class="transition-transform hover:scale-110 hover:text-primary" />
+                <icon name="ph:arrow-right" size="20" class="hover:text-primary" />
               </nuxt-link>
             </div>
           </td>
@@ -59,10 +59,10 @@ const props = defineProps<{
   projects: Project[]
 }>()
 
-const { sortedData: sortedProjects, toggleSort, getSortIconName } = useTableSort<Project>(toRef(props, "projects"), { key: "name", direction: "asc" })
+const { sortedData: sortedProjects, toggleSort, getSortIconName } = useTableSort<Project>(toRef(props, "projects"))
 
 const columns = [
-  { key: "name", label: "Name", sortable: true },
+  { key: "name", label: "Name", class: "w-32", sortable: true },
   { key: "description", label: "Description", sortable: false },
   { key: "secrets", label: "Secrets", class: "w-10", sortable: true },
   { key: "members", label: "Members", class: "w-10", sortable: true },

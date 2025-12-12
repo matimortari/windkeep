@@ -2,7 +2,7 @@
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <header class="navigation-group border-b py-4">
       <h2>
-        My Projects
+        Projects
       </h2>
 
       <nav class="navigation-group w-full flex-1 justify-end">
@@ -79,9 +79,7 @@ const activeOrgProjects = computed(() => {
   }
 
   return projects.value.filter(
-    project =>
-      project.orgId === activeOrg.value?.id
-      && project.memberships?.some(m => m.userId === userStore.user?.id),
+    project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id),
   )
 })
 
@@ -94,7 +92,6 @@ const allProjects = computed(() => {
 
 const { sortedData: sortedProjects, toggleSort, sortDirection } = useTableSort<Project>(
   computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)),
-  { key: "name", direction: "asc" }, // default sort
 )
 
 const filteredProjects = computed(() => sortedProjects.value.filter(project => project.name.toLowerCase().includes(searchQuery.value.toLowerCase())))

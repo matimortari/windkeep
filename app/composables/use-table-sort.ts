@@ -1,6 +1,6 @@
-export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | ComputedRef<T[]>, defaultSort?: { key: keyof T | string, direction: "asc" | "desc" | null }) {
-  const sortKey = ref<keyof T | string | null>(defaultSort?.key ?? null)
-  const sortDirection = ref<"asc" | "desc" | null>(defaultSort?.direction ?? null)
+export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | ComputedRef<T[]>) {
+  const sortKey = ref<keyof T | string | null>(null)
+  const sortDirection = ref<"asc" | "desc" | null>(null)
 
   function getNestedValue(obj: T, path: string): any {
     return path.split(".").reduce((cur, k) => cur?.[k], obj as any)
