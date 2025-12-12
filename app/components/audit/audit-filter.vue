@@ -74,10 +74,7 @@ const isUserDropdownOpen = ref(false)
 const isActionDropdownOpen = ref(false)
 const userDropdownRef = ref<HTMLElement | null>(null)
 const actionDropdownRef = ref<HTMLElement | null>(null)
-
-const availableUsers = computed(() => {
-  return filters.value?.users || []
-})
+const availableUsers = computed(() => filters.value?.users || [])
 
 useClickOutside(userDropdownRef, () => {
   isUserDropdownOpen.value = false
@@ -92,22 +89,27 @@ function getUserDisplayName(userId?: string) {
     return "All Users"
   }
 
-  const user = availableUsers.value.find((u: { id: string, name: string | null, email: string }) => u.id === userId)
+  const user = availableUsers.value.find(u => u.id === userId)
   return user?.name || user?.email
 }
 
 function updateDateFilter() {
-  const newFilters = { ...currentFilters.value, startDate: dateFilter.value }
-  auditStore.updateFilters(newFilters)
+  const updated = { ...currentFilters.value, startDate: dateFilter.value }
+  auditStore.updateFilters(updated)
+  auditStore.getAuditLogs(activeOrg.value!.id, updated)
 }
 
 function setUserFilter(userId: string) {
-  auditStore.updateFilters({ ...currentFilters.value, userId })
+  const updated = { ...currentFilters.value, userId }
+  auditStore.updateFilters(updated)
+  auditStore.getAuditLogs(activeOrg.value!.id, updated)
   isUserDropdownOpen.value = false
 }
 
 function setActionFilter(action: string) {
-  auditStore.updateFilters({ ...currentFilters.value, action })
+  const updated = { ...currentFilters.value, action }
+  auditStore.updateFilters(updated)
+  auditStore.getAuditLogs(activeOrg.value!.id, updated)
   isActionDropdownOpen.value = false
 }
 
@@ -125,8 +127,7 @@ function nextPage() {
 
 const logsSummary = computed(() => {
   const count = auditLogs.value.length
-  const label = count === 1 ? "log" : "logs"
-  return count ? `${count} ${label}` : "no matching logs"
+  return count ? `${count} ${count === 1 ? "log" : "logs"}` : "no matching logs"
 })
 
 async function handleDeleteLogs() {

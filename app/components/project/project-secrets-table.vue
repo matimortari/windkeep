@@ -50,7 +50,7 @@
             </nav>
           </td>
 
-          <td v-for="env in environments" :key="env" class="w-[150px] max-w-[150px] overflow-hidden border p-2 font-mono text-sm text-muted-foreground">
+          <td v-for="env in environments" :key="env" class="w-36 max-w-36 overflow-hidden border p-2 font-mono text-sm text-muted-foreground">
             <div class="flex flex-row items-center justify-between gap-4">
               <span
                 class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors hover:text-secondary!' : '']"
@@ -83,24 +83,10 @@ const emit = defineEmits<{
 }>()
 
 const projectStore = useProjectStore()
-
+const sort = ref<{ key: string, direction: "asc" | "desc" }>({ key: "key", direction: "asc" })
 const visibleKeys = ref<Record<string, boolean>>({})
 const environments = ref(["DEVELOPMENT", "STAGING", "PRODUCTION"])
-const sort = ref<{ key: string, direction: "asc" | "desc" }>({
-  key: "key",
-  direction: "asc",
-})
-
-const sortedSecrets = computed(() => {
-  return [...props.secrets].sort((a, b) => {
-    if (sort.value.direction === "asc") {
-      return a.key.localeCompare(b.key)
-    }
-    else {
-      return b.key.localeCompare(a.key)
-    }
-  })
-})
+const sortedSecrets = computed(() => [...props.secrets].sort((a, b) => sort.value.direction === "asc" ? a.key.localeCompare(b.key) : b.key.localeCompare(a.key)))
 
 function getSecretValue(key: string, env: string) {
   const secretsWithKey = props.secrets.filter(s => s.key === key)
