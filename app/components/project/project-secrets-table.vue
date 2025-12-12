@@ -1,66 +1,54 @@
 <template>
   <div class="w-full overflow-x-auto">
-    <table class="min-w-full table-auto rounded-t-lg border bg-card md:w-full md:overflow-hidden">
+    <table>
       <thead>
         <tr>
-          <th class="header-cell flex w-full flex-row items-center gap-2">
-            <span>Key</span>
-            <button
-              type="button" title="Sort by Key"
-              aria-label="Sort by Key" class="flex items-center hover:text-primary"
-              @click="sort.direction = sort.direction === 'asc' ? 'desc' : 'asc'"
-            >
-              <icon name="ph:arrow-down" size="20" class="transition-transform" :class="sort.direction === 'asc' ? 'rotate-180' : 'rotate-0'" />
-            </button>
-          </th>
-
-          <th v-for="env in environments" :key="env" class="header-cell md:w-1/6">
-            <span>{{ capitalizeFirst(env) }}</span>
+          <th v-for="col in columns" :key="col.key" :class="col.class">
+            <div class="navigation-group">
+              <span>{{ col.label }}</span>
+              <button v-if="col.sortable" class="flex items-center hover:text-primary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+                <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
+              </button>
+            </div>
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <tr
-          v-for="(secret, index) in sortedSecrets" :key="secret.key"
-          v-motion :initial="{ opacity: 0 }"
-          :enter="{ opacity: 1 }" :duration="400"
-          :delay="100 * index" class="border"
-        >
-          <td class="flex flex-row items-center justify-between gap-4 p-2 font-mono text-sm font-semibold text-muted-foreground">
-            <div class="flex flex-row items-center gap-2">
-              <span class="w-full truncate">{{ secret.key }}</span>
+        <tr v-for="secret in sortedSecrets" :key="secret.key" class="hover:bg-muted">
+          <td v-for="col in columns" :key="col.key" :class="col.class">
+            <div v-if="col.key === 'key'" class="flex items-center gap-2 font-mono text-sm font-semibold text-muted-foreground">
+              <span class="truncate">{{ secret.key }}</span>
               <icon
                 v-if="secret.description" name="carbon:information-square"
-                :title="secret.description ?? undefined" size="15"
+                :title="secret.description" size="15"
                 class="hidden shrink-0 cursor-pointer md:inline"
               />
             </div>
 
-            <nav class="flex items-center justify-end gap-2 md:justify-start">
-              <button aria-label="Toggle Secret Value Visibility" class="transition-colors hover:text-primary" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
-                <icon :name="visibleKeys[secret.key] ? 'carbon:view' : 'carbon:view-off'" size="20" />
-              </button>
-              <button aria-label="Edit Secret" class="transition-colors hover:text-primary" @click="handleUpdateSecret(secret.key)">
-                <icon name="carbon:edit" size="20" />
-              </button>
-              <button aria-label="Delete Secret" class="transition-colors hover:text-danger" @click="handleDeleteSecret(secret.key)">
-                <icon name="carbon:delete" size="20" />
-              </button>
-            </nav>
-          </td>
-
-          <td v-for="env in environments" :key="env" class="w-36 max-w-36 overflow-hidden border p-2 font-mono text-sm text-muted-foreground">
-            <div class="flex flex-row items-center justify-between gap-4">
+            <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
               <span
-                class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors hover:text-secondary!' : '']"
-                @click="copyToClipboard(getSecretValue(secret.key, env))"
+                class="max-w-[80%] truncate select-none"
+                :class="[getSecretValue(secret.key, col.env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors hover:text-secondary!' : '']"
+                @click="copyToClipboard(getSecretValue(secret.key, col.env))"
               >
-                {{ renderValue(secret.key, env) }}
+                {{ renderValue(secret.key, col.env) }}
               </span>
 
-              <button v-if="getSecretValue(secret.key, env)" aria-label="Copy Secret Value" class="transition-colors hover:text-primary" @click="copyToClipboard(getSecretValue(secret.key, env))">
-                <icon name="carbon:copy" size="20" />
+              <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copyToClipboard(getSecretValue(secret.key, col.env))">
+                <icon name="carbon:copy" size="20" class="hover:text-primary" />
+              </button>
+            </div>
+
+            <div v-else-if="col.key === 'actions'" class="navigation-group text-muted-foreground">
+              <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
+                <icon :name="visibleKeys[secret.key] ? 'carbon:view' : 'carbon:view-off'" size="20" class="hover:text-primary" />
+              </button>
+              <button aria-label="Edit Secret" @click="handleUpdateSecret(secret.key)">
+                <icon name="carbon:edit" size="20" class="hover:text-primary" />
+              </button>
+              <button aria-label="Delete Secret" @click="handleDeleteSecret(secret.key)">
+                <icon name="carbon:delete" size="20" class="hover:text-danger" />
               </button>
             </div>
           </td>
@@ -83,30 +71,32 @@ const emit = defineEmits<{
 }>()
 
 const projectStore = useProjectStore()
-const sort = ref<{ key: string, direction: "asc" | "desc" }>({ key: "key", direction: "asc" })
 const visibleKeys = ref<Record<string, boolean>>({})
-const environments = ref(["DEVELOPMENT", "STAGING", "PRODUCTION"])
-const sortedSecrets = computed(() => [...props.secrets].sort((a, b) => sort.value.direction === "asc" ? a.key.localeCompare(b.key) : b.key.localeCompare(a.key)))
+const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
+const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
+
+const columns = computed<Record<string, any>[]>(() => {
+  const base = [{ key: "key", label: "Key", class: "w-full", type: "base", sortable: true }]
+  const envCols = environments.map(env => ({
+    key: env.toLowerCase(),
+    label: env.charAt(0) + env.slice(1).toLowerCase(),
+    env,
+    type: "env",
+    class: "max-w-40 md:max-w-52",
+    sortable: false,
+  }))
+  const actions = [{ key: "actions", label: "Actions", class: "w-20 text-right", type: "actions", sortable: false }]
+  return [...base, ...envCols, ...actions]
+})
 
 function getSecretValue(key: string, env: string) {
-  const secretsWithKey = props.secrets.filter(s => s.key === key)
-  for (const secret of secretsWithKey) {
-    const val = secret.values?.find(v => v.environment === env)
-    if (val?.value) {
-      return val.value
-    }
-  }
-
-  return ""
+  const s = props.secrets.find(s => s.key === key)
+  return s?.values?.find(v => v.environment === env)?.value ?? ""
 }
 
-function renderValue(key: string, env: string): string {
-  const secretValue = getSecretValue(key, env)
-  if (!secretValue) {
-    return "—"
-  }
-
-  return visibleKeys.value[key] ? secretValue : "•".repeat(Math.min(secretValue.length))
+function renderValue(key: string, env: string) {
+  const val = getSecretValue(key, env)
+  return val ? (visibleKeys.value[key] ? val : "•".repeat(val.length)) : "—"
 }
 
 function handleUpdateSecret(key: string) {
@@ -117,7 +107,7 @@ function handleUpdateSecret(key: string) {
 }
 
 async function handleDeleteSecret(key: string) {
-  if (!confirm(`Are you sure you want to delete the secret "${key}"?`)) {
+  if (!confirm(`Are you sure you want to delete "${key}"?`)) {
     return
   }
 

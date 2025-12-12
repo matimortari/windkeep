@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="fixed inset-0 z-40 bg-black/50 transition-opacity ease-in-out md:hidden" @click="$emit('update:isOpen', false)" />
 
   <aside
-    class="fixed top-0 left-0 z-50 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-xl md:border-b-2 2xl:w-72"
+    class="fixed top-0 left-0 z-50 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-sm md:border-b-2 2xl:w-72"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <span class="font-semibold">Overview</span>
@@ -21,11 +21,11 @@
       <span class="font-semibold">Projects</span>
 
       <div class="navigation-group">
-        <button class="transition-transform hover:scale-125 hover:text-primary" :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
-          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" />
+        <button :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
+          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" class="hover:text-primary" />
         </button>
-        <button class="transition-transform hover:scale-125 hover:text-primary" aria-label="Create New Project" @click="isDialogOpen = true">
-          <icon name="ph:plus" size="25" />
+        <button aria-label="Create New Project" @click="isDialogOpen = true">
+          <icon name="ph:plus" size="25" class="hover:text-primary" />
         </button>
       </div>
     </div>

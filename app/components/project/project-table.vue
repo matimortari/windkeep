@@ -1,58 +1,50 @@
 <template>
   <div class="w-full overflow-x-auto">
-    <table class="min-w-full table-auto rounded-t-lg border bg-card md:w-full md:overflow-hidden">
+    <table>
       <thead>
         <tr>
-          <th class="header-cell">
-            Name
-          </th>
-          <th class="header-cell">
-            Description
-          </th>
-          <th class="header-cell">
-            Secrets
-          </th>
-          <th class="header-cell">
-            Members
-          </th>
-          <th class="header-cell">
-            Actions
+          <th v-for="col in columns" :key="col.key" :class="col.class">
+            <div class="navigation-group">
+              <span>{{ col.label }}</span>
+              <button v-if="col.sortable" class="flex items-center hover:text-primary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+                <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
+              </button>
+            </div>
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="project in projects" :key="project.id" class="cursor-pointer border text-sm hover:bg-muted" @click="$router.push(`/admin/${project.slug}`)">
-          <td class="border p-2">
+        <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted" @click="$router.push(`/admin/${project.slug}`)">
+          <td class="text-caption">
             {{ project.name }}
           </td>
 
-          <td class="max-w-60 truncate border p-2 text-muted-foreground">
+          <td class="text-caption line-clamp-3" :title="project.description || 'No description provided.'">
             {{ project.description || 'No description provided.' }}
           </td>
 
-          <td class="border p-2">
-            <div class="flex flex-row items-center gap-1 text-muted-foreground">
+          <td>
+            <div class="text-caption navigation-group">
               <icon name="ph:key" size="20" />
               <span>{{ project.secrets?.length }}</span>
             </div>
           </td>
 
-          <td class="border p-2">
-            <div class="flex flex-row items-center gap-1 text-muted-foreground">
+          <td>
+            <div class="text-caption navigation-group">
               <icon name="ph:users" size="20" />
               <span>{{ project.memberships?.length }}</span>
             </div>
           </td>
 
-          <td class="border p-2">
-            <div class="flex justify-end gap-2">
-              <nuxt-link :to="`/admin/${project.slug}/settings`" class="rounded-full p-2 text-muted-foreground hover:bg-muted" title="Settings" @click.stop>
-                <icon name="ph:gear" size="20" />
+          <td>
+            <div class="navigation-group text-muted-foreground">
+              <nuxt-link :to="`/admin/${project.slug}/settings`" title="Settings">
+                <icon name="ph:gear" size="20" class="hover:text-primary" />
               </nuxt-link>
-
-              <nuxt-link :to="`/admin/${project.slug}`" class="rounded-full p-2 text-muted-foreground hover:bg-muted" title="Open" @click.stop>
-                <icon name="ph:arrow-right" size="20" />
+              <nuxt-link :to="`/admin/${project.slug}`" title="Open">
+                <icon name="ph:arrow-right" size="20" class="hover:text-primary" />
               </nuxt-link>
             </div>
           </td>
@@ -63,7 +55,17 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   projects: Project[]
 }>()
+
+const { sortedData: sortedProjects, toggleSort, getSortIconName } = useTableSort<Project>(toRef(props, "projects"))
+
+const columns = [
+  { key: "name", label: "Name", class: "w-32", sortable: true },
+  { key: "description", label: "Description", sortable: false },
+  { key: "secrets", label: "Secrets", class: "w-10", sortable: true },
+  { key: "members", label: "Members", class: "w-10", sortable: true },
+  { key: "actions", label: "Actions", class: "w-24", sortable: false },
+]
 </script>
