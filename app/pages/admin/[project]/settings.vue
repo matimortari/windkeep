@@ -106,7 +106,7 @@
       <div class="flex flex-col gap-1 md:navigation-group">
         <div class="flex flex-row items-center gap-2">
           <input v-model="newMemberId" type="text" placeholder="User ID">
-          <select v-model="newMemberRole" class="md:min-w-[120px]">
+          <select v-model="newMemberRole" class="md:min-w-30">
             <option v-for="role in [...ROLES].reverse().filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
               {{ capitalizeFirst(role.label) }}
             </option>
@@ -284,9 +284,8 @@ async function handleUpdateMemberRole(memberId: string, newRole: Role) {
     return
   }
 
-  if (await projectStore.updateProjectMember(project.value.id, memberId, { role: newRole })) {
-    await projectStore.getProjects()
-  }
+  await projectStore.updateProjectMember(project.value.id, memberId, { role: newRole })
+  await projectStore.getProjects()
 }
 
 async function handleRemoveMember(memberId: string) {
@@ -308,7 +307,6 @@ async function handleSubmit(index: number) {
 
   const oldSlug = project.value.slug
   const newSlug = localProject.value?.slug ?? ""
-
   const success = await projectStore.updateProject(project.value.id, {
     name: localProject.value?.name ?? "",
     slug: localProject.value?.slug ?? "",
@@ -319,7 +317,7 @@ async function handleSubmit(index: number) {
     await projectStore.getProjects()
     saveIcon[index]?.triggerSuccess()
     if (oldSlug !== newSlug) {
-      await navigateTo(`/admin/${newSlug}/settings`) // Redirect to new slug URL
+      await navigateTo(`/admin/${newSlug}/settings`)
     }
   }
 }
@@ -333,6 +331,7 @@ async function handleDeleteProject() {
   }
 
   await projectStore.deleteProject(project.value.id)
+  await navigateTo("/admin/projects")
 }
 
 async function handleLeaveProject() {

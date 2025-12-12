@@ -27,7 +27,7 @@
             {{ project.name }}
           </td>
 
-          <td class="max-w-[250px] truncate border p-2 text-muted-foreground">
+          <td class="max-w-60 truncate border p-2 text-muted-foreground">
             {{ project.description || 'No description provided.' }}
           </td>
 
