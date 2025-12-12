@@ -9,7 +9,7 @@
         <h1 class="font-display md:text-6xl! 2xl:text-7xl!">
           Your Secrets, Secured.
         </h1>
-        <p class="max-w-xl leading-6 font-semibold text-muted-foreground md:text-lg 2xl:text-xl">
+        <p class="max-w-xl leading-5 font-semibold text-muted-foreground md:text-lg 2xl:text-xl">
           No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
         </p>
       </div>
@@ -90,7 +90,7 @@
           for more details.
         </p>
 
-        <div class="flex w-full flex-col items-center gap-4 md:items-start">
+        <div class="flex w-full flex-col gap-4 md:items-start">
           <ul class="text-caption flex flex-col items-start gap-2">
             <li class="navigation-group">
               <Icon name="ph:lock-key" size="20" class="text-secondary" /> Lorem Lorem Lorem.
@@ -114,7 +114,7 @@
         <div class="my-2 flex flex-row gap-1">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
-            class="text-caption flex-1 rounded-t-lg border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
+            class="text-caption flex-1 rounded-t-sm border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
             @click="activeTab = (tab.key as 'install' | 'commands')"
           >
             {{ tab.label }}
@@ -149,8 +149,8 @@
 
     <div class="flex w-full max-w-2xl flex-col divide-y">
       <div v-for="(item, index) in FAQS" :key="index" class="space-y-2 py-4">
-        <button class="group flex w-full items-center justify-between text-start font-semibold hover:text-primary" @click="toggleAccordion(index)">
-          <span>{{ item.question }}</span>
+        <button class="group flex w-full items-center justify-between text-center font-semibold hover:text-primary md:text-start" @click="toggleAccordion(index)">
+          <p>{{ item.question }}</p>
           <icon name="ph:plus" size="20" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
         </button>
 

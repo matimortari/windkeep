@@ -23,7 +23,7 @@
 
       <div ref="actionDropdownRef" class="relative">
         <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
-          <span>{{ getActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
+          <span>{{ auditActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
           <icon name="ph:caret-down" size="15" />
         </button>
 
@@ -32,7 +32,7 @@
             <li class="rounded p-2 hover:bg-muted" @click="setActionFilter('')">
               All Actions
             </li>
-            <li v-for="action in getActions" :key="action.value" class="rounded p-2 hover:bg-muted" @click="setActionFilter(action.value)">
+            <li v-for="action in auditActions" :key="action.value" class="rounded p-2 hover:bg-muted" @click="setActionFilter(action.value)">
               {{ action.label }}
             </li>
           </ul>
@@ -41,7 +41,7 @@
     </nav>
 
     <nav v-if="pagination && pagination.totalPages > 0" class="navigation-group" aria-label="Pagination">
-      <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="prevPage()">
+      <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="auditStore.prevPage(activeOrg!.id)">
         <icon name="ph:arrow-left" size="20" />
       </button>
 
@@ -50,7 +50,7 @@
         <span v-if="auditLogs.length" class="text-xs italic">{{ logsSummary }}</span>
       </div>
 
-      <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="nextPage()">
+      <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="auditStore.nextPage(activeOrg!.id)">
         <icon name="ph:arrow-right" size="20" />
       </button>
 
@@ -67,7 +67,7 @@ defineProps<{
 }>()
 
 const auditStore = useAuditStore()
-const { auditLogs, pagination, filters, currentFilters, getActions } = storeToRefs(auditStore)
+const { auditLogs, auditActions, pagination, filters, currentFilters } = storeToRefs(auditStore)
 const { activeOrg } = storeToRefs(useOrgStore())
 const dateFilter = ref("")
 const isUserDropdownOpen = ref(false)
@@ -89,7 +89,7 @@ function getUserDisplayName(userId?: string) {
     return "All Users"
   }
 
-  const user = availableUsers.value.find(u => u.id === userId)
+  const user = availableUsers.value.find((u: { id: string, name: string | null, email: string | null }) => u.id === userId)
   return user?.name || user?.email
 }
 
@@ -111,18 +111,6 @@ function setActionFilter(action: string) {
   auditStore.updateFilters(updated)
   auditStore.getAuditLogs(activeOrg.value!.id, updated)
   isActionDropdownOpen.value = false
-}
-
-function prevPage() {
-  if (activeOrg.value) {
-    auditStore.prevPage(activeOrg.value.id)
-  }
-}
-
-function nextPage() {
-  if (activeOrg.value) {
-    auditStore.nextPage(activeOrg.value.id)
-  }
 }
 
 const logsSummary = computed(() => {
