@@ -43,9 +43,9 @@
           <button
             v-if="field.onRegenerate" class="btn"
             title="Regenerate Token" aria-label="Regenerate API Token"
-            @click="field.onRegenerate()"
+            @click="() => { regenerateIcon[index]?.triggerSuccess(); field.onRegenerate() }"
           >
-            <icon name="ph:arrows-clockwise" size="20" />
+            <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise'" size="20" />
           </button>
         </div>
 
@@ -173,6 +173,7 @@ const userFields = [
 
 const copyIcon = userFields.map(() => createActionHandler("ph:copy"))
 const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk"))
+const regenerateIcon = userFields.map(() => createActionHandler("ph:arrows-clockwise"))
 
 async function handleUpdateImage(event: Event) {
   const input = event.target as HTMLInputElement
