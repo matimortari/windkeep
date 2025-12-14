@@ -1,12 +1,11 @@
 import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 
-export function useEnvFile(projectId: string) {
+export function useEnvFile(projectRef: Ref<Project | undefined>) {
   const projectStore = useProjectStore()
   const projectSecrets = computed(() => projectStore.secrets)
 
   const mergeValues = (existing: SecretValue[], incoming: { environment: Environment, value: string }[]): { environment: Environment, value: string }[] => {
     const map = new Map<Environment, string>()
-
     for (const v of existing) {
       map.set(v.environment, v.value)
     }
@@ -25,23 +24,29 @@ export function useEnvFile(projectId: string) {
       throw new Error("Secret key is required")
     }
 
-    const existing = projectSecrets.value.find(s => s.key === secret.key && s.projectId === projectId)
+    const currentProjectId = projectRef.value?.id
+    if (!currentProjectId) {
+      throw new Error("Project ID not available")
+    }
+
+    const existing = projectSecrets.value.find(s => s.key === secret.key && s.projectId === currentProjectId)
+
     if (existing) {
       const mergedValues = mergeValues(existing.values ?? [], secret.values ?? [])
       const payload: UpdateSecretInput = { values: mergedValues }
       if (secret.description !== undefined) {
         payload.description = secret.description
       }
-      return await projectStore.updateProjectSecret(projectId, existing.id!, payload)
+      return await projectStore.updateProjectSecret(currentProjectId, existing.id!, payload)
     }
     else {
       const payload: CreateSecretInput = {
         key: secret.key,
         description: secret.description ?? "",
-        projectId,
+        projectId: currentProjectId,
         values: secret.values ?? [],
       }
-      return await projectStore.createProjectSecret(projectId, payload)
+      return await projectStore.createProjectSecret(currentProjectId, payload)
     }
   }
 
@@ -65,35 +70,43 @@ export function useEnvFile(projectId: string) {
       }
     }
 
-    await projectStore.getProjectSecrets(projectId)
+    const currentProjectId = projectRef.value?.id
+    if (currentProjectId) {
+      await projectStore.getProjectSecrets(currentProjectId)
+    }
+
     return { success: successCount, failed: failedCount, errors }
   }
 
-  const exportToEnv = (env: string | null | undefined): { success: boolean, error?: string } => {
-    if (!env) {
-      return { success: false, error: "Environment not specified" }
+  const exportToEnv = (env: string | null | undefined) => {
+    const currentProjectId = projectRef.value?.id
+    if (!env || !currentProjectId) {
+      return { success: false, error: "Environment or project not specified" }
     }
 
     const filteredSecrets = projectSecrets.value
-      .filter(s => s.projectId === projectId)
+      .filter(s => s.projectId === currentProjectId)
       .map((s) => {
-        const value = s.values?.find((v: SecretValue) => v.environment === env)?.value
+        const value = s.values?.find((v: SecretValue) => v.environment.toLowerCase() === env.toLowerCase())?.value
         return value ? `${s.key}="${value}"` : null
       })
       .filter(Boolean)
       .join("\n")
-
     if (!filteredSecrets) {
       return { success: false, error: "No secrets found for this environment" }
     }
 
     try {
       const blob = new Blob([filteredSecrets], { type: "text/plain" })
-      const projectName = projectStore.projects.find(p => p.id === projectId)?.name?.toLowerCase().replaceAll(/\s+/g, "-").replaceAll(/[^\w.-]/g, "")
-      const fileName = `.env.${projectName}.${env.toLowerCase()}`
-      const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: fileName })
+      const projectName = projectRef.value?.name?.toLowerCase().replaceAll(/\s+/g, "-").replaceAll(/[^\w.-]/g, "")
+      const a = document.createElement("a")
+      a.href = URL.createObjectURL(blob)
+      a.download = `.env.${projectName}.${env.toLowerCase()}`
+      document.body.appendChild(a)
       a.click()
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000)
+
       return { success: true }
     }
     catch (error: any) {

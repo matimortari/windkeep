@@ -71,7 +71,7 @@ const slug = route.params.project
 const projectStore = useProjectStore()
 const { secrets } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
-const { importFromEnv, exportToEnv } = useEnvFile(project?.value?.id ?? "")
+const { importFromEnv, exportToEnv } = useEnvFile(project)
 const selectedSecret = ref<Secret | null>(null)
 const dropdownRef = ref<HTMLElement | null>(null)
 const dialogType = ref<"secret" | "env" | null>(null)
