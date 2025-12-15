@@ -2,82 +2,52 @@
   <div
     v-motion :initial="{ opacity: 0 }"
     :visible="{ opacity: 1 }" :duration="800"
-    class="relative flex w-full flex-col items-center justify-center py-24 text-center md:pb-0"
+    class="relative flex min-h-screen w-full flex-col items-center justify-center py-24 text-center md:py-0"
   >
-    <header id="hero" class="z-20 flex min-h-[70vh] w-full max-w-2xl flex-col items-center justify-center gap-8 px-4 py-20 2xl:gap-12">
-      <div class="flex flex-col items-center gap-4 text-center 2xl:gap-8">
-        <h1 class="font-display md:text-6xl! 2xl:text-7xl!">
-          Your Secrets, Secured.
-        </h1>
-        <p class="max-w-xl leading-5 font-semibold text-muted-foreground md:text-lg 2xl:text-xl">
-          No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
-        </p>
-      </div>
+    <header id="hero" class="z-20 flex w-full flex-col items-center gap-8 p-4 md:p-20">
+      <h1 class="font-display md:text-6xl! 2xl:text-7xl!">
+        Your Secrets, Secured.
+      </h1>
+      <p class="max-w-xl leading-6 font-semibold text-muted-foreground md:text-lg">
+        No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
+      </p>
 
-      <div class="flex w-full flex-row items-center justify-center gap-4 md:gap-8">
-        <nuxt-link to="/sign-in" class="btn-primary hero-btn">
+      <div class="flex flex-row items-center gap-4">
+        <nuxt-link to="/sign-in" class="btn-primary rounded-full!">
           <span>Get Started</span>
           <icon name="dinkie-icons:heart-black-suit-circled" size="20" />
         </nuxt-link>
-
-        <nuxt-link to="/cli" class="flex flex-row items-center gap-2 text-sm font-semibold whitespace-nowrap hover:underline">
+        <nuxt-link to="/cli" class="flex flex-row items-center gap-2 text-sm font-semibold hover:underline">
           <span>SecretkeepR CLI</span>
           <icon name="dinkie-icons:code-filled" size="20" />
         </nuxt-link>
       </div>
     </header>
 
-    <section id="highlights" class="w-full border-y-2 bg-card py-12 md:py-20">
-      <div class="flex flex-wrap items-center justify-center gap-4 px-4 md:flex-row md:gap-8">
-        <div
-          v-for="(highlight, index) in HIGHLIGHTS" :key="index"
-          v-motion :initial="{ opacity: 0, y: 20 }"
-          :visible="{ opacity: 1, y: 0 }" :duration="800"
-          :delay="200 * index" class="card flex max-w-sm flex-col items-center gap-4 text-center"
-        >
-          <h4>{{ highlight.title }}</h4>
-          <p class="text-caption">
-            {{ highlight.description }}
-          </p>
-        </div>
+    <section id="highlights" class="flex w-full flex-col items-center justify-center gap-8 md:flex-row">
+      <div
+        v-for="(highlight, index) in HIGHLIGHTS" :key="index"
+        v-motion :initial="{ opacity: 0, y: 20 }"
+        :visible="{ opacity: 1, y: 0 }" :duration="800"
+        :delay="200 * index" class="card flex max-w-sm flex-col items-center gap-4"
+      >
+        <h4>
+          {{ highlight.title }}
+        </h4>
+        <p class="text-caption">
+          {{ highlight.description }}
+        </p>
       </div>
     </section>
   </div>
 
   <section
-    id="features" v-motion
-    :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-12 px-4 py-12 md:px-20 md:py-20 2xl:px-32 2xl:py-32"
-  >
-    <h2 class="text-center font-display">
-      Features
-    </h2>
-
-    <div class="flex flex-wrap items-center justify-center gap-4 md:flex-row md:gap-8 2xl:flex-nowrap">
-      <div
-        v-for="(feature, index) in FEATURES" :key="index"
-        v-motion :initial="{ opacity: 0, y: -20 }"
-        :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="flex max-w-sm min-w-80 flex-col items-center gap-4 p-4 text-center"
-      >
-        <icon :name="feature.icon" class="text-secondary" size="70" />
-        <h3 class="font-display-alt tracking-tighter whitespace-nowrap">
-          {{ feature.title }}
-        </h3>
-        <p class="text-caption">
-          {{ feature.description }}
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section
     id="cli" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="w-full border-y-2 bg-card py-12 md:py-20"
+    :duration="800" class="w-full border-y-2 bg-card py-12"
   >
-    <div class="container mx-auto flex flex-col items-center justify-center gap-8 px-4 md:flex-row md:gap-20 2xl:gap-32">
-      <header class="flex flex-col items-center gap-8 text-center md:items-start md:text-start">
+    <div class="container mx-auto flex flex-col items-center justify-center gap-8 md:flex-row md:gap-20 2xl:gap-32">
+      <header class="flex flex-col items-center gap-4 text-center md:items-start md:text-start">
         <h2 class="font-display">
           Command Line Interface
         </h2>
@@ -103,7 +73,7 @@
             </li>
           </ul>
 
-          <p class="text-caption flex flex-row items-center gap-4 self-end select-none">
+          <p class="text-caption flex flex-row items-end gap-4 self-end select-none">
             <span>Powered by Go</span>
             <img src="/assets/gopher.png" alt="Gopher" width="30" height="30">
           </p>
@@ -111,24 +81,24 @@
       </header>
 
       <div class="w-full max-w-xl flex-1 px-2 md:min-w-80 md:px-0">
-        <div class="my-2 flex flex-row gap-1">
+        <div class="my-2 flex flex-row gap-2">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
-            class="text-caption flex-1 rounded-t-sm border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
+            class="text-caption flex-1 rounded-t-sm border-b-2 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
             @click="activeTab = (tab.key as 'install' | 'commands')"
           >
             {{ tab.label }}
           </button>
         </div>
 
-        <article v-if="activeTab === 'install'" class="card p-4">
+        <article v-if="activeTab === 'install'" class="card space-y-1">
           <p class="text-caption">
             > Install the Go module:
           </p>
           <Shiki lang="bash" :code="INSTALL_COMMAND" class="code-block" />
         </article>
 
-        <article v-if="activeTab === 'commands'" class="card p-4">
+        <article v-if="activeTab === 'commands'" class="card space-y-1">
           <p class="text-caption">
             > After installing, run the following commands to get started:
           </p>
@@ -139,11 +109,38 @@
   </section>
 
   <section
+    id="features" v-motion
+    :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
+    :duration="800" class="flex w-full flex-col items-center gap-12 px-4 py-12 md:px-20 md:py-20"
+  >
+    <h2 class="font-display">
+      Features
+    </h2>
+
+    <div class="grid grid-cols-1 place-items-center gap-16 md:grid-cols-2 md:gap-32">
+      <div
+        v-for="(feature, index) in FEATURES" :key="index"
+        v-motion :initial="{ opacity: 0, y: -20 }"
+        :visible="{ opacity: 1, y: 0 }" :duration="800"
+        :delay="200 * index" class="flex max-w-sm flex-col items-center gap-4 p-4 text-center"
+      >
+        <icon :name="feature.icon" class="text-secondary" size="70" />
+        <h3 class="font-display-alt tracking-tighter whitespace-nowrap">
+          {{ feature.title }}
+        </h3>
+        <p class="text-caption">
+          {{ feature.description }}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section
     id="faq" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 py-12 md:px-20 md:py-20 2xl:px-32 2xl:py-32"
+    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 py-12 md:p-20 2xl:p-32"
   >
-    <h2 class="text-center font-display">
+    <h2 class="font-display">
       Frequently Asked Questions
     </h2>
 
@@ -184,11 +181,6 @@ definePageMeta({
 </script>
 
 <style scoped>
-.hero-btn {
-  box-shadow: 0 0 0 2px var(--primary);
-  border-radius: 5rem;
-}
-
 .accordion-enter-active,
 .accordion-leave-active {
   transition:

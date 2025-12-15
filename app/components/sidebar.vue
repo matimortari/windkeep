@@ -31,7 +31,9 @@
     </div>
 
     <div class="scroll-area flex-1 overflow-y-auto">
-      <Empty v-if="!filteredProjects.length" message="No projects yet." icon-name="ph:folder-simple-minus" :icon-size="30" />
+      <p v-if="!filteredProjects.length" class="text-caption">
+        No projects yet.
+      </p>
 
       <nav v-else aria-label="Projects Navigation" class="text-caption flex flex-col gap-2">
         <nuxt-link
