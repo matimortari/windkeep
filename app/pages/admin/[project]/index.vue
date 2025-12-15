@@ -20,7 +20,7 @@
         </button>
 
         <div ref="dropdownRef" class="relative">
-          <button class="btn" aria-label="Export Secrets to .env File" @click="isDropdownOpen = !isDropdownOpen">
+          <button class="btn-secondary" aria-label="Export Secrets to .env File" @click="isDropdownOpen = !isDropdownOpen">
             <span class="hidden md:block">Export</span>
             <icon name="ph:download" size="20" />
           </button>
@@ -42,7 +42,7 @@
       </nav>
     </header>
 
-    <Empty v-if="!secrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" :icon-size="60" />
+    <Empty v-if="!secrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" />
 
     <div v-if="secrets.length" class="scroll-area max-h-[80vh] overflow-y-auto">
       <ProjectSecretsTable

@@ -24,7 +24,7 @@
 
         <tr v-else-if="!auditLogs.length">
           <td :colspan="columns.length" class="text-caption p-8 text-center">
-            <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus" :icon-size="30" />
+            <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus" />
           </td>
         </tr>
 
