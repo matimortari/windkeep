@@ -59,14 +59,14 @@
           Organization Projects
         </h5>
 
-        <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
-          <li v-for="project in orgProjects" :key="project.id" class="card navigation-group w-full justify-between">
-            <div class="flex flex-col gap-1 truncate">
-              <span>{{ project?.name }}</span>
+        <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
+          <li v-for="project in orgProjects" :key="project.id" class="navigation-group w-full justify-between border-y py-2">
+            <div class="flex flex-col truncate">
+              <span class="font-semibold">{{ project?.name }}</span>
               <span class="text-caption">{{ project?.description || "No description provided." }}</span>
             </div>
 
-            <nav class="navigation-group justify-end" aria-label="Organization Project Actions">
+            <nav class="navigation-group" aria-label="Organization Project Actions">
               <nuxt-link :to="`/admin/${project?.slug}`" class="btn">
                 <icon name="ph:eye" size="15" />
               </nuxt-link>
@@ -84,19 +84,18 @@
           Organization Members
         </h5>
 
-        <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
-          <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="card navigation-group w-full justify-between overflow-hidden">
-            <div class="flex min-w-0 flex-row items-center gap-4">
-              <img :src="orgUser.user.image ?? undefined" alt="Avatar" class="hidden size-12 rounded-full border-2 md:block">
+        <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
+          <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-2">
+            <div class="navigation-group items-start!">
+              <img :src="orgUser.user.image ?? undefined" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
 
-              <div class="flex min-w-0 flex-col">
-                <span class="truncate">{{ orgUser.user.name }}</span>
-                <span class="text-caption truncate">Role: {{ capitalizeFirst(orgUser.role) }}</span>
-                <span class="text-caption truncate">{{ orgUser.user.id }}</span>
+              <div class="flex flex-col truncate">
+                <span class="font-semibold">{{ orgUser.user.name }}</span>
+                <span class="text-caption">Role: {{ capitalizeFirst(orgUser.role) }}</span>
               </div>
             </div>
 
-            <nav v-if="isOwner && orgUser.user.id !== user?.id" class="navigation-group justify-end" aria-label="Organization Member Actions">
+            <nav v-if="isOwner && orgUser.user.id !== user?.id" class="navigation-group" aria-label="Organization Member Actions">
               <select v-model="userRoles[orgUser.user.id as string]">
                 <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value" class="capitalize">
                   {{ capitalizeFirst(role.label) }}

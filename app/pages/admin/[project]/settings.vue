@@ -25,6 +25,7 @@
         </p>
       </div>
 
+      <!-- Project Details -->
       <div v-for="(field, index) in projectFields" :key="index" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
@@ -61,19 +62,18 @@
           Project Members
         </h5>
 
-        <ul class="scroll-area flex max-h-52 flex-col items-start gap-1 overflow-y-auto">
-          <li v-for="member in project?.memberships" :key="member.userId" class="card navigation-group w-full justify-between overflow-hidden">
-            <div class="flex min-w-0 flex-row items-center gap-4">
-              <img :src="member.user?.image ?? undefined" alt="Avatar" class="hidden size-12 rounded-full border-2 md:block">
+        <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
+          <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2">
+            <div class="navigation-group items-start!">
+              <img :src="member.user.image ?? undefined" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
 
-              <div class="flex min-w-0 flex-col">
-                <span class="truncate">{{ member.user?.name }}</span>
-                <span class="text-caption truncate">Role: {{ capitalizeFirst(member.role) }}</span>
-                <span class="text-caption truncate">{{ member.userId }}</span>
+              <div class="flex flex-col truncate">
+                <span class="font-semibold">{{ member.user?.name }}</span>
+                <span class="text-caption">Role: {{ capitalizeFirst(member.role) }}</span>
               </div>
             </div>
 
-            <nav v-if="(isOwner || isAdmin) && member.userId !== user?.id && member.role !== 'OWNER'" class="navigation-group justify-end md:w-1/3" aria-label="Project Member Actions">
+            <nav v-if="(isOwner || isAdmin) && member.userId !== user?.id && member.role !== 'OWNER'" class="navigation-group" aria-label="Project Member Actions">
               <select v-model="member.role">
                 <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
                   {{ capitalizeFirst(role.label) }}
@@ -104,7 +104,7 @@
       </header>
 
       <div class="flex flex-col gap-1 md:navigation-group">
-        <div class="flex flex-row items-center gap-2">
+        <div class="navigation-group">
           <input v-model="newMemberId" type="text" placeholder="User ID">
           <select v-model="newMemberRole" class="md:min-w-30">
             <option v-for="role in [...ROLES].reverse().filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
