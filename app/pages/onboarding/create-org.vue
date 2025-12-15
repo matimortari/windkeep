@@ -9,7 +9,7 @@
         Welcome to SecretkeepR
       </h1>
       <p class="text-caption">
-        To get started, please create an organization name with at least 2 characters.
+        To get started, please create an organization name with at least 3 characters.
       </p>
     </header>
 
@@ -29,8 +29,8 @@
       <span v-if="errors.createOrg" class="text-danger">{{ errors.createOrg }}</span>
 
       <span> Already have an invite? <nuxt-link to="/onboarding/join-org" class="text-primary hover:underline">
-        Join an Organization
-      </nuxt-link>.
+        Join an Organization.
+      </nuxt-link>
       </span>
     </p>
   </div>
@@ -50,7 +50,7 @@ async function handleCreateOrg() {
 
   const result = createOrgSchema.safeParse(localOrg.value)
   if (!result.success) {
-    errors.value.createOrg = "Organization name must be at least 2 characters long."
+    errors.value.createOrg = "Organization name must be at least 3 characters long."
     return
   }
 

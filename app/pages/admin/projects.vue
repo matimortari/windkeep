@@ -32,7 +32,7 @@
       </nav>
     </header>
 
-    <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" :icon-size="60" />
+    <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" />
 
     <div v-else-if="layout === 'list'" class="scroll-area max-h-[80vh] overflow-y-auto">
       <ProjectTable :projects="filteredProjects" />
