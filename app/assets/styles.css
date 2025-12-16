@@ -4,18 +4,21 @@
   Base styles
 */
 :root {
-  --background: #0d0d10;
-  --foreground: #c8c8c8;
-  --card: #111114;
-  --overlay: #18181c;
-  --primary: #1d857f;
-  --primary-foreground: #e0e0e0;
-  --secondary: #317892;
-  --secondary-foreground: #c8c8c8;
-  --muted: #222225;
-  --muted-foreground: #8f8e8e;
-  --danger: #9e4042;
-  --success: #3a6051;
+  --background: #0a0a0a;
+  --foreground: #e5e5e5;
+  --card: #171717;
+  --overlay: #262626;
+  --muted: #404040;
+  --muted-foreground: #a3a3a3;
+
+  /* Surfaces */
+  --primary: #64748b;
+  --secondary: #334155;
+  --danger: #b91c1c;
+  --success: #047857;
+
+  /* Content on surfaces */
+  --surface-foreground: #e5e5e5;
 
   background-color: var(--background);
   color: var(--foreground);
@@ -30,18 +33,21 @@
   Light theme overrides
 */
 html.light {
-  --background: #f9fafa;
-  --foreground: #0a0b0c;
-  --card: #f6f6f7;
-  --overlay: #e6e8e9;
-  --primary: #1d857f;
-  --primary-foreground: #e0e0e0;
-  --secondary: #317892;
-  --secondary-foreground: #c8c8c8;
-  --muted: #e1e3e4;
-  --muted-foreground: #6b6363;
-  --danger: #9e4042;
-  --success: #3a6051;
+  --background: #fafafa;
+  --foreground: #262626;
+  --card: #f5f5f5;
+  --overlay: #e5e5e5;
+  --muted: #d4d4d4;
+  --muted-foreground: #525252;
+
+  /* Surfaces */
+  --primary: #64748b;
+  --secondary: #334155;
+  --danger: #b91c1c;
+  --success: #047857;
+
+  /* Content on surfaces */
+  --surface-foreground: #e5e5e5;
 }
 
 /*
@@ -52,18 +58,17 @@ html.light {
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-overlay: var(--overlay);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
   --color-danger: var(--danger);
   --color-success: var(--success);
+  --color-surface-foreground: var(--surface-foreground);
 
   --font-default: "Roboto", sans-serif;
-  --font-display: "Jockey One";
-  --font-display-alt: "Silkscreen", sans-serif;
+  --font-display: "Russo One", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
 
@@ -185,8 +190,6 @@ input,
 textarea,
 select {
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   background-color: var(--card);
   color: var(--muted-foreground);
   border: 2px solid var(--muted);
@@ -257,7 +260,6 @@ th {
   border-radius: 0.25rem;
   white-space: nowrap;
   user-select: none;
-  cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -288,25 +290,30 @@ th {
   cursor: not-allowed;
 }
 
+/* button tokens */
 .btn {
   --btn-bg: var(--card);
   --btn-fg: var(--foreground);
 }
+
 .btn-primary {
   --btn-bg: var(--primary);
-  --btn-fg: var(--primary-foreground);
+  --btn-fg: var(--surface-foreground);
 }
+
 .btn-secondary {
   --btn-bg: var(--secondary);
-  --btn-fg: var(--secondary-foreground);
+  --btn-fg: var(--surface-foreground);
 }
+
 .btn-danger {
   --btn-bg: var(--danger);
-  --btn-fg: var(--secondary-foreground);
+  --btn-fg: var(--surface-foreground);
 }
+
 .btn-success {
   --btn-bg: var(--success);
-  --btn-fg: var(--secondary-foreground);
+  --btn-fg: var(--surface-foreground);
 }
 
 .btn,
@@ -336,19 +343,19 @@ th {
 
 ::selection {
   background: color-mix(in srgb, var(--secondary) 50%, transparent);
-  color: var(--secondary-foreground);
+  color: var(--foreground);
 }
 
 /*
-  Background color utilities for matching themes
+  Background color utilities
 */
 .bg-primary {
   background-color: var(--primary);
-  color: var(--primary-foreground);
+  color: var(--surface-foreground);
 }
 .bg-secondary {
   background-color: var(--secondary);
-  color: var(--secondary-foreground);
+  color: var(--surface-foreground);
 }
 .bg-muted {
   background-color: var(--muted);
@@ -356,7 +363,7 @@ th {
 }
 
 /*
-  ?????
+  Tailwind utility bridge
 */
 @utility navigation-group {
   @apply flex flex-row items-center gap-2;

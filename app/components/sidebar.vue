@@ -54,7 +54,7 @@
 import type { CreateProjectInput } from "#shared/schemas/project-schema"
 
 const props = defineProps<{
-  org?: Organization
+  org: Organization | null
   isOpen: boolean
 }>()
 
