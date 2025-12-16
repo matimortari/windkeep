@@ -5,7 +5,7 @@
     class="relative flex min-h-screen w-full flex-col items-center justify-center py-24 text-center md:py-0"
   >
     <header id="hero" class="z-20 flex w-full flex-col items-center gap-8 p-4 md:p-20">
-      <h1 class="font-display md:text-6xl! 2xl:text-7xl!">
+      <h1 class="font-display md:text-5xl! 2xl:text-6xl!">
         Your Secrets, Secured.
       </h1>
       <p class="max-w-xl leading-6 font-semibold text-muted-foreground md:text-lg">
@@ -125,7 +125,7 @@
         :delay="200 * index" class="flex max-w-sm flex-col items-center gap-4 p-4 text-center"
       >
         <icon :name="feature.icon" class="text-secondary" size="70" />
-        <h3 class="font-display-alt tracking-tighter whitespace-nowrap">
+        <h3 class="font-display tracking-tighter whitespace-nowrap">
           {{ feature.title }}
         </h3>
         <p class="text-caption">

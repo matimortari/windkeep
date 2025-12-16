@@ -1,13 +1,12 @@
 <template>
   <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
-  <Loading v-if="isLoading" />
-
-  <div v-show="!isLoading" class="flex min-h-screen overflow-hidden py-12">
-    <Sidebar v-if="activeOrg" :org="activeOrg" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
+  <div class="flex min-h-screen overflow-hidden py-12">
+    <Sidebar :org="activeOrg" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
 
     <main class="flex flex-1 flex-col overflow-x-hidden p-4">
-      <slot :active-org="activeOrg" />
+      <Loading v-if="isLoading" />
+      <slot v-else :active-org="activeOrg" />
     </main>
   </div>
 
