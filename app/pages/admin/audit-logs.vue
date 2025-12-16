@@ -6,11 +6,7 @@
 
     <AuditFilter />
 
-    <p v-if="loading" class="text-caption my-8 h-[80vh] text-center">
-      Loading audit logs...
-    </p>
-
-    <div v-else class="scroll-area max-h-[80vh] overflow-y-auto">
+    <div class="scroll-area max-h-[80vh] overflow-y-auto">
       <AuditTable />
     </div>
   </div>
@@ -19,7 +15,6 @@
 <script setup lang="ts">
 const { activeOrg } = storeToRefs(useOrgStore())
 const auditStore = useAuditStore()
-const { loading } = storeToRefs(auditStore)
 
 watch(activeOrg, async (org) => {
   if (org?.id) {
