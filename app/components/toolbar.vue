@@ -1,9 +1,9 @@
 <template>
-  <div v-if="user" class="fixed top-0 left-0 z-30 navigation-group w-full justify-between border-b-2 bg-card p-2">
+  <div class="fixed top-0 left-0 z-30 navigation-group w-full justify-between border-b-2 bg-card p-2">
     <div class="navigation-group">
       <Logo class="hidden md:flex" />
 
-      <nav class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
+      <nav v-if="user" class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
         <div class="text-caption hidden md:navigation-group">
           <span>/</span>
           <span>{{ user.name }}</span>
@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  orgs: Array<Organization>
+  orgs: Array<Organization> | null
   isSidebarOpen: boolean
 }>()
 

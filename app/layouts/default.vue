@@ -1,9 +1,7 @@
 <template>
   <Navbar />
 
-  <Loading v-if="isLoading" />
-
-  <main v-show="!isLoading" class="relative flex min-h-screen flex-col items-center justify-center">
+  <main class="relative flex min-h-screen flex-col items-center justify-center">
     <div class="grid-backdrop" />
     <slot />
   </main>

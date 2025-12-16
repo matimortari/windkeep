@@ -42,11 +42,8 @@ export default defineNuxtConfig({
     families: [
       // Base fonts (default, display, mono)
       { name: "Roboto", provider: "google", weights: ["300 800"] },
-      { name: "Jockey One", provider: "google", weights: ["400"] },
+      { name: "Russo One", provider: "google", weights: ["400"] },
       { name: "JetBrains Mono", provider: "google", weights: ["400"] },
-
-      // Decorative fonts
-      { name: "Silkscreen", provider: "google", weights: ["400 700"] },
     ],
   },
   icon: {
