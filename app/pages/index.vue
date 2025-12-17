@@ -2,9 +2,9 @@
   <div
     v-motion :initial="{ opacity: 0 }"
     :visible="{ opacity: 1 }" :duration="800"
-    class="relative flex min-h-screen w-full flex-col items-center justify-center py-24 text-center md:py-0"
+    class="relative flex min-h-screen w-full flex-col items-center justify-center gap-12 py-24 text-center md:py-0"
   >
-    <header id="hero" class="z-20 flex w-full flex-col items-center gap-8 p-4 md:p-20">
+    <header id="hero" class="z-20 flex w-full flex-col items-center gap-4 px-4 py-20 md:px-20">
       <h1 class="font-display md:text-5xl! 2xl:text-6xl!">
         Your Secrets, Secured.
       </h1>
@@ -12,14 +12,14 @@
         No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
       </p>
 
-      <div class="flex flex-row items-center gap-4">
+      <div class="flex flex-row items-center gap-8">
         <nuxt-link to="/sign-in" class="btn-primary rounded-full!">
           <span>Get Started</span>
-          <icon name="dinkie-icons:heart-black-suit-circled" size="20" />
+          <icon name="ph:arrow-circle-right" size="20" />
         </nuxt-link>
         <nuxt-link to="/cli" class="flex flex-row items-center gap-2 text-sm font-semibold hover:underline">
           <span>SecretkeepR CLI</span>
-          <icon name="dinkie-icons:code-filled" size="20" />
+          <icon name="ph:code-block-bold" size="25" />
         </nuxt-link>
       </div>
     </header>
@@ -29,12 +29,17 @@
         v-for="(highlight, index) in HIGHLIGHTS" :key="index"
         v-motion :initial="{ opacity: 0, y: 20 }"
         :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="card flex max-w-sm flex-col items-center gap-4"
+        :delay="200 * index" class="card flex max-w-sm flex-col items-start gap-2"
       >
-        <h4>
-          {{ highlight.title }}
-        </h4>
-        <p class="text-caption">
+        <div class="flex flex-row items-center gap-2">
+          <span class="flex rounded-full bg-muted p-1.5">
+            <icon :name="highlight.icon" class="text-primary" size="25" />
+          </span>
+          <h4>
+            {{ highlight.title }}
+          </h4>
+        </div>
+        <p class="text-caption text-start">
           {{ highlight.description }}
         </p>
       </div>
@@ -46,7 +51,7 @@
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
     :duration="800" class="w-full border-y-2 bg-card py-12"
   >
-    <div class="container mx-auto flex flex-col items-center justify-center gap-8 md:flex-row md:gap-20 2xl:gap-32">
+    <div class="container mx-auto flex flex-col items-center justify-center gap-8 p-4 md:flex-row md:gap-20 2xl:gap-32">
       <header class="flex flex-col items-center gap-4 text-center md:items-start md:text-start">
         <h2 class="font-display">
           Command Line Interface
@@ -62,14 +67,8 @@
 
         <div class="flex w-full flex-col gap-4 md:items-start">
           <ul class="text-caption flex flex-col items-start gap-2">
-            <li class="navigation-group">
-              <Icon name="ph:lock-key" size="20" class="text-secondary" /> Lorem Lorem Lorem.
-            </li>
-            <li class="navigation-group">
-              <Icon name="ph:rocket" size="20" class="text-secondary" /> Ipsum Ipsum Ipsum.
-            </li>
-            <li class="navigation-group">
-              <Icon name="ph:gear" size="20" class="text-secondary" /> Dolor Sit Amet.
+            <li v-for="bullet in CLI_BULLETS" :key="bullet.description" class="navigation-group">
+              <span>• {{ bullet.description }} </span>
             </li>
           </ul>
 
@@ -81,10 +80,10 @@
       </header>
 
       <div class="w-full max-w-xl flex-1 px-2 md:min-w-80 md:px-0">
-        <div class="my-2 flex flex-row gap-2">
+        <div class="my-2 flex flex-row gap-1">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
-            class="text-caption flex-1 rounded-t-sm border-b-2 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
+            class="text-caption flex-1 rounded-t-sm border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-secondary' : 'border-transparent'"
             @click="activeTab = (tab.key as 'install' | 'commands')"
           >
             {{ tab.label }}
@@ -117,14 +116,16 @@
       Features
     </h2>
 
-    <div class="grid grid-cols-1 place-items-center gap-16 md:grid-cols-2 md:gap-32">
+    <div class="grid grid-cols-1 place-items-center gap-12 md:grid-cols-2 md:gap-24">
       <div
         v-for="(feature, index) in FEATURES" :key="index"
         v-motion :initial="{ opacity: 0, y: -20 }"
         :visible="{ opacity: 1, y: 0 }" :duration="800"
         :delay="200 * index" class="flex max-w-sm flex-col items-center gap-4 p-4 text-center"
       >
-        <icon :name="feature.icon" class="text-secondary" size="70" />
+        <div class="flex items-center justify-center rounded-2xl bg-card p-8">
+          <icon :name="feature.icon" class="text-primary" size="70" />
+        </div>
         <h3 class="font-display tracking-tighter whitespace-nowrap">
           {{ feature.title }}
         </h3>
@@ -138,15 +139,15 @@
   <section
     id="faq" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 py-12 md:p-20 2xl:p-32"
+    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 py-12 text-center md:p-20 2xl:p-32"
   >
     <h2 class="font-display">
       Frequently Asked Questions
     </h2>
 
-    <div class="flex w-full max-w-2xl flex-col divide-y">
-      <div v-for="(item, index) in FAQS" :key="index" class="space-y-2 py-4">
-        <button class="group flex w-full items-center justify-between text-center font-semibold hover:text-primary md:text-start" @click="toggleAccordion(index)">
+    <div class="flex w-full flex-col justify-center divide-y items-center">
+      <div v-for="(item, index) in FAQS" :key="index" class="max-w-xs w-full md:max-w-xl space-y-2 py-4">
+        <button class="group flex w-full items-start justify-between gap-2 font-semibold hover:text-primary" @click="toggleAccordion(index)">
           <p>{{ item.question }}</p>
           <icon name="ph:plus" size="20" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
         </button>

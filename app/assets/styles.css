@@ -176,7 +176,7 @@ h6 {
   background-color: #1f1f28;
   padding: 1.25rem;
   border-radius: 0.25rem;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   text-align: start;
   overflow-x: auto;
   scrollbar-width: thin;
@@ -212,12 +212,10 @@ select:hover {
 */
 table {
   background-color: var(--card);
-  border: 2px solid var(--muted);
   min-width: 100%;
   table-layout: auto;
   border-collapse: collapse;
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
+  border-radius: 0.25rem;
 }
 @media (min-width: 768px) {
   table {
@@ -227,7 +225,6 @@ table {
 
 td,
 th {
-  border-block: 1px solid var(--muted);
   padding: 0.5rem;
 }
 

@@ -57,13 +57,13 @@
       </div>
 
       <!-- Project Members List -->
-      <section class="flex flex-col justify-between border-b p-4 md:px-10">
+      <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
         <h5>
           Project Members
         </h5>
 
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
-          <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2">
+          <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 last:border-b-0">
             <div class="navigation-group items-start!">
               <img :src="member.user.image ?? undefined" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
 
