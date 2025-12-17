@@ -5,7 +5,7 @@
       :visible="{ opacity: 1 }" :duration="800"
       class="card w-full max-w-sm md:max-w-md 2xl:max-w-lg"
     >
-      <header class="flex flex-col items-center gap-2 py-4 text-center 2xl:py-8">
+      <header class="flex flex-col items-center gap-2 py-8 text-center">
         <h1 class="font-display">
           Sign In
         </h1>
@@ -21,18 +21,16 @@
         </button>
       </div>
 
-      <footer class="mx-auto max-w-xs py-4 text-center 2xl:py-8">
-        <p class="text-caption">
-          By signing in, you agree to our
-          <nuxt-link to="/legal/terms" class="underline hover:text-primary">
-            Terms of Service
-          </nuxt-link>
-          and
-          <nuxt-link to="/legal/privacy" class="underline hover:text-primary">
-            Privacy Policy.
-          </nuxt-link>
-        </p>
-      </footer>
+      <p class="text-caption mx-auto max-w-xs py-8 text-center">
+        By signing in, you agree to our
+        <nuxt-link to="/legal/terms" class="underline hover:text-primary">
+          Terms of Service
+        </nuxt-link>
+        and
+        <nuxt-link to="/legal/privacy" class="underline hover:text-primary">
+          Privacy Policy.
+        </nuxt-link>
+      </p>
     </div>
   </div>
 </template>

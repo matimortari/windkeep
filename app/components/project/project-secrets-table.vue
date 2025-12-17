@@ -15,12 +15,12 @@
       </thead>
 
       <tbody>
-        <tr v-for="secret in sortedSecrets" :key="secret.key" class="hover:bg-muted">
+        <tr v-for="secret in sortedSecrets" :key="secret.key" class="group hover:bg-muted">
           <td v-for="col in columns" :key="col.key" :class="col.class">
             <div v-if="col.key === 'key'" class="flex items-center gap-2 font-mono text-sm font-semibold text-muted-foreground">
               <span class="truncate">{{ secret.key }}</span>
               <icon
-                v-if="secret.description" name="carbon:information-square"
+                v-if="secret.description" name="ph:info"
                 :title="secret.description" size="15"
                 class="hidden shrink-0 cursor-pointer md:inline"
               />
@@ -29,26 +29,26 @@
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
               <span
                 class="max-w-[80%] truncate select-none"
-                :class="[getSecretValue(secret.key, col.env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors hover:text-secondary!' : '']"
+                :class="[getSecretValue(secret.key, col.env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors group-hover:bg-card! hover:text-secondary!' : '']"
                 @click="copyToClipboard(getSecretValue(secret.key, col.env))"
               >
                 {{ renderValue(secret.key, col.env) }}
               </span>
 
-              <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copyToClipboard(getSecretValue(secret.key, col.env))">
-                <icon name="carbon:copy" size="20" class="hover:text-primary" />
+              <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copySecret(secret.key, col.env, getSecretValue(secret.key, col.env))">
+                <icon :name="getCopyIcon(secret.key, col.env)" size="20" />
               </button>
             </div>
 
             <div v-else-if="col.key === 'actions'" class="navigation-group text-muted-foreground">
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
-                <icon :name="visibleKeys[secret.key] ? 'carbon:view' : 'carbon:view-off'" size="20" class="hover:text-primary" />
+                <icon :name="visibleKeys[secret.key] ? 'ph:eye' : 'ph:eye-closed'" size="20" class="hover:text-primary" />
               </button>
               <button aria-label="Edit Secret" @click="handleUpdateSecret(secret.key)">
-                <icon name="carbon:edit" size="20" class="hover:text-primary" />
+                <icon name="ph:note-pencil" size="20" class="hover:text-primary" />
               </button>
               <button aria-label="Delete Secret" @click="handleDeleteSecret(secret.key)">
-                <icon name="carbon:delete" size="20" class="hover:text-danger" />
+                <icon name="ph:x" size="20" class="hover:text-danger" />
               </button>
             </div>
           </td>
@@ -72,6 +72,7 @@ const emit = defineEmits<{
 
 const projectStore = useProjectStore()
 const visibleKeys = ref<Record<string, boolean>>({})
+const copyStates = ref<Record<string, boolean>>({})
 const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
 
@@ -88,6 +89,30 @@ const columns = computed<Record<string, any>[]>(() => {
   const actions = [{ key: "actions", label: "Actions", class: "w-20 text-right", type: "actions", sortable: false }]
   return [...base, ...envCols, ...actions]
 })
+
+function getCopyStateKey(secretKey: string, env: string) {
+  return `${secretKey}-${env}`
+}
+
+function getCopyIcon(secretKey: string, env: string) {
+  const key = getCopyStateKey(secretKey, env)
+  return copyStates.value[key] ? "ph:check" : "ph:copy"
+}
+
+async function copySecret(secretKey: string, env: string, value: string) {
+  if (!value) {
+    return
+  }
+
+  await navigator.clipboard.writeText(value)
+
+  const key = getCopyStateKey(secretKey, env)
+  copyStates.value[key] = true
+
+  setTimeout(() => {
+    copyStates.value[key] = false
+  }, 1500)
+}
 
 function getSecretValue(key: string, env: string) {
   const s = props.secrets.find(s => s.key === key)
