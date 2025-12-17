@@ -1,10 +1,7 @@
 export function useActionIcon() {
   function createActionHandler(defaultIcon: string) {
     const success = ref(false)
-
-    const icon = computed(() =>
-      success.value ? "ph:check" : defaultIcon,
-    )
+    const icon = computed(() => success.value ? "ph:check" : defaultIcon)
 
     function triggerSuccess() {
       success.value = true

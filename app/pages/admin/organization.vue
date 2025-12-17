@@ -54,13 +54,13 @@
       </div>
 
       <!-- Organization Projects List -->
-      <section class="flex flex-col justify-between border-b p-4 md:px-10">
+      <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
         <h5>
           Organization Projects
         </h5>
 
-        <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
-          <li v-for="project in orgProjects" :key="project.id" class="navigation-group w-full justify-between border-y py-2">
+        <ul v-if="orgProjects.length" class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
+          <li v-for="project in orgProjects" :key="project.id" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 last:border-b-0">
             <div class="flex flex-col truncate">
               <span class="font-semibold">{{ project?.name }}</span>
               <span class="text-caption">{{ project?.description || "No description provided." }}</span>
@@ -76,16 +76,20 @@
             </nav>
           </li>
         </ul>
+
+        <p v-else class="text-caption">
+          No projects found in this organization.
+        </p>
       </section>
 
       <!-- Organization Members List -->
-      <section class="flex flex-col justify-between border-b p-4 md:px-10">
+      <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
         <h5>
           Organization Members
         </h5>
 
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
-          <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-2">
+          <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 last:border-b-0">
             <div class="navigation-group items-start!">
               <img :src="orgUser.user.image ?? undefined" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
 
