@@ -6,7 +6,7 @@
 
     <main class="flex flex-1 flex-col overflow-x-hidden p-4">
       <Loading v-if="isLoading" />
-      <slot v-else :active-org="activeOrg" />
+      <slot v-else />
     </main>
   </div>
 

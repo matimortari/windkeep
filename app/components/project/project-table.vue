@@ -15,7 +15,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted" @click="$router.push(`/admin/${project.slug}`)">
+        <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted/20" @click="$router.push(`/admin/${project.slug}`)">
           <td class="text-caption">
             {{ project.name }}
           </td>

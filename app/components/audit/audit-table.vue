@@ -29,7 +29,7 @@
         </tr>
 
         <template v-for="log in sortedLogs" v-else :key="log.id">
-          <tr class="cursor-pointer hover:bg-muted" @click="toggleRow(log.id)">
+          <tr class="cursor-pointer hover:bg-muted/20" @click="toggleRow(log.id)">
             <td>
               <icon name="ph:caret-right" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
@@ -54,7 +54,7 @@
             </td>
           </tr>
 
-          <tr v-if="expandedRows.has(log.id)" class="cursor-pointer border text-sm hover:bg-muted" @click="toggleRow(log.id)">
+          <tr v-if="expandedRows.has(log.id)" class="cursor-pointer border text-sm hover:bg-muted/20" @click="toggleRow(log.id)">
             <td :colspan="columns.length" class="max-w-4xl">
               <Shiki v-if="log.metadata && Object.keys(log.metadata).length" lang="json" :code="JSON.stringify(log.metadata, null, 2)" class="code-block" />
             </td>
