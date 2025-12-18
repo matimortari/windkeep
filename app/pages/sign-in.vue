@@ -5,7 +5,7 @@
       :visible="{ opacity: 1 }" :duration="800"
       class="card w-full max-w-sm md:max-w-md 2xl:max-w-lg"
     >
-      <header class="flex flex-col items-center gap-2 py-8 text-center">
+      <header class="flex flex-col items-center gap-2 py-4 text-center">
         <h1 class="font-display">
           Sign In
         </h1>
@@ -21,7 +21,7 @@
         </button>
       </div>
 
-      <p class="text-caption mx-auto max-w-xs py-8 text-center">
+      <p class="text-caption mx-auto max-w-xs py-4 text-center">
         By signing in, you agree to our
         <nuxt-link to="/legal/terms" class="underline hover:text-primary">
           Terms of Service
