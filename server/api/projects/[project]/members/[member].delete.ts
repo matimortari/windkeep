@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     where: { userId_projectId: { userId: member, projectId: project } },
     include: {
       user: { select: { id: true, email: true, name: true } },
-      project: { select: { id: true, name: true, orgId: true } },
+      project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } },
     },
   })
 
@@ -45,23 +45,24 @@ export default defineEventHandler(async (event) => {
   })
 
   await createAuditLog({
-    userId: user.id,
-    orgId: targetRole.project.orgId,
-    projectId: project,
-    action: "project.member.removed",
-    resource: "project_member",
-    metadata: {
-      targetUserId: targetRole.user.id,
-      targetUserEmail: targetRole.user.email,
-      targetUserName: targetRole.user.name,
-      role: targetRole.role,
-      projectName: targetRole.project.name,
-      selfRemoval: member === user.id,
-    },
-    description: member === user.id
-      ? `${targetRole.user.name} (${targetRole.user.email}) left project "${targetRole.project.name}"`
-      : `Removed ${targetRole.user.name} (${targetRole.user.email}) from project "${targetRole.project.name}"`,
     event,
+    userId: user.id,
+    orgId: targetRole.project.org.id,
+    projectId: project,
+    action: "REMOVE.PROJECT_MEMBER",
+    resource: "project_member",
+    description: member === user.id ? `${targetRole.user.name} (${targetRole.user.email}) left project "${targetRole.project.name}"` : `Removed ${targetRole.user.name} (${targetRole.user.email}) from project "${targetRole.project.name}"`,
+    metadata: {
+      userId: targetRole.user.id,
+      userEmail: targetRole.user.email,
+      userName: targetRole.user.name,
+      userRole: targetRole.role,
+      selfRemoval: member === user.id,
+      projectId: targetRole.project.id,
+      projectName: targetRole.project.name,
+      orgId: targetRole.project.org.id,
+      orgName: targetRole.project.org.name,
+    },
   })
 
   return { success: true, message: "Member removed successfully" }
