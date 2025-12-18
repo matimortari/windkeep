@@ -19,8 +19,14 @@ export default defineEventHandler(async (event) => {
       projectId: true,
       project: {
         select: {
+          id: true,
           name: true,
-          orgId: true,
+          org: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
       _count: {
@@ -37,25 +43,29 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
   }
 
-  // Delete the secret (cascade will handle secret values)
-  await db.secret.delete({
-    where: { id: secret },
-  })
-
+  // Create audit log before deletion
   await createAuditLog({
+    event,
     userId: user.id,
-    orgId: secretData.project.orgId,
+    orgId: secretData.project.org.id,
     projectId: project,
-    action: "secret.deleted",
+    action: "DELETE.SECRET",
     resource: "secret",
+    description: `Deleted secret "${secretData.key}" from project "${secretData.project.name}" (${secretData._count.values} value(s) deleted)`,
     metadata: {
       secretId: secretData.id,
       secretKey: secretData.key,
+      projectId: secretData.project.id,
       projectName: secretData.project.name,
+      orgId: secretData.project.org.id,
+      orgName: secretData.project.org.name,
       valuesDeleted: secretData._count.values,
     },
-    description: `Deleted secret "${secretData.key}" from project "${secretData.project.name}" (${secretData._count.values} value(s) deleted)`,
-    event,
+  })
+
+  // Delete the secret (cascade will handle secret values)
+  await db.secret.delete({
+    where: { id: secret },
   })
 
   return {

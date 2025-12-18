@@ -143,6 +143,8 @@ model AuditLog {
   resource    String?
   metadata    Json?
   description String?
+  ip          String?
+  ua          String?
   createdAt   DateTime      @default(now())
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   org         Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)

@@ -23,7 +23,13 @@ export default defineEventHandler(async (event) => {
     where: { id: projectId },
     select: {
       id: true,
-      orgId: true,
+      name: true,
+      org: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   })
   if (!project) {
@@ -47,7 +53,7 @@ export default defineEventHandler(async (event) => {
     where: {
       userId_orgId: {
         userId: result.data.userId,
-        orgId: project.orgId,
+        orgId: project.org.id,
       },
     },
   })
@@ -92,20 +98,23 @@ export default defineEventHandler(async (event) => {
   })
 
   await createAuditLog({
-    userId: user.id,
-    orgId: project.orgId,
-    projectId,
-    action: "project.member.added",
-    resource: "project_member",
-    metadata: {
-      targetUserId: projectRole.user.id,
-      targetUserEmail: projectRole.user.email,
-      targetUserName: projectRole.user.name,
-      role: projectRole.role,
-      projectName: projectRole.project.name,
-    },
-    description: `Added ${projectRole.user.name} (${projectRole.user.email}) as ${projectRole.role} to project "${projectRole.project.name}"`,
     event,
+    userId: user.id,
+    orgId: project.org.id,
+    projectId,
+    action: "ADD.PROJECT_MEMBER",
+    resource: "project_member",
+    description: `Added ${projectRole.user.name} (${projectRole.user.email}) as ${projectRole.role} to project "${projectRole.project.name}"`,
+    metadata: {
+      userId: projectRole.user.id,
+      userEmail: projectRole.user.email,
+      userName: projectRole.user.name,
+      userRole: projectRole.role,
+      projectName: projectRole.project.name,
+      projectId: projectRole.project.id,
+      orgId: project.org.id,
+      orgName: project.org.name,
+    },
   })
 
   return projectRole

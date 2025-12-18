@@ -82,18 +82,23 @@ export default defineEventHandler(async (event) => {
   })
 
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: project.orgId,
     projectId: project.id,
-    action: "project.created",
+    action: "CREATE.PROJECT",
     resource: "project",
+    description: `Created project "${project.name}" (${project.slug}) in organization "${project.org.name}"`,
     metadata: {
+      projectId: project.id,
       projectName: project.name,
       projectSlug: project.slug,
-      organizationName: project.org.name,
+      orgId: project.org.id,
+      orgName: project.org.name,
+      creatorId: user.id,
+      creatorEmail: user.email,
+      creatorName: user.name,
     },
-    description: `Created project "${project.name}" (${project.slug}) in organization "${project.org.name}"`,
-    event,
   })
 
   return project

@@ -38,31 +38,23 @@ export default defineEventHandler(async (event) => {
 
     return tx.organization.findUniqueOrThrow({
       where: { id: org.id },
-      include: {
-        memberships: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
-      },
     })
   })
 
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: organization.id,
-    action: "organization.created",
+    action: "CREATE.ORG",
     resource: "organization",
-    metadata: { organizationName: organization.name },
     description: `Created organization "${organization.name}"`,
-    event,
+    metadata: {
+      orgId: organization.id,
+      orgName: organization.name,
+      creatorId: user.id,
+      creatorName: user.name,
+      creatorEmail: user.email,
+    },
   })
 
   return organization

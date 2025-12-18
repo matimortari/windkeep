@@ -9,23 +9,21 @@ export const useAuditStore = defineStore("audit", () => {
   const errors = ref<Record<string, string | null>>({ getAuditLogs: null, deleteAuditLogs: null })
 
   const auditActions = computed(() => [
-    { label: "Organization Created", value: "organization.created" },
-    { label: "Organization Updated", value: "organization.updated" },
-    { label: "Organization Deleted", value: "organization.deleted" },
-    { label: "Organization Invite Created", value: "organization.invite.created" },
-    { label: "Organization Invite Accepted", value: "organization.invite.accepted" },
-    { label: "Organization Member Added", value: "organization.member.added" },
-    { label: "Organization Member Role Updated", value: "organization.member.role_updated" },
-    { label: "Organization Member Removed", value: "organization.member.removed" },
-    { label: "Project Created", value: "project.created" },
-    { label: "Project Updated", value: "project.updated" },
-    { label: "Project Deleted", value: "project.deleted" },
-    { label: "Project Member Added", value: "project.member.added" },
-    { label: "Project Member Role Updated", value: "project.member.role_updated" },
-    { label: "Project Member Removed", value: "project.member.removed" },
-    { label: "Secret Created", value: "secret.created" },
-    { label: "Secret Updated", value: "secret.updated" },
-    { label: "Secret Deleted", value: "secret.deleted" },
+    { label: "Organization Created", value: "CREATE.ORG" },
+    { label: "Organization Updated", value: "UPDATE.ORG" },
+    { label: "Organization Invite Accepted", value: "ACCEPT.ORG_INVITE" },
+    { label: "Organization Invite Created", value: "CREATE.ORG_INVITE" },
+    { label: "Organization Member Removed", value: "REMOVE.ORG_MEMBER" },
+    { label: "Organization Member Role Updated", value: "UPDATE.ORG_MEMBER_ROLE" },
+    { label: "Project Created", value: "CREATE.PROJECT" },
+    { label: "Project Deleted", value: "DELETE.PROJECT" },
+    { label: "Project Updated", value: "UPDATE.PROJECT" },
+    { label: "Project Member Removed", value: "REMOVE.PROJECT_MEMBER" },
+    { label: "Project Member Role Updated", value: "UPDATE.PROJECT_MEMBER_ROLE" },
+    { label: "Project Member Added", value: "ADD.PROJECT_MEMBER" },
+    { label: "Secret Deleted", value: "DELETE.SECRET" },
+    { label: "Secret Updated", value: "UPDATE.SECRET" },
+    { label: "Secret Created", value: "CREATE.SECRET" },
   ])
 
   async function getAuditLogs(orgId: string, params?: GetAuditLogsInput) {
