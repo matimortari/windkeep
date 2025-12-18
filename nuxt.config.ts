@@ -54,9 +54,9 @@ export default defineNuxtConfig({
   },
   shiki: {
     bundledLangs: ["bash", "go", "html", "javascript", "json", "markdown", "typescript", "vue"],
-    bundledThemes: ["kanagawa-wave"],
+    bundledThemes: ["nord"],
     highlightOptions: {
-      theme: "kanagawa-wave",
+      theme: "nord",
     },
   },
 })

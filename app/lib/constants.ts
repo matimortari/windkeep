@@ -34,22 +34,22 @@ export const FEATURES = [
   {
     title: "Controlled Access",
     description: "Role-based permissions allow you to control who can view, edit, or manage secrets at both the organization and project levels.",
-    icon: "ph:user-check-bold",
+    icon: "ph:user-check",
   },
   {
     title: "Audit Logs",
     description: "Every sensitive operation, from secret changes to role updates, is logged with timestamps for full traceability and accountability.",
-    icon: "ph:list-magnifying-glass-bold",
+    icon: "ph:list-magnifying-glass",
   },
   {
     title: "Secure Encryption",
     description: "Secrets are encrypted from end to end using AES-256-CBC with a unique key for each secret, keeping your data safe and private.",
-    icon: "ph:shield-star-bold",
+    icon: "ph:shield-star",
   },
   {
     title: "Command-Line Tool",
     description: "Use the open-source CLI to securely access and manage secrets programmatically, integrating seamlessly into scripts or pipelines.",
-    icon: "ph:robot-bold",
+    icon: "ph:terminal",
   },
 ]
 
