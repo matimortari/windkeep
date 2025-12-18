@@ -36,20 +36,22 @@ export default defineEventHandler(async (event) => {
 
   // Create audit log before deletion
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: projectData.orgId,
     projectId: project,
-    action: "project.deleted",
+    action: "DELETE.PROJECT",
     resource: "project",
+    description: `Deleted project "${projectData.name}" (${projectData.slug}) from organization "${projectData.org.name}" (${projectData._count.secrets} secret(s), ${projectData._count.memberships} member(s))`,
     metadata: {
+      projectId: projectData.id,
       projectName: projectData.name,
       projectSlug: projectData.slug,
-      organizationName: projectData.org.name,
+      orgId: projectData.orgId,
+      orgName: projectData.org.name,
       secretsDeleted: projectData._count.secrets,
       membersRemoved: projectData._count.memberships,
     },
-    description: `Deleted project "${projectData.name}" (${projectData.slug}) from organization "${projectData.org.name}" (${projectData._count.secrets} secret(s), ${projectData._count.memberships} member(s))`,
-    event,
   })
 
   await db.project.delete({

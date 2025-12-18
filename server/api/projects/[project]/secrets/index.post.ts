@@ -57,27 +57,35 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
-          orgId: true,
+          org: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },
   })
 
   await createAuditLog({
+    event,
     userId: user.id,
-    orgId: secret.project.orgId,
+    orgId: secret.project.org.id,
     projectId: project,
-    action: "secret.created",
+    action: "CREATE.SECRET",
     resource: "secret",
+    description: `Created secret "${secret.key}" in project "${secret.project.name}" with ${secret.values.length} environment(s)`,
     metadata: {
       secretId: secret.id,
       secretKey: secret.key,
+      projectId: secret.project.id,
       projectName: secret.project.name,
+      orgId: secret.project.org.id,
+      orgName: secret.project.org.name,
       environmentCount: secret.values.length,
       environments: secret.values.map(v => v.environment),
     },
-    description: `Created secret "${secret.key}" in project "${secret.project.name}" with ${secret.values.length} environment(s)`,
-    event,
   })
 
   return {
