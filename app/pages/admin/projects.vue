@@ -13,8 +13,8 @@
           </span>
         </div>
 
-        <button class="btn" @click="toggleSort('name')">
-          <icon name="ph:arrow-down" size="20" :class="[sortDirection === 'asc' ? 'rotate-180' : 'rotate-0']" class="transition-transform" />
+        <button class="btn" @click="toggleNameSort">
+          <icon name="ph:arrow-down" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
         </button>
 
         <button aria-label="Toggle Layout" class="btn" @click="layout = layout === 'grid' ? 'list' : 'grid'">
@@ -90,11 +90,17 @@ const allProjects = computed(() => {
   )
 })
 
-const { sortedData: sortedProjects, toggleSort, sortDirection } = useTableSort<Project>(
-  computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)),
-)
-
+const { sortedData: sortedProjects, sortDirection, sortKey, setSort } = useTableSort<Project>(computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)))
 const filteredProjects = computed(() => sortedProjects.value.filter(project => project.name.toLowerCase().includes(searchQuery.value.toLowerCase())))
+
+function toggleNameSort() {
+  if (sortKey.value !== "name") {
+    setSort("name", "asc")
+    return
+  }
+
+  setSort("name", sortDirection.value === "asc" ? "desc" : "asc")
+}
 
 async function handleCreateProject(payload: { name: string, slug: string, description: string }) {
   if (!activeOrg.value) {

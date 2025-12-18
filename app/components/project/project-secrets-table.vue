@@ -15,7 +15,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="secret in sortedSecrets" :key="secret.key" class="group hover:bg-muted">
+        <tr v-for="secret in sortedSecrets" :key="secret.key" class="group hover:bg-muted/20">
           <td v-for="col in columns" :key="col.key" :class="col.class">
             <div v-if="col.key === 'key'" class="flex items-center gap-2 font-mono text-sm font-semibold text-muted-foreground">
               <span class="truncate">{{ secret.key }}</span>
@@ -42,7 +42,7 @@
 
             <div v-else-if="col.key === 'actions'" class="navigation-group text-muted-foreground">
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
-                <icon :name="visibleKeys[secret.key] ? 'ph:eye' : 'ph:eye-closed'" size="20" class="hover:text-primary" />
+                <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed' : 'ph:eye'" size="20" class="hover:text-primary" />
               </button>
               <button aria-label="Edit Secret" @click="handleUpdateSecret(secret.key)">
                 <icon name="ph:note-pencil" size="20" class="hover:text-primary" />
