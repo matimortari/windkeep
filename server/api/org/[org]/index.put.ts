@@ -20,41 +20,33 @@ export default defineEventHandler(async (event) => {
 
   const existingOrg = await db.organization.findUnique({
     where: { id: org },
-    select: { name: true },
-  })
+    select: Object.keys(result.data).reduce((acc, key) => {
+      acc[key] = true
+      return acc
+    }, {} as Record<string, true>),
+  }) as Record<string, unknown> | null
 
   const updatedOrg = await db.organization.update({
     where: { id: org },
-    data: {
-      name: result.data.name,
-    },
-    include: {
-      memberships: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              image: true,
-            },
-          },
-        },
-      },
-    },
+    data: { name: result.data.name },
+  })
+
+  const changes = Object.entries(result.data).map(([key, newValue]) => {
+    return `${key} from "${existingOrg?.[key]}" to "${newValue}"`
   })
 
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: org,
-    action: "organization.updated",
+    action: "UPDATE.ORG",
     resource: "organization",
+    description: `Updated organization ${changes.join(", ")}`,
     metadata: {
-      oldName: existingOrg?.name,
-      newName: updatedOrg.name,
+      orgId: org,
+      orgName: updatedOrg.name,
+      changes: Object.fromEntries(Object.entries(result.data).map(([key, value]) => [key, { from: existingOrg?.[key], to: value }])),
     },
-    description: `Updated organization name from "${existingOrg?.name}" to "${updatedOrg.name}"`,
-    event,
   })
 
   return updatedOrg

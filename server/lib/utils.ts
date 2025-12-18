@@ -66,10 +66,9 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
   description?: string
   event?: H3Event<EventHandlerRequest>
 }) {
-  const ip = event?.node?.req?.headers?.["x-forwarded-for"] || event?.node?.req?.socket?.remoteAddress || null
-  const userAgent = event?.node?.req?.headers?.["user-agent"] || null
-
-  const auditMetadata = { ip: ip || "unknown", userAgent: userAgent || "unknown", ...metadata }
+  const forwarded = event?.node?.req?.headers?.["x-forwarded-for"]
+  const ip = Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(",")[0]?.trim() ?? event?.node?.req?.socket?.remoteAddress
+  const ua = event?.node?.req?.headers?.["user-agent"] ?? undefined
 
   await db.auditLog.create({
     data: {
@@ -78,7 +77,9 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
       projectId,
       action,
       resource,
-      metadata: auditMetadata,
+      metadata,
+      ip,
+      ua,
       description: description || `${action} performed on ${resource || "resource"}`,
     },
   })

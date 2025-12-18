@@ -62,25 +62,26 @@ export default defineEventHandler(async (event) => {
           image: true,
         },
       },
-      org: { select: { name: true } },
+      org: { select: { id: true, name: true } },
     },
   })
 
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: org,
-    action: "organization.member.role_updated",
+    action: "UPDATE.ORG_MEMBER_ROLE",
     resource: "organization_member",
+    description: `Updated ${updatedMembership.user.name} (${updatedMembership.user.email}) role from ${targetMembership.role} to ${updatedMembership.role} in organization "${updatedMembership.org.name}"`,
     metadata: {
-      targetUserId: updatedMembership.user.id,
-      targetUserEmail: updatedMembership.user.email,
-      targetUserName: updatedMembership.user.name,
+      userId: updatedMembership.user.id,
+      userEmail: updatedMembership.user.email,
+      userName: updatedMembership.user.name,
       oldRole: targetMembership.role,
       newRole: updatedMembership.role,
-      organizationName: updatedMembership.org.name,
+      orgId: updatedMembership.org.id,
+      orgName: updatedMembership.org.name,
     },
-    description: `Updated ${updatedMembership.user.name} (${updatedMembership.user.email}) role from ${targetMembership.role} to ${updatedMembership.role} in organization "${updatedMembership.org.name}"`,
-    event,
   })
 
   return updatedMembership

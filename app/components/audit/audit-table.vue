@@ -36,27 +36,35 @@
 
             <td :title="actionLabel(log.action)">
               <div class="navigation-group max-w-xs truncate">
-                <icon :name="resourceIcon(log.resource)" size="15" />
+                <icon :name="resourceIcon(log.resource) || ''" size="15" />
                 <span class="text-caption">{{ actionLabel(log.action) }}</span>
               </div>
             </td>
-
             <td class="text-caption max-w-md truncate" :title="log.description || 'No description'">
               {{ log.description || 'No description' }}
             </td>
-
             <td class="text-caption max-w-sm truncate md:max-w-32" :title="log.user?.name || log.user?.email">
               {{ log.user?.name || log.user?.email }}
             </td>
-
             <td class="text-caption max-w-sm truncate md:max-w-40" :title="log.createdAt ? formatAuditDate(log.createdAt) : 'N/A'">
               {{ log.createdAt ? formatAuditDate(log.createdAt) : 'N/A' }}
             </td>
           </tr>
 
           <tr v-if="expandedRows.has(log.id)" class="cursor-pointer border text-sm hover:bg-muted/20" @click="toggleRow(log.id)">
-            <td :colspan="columns.length" class="max-w-4xl">
-              <Shiki v-if="log.metadata && Object.keys(log.metadata).length" lang="json" :code="JSON.stringify(log.metadata, null, 2)" class="code-block" />
+            <td :colspan="columns.length" class="max-w-4xl space-y-2">
+              <div class="flex flex-col items-start text-sm font-medium">
+                <div class="text-caption navigation-group">
+                  <span class="font-medium whitespace-nowrap">• User Agent:</span>
+                  <span class="truncate">{{ log.ua || "unknown" }}</span>
+                </div>
+                <div class="text-caption navigation-group">
+                  <span class="font-medium whitespace-nowrap">•   IP:</span>
+                  <span class="truncate">{{ log.ip || "unknown" }}</span>
+                </div>
+              </div>
+
+              <Shiki v-if="(log.metadata || {})" lang="json" :code="JSON.stringify((log.metadata || {}), null, 2)" class="code-block" />
             </td>
           </tr>
         </template>
@@ -69,7 +77,6 @@
 const auditStore = useAuditStore()
 const { auditLogs, auditActions, loading } = storeToRefs(auditStore)
 const expandedRows = ref<Set<string>>(new Set())
-
 const { sortedData: sortedLogs, toggleSort, getSortIconName } = useTableSort(auditLogs)
 
 const columns = [
@@ -89,8 +96,12 @@ const resourceMap: Record<string, string> = {
   secret: "ph:key",
 }
 
-function resourceIcon(resource: string | null | undefined) {
-  return (resource && resourceMap[resource]) || "ph:cube"
+function toggleRow(id: string) {
+  expandedRows.value.has(id) ? expandedRows.value.delete(id) : expandedRows.value.add(id)
+}
+
+function resourceIcon(resource: string | null | undefined): string {
+  return (resource && resourceMap[resource]) || ""
 }
 
 function actionLabel(action: string) {
@@ -107,9 +118,5 @@ function formatAuditDate(date: string | Date) {
     minute: "2-digit",
     hour12: false,
   }).format(new Date(date))
-}
-
-function toggleRow(id: string) {
-  expandedRows.value.has(id) ? expandedRows.value.delete(id) : expandedRows.value.add(id)
 }
 </script>

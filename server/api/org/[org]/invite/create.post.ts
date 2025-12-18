@@ -54,17 +54,19 @@ export default defineEventHandler(async (event) => {
   const inviteUrl = `${getInviteBaseUrl(event)}/onboarding/join-org?token=${token}`
 
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: org,
-    action: "organization.invite.created",
+    action: "CREATE.ORG_INVITE",
     resource: "organization_invite",
+    description: `Created invite link for organization "${invitation.org.name}"`,
     metadata: {
+      orgId: invitation.org.id,
       orgName: invitation.org.name,
+      invitedById: invitation.invitedBy.id,
       expiresAt: invitation.expiresAt.toISOString(),
       tokenPrefix: token.substring(0, 8),
     },
-    description: `Created invite link for organization "${invitation.org.name}"`,
-    event,
   })
 
   return { invitation, inviteUrl }

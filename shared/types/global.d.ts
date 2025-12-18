@@ -102,6 +102,8 @@ interface AuditLog {
   resource?: string | null
   metadata?: Record<string, any> | null
   description?: string | null
+  ip?: string | null
+  ua?: string | null
   createdAt?: Date | string
   user?: User
   org?: Organization

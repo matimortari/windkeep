@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     where: { userId_orgId: { userId: member, orgId: org } },
     include: {
       user: { select: { id: true, email: true, name: true } },
-      org: { select: { name: true } },
+      org: { select: { id: true, name: true } },
     },
   })
   if (!targetMembership) {
@@ -64,23 +64,21 @@ export default defineEventHandler(async (event) => {
   })
 
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: org,
-    action: "organization.member.removed",
+    action: "REMOVE.ORG_MEMBER",
     resource: "organization_member",
+    description: member === user.id ? `${targetMembership.user.name} left organization "${targetMembership.org.name}"` : `Removed ${targetMembership.user.name} from organization "${targetMembership.org.name}"`,
     metadata: {
-      targetUserId: targetMembership.user.id,
-      targetUserEmail: targetMembership.user.email,
-      targetUserName: targetMembership.user.name,
-      role: targetMembership.role,
-      organizationName: targetMembership.org.name,
+      userId: targetMembership.user.id,
+      userEmail: targetMembership.user.email,
+      userName: targetMembership.user.name,
+      userRole: targetMembership.role,
       selfRemoval: member === user.id,
+      orgId: targetMembership.org.id,
+      orgName: targetMembership.org.name,
     },
-    description:
-      member === user.id
-        ? `${targetMembership.user.name} left organization "${targetMembership.org.name}"`
-        : `Removed ${targetMembership.user.name} from organization "${targetMembership.org.name}"`,
-    event,
   })
 
   return { success: true, message: "Member removed successfully" }

@@ -74,7 +74,12 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
-          orgId: true,
+          org: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },
@@ -89,20 +94,23 @@ export default defineEventHandler(async (event) => {
   }
 
   await createAuditLog({
+    event,
     userId: user.id,
-    orgId: updatedSecret.project.orgId,
+    orgId: updatedSecret.project.org.id,
     projectId: project,
-    action: "secret.updated",
+    action: "UPDATE.SECRET",
     resource: "secret",
+    description: `Updated secret "${updatedSecret.key}" in project "${updatedSecret.project.name}" (${changes.join(", ")})`,
     metadata: {
       secretId: updatedSecret.id,
       secretKey: updatedSecret.key,
+      projectId: updatedSecret.project.id,
       projectName: updatedSecret.project.name,
+      orgId: updatedSecret.project.org.id,
+      orgName: updatedSecret.project.org.name,
       changedFields: changes,
-      updatedEnvironments: result.data.values?.map(v => v.environment) || [],
+      updatedEnvs: result.data.values?.map(v => v.environment) || [],
     },
-    description: `Updated secret "${updatedSecret.key}" in project "${updatedSecret.project.name}" (${changes.join(", ")})`,
-    event,
   })
 
   return {

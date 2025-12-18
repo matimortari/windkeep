@@ -75,17 +75,18 @@ export default defineEventHandler(async (event) => {
   ])
 
   await createAuditLog({
+    event,
     userId: user.id,
     orgId: invitation.orgId,
-    action: "organization.invite.accepted",
+    action: "ACCEPT.ORG_INVITE",
     resource: "organization_invite",
+    description: `${membership.user.name} (${membership.user.email}) joined organization "${membership.org.name}" via invite link`,
     metadata: {
-      organizationName: membership.org.name,
+      orgId: invitation.org.id,
+      orgName: invitation.org.name,
       userName: membership.user.name,
       userEmail: membership.user.email,
     },
-    description: `${membership.user.name} (${membership.user.email}) joined organization "${membership.org.name}" via invite link`,
-    event,
   })
 
   return membership
