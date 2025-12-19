@@ -9,7 +9,7 @@
         Your Secrets, Secured.
       </h1>
       <p class="max-w-xl leading-6 font-semibold text-muted-foreground md:text-lg">
-        No more .env headaches. SecretkeepR is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
+        No more .env headaches. WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
       </p>
 
       <div class="flex flex-row items-center gap-8">
@@ -18,7 +18,7 @@
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
         <nuxt-link to="/cli" class="flex flex-row items-center gap-2 text-sm font-semibold hover:underline">
-          <span>SecretkeepR CLI</span>
+          <span>WindKeep CLI</span>
           <icon name="ph:code-block-bold" size="25" />
         </nuxt-link>
       </div>
@@ -172,7 +172,7 @@ function toggleAccordion(index: number) {
 
 useHead({
   title: "Securely Manage Your Environment Variables",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app" }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app" }],
   meta: [{ name: "description", content: "Centralize, encrypt, and share your secrets with confidence. Fast, safe, and easy to use." }],
 })
 

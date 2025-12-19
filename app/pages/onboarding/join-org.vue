@@ -64,8 +64,8 @@ onMounted(async () => {
 
 useHead({
   title: "Join Organization",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/onboarding/join-org" }],
-  meta: [{ name: "description", content: "Join an organization on SecretkeepR." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/onboarding/join-org" }],
+  meta: [{ name: "description", content: "Join an organization on WindKeep." }],
 })
 
 definePageMeta({

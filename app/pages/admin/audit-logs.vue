@@ -24,8 +24,8 @@ watch(activeOrg, async (org) => {
 
 useHead({
   title: "Audit Logs",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/admin/audit-logs" }],
-  meta: [{ name: "description", content: "SecretkeepR audit logs page." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/audit-logs" }],
+  meta: [{ name: "description", content: "WindKeep audit logs page." }],
 })
 
 definePageMeta({
