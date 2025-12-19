@@ -26,7 +26,7 @@
       </div>
 
       <!-- Project Details -->
-      <div v-for="(field, index) in projectFields" :key="index" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10">
+      <div v-for="(field, index) in projectFields" :key="index" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
             {{ field.label }}
@@ -93,7 +93,7 @@
     </section>
 
     <!-- Add New Member -->
-    <section v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Add New Member">
+    <section v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Add New Member">
       <header class="flex flex-col gap-1">
         <h5>
           Add New Member
@@ -139,7 +139,7 @@
         </p>
       </header>
 
-      <nav v-if="!isOwner" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Leave Project">
+      <nav v-if="!isOwner" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Leave Project">
         <header class="flex flex-col gap-1">
           <h5>
             Leave Project
@@ -161,7 +161,7 @@
         </div>
       </nav>
 
-      <nav v-if="isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Project">
+      <nav v-if="isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Project">
         <header class="flex flex-col gap-1">
           <h5>
             Delete Project

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Generate invitation token
-  const token = randomBytes(32).toString("hex")
+  const token = randomBytes(12).toString("hex")
   const expiresAt = new Date()
   expiresAt.setHours(expiresAt.getHours() + 12) // 12 hours expiration
 
