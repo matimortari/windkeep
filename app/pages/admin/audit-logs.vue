@@ -6,7 +6,7 @@
 
     <AuditFilter />
 
-    <div class="scroll-area max-h-[80vh] overflow-y-auto">
+    <div class="scroll-area max-h-screen overflow-y-auto">
       <AuditTable />
     </div>
   </div>

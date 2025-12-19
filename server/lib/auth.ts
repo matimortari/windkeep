@@ -31,7 +31,7 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
         email,
         name: name?.trim() || email.split("@")[0],
         image: image || undefined,
-        apiToken: randomBytes(16).toString("hex"),
+        apiToken: randomBytes(12).toString("hex"),
       },
     })
   }

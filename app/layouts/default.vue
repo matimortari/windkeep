@@ -24,11 +24,11 @@ onMounted(async () => {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.25;
+  opacity: 0.3;
   background-image:
     linear-gradient(to right, var(--muted) 1px, transparent 1px),
     linear-gradient(to bottom, var(--muted) 1px, transparent 1px);
-  background-size: 50px 50px;
+  background-size: 250px 250px;
 }
 
 main > *:not(.grid-backdrop) {

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   // Only regenerate when the boolean is explicitly sent and true
   let apiTokenToUpdate: string | undefined
   if (result.data.regenerateApiToken) {
-    apiTokenToUpdate = randomBytes(16).toString("hex")
+    apiTokenToUpdate = randomBytes(12).toString("hex")
   }
 
   const updatedUser = await db.user.update({

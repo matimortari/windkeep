@@ -21,7 +21,7 @@
       </div>
 
       <!-- User Details -->
-      <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10">
+      <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10">
         <header class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
             {{ field.label }}
@@ -83,7 +83,7 @@
         </p>
       </header>
 
-      <nav class="flex flex-col justify-between gap-2 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Account">
+      <nav class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Account">
         <header class="flex flex-col gap-1">
           <h5>
             Delete Account
@@ -157,7 +157,7 @@ const userFields = [
   },
   {
     label: "CLI Token",
-    description: "This token is used for CLI access. Keep it secret and secure.",
+    description: "Use this token to authenticate with the WindKeep CLI. Keep it secure and do not share it with others.",
     value: computed(() => user.value?.apiToken),
     onRegenerate: handleRegenerateToken,
     copyable: true,

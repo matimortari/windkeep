@@ -49,6 +49,23 @@ export function useContent(options: { selector?: string, parseMethod?: boolean }
     }
   }
 
+  function headerClasses(header: any) {
+    const classes: string[] = []
+    if (header.level === 2) {
+      classes.push("ml-0 my-2 font-semibold")
+    }
+    if (header.level === 3) {
+      classes.push("ml-2 my-2 text-sm font-medium")
+    }
+    if (header.level === 4) {
+      classes.push("ml-4 text-xs font-medium")
+    }
+    if (activeSection.value === header.id) {
+      classes.push("text-primary font-semibold border-l-2 border-primary pl-2")
+    }
+    return classes.join(" ")
+  }
+
   onMounted(extractHeaders)
   onBeforeUnmount(() => observer?.disconnect())
 
@@ -56,23 +73,6 @@ export function useContent(options: { selector?: string, parseMethod?: boolean }
     observer?.disconnect()
     await extractHeaders()
   })
-
-  function headerClasses(header: any) {
-    const classes: string[] = []
-    if (header.level === 2) {
-      classes.push("ml-0 my-2 text-base font-semibold")
-    }
-    if (header.level === 3) {
-      classes.push("ml-2 my-2 text-sm font-semibold")
-    }
-    if (header.level === 4) {
-      classes.push("ml-4 text-xs")
-    }
-    if (activeSection.value === header.id) {
-      classes.push("text-primary font-semibold")
-    }
-    return classes.join(" ")
-  }
 
   return { headers, headerClasses }
 }
