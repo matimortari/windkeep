@@ -1,4 +1,4 @@
-module github.com/matimortari/secretkeepr/cli
+module github.com/matimortari/windkeep/cli
 
 go 1.21
 
