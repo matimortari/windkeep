@@ -329,8 +329,8 @@ watch(() => orgMembers.value, (memberships: OrgMembership[] = []) => {
 
 useHead({
   title: "Organization",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/admin/organization" }],
-  meta: [{ name: "description", content: "SecretkeepR organization page." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/organization" }],
+  meta: [{ name: "description", content: "WindKeep organization page." }],
 })
 
 definePageMeta({

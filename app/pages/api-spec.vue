@@ -9,8 +9,8 @@ provide("contentHeaders", useContent({ selector: ".markdown", parseMethod: true 
 
 useHead({
   title: "API Specification",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/api-spec" }],
-  meta: [{ name: "description", content: "SecretkeepR API Specification." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/api-spec" }],
+  meta: [{ name: "description", content: "WindKeep API Specification." }],
 })
 
 definePageMeta({

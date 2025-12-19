@@ -109,7 +109,7 @@ watch(() => project.value?.id, async (id: string | undefined) => {
 
   useHead({
     title: `${projectTitle}`,
-    link: [{ rel: "canonical", href: `https://secretkeepr.vercel.app/${id}` }],
+    link: [{ rel: "canonical", href: `https://windkeep.vercel.app/${id}` }],
     meta: [{ name: "description", content: `${projectTitle} project page.` }],
   })
 }, { immediate: true })
