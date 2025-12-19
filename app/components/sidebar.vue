@@ -10,7 +10,7 @@
       <nuxt-link
         v-for="link in SIDEBAR_NAV_LINKS" :key="link.url"
         :to="link.url" class="group navigation-group rounded p-2 transition-colors hover:bg-muted"
-        @click="$emit('update:isOpen', false)"
+        :class="{ 'bg-muted/50': route.path === link.url }" @click="$emit('update:isOpen', false)"
       >
         <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />
         <span>{{ link.label }}</span>
@@ -39,7 +39,7 @@
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
           :to="`/admin/${project.slug}`" class="truncate hover:underline"
-          @click="$emit('update:isOpen', false)"
+          :class="{ 'font-semibold text-primary': route.path === `/admin/${project.slug}` }" @click="$emit('update:isOpen', false)"
         >
           {{ project.name }}
         </nuxt-link>
@@ -60,11 +60,11 @@ const props = defineProps<{
 
 defineEmits<(e: "update:isOpen", value: boolean) => void>()
 
+const route = useRoute()
 const projectStore = useProjectStore()
 const userStore = useUserStore()
 const { activeOrg } = storeToRefs(useOrgStore())
 const { projects } = storeToRefs(projectStore)
-
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
 

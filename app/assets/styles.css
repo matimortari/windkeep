@@ -100,17 +100,17 @@ html.light {
 */
 h1 {
   font-size: 3rem;
-  line-height: 3.5rem;
+  line-height: 3rem;
   font-weight: 700;
 }
 h2 {
   font-size: 2.25rem;
-  line-height: 2.5rem;
+  line-height: 2.25rem;
   font-weight: 700;
 }
 h3 {
   font-size: 1.75rem;
-  line-height: 2rem;
+  line-height: 1.75rem;
   font-weight: 700;
 }
 h4 {
@@ -120,7 +120,7 @@ h4 {
 }
 h5 {
   font-size: 1.125rem;
-  line-height: 1.25rem;
+  line-height: 1.125rem;
   font-weight: 700;
 }
 h6 {
@@ -134,7 +134,7 @@ h6 {
 .text-success {
   font-size: 0.875rem;
   line-height: 1.25rem;
-  font-weight: 400;
+  font-weight: 500;
 }
 .text-caption {
   color: var(--muted-foreground);
@@ -176,7 +176,7 @@ h6 {
   background-color: #2e3440;
   padding: 1rem;
   border-radius: 0.25rem;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   text-align: start;
   overflow-x: auto;
   scrollbar-width: thin;

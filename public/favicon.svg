@@ -1,57 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   width="255.99998"
-   height="255.99998"
-   viewBox="0 0 67.733321 67.733321"
-   version="1.1"
-   id="svg1"
-   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
-   sodipodi:docname="secretkeepr.svg"
-   xml:space="preserve"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
-     id="namedview1"
-     pagecolor="#505050"
-     bordercolor="#eeeeee"
-     borderopacity="1"
-     inkscape:showpageshadow="false"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="true"
-     inkscape:deskcolor="#505050"
-     inkscape:document-units="px"
-     showguides="true"
-     borderlayer="true"
-     labelstyle="default"
-     showborder="true"
-     inkscape:zoom="0.32"
-     inkscape:cx="128.125"
-     inkscape:cy="126.5625"
-     inkscape:window-width="1366"
-     inkscape:window-height="697"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer4"
-     showgrid="false"><inkscape:page
-       x="0"
-       y="0"
-       width="67.733322"
-       height="67.733322"
-       id="page2"
-       margin="0"
-       bleed="0"
-       inkscape:label="logo" /></sodipodi:namedview><defs
-     id="defs1" /><g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="logo"><path
-       fill="currentColor"
-       fill-rule="evenodd"
-       d="M 33.866656,-1.767334e-6 64.657742,16.933323 V 50.800129 L 33.866656,67.733324 3.0755799,50.800129 V 16.933323 Z M 37.287812,19.209866 h -6.842403 v 29.329447 h 6.842403 z m -13.684915,6.517556 h -6.842503 v 16.294179 h 6.842503 z m 27.369929,0 h -6.842512 v 16.294179 h 6.842512 z"
-       id="path1-8"
-       style="fill:#d0d867;fill-opacity:1;stroke-width:0.156518"
-       inkscape:label="bg" /></g></svg>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M84.25 103C80.7083 103 77.7417 101.8 75.35 99.4C72.9583 97 71.7583 94.0333 71.75 90.5C71.7417 86.9667 72.9417 84 75.35 81.6C77.7583 79.2 80.725 78 84.25 78C87.775 78 90.7458 79.2 93.1625 81.6C95.5792 84 96.775 86.9667 96.75 90.5C96.725 94.0333 95.525 97.0042 93.15 99.4125C90.775 101.821 87.8083 103.017 84.25 103ZM171.75 103C168.208 103 165.242 101.8 162.85 99.4C160.458 97 159.258 94.0333 159.25 90.5C159.242 86.9667 160.442 84 162.85 81.6C165.258 79.2 168.225 78 171.75 78C175.275 78 178.246 79.2 180.662 81.6C183.079 84 184.275 86.9667 184.25 90.5C184.225 94.0333 183.025 97.0042 180.65 99.4125C178.275 101.821 175.308 103.017 171.75 103ZM128 253C100.083 253 76.4375 243.312 57.0625 223.937C37.6875 204.562 28 180.917 28 153V90.5C28 65.0833 38 44.1458 58 27.6875C78 11.2292 101.333 3 128 3C154.667 3 178 11.2292 198 27.6875C218 44.1458 228 65.0833 228 90.5V215.5C228 219.042 226.8 222.012 224.4 224.412C222 226.812 219.033 228.008 215.5 228H203C192.583 228 183.729 224.354 176.438 217.062C169.146 209.771 165.5 200.917 165.5 190.5V189.875C165.5 185.708 164.2 182.583 161.6 180.5C159 178.417 156.133 177.375 153 177.375C149.867 177.375 147.004 178.417 144.412 180.5C141.821 182.583 140.517 185.708 140.5 189.875V190.5C140.5 200.5 142.687 209.771 147.062 218.312C151.437 226.854 157.271 233.937 164.562 239.562C167.688 241.854 168.783 244.667 167.85 248C166.917 251.333 164.883 253 161.75 253H128ZM128 153C147.792 153 165.242 147.217 180.35 135.65C195.458 124.083 203.008 109.033 203 90.5C203 83.2083 201.75 76.3833 199.25 70.025C196.75 63.6667 193.208 57.9917 188.625 53C175.292 53.4167 163.938 58.4167 154.562 68C145.188 77.5833 140.5 89.25 140.5 103C140.5 106.542 139.304 109.513 136.913 111.913C134.521 114.312 131.55 115.508 128 115.5C124.45 115.492 121.483 114.292 119.1 111.9C116.717 109.508 115.517 106.542 115.5 103C115.5 89.25 110.812 77.6875 101.438 68.3125C92.0625 58.9375 80.7083 53.9375 67.375 53.3125C62.7917 58.3125 59.25 63.9375 56.75 70.1875C54.25 76.4375 53 83.2083 53 90.5C53 109.042 60.5542 124.096 75.6625 135.663C90.7708 147.229 108.217 153.008 128 153Z" fill="url(#paint0_linear_4046_109)"/>
+<defs>
+<linearGradient id="paint0_linear_4046_109" x1="128" y1="3" x2="128" y2="253" gradientUnits="userSpaceOnUse">
+<stop offset="1" stop-color="#64748B"/>
+</linearGradient>
+</defs>
+</svg>

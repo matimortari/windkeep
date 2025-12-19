@@ -34,11 +34,11 @@
 
     <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" />
 
-    <div v-else-if="layout === 'list'" class="scroll-area max-h-[80vh] overflow-y-auto">
+    <div v-else-if="layout === 'list'" class="scroll-area max-h-screen overflow-y-auto">
       <ProjectTable :projects="filteredProjects" />
     </div>
 
-    <ul v-else class="scroll-area grid max-h-[80vh] gap-2 overflow-y-auto md:grid-cols-3">
+    <ul v-else class="scroll-area grid max-h-screen gap-2 overflow-y-auto md:grid-cols-3">
       <li
         v-for="(project, index) in filteredProjects" :key="project.id"
         v-motion :initial="{ opacity: 0 }"

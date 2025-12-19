@@ -15,10 +15,10 @@
       </thead>
 
       <tbody>
-        <tr v-for="secret in sortedSecrets" :key="secret.key" class="group hover:bg-muted/20">
+        <tr v-for="(secret, index) in sortedSecrets" :key="secret.key" class="group hover:bg-muted/20">
           <td v-for="col in columns" :key="col.key" :class="col.class">
             <div v-if="col.key === 'key'" class="flex items-center gap-2 font-mono text-sm font-semibold text-muted-foreground">
-              <span class="truncate">{{ secret.key }}</span>
+              <span class="truncate"><span class="text-primary">{{ index + 1 }}.</span> {{ secret.key }}</span>
               <icon
                 v-if="secret.description" name="ph:info"
                 :title="secret.description" size="15"
