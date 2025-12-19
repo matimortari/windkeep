@@ -152,7 +152,7 @@ const userFields = [
 
   {
     label: "Joined On",
-    description: "The date you joined SecretkeepR.",
+    description: "The date you joined WindKeep.",
     value: computed(() => formatDate(user.value?.createdAt)),
   },
   {
@@ -227,8 +227,8 @@ async function handleDeleteUser() {
 
 useHead({
   title: "Preferences",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/admin/preferences" }],
-  meta: [{ name: "description", content: "SecretkeepR preferences page." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/preferences" }],
+  meta: [{ name: "description", content: "WindKeep preferences page." }],
 })
 
 definePageMeta({

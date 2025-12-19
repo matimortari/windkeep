@@ -42,6 +42,6 @@ function signIn(provider: string) {
 
 useHead({
   title: "Sign In",
-  meta: [{ name: "description", content: "SecretkeepR Sign In page" }],
+  meta: [{ name: "description", content: "WindKeep Sign In page" }],
 })
 </script>

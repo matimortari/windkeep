@@ -6,7 +6,7 @@
       :duration="800"
     >
       <h1 class="font-display">
-        Welcome to SecretkeepR
+        Welcome to WindKeep
       </h1>
       <p class="text-caption">
         To get started, please create an organization name with at least 3 characters.
@@ -70,8 +70,8 @@ onMounted(async () => {
 
 useHead({
   title: "Create Organization",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/onboarding/create-org" }],
-  meta: [{ name: "description", content: "Create your organization on SecretkeepR." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/onboarding/create-org" }],
+  meta: [{ name: "description", content: "Create your organization on WindKeep." }],
 })
 
 definePageMeta({

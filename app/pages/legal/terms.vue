@@ -7,8 +7,8 @@ const pageContent = await queryCollection("content").path("/terms-of-service").f
 
 useHead({
   title: "Terms of Service",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/legal/terms" }],
-  meta: [{ name: "description", content: "SecretkeepR Terms of Service." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/legal/terms" }],
+  meta: [{ name: "description", content: "WindKeep Terms of Service." }],
 })
 
 definePageMeta({

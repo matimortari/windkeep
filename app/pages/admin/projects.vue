@@ -132,8 +132,8 @@ watch(layout, (newLayout) => {
 
 useHead({
   title: "Projects",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/admin/projects" }],
-  meta: [{ name: "description", content: "SecretkeepR projects page." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/projects" }],
+  meta: [{ name: "description", content: "WindKeep projects page." }],
 })
 
 definePageMeta({
