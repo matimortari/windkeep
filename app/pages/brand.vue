@@ -5,7 +5,7 @@
         Brand & Assets
       </h2>
       <p class="text-caption">
-        Download SecretkeepR logos and explore our design colors.
+        Download WindKeep logos and explore our design colors.
       </p>
     </header>
 
@@ -138,7 +138,7 @@ onMounted(() => {
 
 useHead({
   title: "Brand Assets",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/brand" }],
-  meta: [{ name: "description", content: "SecretkeepR Brand Assets." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/brand" }],
+  meta: [{ name: "description", content: "WindKeep Brand Assets." }],
 })
 </script>

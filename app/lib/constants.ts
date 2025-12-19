@@ -1,4 +1,4 @@
-export const BASE_URL = "https://secretkeepr.vercel.app"
+export const BASE_URL = "https://windkeep.vercel.app"
 
 export const HIGHLIGHTS = [
   {
@@ -8,7 +8,7 @@ export const HIGHLIGHTS = [
   },
   {
     title: "Free & Open Source",
-    description: "SecretkeepR is completely free to use and open source, giving you full transparency and control.",
+    description: "WindKeep is completely free to use and open source, giving you full transparency and control.",
     icon: "ph:code-bold",
   },
   {
@@ -67,17 +67,17 @@ export const FAQS = [
     answer: "Audit logs record actions performed within the workspace — such as updating secrets, changing roles, or modifying projects. Each log entry captures who performed the action, timestamps, and additional metadata. Audit logs help teams stay transparent, investigate issues, and maintain accountability. All members in the organization can view the logs, and the Owner can clear them if desired.",
   },
   {
-    question: "What is the SecretkeepR CLI and how can i use it?",
-    answer: "The SecretkeepR CLI allows you to interact with secrets and projects directly from your terminal, eliminating the need for hardcoded .env files and making it easy to integrate secrets into scripts and automated workflows. Whether you're retrieving secrets, updating them, or managing project settings, the CLI makes these tasks faster, more consistent, and scriptable.",
+    question: "What is the WindKeep CLI and how can i use it?",
+    answer: "The WindKeep CLI allows you to interact with secrets and projects directly from your terminal, eliminating the need for hardcoded .env files and making it easy to integrate secrets into scripts and automated workflows. Whether you're retrieving secrets, updating them, or managing project settings, the CLI makes these tasks faster, more consistent, and scriptable.",
   },
 ]
 
-export const INSTALL_COMMAND = "go install github.com/matimortari/secretkeepr/cli@latest"
+export const INSTALL_COMMAND = "go install github.com/matimortari/windkeep/cli@latest"
 
 export const CLI_COMMANDS = [
-  "secretkeepr login",
-  "secretkeepr whoami",
-  "secretkeepr project list-all",
+  "windkeep login",
+  "windkeep whoami",
+  "windkeep project list-all",
 ]
 
 export const SIDEBAR_NAV_LINKS = [

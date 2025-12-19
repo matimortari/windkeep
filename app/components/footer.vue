@@ -6,10 +6,10 @@
 
         <div class="flex flex-row items-center justify-between gap-4">
           <p class="text-caption whitespace-nowrap">
-            © {{ new Date().getFullYear() }} SecretkeepR. All rights reserved.
+            © {{ new Date().getFullYear() }} WindKeep. All rights reserved.
           </p>
 
-          <nuxt-link to="https://github.com/matimortari/secretkeepr" target="_blank" aria-label="GitHub Repository">
+          <nuxt-link to="https://github.com/matimortari/windkeep" target="_blank" aria-label="GitHub Repository">
             <icon name="simple-icons:github" size="25" class="transition-transform hover:scale-110 hover:text-primary" />
           </nuxt-link>
         </div>

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const imageUrl = await uploadFile({
-    path: `secretkeepr-user-uploads/avatar/${user.id}`,
+    path: `windkeep-user-uploads/avatar/${user.id}`,
     file,
     maxSize: 2 * 1024 * 1024, // 2 MB
     allowedMimeTypes: ["image/png", "image/jpeg", "image/webp"],

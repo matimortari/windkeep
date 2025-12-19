@@ -1,5 +1,5 @@
 {
-  "name": "secretkeepr",
+  "name": "windkeep",
   "type": "module",
   "private": true,
   "scripts": {

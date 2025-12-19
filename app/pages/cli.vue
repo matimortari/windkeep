@@ -7,8 +7,8 @@ const pageContent = await queryCollection("content").path("/cli").first()
 
 useHead({
   title: "Command Line Interface",
-  link: [{ rel: "canonical", href: "https://secretkeepr.vercel.app/legal/cli" }],
-  meta: [{ name: "description", content: "SecretkeepR Command Line Interface." }],
+  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/legal/cli" }],
+  meta: [{ name: "description", content: "WindKeep Command Line Interface." }],
 })
 
 definePageMeta({
