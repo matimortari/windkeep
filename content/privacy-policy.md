@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This Privacy Policy explains how SecretkeepR collects, uses, and protects your personal information when you access or use our services, including web applications and command-line tools.
+This Privacy Policy explains how WindKeep collects, uses, and protects your personal information when you access or use our services, including web applications and command-line tools.
 
-In this Policy, “we”, “us”, and “our” refer to SecretkeepR and its affiliates, and “you” and “your” refer to users of our services.
+In this Policy, “we”, “us”, and “our” refer to WindKeep and its affiliates, and “you” and “your” refer to users of our services.
 
 ## Information We Collect
 
@@ -31,12 +31,12 @@ We do not sell your personal information. We may share data under the following 
 
 - With service providers that help us operate or secure the platform.
 - When required by law, legal process, or governmental request.
-- To protect the rights, safety, or property of SecretkeepR, its users, or third parties.
+- To protect the rights, safety, or property of WindKeep, its users, or third parties.
 - During mergers, acquisitions, or other corporate transactions, while keeping user data secure.
 
 ## Cookies and Tracking
 
-SecretkeepR uses cookies and similar technologies to enhance security, improve your experience, and measure usage.
+WindKeep uses cookies and similar technologies to enhance security, improve your experience, and measure usage.
 
 - Essential cookies for authentication and security.
 - Analytics cookies to monitor platform usage and feature adoption.
@@ -57,7 +57,7 @@ Depending on your jurisdiction, you may have rights regarding your personal data
 
 ## Changes to This Policy
 
-We may update this Privacy Policy from time to time. Continued use of SecretkeepR constitutes acceptance of the updated policy. We encourage you to review this page periodically.
+We may update this Privacy Policy from time to time. Continued use of WindKeep constitutes acceptance of the updated policy. We encourage you to review this page periodically.
 
 ## Contact
 
