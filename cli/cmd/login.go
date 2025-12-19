@@ -3,15 +3,15 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/matimortari/secretkeepr/cli/api"
-	"github.com/matimortari/secretkeepr/cli/config"
+	"github.com/matimortari/windkeep/cli/api"
+	"github.com/matimortari/windkeep/cli/config"
 	"github.com/spf13/cobra"
 )
 
 var loginCmd = &cobra.Command{
 	Use:   "login [API_TOKEN]",
-	Short: "Authenticate with SecretkeepR",
-	Long:  `Authenticate with SecretkeepR using your API token.`,
+	Short: "Authenticate with WindKeep",
+	Long:  `Authenticate with WindKeep using your API token.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		apiToken := args[0]

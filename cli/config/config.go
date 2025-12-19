@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	DefaultConfigDir  = ".secretkeepr"
+	DefaultConfigDir  = ".windkeep"
 	DefaultConfigFile = "config.yaml"
-	DefaultAPIURL     = "https://secretkeepr.vercel.app"
+	DefaultAPIURL     = "https://windkeep.vercel.app"
 )
 
 type Config struct {

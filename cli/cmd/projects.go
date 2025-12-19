@@ -5,7 +5,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/matimortari/secretkeepr/cli/api"
+	"github.com/matimortari/windkeep/cli/api"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +29,7 @@ var projectsListCmd = &cobra.Command{
 		}
 
 		if len(projects) == 0 {
-			fmt.Println("No projects found. Create one with 'secretkeepr projects create'")
+			fmt.Println("No projects found. Create one with 'windkeep projects create'")
 			return nil
 		}
 
@@ -61,7 +61,7 @@ var projectsCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if cfg.ActiveOrgID == "" {
-			return fmt.Errorf("no active organization. Use 'secretkeepr orgs switch' first")
+			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
 		}
 
 		name := args[0]
