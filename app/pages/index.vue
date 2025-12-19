@@ -4,22 +4,23 @@
     :visible="{ opacity: 1 }" :duration="800"
     class="relative flex min-h-screen w-full flex-col items-center justify-center gap-12 py-24 text-center"
   >
-    <header id="hero" class="z-20 flex w-full flex-col items-center gap-4 px-4 py-20 md:px-20">
+    <header id="hero" class="z-20 flex w-full flex-col items-center gap-8 px-4 py-20 md:px-20">
       <h1 class="font-display md:text-5xl! 2xl:text-6xl!">
         Your Secrets, Secured.
       </h1>
-      <p class="max-w-xl leading-6 font-semibold text-muted-foreground md:text-lg">
-        No more .env headaches. WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
+      <p class="max-w-2xl leading-6 font-semibold text-muted-foreground md:text-lg">
+        No more .env headaches — WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
       </p>
 
-      <div class="flex flex-row items-center gap-8">
-        <nuxt-link to="/sign-in" class="btn-primary rounded-full!">
-          <span>Get Started</span>
+      <div class="flex flex-col items-center gap-4 backdrop-blur-xs">
+        <nuxt-link to="/sign-in" class="btn rounded-full! shadow-lg shadow-primary/20 hover:shadow-primary/30">
+          <span>Create Account</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
-        <nuxt-link to="/cli" class="flex flex-row items-center gap-2 text-sm font-semibold hover:underline">
-          <span>WindKeep CLI</span>
-          <icon name="ph:code-block-bold" size="25" />
+
+        <nuxt-link to="/cli" class="text-caption group flex flex-row items-center gap-1">
+          <span>Or explore the <span class="font-semibold text-primary group-hover:underline"> WindKeep CLI</span></span>
+          <icon name="ph:code-block-bold" size="20" class="text-primary transition-transform group-hover:scale-125" />
         </nuxt-link>
       </div>
     </header>
@@ -32,7 +33,7 @@
         :delay="200 * index" class="card flex max-w-sm flex-col items-start gap-2"
       >
         <div class="flex flex-row items-center gap-2">
-          <span class="flex rounded-full bg-muted p-1.5">
+          <span class="card rounded-full! p-2!">
             <icon :name="highlight.icon" class="text-primary" size="25" />
           </span>
           <h4>
@@ -49,7 +50,7 @@
   <section
     id="cli" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="w-full border-y-2 bg-card py-12"
+    :duration="800" class="w-full border-y-2 bg-card py-24"
   >
     <div class="container mx-auto flex flex-col items-center justify-center gap-8 p-4 md:flex-row md:gap-20 2xl:gap-32">
       <header class="flex flex-col items-center gap-4 text-center md:items-start md:text-start">
@@ -65,25 +66,18 @@
           for more details.
         </p>
 
-        <div class="flex w-full flex-col gap-4 md:items-start">
-          <ul class="text-caption flex flex-col items-start gap-2">
-            <li v-for="bullet in CLI_BULLETS" :key="bullet.description" class="navigation-group">
-              <span>• {{ bullet.description }} </span>
-            </li>
-          </ul>
-
-          <p class="text-caption flex flex-row items-end gap-4 self-end select-none">
-            <span>Powered by Go</span>
-            <img src="/assets/gopher.png" alt="Gopher" width="30" height="30">
-          </p>
-        </div>
+        <ul class="text-caption flex flex-col items-start gap-2">
+          <li v-for="bullet in CLI_BULLETS" :key="bullet.description" class="navigation-group">
+            <span>• {{ bullet.description }} </span>
+          </li>
+        </ul>
       </header>
 
       <div class="w-full max-w-xl flex-1 px-2 md:min-w-80 md:px-0">
         <div class="my-2 flex flex-row gap-1">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
-            class="text-caption flex-1 rounded-t-sm border-b-4 bg-muted p-2" :class="activeTab === tab.key ? 'border-primary' : 'border-transparent'"
+            class="text-caption flex-1 rounded-t-sm border-2 border-b-4 p-2" :class="activeTab === tab.key ? 'border-b-primary' : 'border-transparent'"
             @click="activeTab = (tab.key as 'install' | 'commands')"
           >
             {{ tab.label }}
@@ -121,9 +115,9 @@
         v-for="(feature, index) in FEATURES" :key="index"
         v-motion :initial="{ opacity: 0, y: -20 }"
         :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="flex max-w-sm flex-col items-center gap-4 p-4 text-center"
+        :delay="200 * index" class="flex max-w-md flex-col items-center gap-4 text-center"
       >
-        <div class="flex items-center justify-center rounded-2xl bg-card p-8">
+        <div class="card flex items-center justify-center rounded-2xl!">
           <icon :name="feature.icon" class="text-primary" size="70" />
         </div>
         <h3 class="whitespace-nowrap">

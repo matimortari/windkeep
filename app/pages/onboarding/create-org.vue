@@ -43,7 +43,7 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { errors } = storeToRefs(orgStore)
-const localOrg = ref({ name: `${user.value?.name || user.value?.email}'s Organization` })
+const localOrg = ref({ name: `${user.value?.name || user.value?.email}'s Team` })
 
 async function handleCreateOrg() {
   errors.value.createOrg = null
@@ -65,7 +65,7 @@ async function handleCreateOrg() {
 
 onMounted(async () => {
   await userStore.getUser()
-  localOrg.value.name = `${user.value?.name || user.value?.email}'s Organization` || "My Organization"
+  localOrg.value.name = `${user.value?.name || user.value?.email}'s Team` || "My Team"
 })
 
 useHead({

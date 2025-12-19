@@ -8,7 +8,7 @@
               <icon :name="col.icon" size="20" />
               <span>{{ col.label }}</span>
               <button v-if="col.sortable" class="flex items-center hover:text-primary focus:outline-none" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
-                <icon :name="getSortIconName(col.key)" size="20" class="transition-transform" />
+                <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
               </button>
             </div>
           </th>

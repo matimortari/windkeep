@@ -44,7 +44,7 @@
 
     <Empty v-if="!secrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" />
 
-    <div v-if="secrets.length" class="scroll-area max-h-[80vh] overflow-y-auto">
+    <div v-if="secrets.length" class="scroll-area max-h-screen overflow-y-auto">
       <ProjectSecretsTable
         :secrets="secrets" :project-id="project?.id ?? ''"
         @edit="(secret: Secret) => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = secret }"

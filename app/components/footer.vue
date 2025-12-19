@@ -43,31 +43,31 @@ const { clear, loggedIn } = useUserSession()
 
 const footerSections = [
   {
-    title: "Product",
-    links: [
-      ...(!loggedIn.value
-        ? [
-            { label: "Home", href: "/" },
-            { label: "Features", href: "/#features" },
-            { label: "CLI Reference", href: "/cli" },
-            { label: "API", href: "/api-spec" },
-            { label: "Sign in", href: "/sign-in" },
-          ]
-        : [
-            { label: "Preferences", href: "/admin/preferences" },
-            { label: "CLI Reference", href: "/cli" },
-            { label: "API", href: "/api-spec" },
-            { label: "Sign out", action: signOut },
-          ]
-      ),
-    ],
+    // Auth-aware section for everything related to the application
+    title: "Application",
+    links: [...(!loggedIn.value
+      ? [
+          { label: "Home", href: "/" },
+          { label: "Features", href: "/#features" },
+          { label: "CLI Reference", href: "/cli" },
+          { label: "API Reference", href: "/api-spec" },
+          { label: "Sign in", href: "/sign-in" },
+        ]
+      : [
+          { label: "Preferences", href: "/admin/preferences" },
+          { label: "CLI Reference", href: "/cli" },
+          { label: "API Reference", href: "/api-spec" },
+          { label: "Sign out", action: signOut },
+        ]
+    )],
   },
   {
+    // Informational and support links
     title: "Resources",
     links: [
       { label: "Privacy Policy", href: "/legal/privacy" },
       { label: "Terms of Service", href: "/legal/terms" },
-      { label: "Brand & Assets", href: "/brand" },
+      { label: "Brand", href: "/brand" },
     ],
   },
 ]
