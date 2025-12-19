@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/matimortari/secretkeepr/cli/config"
+	"github.com/matimortari/windkeep/cli/config"
 	"github.com/spf13/cobra"
 )
 
@@ -13,10 +13,10 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "secretkeepr",
-	Short: "SecretkeepR CLI - Manage your secrets from the terminal",
-	Long: `SecretkeepR CLI is a command-line interface for managing secrets,
-organizations, and projects in your SecretkeepR instance.
+	Use:   "windkeep",
+	Short: "WindKeep CLI - Manage your secrets from the terminal",
+	Long: `WindKeep CLI is a command-line interface for managing secrets,
+organizations, and projects in your WindKeep instance.
 
 Securely store, retrieve, and manage sensitive information across
 multiple environments with ease.`,
@@ -29,11 +29,11 @@ multiple environments with ease.`,
 		var err error
 		cfg, err = config.Load(cfgFile)
 		if err != nil {
-			return fmt.Errorf("failed to load config: %w\nRun 'secretkeepr login' to authenticate", err)
+			return fmt.Errorf("failed to load config: %w\nRun 'windkeep login' to authenticate", err)
 		}
 
 		if cfg.APIToken == "" {
-			return fmt.Errorf("not authenticated. Run 'secretkeepr login' first")
+			return fmt.Errorf("not authenticated. Run 'windkeep login' first")
 		}
 
 		return nil
@@ -45,8 +45,8 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.secretkeepr/config.yaml)")
-	rootCmd.PersistentFlags().StringP("api-url", "u", "https://secretkeepr.vercel.app", "API base URL")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.windkeep/config.yaml)")
+	rootCmd.PersistentFlags().StringP("api-url", "u", "https://windkeep.vercel.app", "API base URL")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 
 	// Add subcommands

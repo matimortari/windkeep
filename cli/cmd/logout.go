@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/matimortari/secretkeepr/cli/config"
+	"github.com/matimortari/windkeep/cli/config"
 	"github.com/spf13/cobra"
 )
 

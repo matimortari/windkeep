@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/matimortari/secretkeepr/cli/cmd"
+	"github.com/matimortari/windkeep/cli/cmd"
 )
 
 func main() {
