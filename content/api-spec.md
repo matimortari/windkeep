@@ -1,6 +1,6 @@
-# SecretkeepR API Specification
+# WindKeep API Specification
 
-This document provides documentation for the SecretkeepR API.
+This document provides documentation for the WindKeep API.
 
 ## Overview
 

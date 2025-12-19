@@ -3,12 +3,12 @@
     <img src="public/logo-full-light.png" alt="Logo" width="300" />
 </h1>
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=matimortari_secretkeepr&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=matimortari_secretkeepr)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=matimortari_secretkeepr&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=matimortari_secretkeepr)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=matimortari_secretkeepr&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=matimortari_secretkeepr)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=matimortari_windkeep&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=matimortari_windkeep)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=matimortari_windkeep&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=matimortari_windkeep)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=matimortari_windkeep&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=matimortari_windkeep)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat&colorA=0d1117)](https://opensource.org/licenses/MIT)
 
-[**SecretkeepR**](https://secretkeepr.vercel.app) is a secrets management platform that helps organizations securely store, manage, and share sensitive information. It features role-based access control, audit logging, encrypted storage, and an integrated command line interface for easy secret management.
+[**windkeep**](https://windkeep.vercel.app) is a secrets management platform that helps organizations securely store, manage, and share sensitive information. It features role-based access control, audit logging, encrypted storage, and an integrated command line interface for easy secret management.
 
 Also check out the [**CLI documentation**](./cli/README.md) for usage and setup instructions.
 
@@ -21,7 +21,7 @@ Also check out the [**CLI documentation**](./cli/README.md) for usage and setup 
 - **Role-Based Access Control:** Control access at both organization and project levels for maximum flexibility and security.
 - **Audit Logs:** Monitor your organization's activities with detailed audit logs tracking sensitive operations, such as secret changes and role updates.
 - **Encrypted Secrets:** Your secrets are encrypted at rest and never exposed unencrypted beyond the UI.
-- **CLI Integration:** Take control from your terminal with the SecretkeepR CLI for fast, scriptable management.
+- **CLI Integration:** Take control from your terminal with the WindKeep CLI for fast, scriptable management.
 
 ## Stack
 

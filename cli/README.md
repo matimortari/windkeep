@@ -1,13 +1,13 @@
-# SecretkeepR CLI
+# WindKeep CLI
 
-Command-line interface for managing secrets in SecretkeepR.
+Command-line interface for managing secrets in WindKeep.
 
 ## Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/matimortari/secretkeepr/cli.git
+git clone https://github.com/matimortari/windkeep/cli.git
 cd cli
 ```
 
@@ -20,7 +20,7 @@ go mod download
 3. Build the CLI:
 
 ```bash
-go build -o secretkeepr
+go build -o windkeep
 ```
 
 4. (Optional) Install globally:
@@ -31,11 +31,11 @@ go install
 
 ## Configuration
 
-The CLI stores its configuration in `~/.secretkeepr/config.yaml`:
+The CLI stores its configuration in `~/.windkeep/config.yaml`:
 
 ```yaml
 api_token: your-api-token
-api_url: https://secretkeepr.vercel.app
+api_url: https://windkeep.vercel.app
 active_org_id: org-id
 active_org_name: My Organization
 active_project_id: project-id
@@ -49,65 +49,65 @@ default_environment: DEVELOPMENT
 
 ```bash
 # Login with your API token
-secretkeepr login YOUR_API_TOKEN
+windkeep login YOUR_API_TOKEN
 
 # Logout
-secretkeepr logout
+windkeep logout
 ```
 
 ### Configuration
 
 ```bash
 # View current configuration
-secretkeepr config view
+windkeep config view
 
 # Set configuration values
-secretkeepr config set default_environment PRODUCTION
+windkeep config set default_environment PRODUCTION
 ```
 
 ### Secrets Management
 
 ```bash
 # List all secrets in the active project
-secretkeepr secrets list
+windkeep secrets list
 
 # Get a specific secret
-secretkeepr secrets get API_KEY
+windkeep secrets get API_KEY
 
 # Create a new secret
-secretkeepr secrets create DATABASE_URL --description "Database connection string"
+windkeep secrets create DATABASE_URL --description "Database connection string"
 
 # Set a secret value for an environment
-secretkeepr secrets set DATABASE_URL postgres://... --env PRODUCTION
+windkeep secrets set DATABASE_URL postgres://... --env PRODUCTION
 
 # Delete a secret
-secretkeepr secrets delete API_KEY
+windkeep secrets delete API_KEY
 ```
 
 ### Organizations
 
 ```bash
 # List all organizations
-secretkeepr orgs list
+windkeep orgs list
 
 # Switch active organization
-secretkeepr orgs use my-org-id
+windkeep orgs use my-org-id
 
 # Create a new organization
-secretkeepr orgs create "My New Organization"
+windkeep orgs create "My New Organization"
 ```
 
 ### Projects
 
 ```bash
 # List all projects in active organization
-secretkeepr projects list
+windkeep projects list
 
 # Switch active project
-secretkeepr projects use my-project-slug
+windkeep projects use my-project-slug
 
 # Create a new project
-secretkeepr projects create "My Project" --slug my-project --description "Project description"
+windkeep projects create "My Project" --slug my-project --description "Project description"
 ```
 
 ## Development
@@ -122,16 +122,16 @@ go test ./...
 
 ```bash
 # Linux
-GOOS=linux GOARCH=amd64 go build -o secretkeepr-linux-amd64
+GOOS=linux GOARCH=amd64 go build -o windkeep-linux-amd64
 
 # macOS (Intel)
-GOOS=darwin GOARCH=amd64 go build -o secretkeepr-darwin-amd64
+GOOS=darwin GOARCH=amd64 go build -o windkeep-darwin-amd64
 
 # macOS (Apple Silicon)
-GOOS=darwin GOARCH=arm64 go build -o secretkeepr-darwin-arm64
+GOOS=darwin GOARCH=arm64 go build -o windkeep-darwin-arm64
 
 # Windows
-GOOS=windows GOARCH=amd64 go build -o secretkeepr-windows-amd64.exe
+GOOS=windows GOARCH=amd64 go build -o windkeep-windows-amd64.exe
 ```
 
 ## Contact
