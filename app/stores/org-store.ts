@@ -31,7 +31,7 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.getOrg = null
 
     try {
-      const res = await $fetch<Organization>(`/api/org/${orgId}`, { method: "GET", credentials: "include" })
+      const res = await $fetch<Organization>(`/api/orgs/${orgId}`, { method: "GET", credentials: "include" })
       activeOrg.value = res
       const index = organizations.value.findIndex(o => o.id === orgId)
       if (index === -1) {
@@ -79,7 +79,7 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.updateOrg = null
 
     try {
-      const res = await $fetch<Organization>(`/api/org/${orgId}`, { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch<Organization>(`/api/orgs/${orgId}`, { method: "PUT", body: data, credentials: "include" })
       const index = organizations.value.findIndex(o => o.id === orgId)
       if (index !== -1) {
         organizations.value[index] = res
@@ -100,7 +100,7 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.deleteOrg = null
 
     try {
-      await $fetch(`/api/org/${orgId}`, { method: "DELETE", credentials: "include" })
+      await $fetch(`/api/orgs/${orgId}`, { method: "DELETE", credentials: "include" })
       organizations.value = organizations.value.filter(o => o.id !== orgId)
     }
     catch (err: any) {
@@ -117,7 +117,7 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.updateOrgMember = null
 
     try {
-      const res = await $fetch(`/api/org/${orgId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch(`/api/orgs/${orgId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
       return res
     }
     catch (err: any) {
@@ -134,7 +134,7 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.removeOrgMember = null
 
     try {
-      await $fetch(`/api/org/${orgId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
+      await $fetch(`/api/orgs/${orgId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
     }
     catch (err: any) {
       errors.value.removeOrgMember = err.data.message || "Failed to remove organization member"
@@ -150,7 +150,7 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.createInvite = null
 
     try {
-      const res = await $fetch(`/api/org/${orgId}/invite/create`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch(`/api/orgs/${orgId}/invite/create`, { method: "POST", body: data, credentials: "include" })
       return res
     }
     catch (err: any) {
@@ -167,7 +167,7 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.acceptInvite = null
 
     try {
-      const res = await $fetch<{ organization: Organization }>(`/api/org/${orgId}/invite/accept`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ organization: Organization }>(`/api/orgs/${orgId}/invite/accept`, { method: "POST", body: data, credentials: "include" })
       if (!organizations.value.some(o => o.id === orgId) && res.organization) {
         organizations.value.push(res.organization)
       }

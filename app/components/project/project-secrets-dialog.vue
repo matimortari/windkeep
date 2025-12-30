@@ -32,7 +32,7 @@
 
       <footer class="flex flex-row items-center justify-between">
         <p class="text-danger">
-          {{ validationError || (isUpdateMode ? errors.updateProjectSecret : errors.createProjectSecret) || '' }}
+          {{ (isUpdateMode ? errors.updateProjectSecret : errors.createProjectSecret) || '' }}
         </p>
 
         <div class="navigation-group">
@@ -64,14 +64,11 @@ const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 
 const projectStore = useProjectStore()
 const { errors, loading } = storeToRefs(projectStore)
-
 const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({
   key: "",
   description: "",
   values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
 })
-
-const validationError = ref<string | null>(null)
 
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
@@ -106,18 +103,22 @@ function resetForm() {
     }
   }
 
-  validationError.value = null
+  errors.value.createProjectSecret = null
+  errors.value.updateProjectSecret = null
 }
 
 async function handleSubmit() {
-  validationError.value = null
+  errors.value.createProjectSecret = null
+  errors.value.updateProjectSecret = null
 
   if (!form.value.key.trim()) {
-    validationError.value = "Secret key is required"
+    errors.value.createProjectSecret = "Secret key is required"
+    errors.value.updateProjectSecret = "Secret key is required"
     return
   }
   if (!normalizeKey(form.value.key)) {
-    validationError.value = "Secret key must contain at least one valid character"
+    errors.value.createProjectSecret = "Secret key must contain at least one valid character"
+    errors.value.updateProjectSecret = "Secret key must contain at least one valid character"
     return
   }
 
