@@ -52,7 +52,7 @@
         <icon :name="themeIcon" size="20" />
       </button>
       <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="$emit('toggleSidebar')">
-        <icon :name="props.isSidebarOpen ? 'ph:x' : 'ph:list'" size="20" />
+        <icon name="ph:list" size="20" />
       </button>
       <button class="btn" aria-label="Sign Out" @click="signOut">
         <icon name="ph:sign-out" size="20" />
@@ -62,9 +62,8 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   orgs: Array<Organization> | null
-  isSidebarOpen: boolean
 }>()
 
 defineEmits<(e: "toggleSidebar") => void>()

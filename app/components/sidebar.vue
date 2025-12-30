@@ -1,5 +1,6 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-40 bg-black/50 transition-opacity ease-in-out md:hidden" @click="$emit('update:isOpen', false)" />
+  <!-- Mobile overlay -->
+  <div v-if="isOpen" class="fixed inset-0 z-40 bg-black/50 md:hidden" @click="$emit('update:isOpen', false)" />
 
   <aside
     class="fixed top-0 left-0 z-50 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-sm md:border-b-2 2xl:w-72"
@@ -61,12 +62,20 @@ const props = defineProps<{
 defineEmits<(e: "update:isOpen", value: boolean) => void>()
 
 const route = useRoute()
-const projectStore = useProjectStore()
 const userStore = useUserStore()
-const { activeOrg } = storeToRefs(useOrgStore())
+const orgStore = useOrgStore()
+const { activeOrg } = storeToRefs(orgStore)
+const projectStore = useProjectStore()
 const { projects } = storeToRefs(projectStore)
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
+
+// All projects the user has access to, across all orgs
+const allProjects = computed(() => {
+  return projects.value.filter(project =>
+    project.memberships?.some(m => m.userId === userStore.user?.id),
+  )
+})
 
 // Projects in the active organization that the user has access to
 const activeOrgProjects = computed(() => {
@@ -75,16 +84,7 @@ const activeOrgProjects = computed(() => {
   }
 
   return projects.value.filter(
-    project =>
-      project.orgId === activeOrg.value?.id
-      && project.memberships?.some(m => m.userId === userStore.user?.id),
-  )
-})
-
-// All projects the user has access to, across all orgs
-const allProjects = computed(() => {
-  return projects.value.filter(project =>
-    project.memberships?.some(m => m.userId === userStore.user?.id),
+    project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id),
   )
 })
 

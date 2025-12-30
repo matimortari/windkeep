@@ -21,7 +21,7 @@
 
       <footer class="flex flex-row items-center justify-between">
         <p class="text-danger">
-          {{ validationError || errors.createProjectSecret || " " }}
+          {{ errors.createProjectSecret || " " }}
         </p>
 
         <div class="navigation-group">
@@ -53,17 +53,13 @@ const emit = defineEmits<{
 }>()
 
 const { errors } = storeToRefs(useProjectStore())
-
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
-
 const envContent = ref("")
 const selectedEnv = ref<Environment>("DEVELOPMENT")
-const validationError = ref<string | null>(null)
 
 function parseEnv(text: string): Record<string, string> {
   const lines = text.split("\n")
   const parsed: Record<string, string> = {}
-
   for (const line of lines) {
     const trimmed = line.trim()
     if (!trimmed || trimmed.startsWith("#")) {
@@ -77,10 +73,7 @@ function parseEnv(text: string): Record<string, string> {
 
     const key = match && match[1] ? match[1].trim() : ""
     let value = match && match[2] ? match[2].trim() : ""
-    if (
-      (value.startsWith("\"") && value.endsWith("\""))
-      || (value.startsWith("'") && value.endsWith("'"))
-    ) {
+    if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
       value = value.slice(1, -1)
     }
 
@@ -91,18 +84,15 @@ function parseEnv(text: string): Record<string, string> {
 }
 
 function handleSubmit() {
-  validationError.value = null
+  errors.value.createProjectSecret = null
 
   const parsed = parseEnv(envContent.value)
   if (!Object.keys(parsed).length) {
-    validationError.value = "No valid key-value pairs found."
+    errors.value.createProjectSecret = "No valid key-value pairs found"
     return
   }
 
-  const normalized = Object.fromEntries(
-    Object.entries(parsed)
-      .map(([key, value]) => [normalizeKey(key), value])
-      .filter(([key]) => Boolean(key)),
+  const normalized = Object.fromEntries(Object.entries(parsed).map(([key, value]) => [normalizeKey(key), value]).filter(([key]) => Boolean(key)),
   )
 
   const duplicates = Object.keys(normalized).filter((key) => {
@@ -111,7 +101,7 @@ function handleSubmit() {
   })
 
   if (duplicates.length) {
-    validationError.value = `The following keys already exist: ${duplicates.join(", ")}`
+    errors.value.createProjectSecret = `The following keys already exist in the selected environment: ${duplicates.join(", ")}`
     return
   }
 
@@ -137,7 +127,7 @@ watch(() => props.isOpen, (open) => {
   if (open) {
     envContent.value = ""
     selectedEnv.value = "DEVELOPMENT"
-    validationError.value = null
+    errors.value.createProjectSecret = null
   }
 })
 </script>

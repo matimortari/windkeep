@@ -39,7 +39,7 @@ export const useAuditStore = defineStore("audit", () => {
         }
       }
 
-      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`/api/org/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
+      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`/api/orgs/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
       auditLogs.value = res.auditLogs as AuditLog[]
       pagination.value = res.pagination
       filters.value = res.filters
@@ -63,7 +63,7 @@ export const useAuditStore = defineStore("audit", () => {
     errors.value.deleteAuditLogs = null
 
     try {
-      await $fetch(`/api/org/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
+      await $fetch(`/api/orgs/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
     }
     catch (err: any) {
       errors.value.deleteAuditLogs = err.data.message || "Failed to delete audit logs"

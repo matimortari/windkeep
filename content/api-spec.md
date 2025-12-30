@@ -8,32 +8,15 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vi
 
 ---
 
-## Endpoints
-
-### Authentication
-
-#### Sign In with OAuth Provider
-
-**GET** `/auth/{provider}`
-
-Initiates OAuth authentication flow. The supported providers are `google`, `github`, and `gitlab`.
-
-**Response:**
-
-- Redirects to the provider OAuth consent screen
-- On success, redirects to application with session cookie
-
----
-
-### User
+### User Profile
 
 #### Get User Profile
 
-**GET** `/user`
+> **GET** `/user`
 
 Get the current user's profile information.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -77,7 +60,7 @@ Get the current user's profile information.
 
 #### Update User Profile
 
-**PUT** `/user`
+> **PUT** `/user`
 
 Update current user's profile information.
 
@@ -85,14 +68,14 @@ Update current user's profile information.
 
 ```json
 {
-  "name": "string | optional",
-  "image": "string | optional",
-  "activeOrgId": "string | null | optional", // For switching active org
-  "apiToken": "string | optional" // For API token regeneration
+  "name": "string", // Optional
+  "image": "string", // Optional
+  "activeOrgId": "string | null", // Optional, for switching active org
+  "apiToken": "string" // Optional// For API token regeneration
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -109,7 +92,7 @@ Update current user's profile information.
 
 #### Update User Image
 
-**PUT** `/user/image-upload`
+> **PUT** `/user/image-upload`
 
 Update current user's profile image.
 
@@ -121,7 +104,7 @@ Update current user's profile image.
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -131,11 +114,11 @@ Update current user's profile image.
 
 #### Delete User Account
 
-**DELETE** `/user`
+> **DELETE** `/user`
 
 Delete current user account.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -146,11 +129,11 @@ Delete current user account.
 
 ---
 
-### Organization Management
+### Organization
 
 #### Create Organization
 
-**POST** `/org`
+> **POST** `/orgs`
 
 Create a new organization.
 
@@ -162,7 +145,37 @@ Create a new organization.
 }
 ```
 
-**Response**:
+**Response:**
+
+```json
+{
+  "id": "string",
+  "name": "string",
+  "memberships": [
+    {
+      "role": "OWNER | ADMIN | MEMBER",
+      "user": {
+        "id": "string",
+        "name": "string",
+        "email": "string",
+        "image": "string | null"
+      }
+    }
+  ]
+}
+```
+
+#### Get Organization Details
+
+> **GET** `/orgs/{org}`
+
+Retrieve details of a specific organization.
+
+**Route Parameters**:
+
+- `org`: Organization ID.
+
+**Response:**
 
 ```json
 {
@@ -184,7 +197,7 @@ Create a new organization.
 
 #### Update Organization
 
-**PUT** `/org/{org}`
+> **PUT** `/orgs/{org}`
 
 Update organization information. Only owners and admins can perform this action.
 
@@ -200,7 +213,7 @@ Update organization information. Only owners and admins can perform this action.
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -222,7 +235,7 @@ Update organization information. Only owners and admins can perform this action.
 
 #### Delete Organization
 
-**DELETE** `/org/{org}`
+> **DELETE** `/orgs/{org}`
 
 Delete an organization.
 
@@ -230,7 +243,7 @@ Delete an organization.
 
 - `org`: Organization ID.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -241,11 +254,11 @@ Delete an organization.
 
 ---
 
-### Organization Members and Invites
+### Organization Memberships
 
 #### Update Organization Member Role
 
-**PUT** `/org/{org}/members/{member}`
+> **PUT** `/orgs/{org}/members/{member}`
 
 Update a member's role in the organization.
 
@@ -262,7 +275,7 @@ Update a member's role in the organization.
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -281,7 +294,7 @@ Update a member's role in the organization.
 
 #### Remove Organization Member
 
-**DELETE** `/org/{org}/members/{member}`
+> **DELETE** `/orgs/{org}/members/{member}`
 
 Remove a member from the organization. Members can also remove themselves. Only organization owners can remove members.
 
@@ -290,7 +303,7 @@ Remove a member from the organization. Members can also remove themselves. Only 
 - `org`: Organization ID.
 - `member`: Member ID to remove.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -301,7 +314,7 @@ Remove a member from the organization. Members can also remove themselves. Only 
 
 #### Create Organization Invite
 
-**POST** `/org/{org}/invite/create`
+> **POST** `/orgs/{org}/invite/create`
 
 Create an invitation for a new organization member.
 
@@ -309,7 +322,7 @@ Create an invitation for a new organization member.
 
 - `org`: Organization ID.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -333,7 +346,7 @@ Create an invitation for a new organization member.
 
 #### Accept Organization Invite
 
-**POST** `/org/{org}/invite/accept`
+> **POST** `/orgs/{org}/invite/accept`
 
 Accept an invite to join an organization.
 
@@ -349,7 +362,7 @@ Accept an invite to join an organization.
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -369,11 +382,11 @@ Accept an invite to join an organization.
 
 ---
 
-### Audit Logs
+### Audit
 
 #### Get Organization Audit Logs
 
-**GET** `/org/{org}/audit`
+> **GET** `/orgs/{org}/audit`
 
 Retrieve audit logs for an organization with optional filtering and pagination. Only owners and admins can access.
 
@@ -391,7 +404,7 @@ Retrieve audit logs for an organization with optional filtering and pagination. 
 - `startDate` — Filter logs created after this date.
 - `endDate` — Filter logs created before this date.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -434,7 +447,7 @@ Retrieve audit logs for an organization with optional filtering and pagination. 
 
 #### Delete Organization Audit Logs
 
-**DELETE** `/org/{org}/audit`
+> **DELETE** `/orgs/{org}/audit`
 
 Delete audit logs in an organization. Only owners can perform this action.
 
@@ -453,7 +466,7 @@ Delete audit logs in an organization. Only owners can perform this action.
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -465,15 +478,15 @@ Delete audit logs in an organization. Only owners can perform this action.
 
 ---
 
-### Project Management
+### Project
 
 #### Get Projects
 
-**GET** `/projects`
+> **GET** `/projects`
 
 Retrieve all projects the current user has access to.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -514,7 +527,7 @@ Retrieve all projects the current user has access to.
 
 #### Create Project
 
-**POST** `/projects`
+> **POST** `/projects`
 
 Create a new project in an organization. Only owners and admins of the organization can create projects.
 
@@ -524,12 +537,12 @@ Create a new project in an organization. Only owners and admins of the organizat
 {
   "name": "string",
   "slug": "string",
-  "description": "string | optional",
+  "description": "string", // Optional
   "organizationId": "string"
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -561,7 +574,7 @@ Create a new project in an organization. Only owners and admins of the organizat
 
 #### Update Project
 
-**PUT** `/projects/{project}`
+> **PUT** `/projects/{project}`
 
 Update project details. Only project owners and admins can perform this action.
 
@@ -573,13 +586,13 @@ Update project details. Only project owners and admins can perform this action.
 
 ```json
 {
-  "name": "string | optional",
-  "slug": "string | optional",
-  "description": "string | optional"
+  "name": "string", // Optional
+  "slug": "string", // Optional
+  "description": "string" // Optional
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -597,7 +610,7 @@ Update project details. Only project owners and admins can perform this action.
 
 #### Delete Project
 
-**DELETE** `/projects/{project}`
+> **DELETE** `/projects/{project}`
 
 Delete a project. Only project owners can delete. All secrets, secret values, roles, and audit logs are cascade deleted.
 
@@ -605,7 +618,7 @@ Delete a project. Only project owners can delete. All secrets, secret values, ro
 
 - `project`: Project ID.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -617,11 +630,11 @@ Delete a project. Only project owners can delete. All secrets, secret values, ro
 
 ---
 
-### Project Members
+### Project Memberships
 
 #### Add Project Member
 
-**POST** `/projects/{project}/members`
+> **POST** `/projects/{project}/members`
 
 Add a new member to a project. Only project owners and admins can add members.
 
@@ -638,7 +651,7 @@ Add a new member to a project. Only project owners and admins can add members.
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -658,7 +671,7 @@ Add a new member to a project. Only project owners and admins can add members.
 
 #### Update Project Member
 
-**PUT** `/projects/{project}/members/{member}`
+> **PUT** `/projects/{project}/members/{member}`
 
 Update the role of a project member. Owners and admins can update roles, with restrictions: non-owners cannot promote to owner or demote an owner, and members cannot update their own role.
 
@@ -675,7 +688,7 @@ Update the role of a project member. Owners and admins can update roles, with re
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -696,7 +709,7 @@ Update the role of a project member. Owners and admins can update roles, with re
 
 #### Remove Project Member
 
-**DELETE** `/projects/{project}/members/{member}`
+> **DELETE** `/projects/{project}/members/{member}`
 
 Remove a member from a project. Members can remove themselves, but the last owner cannot leave the project. Only owners can remove other owners.
 
@@ -705,7 +718,7 @@ Remove a member from a project. Members can remove themselves, but the last owne
 - `project`: Project ID.
 - `member`: Member ID to remove.
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -716,11 +729,11 @@ Remove a member from a project. Members can remove themselves, but the last owne
 
 ---
 
-### Project Secret Management
+### Project Secrets
 
 #### Get Project Secrets
 
-**GET** `/projects/{project}/secrets`
+> **GET** `/projects/{project}/secrets`
 
 Get secrets for a project.
 
@@ -728,7 +741,7 @@ Get secrets for a project.
 
 - `project`: Project ID.
 
-**Response**:
+**Response:**
 
 ```json
 [
@@ -755,7 +768,7 @@ Get secrets for a project.
 
 #### Create Secret
 
-**POST** `/projects/{project}/secrets`
+> **POST** `/projects/{project}/secrets`
 
 Create a new secret in a project. Only project owners or admins can perform this action.
 
@@ -768,17 +781,17 @@ Create a new secret in a project. Only project owners or admins can perform this
 ```json
 {
   "key": "string",
-  "description": "string | optional",
+  "description": "string", // Optional
   "values": [
     {
       "environment": "string",
       "value": "string"
     }
-  ] | optional
+  ] // Optional
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -803,7 +816,7 @@ Create a new secret in a project. Only project owners or admins can perform this
 
 #### Update Secret
 
-**PUT** `/projects/{project}/secrets/{secret}`
+> **PUT** `/projects/{project}/secrets/{secret}`
 
 Update a secret's description or its environment values. Only project owners or admins can perform this action.
 
@@ -816,17 +829,17 @@ Update a secret's description or its environment values. Only project owners or 
 
 ```json
 {
-  "description": "string | optional",
+  "description": "string", // Optional
   "values": [
     {
       "environment": "string",
       "value": "string"
     }
-  ] | optional
+  ] // Optional
 }
 ```
 
-**Response**:
+**Response:**
 
 ```json
 {
@@ -851,7 +864,7 @@ Update a secret's description or its environment values. Only project owners or 
 
 #### Delete Secret
 
-**DELETE** `/projects/{project}/secrets/{secret}`
+> **DELETE** `/projects/{project}/secrets/{secret}`
 
 Delete a secret. Only project owners can perform this action.
 
@@ -860,7 +873,7 @@ Delete a secret. Only project owners can perform this action.
 - `project`: Project ID.
 - `secret`: Secret ID to delete.
 
-**Response**:
+**Response:**
 
 ```json
 {
