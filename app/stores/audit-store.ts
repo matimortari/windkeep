@@ -6,7 +6,10 @@ export const useAuditStore = defineStore("audit", () => {
   const filters = ref<AuditFilters | null>(null)
   const currentFilters = ref<GetAuditLogsInput>({ page: 1, limit: 50 })
   const loading = ref(false)
-  const errors = ref<Record<string, string | null>>({ getAuditLogs: null, deleteAuditLogs: null })
+  const errors = ref<Record<string, string | null>>({
+    getAuditLogs: null,
+    deleteAuditLogs: null,
+  })
 
   const auditActions = computed(() => [
     { label: "Organization Created", value: "CREATE.ORG" },
@@ -40,7 +43,7 @@ export const useAuditStore = defineStore("audit", () => {
       }
 
       const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`/api/orgs/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
-      auditLogs.value = res.auditLogs as AuditLog[]
+      auditLogs.value = res.auditLogs
       pagination.value = res.pagination
       filters.value = res.filters
       if (params) {
@@ -50,7 +53,7 @@ export const useAuditStore = defineStore("audit", () => {
       return res
     }
     catch (err: any) {
-      errors.value.getAuditLogs = err.data.message || "Failed to fetch audit logs"
+      errors.value.getAuditLogs = err.data?.message || "Failed to fetch audit logs"
       console.error("getAuditLogs error:", err)
     }
     finally {
@@ -66,7 +69,7 @@ export const useAuditStore = defineStore("audit", () => {
       await $fetch(`/api/orgs/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
     }
     catch (err: any) {
-      errors.value.deleteAuditLogs = err.data.message || "Failed to delete audit logs"
+      errors.value.deleteAuditLogs = err.data?.message || "Failed to delete audit logs"
       console.error("deleteAuditLogs error:", err)
     }
     finally {
@@ -78,15 +81,21 @@ export const useAuditStore = defineStore("audit", () => {
     currentFilters.value = { ...currentFilters.value, ...newFilters }
   }
 
-  function nextPage(orgId: string) {
+  async function nextPage(orgId: string) {
     if (pagination.value?.hasNext) {
-      return getAuditLogs(orgId, { ...currentFilters.value, page: currentFilters.value.page! + 1 })
+      return await getAuditLogs(orgId, {
+        ...currentFilters.value,
+        page: currentFilters.value.page! + 1,
+      })
     }
   }
 
-  function prevPage(orgId: string) {
+  async function prevPage(orgId: string) {
     if (pagination.value?.hasPrev) {
-      return getAuditLogs(orgId, { ...currentFilters.value, page: Math.max(1, currentFilters.value.page! - 1) })
+      return await getAuditLogs(orgId, {
+        ...currentFilters.value,
+        page: Math.max(1, currentFilters.value.page! - 1),
+      })
     }
   }
 

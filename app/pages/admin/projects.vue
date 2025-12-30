@@ -13,11 +13,11 @@
           </span>
         </div>
 
-        <button class="btn" @click="toggleNameSort">
+        <button class="btn" :title="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="toggleSort">
           <icon name="ph:arrow-down" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
         </button>
 
-        <button aria-label="Toggle Layout" class="btn" @click="layout = layout === 'grid' ? 'list' : 'grid'">
+        <button title="Toggle Layout" class="btn" @click="layout = layout === 'grid' ? 'list' : 'grid'">
           <icon :name="layout === 'grid' ? 'ph:list-bullets' : 'ph:squares-four'" size="20" />
         </button>
 
@@ -93,7 +93,7 @@ const activeOrgProjects = computed(() => {
 const { sortedData: sortedProjects, sortDirection, sortKey, setSort } = useTableSort<Project>(computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)))
 const filteredProjects = computed(() => sortedProjects.value.filter(project => project.name.toLowerCase().includes(searchQuery.value.toLowerCase())))
 
-function toggleNameSort() {
+function toggleSort() {
   if (sortKey.value !== "name") {
     setSort("name", "asc")
     return

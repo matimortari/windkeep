@@ -9,6 +9,7 @@ export function useEnvFile(projectRef: Ref<Project | undefined>) {
     for (const v of existing) {
       map.set(v.environment, v.value)
     }
+
     for (const v of incoming) {
       map.set(v.environment, v.value)
     }
@@ -30,7 +31,6 @@ export function useEnvFile(projectRef: Ref<Project | undefined>) {
     }
 
     const existing = projectSecrets.value.find(s => s.key === secret.key && s.projectId === currentProjectId)
-
     if (existing) {
       const mergedValues = mergeValues(existing.values ?? [], secret.values ?? [])
       const payload: UpdateSecretInput = { values: mergedValues }
@@ -59,7 +59,6 @@ export function useEnvFile(projectRef: Ref<Project | undefined>) {
     let successCount = 0
     let failedCount = 0
     const errors: string[] = []
-
     for (const [i, result] of results.entries()) {
       if (result.status === "rejected") {
         failedCount++
@@ -105,12 +104,11 @@ export function useEnvFile(projectRef: Ref<Project | undefined>) {
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
-      setTimeout(() => URL.revokeObjectURL(a.href), 5000)
 
       return { success: true }
     }
-    catch (error: any) {
-      return { success: false, error: error?.message || "Failed to export secrets" }
+    catch (err: any) {
+      return { success: false, error: err.data?.message || "Failed to export secrets" }
     }
   }
 

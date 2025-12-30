@@ -78,8 +78,8 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
       action,
       resource,
       metadata,
-      ip,
-      ua,
+      ip: ip ?? "",
+      ua: ua ?? "",
       description: description || `${action} performed on ${resource || "resource"}`,
     },
   })

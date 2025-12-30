@@ -3,7 +3,12 @@ import type { UpdateUserInput } from "#shared/schemas/user-schema"
 export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null)
   const loading = ref(false)
-  const errors = ref<Record<string, string | null>>({ getUser: null, updateUser: null, updateUserImage: null, deleteUser: null })
+  const errors = ref<Record<string, string | null>>({
+    getUser: null,
+    updateUser: null,
+    updateUserImage: null,
+    deleteUser: null,
+  })
 
   async function getUser() {
     loading.value = true
@@ -12,9 +17,10 @@ export const useUserStore = defineStore("user", () => {
     try {
       const res = await $fetch<User>("/api/user", { method: "GET", credentials: "include" })
       user.value = res
+      return res
     }
     catch (err: any) {
-      errors.value.getUser = err.data.message || "Failed to get user"
+      errors.value.getUser = err.data?.message || "Failed to get user"
       console.error("getUser error:", err)
     }
     finally {
@@ -31,11 +37,10 @@ export const useUserStore = defineStore("user", () => {
       if (user.value) {
         Object.assign(user.value, res)
       }
-
       return res
     }
     catch (err: any) {
-      errors.value.updateUser = err.data.message || "Failed to update user"
+      errors.value.updateUser = err.data?.message || "Failed to update user"
       console.error("updateUser error:", err)
     }
     finally {
@@ -55,11 +60,10 @@ export const useUserStore = defineStore("user", () => {
       if (user.value && res.imageUrl) {
         user.value.image = res.imageUrl
       }
-
       return res
     }
     catch (err: any) {
-      errors.value.updateUserImage = err.data.message || "Failed to update user image"
+      errors.value.updateUserImage = err.data?.message || "Failed to update user image"
       console.error("updateUserImage error:", err)
     }
     finally {
@@ -74,12 +78,10 @@ export const useUserStore = defineStore("user", () => {
     try {
       await $fetch("/api/user", { method: "DELETE", credentials: "include" })
       user.value = null
-      return true
     }
     catch (err: any) {
-      errors.value.deleteUser = err.data.message || "Failed to delete user"
+      errors.value.deleteUser = err.data?.message || "Failed to delete user"
       console.error("deleteUser error:", err)
-      return false
     }
     finally {
       loading.value = false

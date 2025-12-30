@@ -216,11 +216,7 @@ async function handleDeleteUser() {
     return
   }
 
-  const success = await userStore.deleteUser()
-  if (!success) {
-    return
-  }
-
+  await userStore.deleteUser()
   await clear()
   await navigateTo("/sign-in", { replace: true })
 }

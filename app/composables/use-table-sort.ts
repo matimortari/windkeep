@@ -2,18 +2,14 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
   const sortKey = ref<keyof T | string | null>(null)
   const sortDirection = ref<"asc" | "desc" | null>(null)
 
-  function getNestedValue(obj: T, path: string): any {
-    return path.split(".").reduce((cur, k) => cur?.[k], obj as any)
-  }
-
   const sortedData = computed(() => {
     if (!sortKey.value || !sortDirection.value) {
       return data.value
     }
 
     return [...data.value].sort((a, b) => {
-      const A = getNestedValue(a, sortKey.value as string)
-      const B = getNestedValue(b, sortKey.value as string)
+      const A = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], a as any)
+      const B = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], b as any)
 
       if (A == null && B == null) {
         return 0
@@ -66,11 +62,6 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     sortDirection.value = direction
   }
 
-  function clearSort() {
-    sortKey.value = null
-    sortDirection.value = null
-  }
-
   function isSorted(key: keyof T | string): "asc" | "desc" | null {
     return sortKey.value === key ? sortDirection.value : null
   }
@@ -98,9 +89,7 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     sortDirection: readonly(sortDirection),
     sortedData,
     toggleSort,
-    getNestedValue,
     setSort,
-    clearSort,
     isSorted,
     getSortIcon,
     getSortIconName,
