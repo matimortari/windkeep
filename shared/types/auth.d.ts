@@ -3,8 +3,8 @@ declare module "#auth-utils" {
     id: string
     email: string
     name: string
-    image?: string
-    apiToken?: string
+    image?: string | null
+    apiToken?: string | null
   }
 
   interface UserSession {
@@ -17,9 +17,9 @@ declare module "#auth-utils" {
     userId: string
     provider: string
     providerAccountId: string
+    user?: User
     createdAt?: Date | string
     updatedAt?: Date | string
-    user?: User
   }
 }
 
