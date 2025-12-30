@@ -1,5 +1,5 @@
 <template>
-  <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+  <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
   <div class="flex min-h-screen overflow-hidden py-12">
     <Sidebar :org="activeOrg" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
@@ -22,7 +22,7 @@ const { activeOrg } = storeToRefs(orgStore)
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
-async function getUserData() {
+onMounted(async () => {
   try {
     await userStore.getUser()
     const activeMembership = userStore.user?.orgMemberships?.find(m => m.isActive)
@@ -41,7 +41,5 @@ async function getUserData() {
   finally {
     isLoading.value = false
   }
-}
-
-onMounted(getUserData)
+})
 </script>

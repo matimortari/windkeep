@@ -51,7 +51,6 @@ const emit = defineEmits<{
 }>()
 
 const { errors } = storeToRefs(useProjectStore())
-
 const form = ref<{ name: string, slug: string, description: string }>({
   name: "",
   slug: "",
