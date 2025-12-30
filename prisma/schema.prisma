@@ -19,42 +19,42 @@ enum Role {
   MEMBER
 }
 
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+}
+
 model User {
   id                 String              @id @default(cuid())
   email              String              @unique
   name               String
   image              String?
   apiToken           String?             @unique
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  accounts           Account[]
   orgMemberships     OrgMembership[]
   projectMemberships ProjectMembership[]
   invitations        Invitation[]
   auditLogs          AuditLog[]
-}
-
-model Account {
-  id                String   @id @default(cuid())
-  userId            String
-  provider          String
-  providerAccountId String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
+  accounts           Account[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 }
 
 model Organization {
   id          String          @id @default(cuid())
   name        String
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
   memberships OrgMembership[]
   projects    Project[]
   invitations Invitation[]
   auditLogs   AuditLog[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model OrgMembership {
@@ -62,10 +62,10 @@ model OrgMembership {
   orgId     String
   role      Role         @default(MEMBER)
   isActive  Boolean      @default(false)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@id([userId, orgId])
 }
@@ -76,12 +76,12 @@ model Project {
   slug        String
   description String?
   orgId       String
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
   org         Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
   secrets     Secret[]
   memberships ProjectMembership[]
   auditLogs   AuditLog[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 
   @@unique([slug, orgId])
 }
@@ -90,12 +90,12 @@ model ProjectMembership {
   userId    String
   projectId String
   role      Role     @default(MEMBER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([userId, projectId])
+  @@id([userId, projectId])
 }
 
 model Secret {
@@ -103,10 +103,10 @@ model Secret {
   key         String
   description String?
   projectId   String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
   project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   values      SecretValue[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@unique([key, projectId])
 }
@@ -116,9 +116,9 @@ model SecretValue {
   secretId    String
   environment Environment
   value       String
+  secret      Secret      @relation(fields: [secretId], references: [id], onDelete: Cascade)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  secret      Secret      @relation(fields: [secretId], references: [id], onDelete: Cascade)
 
   @@unique([secretId, environment])
 }
@@ -127,11 +127,11 @@ model Invitation {
   id          String       @id @default(cuid())
   orgId       String
   token       String       @unique
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  invitedBy   User         @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+  invitedById String
   expiresAt   DateTime
   createdAt   DateTime     @default(now())
-  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  invitedById String
-  invitedBy   User         @relation(fields: [invitedById], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
@@ -141,12 +141,16 @@ model AuditLog {
   projectId   String?
   action      String
   resource    String?
-  metadata    Json?
   description String?
-  ip          String?
-  ua          String?
-  createdAt   DateTime      @default(now())
+  metadata    Json?
+  ip          String
+  ua          String
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   org         Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)
   project     Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+
+  @@index([orgId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([userId, createdAt])
 }
