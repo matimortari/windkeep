@@ -9,12 +9,12 @@
       </h2>
 
       <nav class="navigation-group w-full flex-1 justify-end" aria-label="Project Actions">
-        <button class="btn-primary" aria-label="Add New Secret" @click="() => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = null }">
+        <button class="btn-primary" aria-label="Add New Secret" @click="() => { isSecretsDialogOpen = true; selectedSecret = null }">
           <span class="hidden md:inline">Add New Secret</span>
           <icon name="ph:plus" size="20" />
         </button>
 
-        <button class="btn-secondary" aria-label="Import Secrets from .env File" @click="() => { isDialogOpen = true; dialogType = 'env'; selectedSecret = null }">
+        <button class="btn-secondary" aria-label="Import Secrets from .env File" @click="() => { isEnvDialogOpen = true; selectedSecret = null }">
           <span class="hidden md:block">Import</span>
           <icon name="ph:upload" size="20" />
         </button>
@@ -47,20 +47,20 @@
     <div v-if="secrets.length" class="scroll-area max-h-screen overflow-y-auto">
       <ProjectSecretsTable
         :secrets="secrets" :project-id="project?.id ?? ''"
-        @edit="(secret: Secret) => { isDialogOpen = true; dialogType = 'secret'; selectedSecret = secret }"
+        @edit="(secret: Secret) => { isSecretsDialogOpen = true; selectedSecret = secret }"
       />
     </div>
 
     <ProjectSecretsDialog
-      :is-open="isDialogOpen && dialogType === 'secret'" :selected-secret="selectedSecret"
-      :project-id="project?.id ?? ''" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
+      :is-open="isSecretsDialogOpen" :selected-secret="selectedSecret"
+      :project-id="project?.id ?? ''" @close="() => { isSecretsDialogOpen = false; selectedSecret = null }"
       @save="handleSubmit"
     />
 
     <ProjectSecretsImportDialog
-      :is-open="isDialogOpen && dialogType === 'env'" :project-id="project?.id ?? ''"
-      :secrets="secrets" @close="() => { isDialogOpen = false; dialogType = null; selectedSecret = null }"
-      @save="(secrets) => { importFromEnv(secrets); isDialogOpen = false }"
+      :is-open="isEnvDialogOpen" :project-id="project?.id ?? ''"
+      :secrets="secrets" @close="() => { isEnvDialogOpen = false; selectedSecret = null }"
+      @save="(secrets) => { importFromEnv(secrets); isEnvDialogOpen = false }"
     />
   </div>
 </template>
@@ -74,8 +74,8 @@ const project = computed(() => projectStore.projects.find(p => p.slug === slug))
 const { importFromEnv, exportToEnv } = useEnvFile(project)
 const selectedSecret = ref<Secret | null>(null)
 const dropdownRef = ref<HTMLElement | null>(null)
-const dialogType = ref<"secret" | "env" | null>(null)
-const isDialogOpen = ref(false)
+const isSecretsDialogOpen = ref(false)
+const isEnvDialogOpen = ref(false)
 const isDropdownOpen = ref(false)
 
 useClickOutside(dropdownRef, () => {
@@ -83,8 +83,8 @@ useClickOutside(dropdownRef, () => {
 }, { escapeKey: true })
 
 async function handleSubmit(secret: any) {
-  isDialogOpen.value = false
-  dialogType.value = null
+  isSecretsDialogOpen.value = false
+  isEnvDialogOpen.value = false
   selectedSecret.value = null
   if (!project.value?.id) {
     return
