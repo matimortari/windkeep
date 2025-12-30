@@ -19,11 +19,8 @@ export const useOrgStore = defineStore("org", () => {
   })
 
   const orgMembers = computed(() => activeOrg.value?.memberships ?? [])
-
   const orgProjects = computed(() => projectStore.projects.filter(p => p.orgId === activeOrg.value?.id) ?? [])
-
   const isOwner = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "OWNER")
-
   const isAdmin = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "ADMIN")
 
   async function getOrg(orgId: string) {
@@ -37,12 +34,13 @@ export const useOrgStore = defineStore("org", () => {
       if (index === -1) {
         organizations.value.push(res)
       }
-      else { organizations.value[index] = res }
-
+      else {
+        organizations.value[index] = res
+      }
       return res
     }
     catch (err: any) {
-      errors.value.getOrg = err.data.message || "Failed to get organization"
+      errors.value.getOrg = err.data?.message || "Failed to get organization"
       console.error("getOrg error:", err)
     }
     finally {
@@ -59,14 +57,13 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.createOrg = null
 
     try {
-      const res = await $fetch<Organization>(`/api/org`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<Organization>("/api/orgs", { method: "POST", body: data, credentials: "include" })
       organizations.value.push(res)
-      const userStore = useUserStore()
       await userStore.getUser()
       return res
     }
     catch (err: any) {
-      errors.value.createOrg = err.data.message || "Failed to create organization"
+      errors.value.createOrg = err.data?.message || "Failed to create organization"
       console.error("createOrg error:", err)
     }
     finally {
@@ -84,10 +81,13 @@ export const useOrgStore = defineStore("org", () => {
       if (index !== -1) {
         organizations.value[index] = res
       }
+      if (activeOrg.value?.id === orgId) {
+        activeOrg.value = res
+      }
       return res
     }
     catch (err: any) {
-      errors.value.updateOrg = err.data.message || "Failed to update organization"
+      errors.value.updateOrg = err.data?.message || "Failed to update organization"
       console.error("updateOrg error:", err)
     }
     finally {
@@ -102,9 +102,12 @@ export const useOrgStore = defineStore("org", () => {
     try {
       await $fetch(`/api/orgs/${orgId}`, { method: "DELETE", credentials: "include" })
       organizations.value = organizations.value.filter(o => o.id !== orgId)
+      if (activeOrg.value?.id === orgId) {
+        activeOrg.value = null
+      }
     }
     catch (err: any) {
-      errors.value.deleteOrg = err.data.message || "Failed to delete organization"
+      errors.value.deleteOrg = err.data?.message || "Failed to delete organization"
       console.error("deleteOrg error:", err)
     }
     finally {
@@ -117,11 +120,11 @@ export const useOrgStore = defineStore("org", () => {
     errors.value.updateOrgMember = null
 
     try {
-      const res = await $fetch(`/api/orgs/${orgId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch<OrgMembership>(`/api/orgs/${orgId}/members/${memberId}`, { method: "PUT", body: data, credentials: "include" })
       return res
     }
     catch (err: any) {
-      errors.value.updateOrgMember = err.data.message || "Failed to update organization member"
+      errors.value.updateOrgMember = err.data?.message || "Failed to update organization member"
       console.error("updateOrgMember error:", err)
     }
     finally {
@@ -137,7 +140,7 @@ export const useOrgStore = defineStore("org", () => {
       await $fetch(`/api/orgs/${orgId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
     }
     catch (err: any) {
-      errors.value.removeOrgMember = err.data.message || "Failed to remove organization member"
+      errors.value.removeOrgMember = err.data?.message || "Failed to remove organization member"
       console.error("removeOrgMember error:", err)
     }
     finally {
@@ -154,7 +157,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.createInvite = err.data.message || "Failed to create organization invite"
+      errors.value.createInvite = err.data?.message || "Failed to create organization invite"
       console.error("createInvite error:", err)
     }
     finally {
@@ -174,7 +177,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.acceptInvite = err.data.message || "Failed to accept organization invite"
+      errors.value.acceptInvite = err.data?.message || "Failed to accept organization invite"
       console.error("acceptInvite error:", err)
     }
     finally {
