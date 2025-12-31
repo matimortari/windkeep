@@ -1,13 +1,16 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <h2 class="border-b py-4">
-      Audit Logs
-    </h2>
+    <header class="navigation-group border-b py-4">
+      <h2>
+        Audit Logs
+      </h2>
 
-    <AuditFilter />
+      <AuditFilter />
+    </header>
 
-    <div class="scroll-area max-h-screen overflow-y-auto">
+    <div class="scroll-area flex max-h-screen flex-col gap-2 overflow-y-auto">
       <AuditTable />
+      <AuditPagination />
     </div>
   </div>
 </template>
