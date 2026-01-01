@@ -267,10 +267,8 @@ async function handleUpdateMemberRole(memberId: string, newRole: Role) {
     return
   }
 
-  const success = await orgStore.updateOrgMember(activeOrg.value.id, memberId, { role: newRole })
-  if (success) {
-    await userStore.getUser()
-  }
+  await orgStore.updateOrgMember(activeOrg.value.id, memberId, { role: newRole })
+  await userStore.getUser()
 }
 
 async function handleRemoveMember(memberId: string) {
@@ -290,14 +288,12 @@ async function handleSubmit(index: number) {
     return
   }
 
-  const success = await orgStore.updateOrg(activeOrg.value.id, {
+  await orgStore.updateOrg(activeOrg.value.id, {
     name: activeOrg.value.name || "",
   })
 
-  if (success) {
-    await userStore.getUser()
-    saveIcon[index]?.triggerSuccess()
-  }
+  await userStore.getUser()
+  saveIcon[index]?.triggerSuccess()
 }
 
 async function handleLeaveOrg() {

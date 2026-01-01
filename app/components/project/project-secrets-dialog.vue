@@ -102,15 +102,9 @@ function resetForm() {
       },
     }
   }
-
-  errors.value.createProjectSecret = null
-  errors.value.updateProjectSecret = null
 }
 
 async function handleSubmit() {
-  errors.value.createProjectSecret = null
-  errors.value.updateProjectSecret = null
-
   if (!form.value.key.trim()) {
     errors.value.createProjectSecret = "Secret key is required"
     errors.value.updateProjectSecret = "Secret key is required"
