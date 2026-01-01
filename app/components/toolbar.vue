@@ -71,9 +71,9 @@ defineEmits<(e: "toggleSidebar") => void>()
 const { toggleTheme, themeIcon } = useTheme()
 const { clear } = useUserSession()
 const { user } = storeToRefs(useUserStore())
-const { activeOrg, errors } = storeToRefs(useOrgStore())
+const { activeOrg, organizations } = storeToRefs(useOrgStore())
 const route = useRoute()
-
+const orgStore = useOrgStore()
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 
@@ -94,24 +94,17 @@ async function handleSetActiveOrg(orgId: string) {
     return
   }
 
-  try {
-    isDropdownOpen.value = false
-
-    const orgStore = useOrgStore()
-    const org = orgStore.organizations.find((o: Organization) => o.id === orgId)
-    if (!org) {
-      const res = await orgStore.getOrg(orgId)
-      if (res) {
-        orgStore.setActiveOrg(res.id)
-      }
-      return
+  isDropdownOpen.value = false
+  const org = organizations.value.find((o: Organization) => o.id === activeOrg.value?.id)
+  if (!org) {
+    const res = await orgStore.getOrg(orgId)
+    if (res) {
+      orgStore.setActiveOrg(res.id)
     }
+    return
+  }
 
-    orgStore.setActiveOrg(org.id)
-  }
-  catch (err: any) {
-    errors.value.setActiveOrg = err.data.message
-  }
+  orgStore.setActiveOrg(org.id)
 }
 
 async function signOut() {
