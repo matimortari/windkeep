@@ -90,13 +90,14 @@ async function handleSubmit(secret: any) {
     return
   }
 
-  const success = secret.id
-    ? await projectStore.updateProjectSecret(project.value.id, secret.id, { description: secret.description ?? "" })
-    : await projectStore.createProjectSecret(project.value.id, { key: secret.key, description: secret.description ?? "", projectId: project.value.id })
-
-  if (success) {
-    await projectStore.getProjectSecrets(project.value.id)
+  if (secret.id) {
+    await projectStore.updateProjectSecret(project.value.id, secret.id, { description: secret.description ?? "" })
   }
+  else {
+    await projectStore.createProjectSecret(project.value.id, { key: secret.key, description: secret.description ?? "", projectId: project.value.id })
+  }
+
+  await projectStore.getProjectSecrets(project.value.id)
 }
 
 watch(() => project.value?.id, async (id: string | undefined) => {

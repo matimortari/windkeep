@@ -27,10 +27,7 @@
 
     <p class="text-caption flex min-h-4 flex-col items-center gap-2">
       <span v-if="errors.createOrg" class="text-danger">{{ errors.createOrg }}</span>
-
-      <span> Already have an invite? <nuxt-link to="/onboarding/join-org" class="text-primary hover:underline">
-        Join an Organization.
-      </nuxt-link>
+      <span> Already have an invite? <nuxt-link to="/onboarding/join-org" class="text-primary hover:underline">Join an Organization.</nuxt-link>
       </span>
     </p>
   </div>
@@ -46,8 +43,6 @@ const { errors } = storeToRefs(orgStore)
 const localOrg = ref({ name: `${user.value?.name}'s Team` })
 
 async function handleCreateOrg() {
-  errors.value.createOrg = null
-
   const result = createOrgSchema.safeParse(localOrg.value)
   if (!result.success) {
     errors.value.createOrg = "Organization name must be at least 3 characters long."

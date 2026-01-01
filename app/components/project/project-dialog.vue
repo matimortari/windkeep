@@ -72,11 +72,9 @@ const suggestedSlug = computed(() => {
 })
 
 async function handleSubmit() {
-  const finalSlug = form.value.slug.trim() || suggestedSlug.value
-
   const payload = {
     name: form.value.name.trim(),
-    slug: finalSlug,
+    slug: form.value.slug.trim() || suggestedSlug.value,
     description: form.value.description.trim(),
   }
 
@@ -89,7 +87,6 @@ watch(() => props.isOpen, (open) => {
     form.value.name = ""
     form.value.slug = ""
     form.value.description = ""
-    errors.value.createProject = null
   }
 }, { immediate: true })
 </script>
