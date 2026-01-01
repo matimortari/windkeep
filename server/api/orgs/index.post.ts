@@ -1,7 +1,6 @@
 import db from "#server/lib/db"
 import { createAuditLog, getUserFromSession } from "#server/lib/utils"
 import { createOrgSchema } from "#shared/schemas/org-schema"
-import { z } from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -9,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const result = createOrgSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const organization = await db.$transaction(async (tx) => {
@@ -57,5 +56,5 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return organization
+  return { organization }
 })

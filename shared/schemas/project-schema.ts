@@ -11,14 +11,8 @@ export const createProjectSchema = z.object({
     .string()
     .min(3, "Slug must be at least 3 characters")
     .max(50, "Slug must be at most 50 characters")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase, alphanumeric, and can contain hyphens")
-    .refine(val => !val.startsWith("-") && !val.endsWith("-"), {
-      message: "Slug cannot start or end with a hyphen",
-    })
-    .refine(val => !val.includes("--"), {
-      message: "Slug cannot contain consecutive hyphens",
-    })
-    .transform(val => val.trim()),
+    .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
+    .optional(),
   description: z
     .string()
     .max(255, "Description must be at most 255 characters")
@@ -39,14 +33,7 @@ export const updateProjectSchema = z.object({
     .string()
     .min(3, "Slug must be at least 3 characters")
     .max(50, "Slug must be at most 50 characters")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase, alphanumeric, and can contain hyphens")
-    .refine(val => !val.startsWith("-") && !val.endsWith("-"), {
-      message: "Slug cannot start or end with a hyphen",
-    })
-    .refine(val => !val.includes("--"), {
-      message: "Slug cannot contain consecutive hyphens",
-    })
-    .transform(val => val.trim())
+    .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
     .optional(),
   description: z
     .string()

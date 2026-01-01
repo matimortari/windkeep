@@ -3,15 +3,15 @@ import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/uti
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const project = getRouterParam(event, "project")
-  if (!project) {
+  const projectId = getRouterParam(event, "project")
+  if (!projectId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER"])
 
   const projectData = await db.project.findUnique({
-    where: { id: project },
+    where: { id: projectId },
     select: {
       id: true,
       name: true,
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     event,
     userId: user.id,
     orgId: projectData.orgId,
-    projectId: project,
+    projectId,
     action: "DELETE.PROJECT",
     resource: "project",
     description: `Deleted project "${projectData.name}" (${projectData.slug}) from organization "${projectData.org.name}" (${projectData._count.secrets} secret(s), ${projectData._count.memberships} member(s))`,
@@ -55,12 +55,8 @@ export default defineEventHandler(async (event) => {
   })
 
   await db.project.delete({
-    where: { id: project },
+    where: { id: projectId },
   })
 
-  return {
-    success: true,
-    message: `Project "${projectData.name}" deleted successfully`,
-    secretsDeleted: projectData._count.secrets,
-  }
+  return { success: true, message: "Project deleted successfully" }
 })

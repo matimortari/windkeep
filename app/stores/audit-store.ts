@@ -55,6 +55,7 @@ export const useAuditStore = defineStore("audit", () => {
     catch (err: any) {
       errors.value.getAuditLogs = err.data?.message || "Failed to fetch audit logs"
       console.error("getAuditLogs error:", err)
+      throw err
     }
     finally {
       loading.value = false
@@ -71,6 +72,7 @@ export const useAuditStore = defineStore("audit", () => {
     catch (err: any) {
       errors.value.deleteAuditLogs = err.data?.message || "Failed to delete audit logs"
       console.error("deleteAuditLogs error:", err)
+      throw err
     }
     finally {
       loading.value = false

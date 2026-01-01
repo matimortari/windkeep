@@ -2,26 +2,25 @@ import db from "#server/lib/db"
 import { decrypt, encrypt } from "#server/lib/encryption"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/utils"
 import { updateSecretSchema } from "#shared/schemas/secret-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const project = getRouterParam(event, "project")
-  const secret = getRouterParam(event, "secret")
-  if (!project || !secret) {
+  const projectId = getRouterParam(event, "project")
+  const secretId = getRouterParam(event, "secret")
+  if (!projectId || !secretId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Secret ID are required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateSecretSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const existingSecret = await db.secret.findUnique({
-    where: { id: secret },
+    where: { id: secretId },
     select: {
       projectId: true,
       key: true,
@@ -31,7 +30,7 @@ export default defineEventHandler(async (event) => {
   if (!existingSecret) {
     throw createError({ statusCode: 404, statusMessage: "Secret not found" })
   }
-  if (existingSecret.projectId !== project) {
+  if (existingSecret.projectId !== projectId) {
     throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
   }
 
@@ -49,7 +48,7 @@ export default defineEventHandler(async (event) => {
       await db.secretValue.upsert({
         where: {
           secretId_environment: {
-            secretId: secret,
+            secretId,
             environment: val.environment,
           },
         },
@@ -57,7 +56,7 @@ export default defineEventHandler(async (event) => {
           value: encrypt(val.value),
         },
         create: {
-          secretId: secret,
+          secretId,
           environment: val.environment,
           value: encrypt(val.value),
         },
@@ -66,7 +65,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedSecret = await db.secret.update({
-    where: { id: secret },
+    where: { id: secretId },
     data: updateData,
     include: {
       values: true,
@@ -97,7 +96,7 @@ export default defineEventHandler(async (event) => {
     event,
     userId: user.id,
     orgId: updatedSecret.project.org.id,
-    projectId: project,
+    projectId,
     action: "UPDATE.SECRET",
     resource: "secret",
     description: `Updated secret "${updatedSecret.key}" in project "${updatedSecret.project.name}" (${changes.join(", ")})`,

@@ -4,15 +4,15 @@ import { getUserFromSession, requireRole } from "#server/lib/utils"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const project = getRouterParam(event, "project")
-  if (!project) {
+  const projectId = getRouterParam(event, "project")
+  if (!projectId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN", "MEMBER"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
 
   const secrets = await db.secret.findMany({
-    where: { projectId: project },
+    where: { projectId },
     include: {
       values: {
         orderBy: {
@@ -34,5 +34,5 @@ export default defineEventHandler(async (event) => {
     })),
   }))
 
-  return decryptedSecrets
+  return { decryptedSecrets }
 })

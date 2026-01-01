@@ -1,7 +1,6 @@
 import db from "#server/lib/db"
 import { createAuditLog, getUserFromSession } from "#server/lib/utils"
 import { acceptInviteSchema } from "#shared/schemas/org-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -9,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const result = acceptInviteSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const invitation = await db.invitation.findUnique({
@@ -45,7 +44,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 409, statusMessage: "You are already a member of this organization" })
   }
 
-  const [membership] = await db.$transaction([
+  const [newMembership] = await db.$transaction([
     db.orgMembership.create({
       data: {
         userId: user.id,
@@ -80,14 +79,14 @@ export default defineEventHandler(async (event) => {
     orgId: invitation.orgId,
     action: "ACCEPT.ORG_INVITE",
     resource: "organization_invite",
-    description: `${membership.user.name} (${membership.user.email}) joined organization "${membership.org.name}" via invite link`,
+    description: `${newMembership.user.name} (${newMembership.user.email}) joined organization "${newMembership.org.name}" via invite link`,
     metadata: {
       orgId: invitation.org.id,
       orgName: invitation.org.name,
-      userName: membership.user.name,
-      userEmail: membership.user.email,
+      userName: newMembership.user.name,
+      userEmail: newMembership.user.email,
     },
   })
 
-  return membership
+  return { organization: newMembership.org, membership: newMembership }
 })

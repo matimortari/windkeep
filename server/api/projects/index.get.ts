@@ -31,9 +31,6 @@ export default defineEventHandler(async (event) => {
       createdAt: "desc",
     },
   })
-  if (!projects) {
-    throw createError({ statusCode: 404, statusMessage: "No projects found" })
-  }
 
   return { projects }
 })

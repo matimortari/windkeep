@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
       },
     },
   })
-
   for (const membership of ownedOrgs) {
     const ownerCount = membership.org.memberships.filter(m => m.role === "OWNER").length
     if (ownerCount === 1) {
@@ -42,5 +41,5 @@ export default defineEventHandler(async (event) => {
   // Clear the session
   await clearUserSession(event)
 
-  return { success: true, message: "Account deleted successfully" }
+  return { success: true, message: "User deleted successfully" }
 })
