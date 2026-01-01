@@ -2,7 +2,6 @@ import { randomBytes } from "node:crypto"
 import db from "#server/lib/db"
 import { getUserFromSession } from "#server/lib/utils"
 import { updateUserSchema } from "#shared/schemas/user-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -10,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const result = updateUserSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   // Only regenerate when the boolean is explicitly sent and true
@@ -36,9 +35,6 @@ export default defineEventHandler(async (event) => {
       updatedAt: true,
     },
   })
-  if (apiTokenToUpdate) {
-    return { message: "API token updated successfully", apiToken: apiTokenToUpdate }
-  }
 
-  return updatedUser
+  return { updatedUser }
 })

@@ -2,24 +2,20 @@ import { randomBytes } from "node:crypto"
 import db from "#server/lib/db"
 import { createAuditLog, getInviteBaseUrl, getUserFromSession, requireRole } from "#server/lib/utils"
 import { createInviteSchema } from "#shared/schemas/org-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const org = getRouterParam(event, "org")
-  if (!org) {
+  const orgId = getRouterParam(event, "org")
+  if (!orgId) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
-  const result = createInviteSchema.safeParse({
-    ...body,
-    orgId: org,
-  })
+  const result = createInviteSchema.safeParse({ ...body, orgId })
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   // Generate invitation token
@@ -29,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
   const invitation = await db.invitation.create({
     data: {
-      orgId: org,
+      orgId,
       token,
       expiresAt,
       invitedById: user.id,
@@ -56,7 +52,7 @@ export default defineEventHandler(async (event) => {
   await createAuditLog({
     event,
     userId: user.id,
-    orgId: org,
+    orgId,
     action: "CREATE.ORG_INVITE",
     resource: "organization_invite",
     description: `Created invite link for organization "${invitation.org.name}"`,

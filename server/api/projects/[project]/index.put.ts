@@ -1,25 +1,24 @@
 import db from "#server/lib/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/utils"
 import { updateProjectSchema } from "#shared/schemas/project-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const project = getRouterParam(event, "project")
-  if (!project) {
+  const projectId = getRouterParam(event, "project")
+  if (!projectId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER"])
 
   const body = await readBody(event)
   const result = updateProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const existingProject = await db.project.findUnique({
-    where: { id: project },
+    where: { id: projectId },
     select: Object.keys(result.data).reduce((acc, key) => {
       acc[key] = true
       return acc
@@ -38,7 +37,7 @@ export default defineEventHandler(async (event) => {
           result.data.name ? { name: result.data.name } : {},
           result.data.slug ? { slug: result.data.slug } : {},
         ].filter(Boolean),
-        NOT: { id: project },
+        NOT: { id: projectId },
       },
     })
 
@@ -51,7 +50,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedProject = await db.project.update({
-    where: { id: project },
+    where: { id: projectId },
     data: result.data,
     include: { org: true },
   })
@@ -64,12 +63,12 @@ export default defineEventHandler(async (event) => {
     event,
     userId: user.id,
     orgId: updatedProject.org.id,
-    projectId: project,
+    projectId,
     action: "UPDATE.PROJECT",
     resource: "project",
     description: `Updated project ${changes.join(", ")}`,
     metadata: {
-      projectId: project,
+      projectId,
       projectName: updatedProject.name,
       changes: Object.fromEntries(
         Object.entries(result.data).map(([key, value]) => [
@@ -82,5 +81,5 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return updatedProject
+  return { project: updatedProject }
 })

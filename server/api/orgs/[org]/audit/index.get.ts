@@ -1,48 +1,57 @@
 import db from "#server/lib/db"
 import { getUserFromSession, requireRole } from "#server/lib/utils"
+import { getAuditLogsSchema } from "#shared/schemas/audit-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const org = getRouterParam(event, "org")
-  if (!org) {
+  const orgId = getRouterParam(event, "org")
+  if (!orgId) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
 
   const query = getQuery(event)
-  const page = Number(query.page) || 1
-  const limit = Number(query.limit) || 20
+  const parsedQuery = {
+    page: query.page ? Number(query.page) : undefined,
+    limit: query.limit ? Number(query.limit) : undefined,
+    projectId: query.projectId as string | undefined,
+    action: query.action as string | undefined,
+    userId: query.userId as string | undefined,
+    startDate: query.startDate as string | undefined,
+    endDate: query.endDate as string | undefined,
+  }
+
+  const result = getAuditLogsSchema.safeParse(parsedQuery)
+  if (!result.success) {
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid query parameters" })
+  }
+
+  const page = result.data.page
+  const limit = result.data.limit
   const offset = (page - 1) * limit
-  const projectId = query.projectId as string | undefined
-  const action = query.action as string | undefined
-  const userId = query.userId as string | undefined
-  const startDate = query.startDate as string | undefined
-  const endDate = query.endDate as string | undefined
 
-  const where: any = {
-    orgId: org,
+  const where: any = { orgId }
+
+  if (result.data.projectId) {
+    where.projectId = result.data.projectId
   }
 
-  if (projectId) {
-    where.projectId = projectId
+  if (result.data.action) {
+    where.action = { contains: result.data.action, mode: "insensitive" }
   }
 
-  if (action) {
-    where.action = { contains: action, mode: "insensitive" }
+  if (result.data.userId) {
+    where.userId = result.data.userId
   }
 
-  if (userId) {
-    where.userId = userId
-  }
-
-  if (startDate || endDate) {
+  if (result.data.startDate || result.data.endDate) {
     where.createdAt = {}
-    if (startDate) {
-      where.createdAt.gte = new Date(startDate)
+    if (result.data.startDate) {
+      where.createdAt.gte = new Date(result.data.startDate)
     }
-    if (endDate) {
-      where.createdAt.lte = new Date(endDate)
+    if (result.data.endDate) {
+      where.createdAt.lte = new Date(result.data.endDate)
     }
   }
 
@@ -79,9 +88,7 @@ export default defineEventHandler(async (event) => {
   const users = await db.user.findMany({
     where: {
       auditLogs: {
-        some: {
-          orgId: org,
-        },
+        some: { orgId },
       },
     },
     select: {
@@ -96,9 +103,7 @@ export default defineEventHandler(async (event) => {
 
   // Get projects in this organization
   const projects = await db.project.findMany({
-    where: {
-      orgId: org,
-    },
+    where: { orgId },
     select: {
       id: true,
       name: true,
@@ -110,9 +115,7 @@ export default defineEventHandler(async (event) => {
 
   // Get unique actions
   const actionsResult = await db.auditLog.findMany({
-    where: {
-      orgId: org,
-    },
+    where: { orgId },
     select: {
       action: true,
     },

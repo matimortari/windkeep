@@ -1,25 +1,24 @@
 import db from "#server/lib/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/utils"
 import { updateOrgSchema } from "#shared/schemas/org-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const org = getRouterParam(event, "org")
-  if (!org) {
+  const orgId = getRouterParam(event, "org")
+  if (!orgId) {
     throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER"])
+  await requireRole(user.id, { type: "organization", orgId }, ["OWNER"])
 
   const body = await readBody(event)
   const result = updateOrgSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const existingOrg = await db.organization.findUnique({
-    where: { id: org },
+    where: { id: orgId },
     select: Object.keys(result.data).reduce((acc, key) => {
       acc[key] = true
       return acc
@@ -27,7 +26,7 @@ export default defineEventHandler(async (event) => {
   }) as Record<string, unknown> | null
 
   const updatedOrg = await db.organization.update({
-    where: { id: org },
+    where: { id: orgId },
     data: { name: result.data.name },
   })
 
@@ -38,16 +37,16 @@ export default defineEventHandler(async (event) => {
   await createAuditLog({
     event,
     userId: user.id,
-    orgId: org,
+    orgId,
     action: "UPDATE.ORG",
     resource: "organization",
     description: `Updated organization ${changes.join(", ")}`,
     metadata: {
-      orgId: org,
+      orgId,
       orgName: updatedOrg.name,
       changes: Object.fromEntries(Object.entries(result.data).map(([key, value]) => [key, { from: existingOrg?.[key], to: value }])),
     },
   })
 
-  return updatedOrg
+  return { updatedOrg }
 })

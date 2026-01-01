@@ -3,16 +3,16 @@ import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/uti
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const project = getRouterParam(event, "project")
-  const secret = getRouterParam(event, "secret")
-  if (!project || !secret) {
+  const projectId = getRouterParam(event, "project")
+  const secretId = getRouterParam(event, "secret")
+  if (!projectId || !secretId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Secret ID are required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const secretData = await db.secret.findUnique({
-    where: { id: secret },
+    where: { id: secretId },
     select: {
       id: true,
       key: true,
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
   if (!secretData) {
     throw createError({ statusCode: 404, statusMessage: "Secret not found" })
   }
-  if (secretData.projectId !== project) {
+  if (secretData.projectId !== projectId) {
     throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
   }
 
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     event,
     userId: user.id,
     orgId: secretData.project.org.id,
-    projectId: project,
+    projectId,
     action: "DELETE.SECRET",
     resource: "secret",
     description: `Deleted secret "${secretData.key}" from project "${secretData.project.name}" (${secretData._count.values} value(s) deleted)`,
@@ -65,12 +65,8 @@ export default defineEventHandler(async (event) => {
 
   // Delete the secret (cascade will handle secret values)
   await db.secret.delete({
-    where: { id: secret },
+    where: { id: secretId },
   })
 
-  return {
-    success: true,
-    message: `Secret "${secretData.key}" deleted successfully`,
-    valuesDeleted: secretData._count.values,
-  }
+  return { success: true, message: `Secret deleted successfully` }
 })

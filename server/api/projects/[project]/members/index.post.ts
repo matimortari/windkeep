@@ -1,12 +1,10 @@
 import db from "#server/lib/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/utils"
 import { addProjectMemberSchema } from "#shared/schemas/project-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
-
   if (!projectId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
@@ -16,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = addProjectMemberSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const project = await db.project.findUnique({
@@ -117,5 +115,5 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return projectRole
+  return { projectRole }
 })

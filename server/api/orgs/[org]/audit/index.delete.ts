@@ -1,5 +1,6 @@
 import db from "#server/lib/db"
 import { getUserFromSession, requireRole } from "#server/lib/utils"
+import { deleteAuditLogsSchema } from "#shared/schemas/audit-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -10,35 +11,28 @@ export default defineEventHandler(async (event) => {
 
   await requireRole(user.id, { type: "organization", orgId: org }, ["OWNER"])
 
-  const body = (await readBody(event).catch(() => ({}))) || {}
-
-  const { olderThan, projectId, userId, action } = body as Record<string, string | undefined>
+  const body = await readBody(event)
+  const result = deleteAuditLogsSchema.safeParse(body)
+  if (!result.success) {
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+  }
 
   const where: any = { orgId: org }
 
-  if (olderThan) {
-    const date = new Date(olderThan)
-    if (Number.isNaN(date.getTime())) {
-      throw createError({ statusCode: 400, statusMessage: "Invalid date format" })
-    }
-    where.createdAt = { lt: date }
+  if (result.data.olderThan) {
+    where.createdAt = { lt: new Date(result.data.olderThan) }
+  }
+  if (result.data.projectId) {
+    where.projectId = result.data.projectId
+  }
+  if (result.data.userId) {
+    where.userId = result.data.userId
+  }
+  if (result.data.action) {
+    where.action = { contains: result.data.action, mode: "insensitive" }
   }
 
-  if (projectId) {
-    where.projectId = projectId
-  }
-  if (userId) {
-    where.userId = userId
-  }
-  if (action) {
-    where.action = { contains: action, mode: "insensitive" }
-  }
+  const deleteResult = await db.auditLog.deleteMany({ where })
 
-  const result = await db.auditLog.deleteMany({ where })
-
-  return {
-    success: true,
-    message: `Deleted ${result.count} audit log(s)`,
-    deletedCount: result.count,
-  }
+  return { success: true, message: `Deleted ${deleteResult.count} audit log(s)` }
 })

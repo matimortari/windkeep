@@ -2,31 +2,27 @@ import db from "#server/lib/db"
 import { decrypt, encrypt } from "#server/lib/encryption"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/utils"
 import { createSecretSchema } from "#shared/schemas/secret-schema"
-import z from "zod"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const project = getRouterParam(event, "project")
-  if (!project) {
+  const projectId = getRouterParam(event, "project")
+  if (!projectId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
-  const result = createSecretSchema.safeParse({
-    ...body,
-    projectId: project,
-  })
+  const result = createSecretSchema.safeParse({ ...body, projectId })
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid input", data: z.treeifyError(result.error) })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const existingSecret = await db.secret.findUnique({
     where: {
       key_projectId: {
         key: result.data.key,
-        projectId: project,
+        projectId,
       },
     },
   })
@@ -37,7 +33,7 @@ export default defineEventHandler(async (event) => {
   const secretData: any = {
     key: result.data.key,
     description: result.data.description,
-    projectId: project,
+    projectId,
   }
 
   if (result.data.values && Array.isArray(result.data.values)) {
@@ -72,7 +68,7 @@ export default defineEventHandler(async (event) => {
     event,
     userId: user.id,
     orgId: secret.project.org.id,
-    projectId: project,
+    projectId,
     action: "CREATE.SECRET",
     resource: "secret",
     description: `Created secret "${secret.key}" in project "${secret.project.name}" with ${secret.values.length} environment(s)`,
