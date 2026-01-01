@@ -15,13 +15,14 @@ export const useUserStore = defineStore("user", () => {
     errors.value.getUser = null
 
     try {
-      const res = await $fetch<User>("/api/user", { method: "GET", credentials: "include" })
-      user.value = res
+      const res = await $fetch<{ userData: User }>("/api/user", { method: "GET", credentials: "include" })
+      user.value = res.userData
       return res
     }
     catch (err: any) {
       errors.value.getUser = err.data?.message || "Failed to get user"
       console.error("getUser error:", err)
+      throw err
     }
     finally {
       loading.value = false
@@ -33,15 +34,14 @@ export const useUserStore = defineStore("user", () => {
     errors.value.updateUser = null
 
     try {
-      const res = await $fetch<User & { apiToken?: string }>("/api/user", { method: "PUT", body: data, credentials: "include" })
-      if (user.value) {
-        Object.assign(user.value, res)
-      }
+      const res = await $fetch<{ updatedUser: User }>("/api/user", { method: "PUT", body: data, credentials: "include" })
+      user.value = res.updatedUser
       return res
     }
     catch (err: any) {
       errors.value.updateUser = err.data?.message || "Failed to update user"
       console.error("updateUser error:", err)
+      throw err
     }
     finally {
       loading.value = false
@@ -65,6 +65,7 @@ export const useUserStore = defineStore("user", () => {
     catch (err: any) {
       errors.value.updateUserImage = err.data?.message || "Failed to update user image"
       console.error("updateUserImage error:", err)
+      throw err
     }
     finally {
       loading.value = false
@@ -82,6 +83,7 @@ export const useUserStore = defineStore("user", () => {
     catch (err: any) {
       errors.value.deleteUser = err.data?.message || "Failed to delete user"
       console.error("deleteUser error:", err)
+      throw err
     }
     finally {
       loading.value = false
