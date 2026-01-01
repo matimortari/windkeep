@@ -3,30 +3,28 @@ import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/uti
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
-  const project = getRouterParam(event, "project")
-  const member = getRouterParam(event, "member")
-  if (!project || !member) {
+  const projectId = getRouterParam(event, "project")
+  const memberId = getRouterParam(event, "member")
+  if (!projectId || !memberId) {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
   }
 
-  // Check if the member exists in the project
   const targetRole = await db.projectMembership.findUnique({
-    where: { userId_projectId: { userId: member, projectId: project } },
+    where: { userId_projectId: { userId: memberId, projectId } },
     include: {
       user: { select: { id: true, email: true, name: true } },
       project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } },
     },
   })
-
   if (!targetRole) {
     throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
   }
 
-  // Allow self-removal (unless user is last owner)
-  if (member === user.id) {
+  // If self-removal, allow always but check for last owner
+  if (memberId === user.id) {
     if (targetRole.role === "OWNER") {
       const ownerCount = await db.projectMembership.count({
-        where: { projectId: project, role: "OWNER" },
+        where: { projectId, role: "OWNER" },
       })
       if (ownerCount === 1) {
         throw createError({ statusCode: 400, statusMessage: "Cannot leave project as the last owner." })
@@ -34,30 +32,30 @@ export default defineEventHandler(async (event) => {
     }
   }
   else {
-    const userRole = await requireRole(user.id, { type: "project", projectId: project }, ["OWNER", "ADMIN"])
+    const userRole = await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
     if (userRole.role !== "OWNER" && targetRole.role === "OWNER") {
       throw createError({ statusCode: 403, statusMessage: "Only owners can remove other owners" })
     }
   }
 
   await db.projectMembership.delete({
-    where: { userId_projectId: { userId: member, projectId: project } },
+    where: { userId_projectId: { userId: memberId, projectId } },
   })
 
   await createAuditLog({
     event,
     userId: user.id,
     orgId: targetRole.project.org.id,
-    projectId: project,
+    projectId,
     action: "REMOVE.PROJECT_MEMBER",
     resource: "project_member",
-    description: member === user.id ? `${targetRole.user.name} (${targetRole.user.email}) left project "${targetRole.project.name}"` : `Removed ${targetRole.user.name} (${targetRole.user.email}) from project "${targetRole.project.name}"`,
+    description: memberId === user.id ? `${targetRole.user.name} (${targetRole.user.email}) left project "${targetRole.project.name}"` : `Removed ${targetRole.user.name} (${targetRole.user.email}) from project "${targetRole.project.name}"`,
     metadata: {
       userId: targetRole.user.id,
       userEmail: targetRole.user.email,
       userName: targetRole.user.name,
       userRole: targetRole.role,
-      selfRemoval: member === user.id,
+      selfRemoval: memberId === user.id,
       projectId: targetRole.project.id,
       projectName: targetRole.project.name,
       orgId: targetRole.project.org.id,
