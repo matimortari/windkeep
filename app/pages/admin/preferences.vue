@@ -194,8 +194,8 @@ async function handleRegenerateToken() {
   }
 
   const res = await userStore.updateUser({ regenerateApiToken: true })
-  if (res?.apiToken && user.value) {
-    user.value.apiToken = res.apiToken
+  if (res?.updatedUser?.apiToken && user.value) {
+    user.value.apiToken = res.updatedUser.apiToken
   }
 }
 

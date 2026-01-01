@@ -27,9 +27,7 @@
 
     <p class="text-caption flex min-h-4 flex-col items-center gap-2">
       <span v-if="errors.acceptInvite" class="text-danger">{{ errors.acceptInvite }}</span>
-      <span v-else-if="joinOrgSuccess" class="text-success">
-        {{ joinOrgSuccess }}
-      </span>
+      <span v-else-if="joinOrgSuccess" class="text-success">{{ joinOrgSuccess }}</span>
     </p>
   </div>
 </template>
@@ -43,24 +41,16 @@ const token = ref(route.query.token as string || "")
 const joinOrgSuccess = ref<string | null>(null)
 
 async function handleAcceptInvite() {
-  errors.value.acceptInvite = null
   joinOrgSuccess.value = null
 
-  try {
-    const res = await orgStore.acceptInvite(token.value, { token: token.value })
-    if (res) {
-      joinOrgSuccess.value = "Invitation accepted! Redirecting."
-      setTimeout(() => navigateTo("/admin/projects"), 2000)
-    }
-  }
-  catch (err: any) {
-    errors.value.acceptInvite = err.data.message
+  const res = await orgStore.acceptInvite(token.value, { token: token.value })
+  if (res) {
+    joinOrgSuccess.value = "Invitation accepted! Redirecting."
+    setTimeout(() => navigateTo("/admin/projects"), 2000)
   }
 }
 
-onMounted(async () => {
-  await userStore.getUser()
-})
+onMounted(async () => await userStore.getUser())
 
 useHead({
   title: "Join Organization",

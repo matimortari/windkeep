@@ -266,17 +266,15 @@ async function handleAddMember() {
     return
   }
 
-  const success = await projectStore.addProjectMember(project.value.id, {
+  await projectStore.addProjectMember(project.value.id, {
     userId: newMemberId.value.trim(),
     role: newMemberRole.value as Role,
   })
 
-  if (success) {
-    await projectStore.getProjects()
-    addMemberSuccess.value = "Member added successfully."
-    newMemberId.value = ""
-    newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
-  }
+  await projectStore.getProjects()
+  addMemberSuccess.value = "Member added successfully."
+  newMemberId.value = ""
+  newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
 }
 
 async function handleUpdateMemberRole(memberId: string, newRole: Role) {
@@ -307,18 +305,16 @@ async function handleSubmit(index: number) {
 
   const oldSlug = project.value.slug
   const newSlug = localProject.value?.slug ?? ""
-  const success = await projectStore.updateProject(project.value.id, {
+  await projectStore.updateProject(project.value.id, {
     name: localProject.value?.name ?? "",
     slug: localProject.value?.slug ?? "",
     description: localProject.value?.description ?? "",
   })
 
-  if (success) {
-    await projectStore.getProjects()
-    saveIcon[index]?.triggerSuccess()
-    if (oldSlug !== newSlug) {
-      await navigateTo(`/admin/${newSlug}/settings`)
-    }
+  await projectStore.getProjects()
+  saveIcon[index]?.triggerSuccess()
+  if (oldSlug !== newSlug) {
+    await navigateTo(`/admin/${newSlug}/settings`)
   }
 }
 

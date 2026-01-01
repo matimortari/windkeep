@@ -84,17 +84,13 @@ function parseEnv(text: string): Record<string, string> {
 }
 
 function handleSubmit() {
-  errors.value.createProjectSecret = null
-
   const parsed = parseEnv(envContent.value)
   if (!Object.keys(parsed).length) {
     errors.value.createProjectSecret = "No valid key-value pairs found"
     return
   }
 
-  const normalized = Object.fromEntries(Object.entries(parsed).map(([key, value]) => [normalizeKey(key), value]).filter(([key]) => Boolean(key)),
-  )
-
+  const normalized = Object.fromEntries(Object.entries(parsed).map(([key, value]) => [normalizeKey(key), value]).filter(([key]) => Boolean(key)))
   const duplicates = Object.keys(normalized).filter((key) => {
     const existing = props.secrets.find(s => s.key === key)
     return existing?.values?.some(v => v.environment === selectedEnv.value)
@@ -110,12 +106,7 @@ function handleSubmit() {
       key,
       description: "",
       projectId: props.projectId,
-      values: [
-        {
-          environment: selectedEnv.value,
-          value,
-        },
-      ],
+      values: [{ environment: selectedEnv.value, value }],
     }),
   )
 
@@ -127,7 +118,6 @@ watch(() => props.isOpen, (open) => {
   if (open) {
     envContent.value = ""
     selectedEnv.value = "DEVELOPMENT"
-    errors.value.createProjectSecret = null
   }
 })
 </script>
