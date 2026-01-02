@@ -94,7 +94,7 @@ async function handleSetActiveOrg(orgId: string) {
   }
 
   isDropdownOpen.value = false
-  const org = organizations.value.find((o: Organization) => o.id === activeOrg.value?.id)
+  const org = organizations.value.find((o: Organization) => o.id === orgId)
   if (!org) {
     const res = await orgStore.getOrg(orgId)
     if (res) {

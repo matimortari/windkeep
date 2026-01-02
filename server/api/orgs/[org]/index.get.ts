@@ -10,6 +10,18 @@ export default defineEventHandler(async (event) => {
 
   await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "MEMBER", "ADMIN"])
 
+  // Set this org as active and deactivate others
+  await db.$transaction([
+    db.orgMembership.updateMany({
+      where: { userId: user.id, isActive: true },
+      data: { isActive: false },
+    }),
+    db.orgMembership.update({
+      where: { userId_orgId: { userId: user.id, orgId } },
+      data: { isActive: true },
+    }),
+  ])
+
   const membership = await db.orgMembership.findUnique({
     where: { userId_orgId: { userId: user.id, orgId } },
     select: {
