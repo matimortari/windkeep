@@ -20,7 +20,7 @@ export const updateOrgSchema = z.object({
 })
 
 export const updateMemberRoleSchema = z.object({
-  role: z.enum(["OWNER", "ADMIN", "MEMBER"]),
+  role: z.enum(["ADMIN", "MEMBER"]),
 })
 
 export const createInviteSchema = z.object({

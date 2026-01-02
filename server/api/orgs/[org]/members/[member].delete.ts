@@ -20,22 +20,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Member not found in organization" })
   }
 
-  // If self-removal, allow always but check for last owner
-  if (memberId === user.id) {
-    if (targetRole.role === "OWNER") {
-      const ownerCount = await db.orgMembership.count({
-        where: { orgId, role: "OWNER" },
-      })
-      if (ownerCount === 1) {
-        throw createError({ statusCode: 400, statusMessage: "Cannot leave organization as the last owner." })
-      }
-    }
+  // Prevent removing OWNER users
+  if (targetRole.role === "OWNER") {
+    throw createError({ statusCode: 403, statusMessage: "Cannot remove organization owners" })
   }
-  else {
-    const userRole = await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
-    if (targetRole.role === "OWNER" && userRole.role !== "OWNER") {
-      throw createError({ statusCode: 403, statusMessage: "Organization owners cannot be removed." })
-    }
+
+  // Check permissions for non-self removal
+  if (memberId !== user.id) {
+    await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
   }
 
   // Ensure no dangling active org
