@@ -15,10 +15,9 @@ var loginCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		apiToken := args[0]
-		apiURL, _ := cmd.Flags().GetString("api-url")
 
 		// Validate token by making a test request
-		client := api.NewClient(apiURL, apiToken)
+		client := api.NewClient(config.APIURL, apiToken)
 		var user api.User
 		if err := client.Get("/api/user", &user); err != nil {
 			return fmt.Errorf("authentication failed: %w", err)
@@ -27,7 +26,6 @@ var loginCmd = &cobra.Command{
 		// Save configuration
 		cfg := &config.Config{
 			APIToken:      apiToken,
-			APIURL:        apiURL,
 			ActiveOrgID:   "",
 			ActiveOrgName: "",
 		}
