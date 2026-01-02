@@ -37,11 +37,15 @@ var projectsListCmd = &cobra.Command{
 	Short: "List your projects",
 	Long:  `List all projects in your active organization.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if cfg.ActiveOrgID == "" {
+		client := api.NewClient(config.APIURL, cfg.APIToken)
+
+		activeOrg, err := getActiveOrg(client)
+		if err != nil {
+			return err
+		}
+		if activeOrg == nil {
 			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
 		}
-
-		client := api.NewClient(config.APIURL, cfg.APIToken)
 
 		projects, err := client.GetProjects()
 		if err != nil {
@@ -51,13 +55,13 @@ var projectsListCmd = &cobra.Command{
 		// Filter projects by active organization
 		var orgProjects []api.Project
 		for _, proj := range projects {
-			if proj.Org != nil && proj.Org.ID == cfg.ActiveOrgID {
+			if proj.Org != nil && proj.Org.ID == activeOrg.OrgID {
 				orgProjects = append(orgProjects, proj)
 			}
 		}
 
 		if len(orgProjects) == 0 {
-			fmt.Printf("No projects found in '%s'. Create one with 'windkeep projects create'\n", cfg.ActiveOrgName)
+			fmt.Printf("No projects found in '%s'. Create one with 'windkeep projects create'\n", activeOrg.Org.Name)
 			return nil
 		}
 
@@ -88,7 +92,13 @@ var projectsCreateCmd = &cobra.Command{
 	Long:  `Create a new project in your active organization. The slug will be auto-generated from the name.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if cfg.ActiveOrgID == "" {
+		client := api.NewClient(config.APIURL, cfg.APIToken)
+
+		activeOrg, err := getActiveOrg(client)
+		if err != nil {
+			return err
+		}
+		if activeOrg == nil {
 			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
 		}
 
@@ -96,12 +106,10 @@ var projectsCreateCmd = &cobra.Command{
 		description, _ := cmd.Flags().GetString("description")
 		slug := generateSlug(name)
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
 		req := api.CreateProjectRequest{
 			Name:  name,
 			Slug:  slug,
-			OrgID: cfg.ActiveOrgID,
+			OrgID: activeOrg.OrgID,
 		}
 		if description != "" {
 			req.Description = &description
@@ -114,6 +122,7 @@ var projectsCreateCmd = &cobra.Command{
 
 		fmt.Printf("✓ Project '%s' created successfully (slug: %s)\n", project.Name, project.Slug)
 
+		cfg.ActiveProjectID = project.ID
 		cfg.ActiveProjectSlug = project.Slug
 		cfg.ActiveProjectName = project.Name
 		if err := cfg.Save(cfgFile); err != nil {
@@ -150,6 +159,7 @@ var projectsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("project not found or you don't have access to it")
 		}
 
+		cfg.ActiveProjectID = selectedProject.ID
 		cfg.ActiveProjectSlug = selectedProject.Slug
 		cfg.ActiveProjectName = selectedProject.Name
 
@@ -217,6 +227,7 @@ var projectsUpdateCmd = &cobra.Command{
 
 		// Update config if it's the active project
 		if cfg.ActiveProjectSlug == projectSlug {
+			cfg.ActiveProjectID = project.ID
 			cfg.ActiveProjectSlug = project.Slug
 			cfg.ActiveProjectName = project.Name
 			if err := cfg.Save(cfgFile); err != nil {
@@ -269,6 +280,7 @@ var projectsDeleteCmd = &cobra.Command{
 
 		// Clear from config if it was active
 		if cfg.ActiveProjectSlug == projectSlug {
+			cfg.ActiveProjectID = ""
 			cfg.ActiveProjectSlug = ""
 			cfg.ActiveProjectName = ""
 			if err := cfg.Save(cfgFile); err != nil {
