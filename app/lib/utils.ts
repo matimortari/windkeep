@@ -36,7 +36,12 @@ export function capitalizeFirst(str: string) {
  * Normalizes a string to be used as an environment variable key.
  */
 export function normalizeKey(key: string): string {
-  return key.trim().toUpperCase().replace(/[^A-Z0-9_]/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "")
+  return key
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]/g, "_") // Replace invalid chars with underscore
+    .replace(/_+/g, "_") // Collapse multiple underscores
+    .replace(/^_+|_+$/g, "") // Remove leading/trailing underscores
 }
 
 /**

@@ -116,7 +116,7 @@ var orgsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("organization not found or you are not a member")
 		}
 
-		org, err := client.SwitchOrganization(orgID)
+		org, err := client.GetOrganization(orgID)
 		if err != nil {
 			return fmt.Errorf("failed to switch organization: %w", err)
 		}
