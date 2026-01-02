@@ -46,13 +46,9 @@ func Execute() error {
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.windkeep/config.yaml)")
-	rootCmd.PersistentFlags().StringP("api-url", "u", "https://windkeep.vercel.app", "API base URL")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
-
-	// Add subcommands
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)
-	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(secretsCmd)
 	rootCmd.AddCommand(orgsCmd)
 	rootCmd.AddCommand(projectsCmd)

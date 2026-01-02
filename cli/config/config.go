@@ -11,12 +11,11 @@ import (
 const (
 	DefaultConfigDir  = ".windkeep"
 	DefaultConfigFile = "config.yaml"
-	DefaultAPIURL     = "https://windkeep.vercel.app"
+	APIURL            = "https://windkeep.vercel.app"
 )
 
 type Config struct {
 	APIToken           string `yaml:"api_token"`
-	APIURL             string `yaml:"api_url"`
 	ActiveOrgID        string `yaml:"active_org_id,omitempty"`
 	ActiveOrgName      string `yaml:"active_org_name,omitempty"`
 	ActiveProjectID    string `yaml:"active_project_id,omitempty"`
@@ -49,20 +48,6 @@ func GetConfigPath(customPath string) (string, error) {
 	return filepath.Join(configDir, DefaultConfigFile), nil
 }
 
-// EnsureConfigDir creates the config directory if it doesn't exist
-func EnsureConfigDir() error {
-	configDir, err := GetConfigDir()
-	if err != nil {
-		return err
-	}
-
-	if err := os.MkdirAll(configDir, 0700); err != nil {
-		return fmt.Errorf("failed to create config directory: %w", err)
-	}
-
-	return nil
-}
-
 // Load reads the configuration from the file
 func Load(customPath string) (*Config, error) {
 	configPath, err := GetConfigPath(customPath)
@@ -83,18 +68,18 @@ func Load(customPath string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
-	// Set defaults if not provided
-	if cfg.APIURL == "" {
-		cfg.APIURL = DefaultAPIURL
-	}
-
 	return &cfg, nil
 }
 
 // Save writes the configuration to the file
 func (c *Config) Save(customPath string) error {
-	if err := EnsureConfigDir(); err != nil {
+	configDir, err := GetConfigDir()
+	if err != nil {
 		return err
+	}
+
+	if err := os.MkdirAll(configDir, 0700); err != nil {
+		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
 	configPath, err := GetConfigPath(customPath)
@@ -134,8 +119,6 @@ func (c *Config) Update(updates map[string]string) {
 		switch key {
 		case "api_token":
 			c.APIToken = value
-		case "api_url":
-			c.APIURL = value
 		case "active_org_id":
 			c.ActiveOrgID = value
 		case "active_org_name":
@@ -148,19 +131,4 @@ func (c *Config) Update(updates map[string]string) {
 			c.DefaultEnvironment = value
 		}
 	}
-}
-
-// IsAuthenticated checks if the user has a valid API token
-func (c *Config) IsAuthenticated() bool {
-	return c.APIToken != ""
-}
-
-// HasActiveOrg checks if an organization is set
-func (c *Config) HasActiveOrg() bool {
-	return c.ActiveOrgID != ""
-}
-
-// HasActiveProject checks if a project is set
-func (c *Config) HasActiveProject() bool {
-	return c.ActiveProjectID != ""
 }
