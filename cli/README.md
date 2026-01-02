@@ -79,11 +79,11 @@ windkeep orgs switch <ORG_ID>
 
 ```bash
 # Create a new project
-windkeep projects create "My Project" my-project -d "Project description"
+windkeep projects create "My Project" -d "Project description"
 
 # Or list and switch to an existing one
 windkeep projects list
-windkeep projects switch <PROJECT_ID>
+windkeep projects switch my-project
 ```
 
 ### 5. Manage Secrets
@@ -117,9 +117,8 @@ The CLI stores its configuration in `~/.windkeep/config.yaml`:
 api_token: your-api-token
 active_org_id: org-id
 active_org_name: My Organization
-active_project_id: project-id
+active_project_slug: my-project
 active_project_name: My Project
-default_environment: DEVELOPMENT
 ```
 
 ## Command Reference
@@ -144,6 +143,38 @@ Remove stored authentication credentials.
 
 ```bash
 windkeep logout
+```
+
+#### `windkeep whoami`
+
+Display current user and configuration information.
+
+**Example:**
+
+```bash
+windkeep whoami
+```
+
+**Output:**
+
+```
+=== User Information ===
+Name:  John Doe
+Email: john@example.com
+API Token: a1b2c3d4e5f6g7h8
+
+=== Active Configuration ===
+Organization: My Organization (ID: cm123abc456)
+Project:      My Project (slug: my-project)
+
+=== Configuration File ===
+Location: /home/user/.windkeep/config.yaml
+
+api_token: a1b2c3d4e5f6g7h8
+active_org_id: cm123abc456
+active_org_name: My Organization
+active_project_slug: my-project
+active_project_name: My Project
 ```
 
 ---
@@ -220,9 +251,9 @@ cm111aaa111     My Project    my-project   My Organization   5
 cm222bbb222     API Service   api-service  Team Workspace    12
 ```
 
-#### `windkeep projects create [NAME] [SLUG]`
+#### `windkeep projects create [NAME]`
 
-Create a new project in your active organization.
+Create a new project in your active organization. The slug is automatically generated from the name.
 
 **Flags:**
 
@@ -231,21 +262,25 @@ Create a new project in your active organization.
 **Examples:**
 
 ```bash
-windkeep projects create "My Project" my-project
-windkeep projects create "API Service" api-service -d "Backend API for mobile app"
+# Create a project (slug auto-generated)
+windkeep projects create "My Project"
+# Creates project with slug: my-project
+
+windkeep projects create "API Service" -d "Backend API for mobile app"
+# Creates project with slug: api-service
 ```
 
-#### `windkeep projects switch [PROJECT_ID]`
+#### `windkeep projects switch [PROJECT_SLUG]`
 
 Set the active project for future commands.
 
 **Example:**
 
 ```bash
-windkeep projects switch cm111aaa111
+windkeep projects switch my-project
 ```
 
-#### `windkeep projects update [PROJECT_ID]`
+#### `windkeep projects update [PROJECT_SLUG]`
 
 Update a project's details.
 
@@ -258,18 +293,18 @@ Update a project's details.
 **Examples:**
 
 ```bash
-windkeep projects update cm111aaa111 --name "Updated Project Name"
-windkeep projects update cm111aaa111 --slug new-slug --description "New description"
+windkeep projects update my-project --name "Updated Project Name"
+windkeep projects update my-project --slug new-slug --description "New description"
 ```
 
-#### `windkeep projects delete [PROJECT_ID] --confirm`
+#### `windkeep projects delete [PROJECT_SLUG] --confirm`
 
 Delete a project and all its secrets. This action cannot be undone.
 
 **Example:**
 
 ```bash
-windkeep projects delete cm111aaa111 --confirm
+windkeep projects delete my-project --confirm
 ```
 
 ---
@@ -383,67 +418,6 @@ windkeep secrets delete OLD_API_KEY --confirm
 
 ---
 
-## Testing
-
-### Manual Testing
-
-1. **Setup test environment:**
-
-```bash
-# Build the CLI
-go build -o windkeep
-
-# Login
-./windkeep login YOUR_API_TOKEN
-```
-
-2. **Test organization management:**
-
-```bash
-# Create organization
-./windkeep orgs create "Test Org"
-
-# List organizations
-./windkeep orgs list
-
-# Switch organizations (use ID from list)
-./windkeep orgs switch <ORG_ID>
-```
-
-3. **Test project management:**
-
-```bash
-# Create project
-./windkeep projects create "Test Project" test-project
-
-# List projects
-./windkeep projects list
-
-# Switch projects
-./windkeep projects switch <PROJECT_ID>
-```
-
-4. **Test secret management:**
-
-```bash
-# Create secrets
-./windkeep secrets create TEST_SECRET --dev "dev-value" --prod "prod-value"
-
-# List secrets
-./windkeep secrets list
-
-# Get secret
-./windkeep secrets get TEST_SECRET
-
-# Update secret
-./windkeep secrets set TEST_SECRET --staging "staging-value"
-
-# Delete secret
-./windkeep secrets delete TEST_SECRET --confirm
-```
-
----
-
 ## Development
 
 ### Building for Multiple Platforms
@@ -461,28 +435,6 @@ GOOS=darwin GOARCH=arm64 go build -o windkeep-darwin-arm64
 # Windows (64-bit)
 GOOS=windows GOARCH=amd64 go build -o windkeep-windows-amd64.exe
 ```
-
-### Common Development Tasks
-
-**Run without building:**
-
-```bash
-go run main.go [command]
-```
-
-**Format code:**
-
-```bash
-go fmt ./...
-```
-
-**Check for issues:**
-
-```bash
-go vet ./...
-```
-
----
 
 ## Troubleshooting
 
