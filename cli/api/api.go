@@ -144,72 +144,86 @@ func (c *Client) Delete(endpoint string) error {
 
 // GetUser retrieves the authenticated user's information
 func (c *Client) GetUser() (*User, error) {
-	var user User
-	if err := c.Get("/api/user", &user); err != nil {
+	var response struct {
+		UserData User `json:"userData"`
+	}
+	if err := c.Get("/api/user", &response); err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return &response.UserData, nil
 }
 
 // GetOrganization retrieves a specific organization by ID
 func (c *Client) GetOrganization(orgID string) (*Organization, error) {
-	var org Organization
-	if err := c.Get("/api/orgs/"+orgID, &org); err != nil {
+	var response struct {
+		Organization Organization `json:"organization"`
+	}
+	if err := c.Get("/api/orgs/"+orgID, &response); err != nil {
 		return nil, err
 	}
 
-	return &org, nil
+	return &response.Organization, nil
 }
 
 // CreateOrganization creates a new organization
 func (c *Client) CreateOrganization(req CreateOrgRequest) (*Organization, error) {
-	var org Organization
-	if err := c.Post("/api/orgs", req, &org); err != nil {
+	var response struct {
+		Organization Organization `json:"organization"`
+	}
+	if err := c.Post("/api/orgs", req, &response); err != nil {
 		return nil, err
 	}
 
-	return &org, nil
+	return &response.Organization, nil
 }
 
 // UpdateOrganization updates an organization
 func (c *Client) UpdateOrganization(orgID string, req UpdateOrgRequest) (*Organization, error) {
-	var org Organization
-	if err := c.Put("/api/orgs/"+orgID, req, &org); err != nil {
+	var response struct {
+		UpdatedOrg Organization `json:"updatedOrg"`
+	}
+	if err := c.Put("/api/orgs/"+orgID, req, &response); err != nil {
 		return nil, err
 	}
 
-	return &org, nil
+	return &response.UpdatedOrg, nil
 }
 
 // GetProjects retrieves all projects the user has access to
 func (c *Client) GetProjects() ([]Project, error) {
-	var projects []Project
-	if err := c.Get("/api/projects", &projects); err != nil {
+	var response struct {
+		Projects []Project `json:"projects"`
+	}
+	if err := c.Get("/api/projects", &response); err != nil {
 		return nil, err
 	}
 
-	return projects, nil
+	return response.Projects, nil
 }
 
 // CreateProject creates a new project
 func (c *Client) CreateProject(req CreateProjectRequest) (*Project, error) {
-	var project Project
-	if err := c.Post("/api/projects", req, &project); err != nil {
+	var response struct {
+		Project Project `json:"project"`
+	}
+	if err := c.Post("/api/projects", req, &response); err != nil {
 		return nil, err
 	}
 
-	return &project, nil
+	return &response.Project, nil
 }
 
 // UpdateProject updates a project
 func (c *Client) UpdateProject(projectID string, req UpdateProjectRequest) (*Project, error) {
-	var project Project
-	if err := c.Put("/api/projects/"+projectID, req, &project); err != nil {
+	var response struct {
+		Project Project `json:"project"`
+	}
+	if err := c.Put("/api/projects/"+projectID, req, &response); err != nil {
 		return nil, err
 	}
 
-	return &project, nil
+	return &response.Project, nil
 }
 
 // DeleteProject deletes a project
@@ -219,12 +233,14 @@ func (c *Client) DeleteProject(projectID string) error {
 
 // GetSecrets retrieves all secrets for a project
 func (c *Client) GetSecrets(projectID string) ([]Secret, error) {
-	var secrets []Secret
-	if err := c.Get("/api/projects/"+projectID+"/secrets", &secrets); err != nil {
+	var response struct {
+		DecryptedSecrets []Secret `json:"decryptedSecrets"`
+	}
+	if err := c.Get("/api/projects/"+projectID+"/secrets", &response); err != nil {
 		return nil, err
 	}
 
-	return secrets, nil
+	return response.DecryptedSecrets, nil
 }
 
 // CreateSecret creates a new secret

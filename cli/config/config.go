@@ -15,12 +15,12 @@ const (
 )
 
 type Config struct {
-	APIToken           string `yaml:"api_token"`
-	ActiveOrgID        string `yaml:"active_org_id,omitempty"`
-	ActiveOrgName      string `yaml:"active_org_name,omitempty"`
-	ActiveProjectID    string `yaml:"active_project_id,omitempty"`
-	ActiveProjectName  string `yaml:"active_project_name,omitempty"`
-	DefaultEnvironment string `yaml:"default_environment,omitempty"`
+	APIToken          string `yaml:"api_token"`
+	ActiveOrgID       string `yaml:"active_org_id,omitempty"`
+	ActiveOrgName     string `yaml:"active_org_name,omitempty"`
+	ActiveProjectID   string `yaml:"active_project_id,omitempty"`
+	ActiveProjectSlug string `yaml:"active_project_slug,omitempty"`
+	ActiveProjectName string `yaml:"active_project_name,omitempty"`
 }
 
 // GetConfigDir returns the configuration directory path
@@ -123,12 +123,10 @@ func (c *Config) Update(updates map[string]string) {
 			c.ActiveOrgID = value
 		case "active_org_name":
 			c.ActiveOrgName = value
-		case "active_project_id":
-			c.ActiveProjectID = value
+		case "active_project_slug":
+			c.ActiveProjectSlug = value
 		case "active_project_name":
 			c.ActiveProjectName = value
-		case "default_environment":
-			c.DefaultEnvironment = value
 		}
 	}
 }
