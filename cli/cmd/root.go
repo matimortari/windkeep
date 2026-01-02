@@ -49,8 +49,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)
-	rootCmd.AddCommand(whoamiCmd)
 	rootCmd.AddCommand(secretsCmd)
 	rootCmd.AddCommand(orgsCmd)
 	rootCmd.AddCommand(projectsCmd)
+	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(whoamiCmd)
 }

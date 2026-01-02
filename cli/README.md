@@ -46,72 +46,16 @@ Move-Item windkeep.exe C:\Windows\System32\windkeep.exe
 
 ## Getting Started
 
-### 1. Get Your API Token
-
 1. Sign in to WindKeep at https://windkeep.vercel.app
 2. Navigate to Admin → Preferences
 3. Copy your API token from the dashboard
-
-### 2. Login
+4. Authenticate using the CLI:
 
 ```bash
 windkeep login YOUR_API_TOKEN
 ```
 
-This will:
-
-- Validate your token
-- Save your configuration to `~/.windkeep/config.yaml`
-- Display your authenticated user information
-
-### 3. Create or Switch to an Organization
-
-```bash
-# Create a new organization
-windkeep orgs create "My Organization"
-
-# Or list and switch to an existing one
-windkeep orgs list
-windkeep orgs switch <ORG_ID>
-```
-
-### 4. Create or Switch to a Project
-
-```bash
-# Create a new project
-windkeep projects create "My Project" -d "Project description"
-
-# Or list and switch to an existing one
-windkeep projects list
-windkeep projects switch my-project
-```
-
-### 5. Manage Secrets
-
-```bash
-# Create a secret with values for different environments
-windkeep secrets create DATABASE_URL \
-  --description "Database connection string" \
-  --dev "postgres://localhost:5432/dev" \
-  --staging "postgres://staging-db:5432/app" \
-  --prod "postgres://prod-db:5432/app"
-
-# List all secrets
-windkeep secrets list
-
-# View a specific secret
-windkeep secrets get DATABASE_URL
-
-# Update secret values
-windkeep secrets set DATABASE_URL --prod "postgres://new-prod-db:5432/app"
-
-# Delete a secret (requires confirmation)
-windkeep secrets delete DATABASE_URL --confirm
-```
-
-## Configuration
-
-The CLI stores its configuration in `~/.windkeep/config.yaml`:
+This will validate your token and save your configuration. The CLI stores its configuration in `~/.windkeep/config.yaml`:
 
 ```yaml
 api_token: your-api-token
@@ -155,28 +99,6 @@ Display current user and configuration information.
 windkeep whoami
 ```
 
-**Output:**
-
-```
-=== User Information ===
-Name:  John Doe
-Email: john@example.com
-API Token: a1b2c3d4e5f6g7h8
-
-=== Active Configuration ===
-Organization: My Organization (ID: cm123abc456)
-Project:      My Project (slug: my-project)
-
-=== Configuration File ===
-Location: /home/user/.windkeep/config.yaml
-
-api_token: a1b2c3d4e5f6g7h8
-active_org_id: cm123abc456
-active_org_name: My Organization
-active_project_slug: my-project
-active_project_name: My Project
-```
-
 ---
 
 ### Organizations
@@ -189,14 +111,6 @@ List all organizations you are a member of.
 
 ```bash
 windkeep orgs list
-```
-
-**Output:**
-
-```
-ID              NAME              ROLE    ACTIVE
-cm123abc456     My Organization   OWNER   ✓
-cm789def012     Team Workspace    ADMIN
 ```
 
 #### `windkeep orgs create [NAME]`
@@ -241,14 +155,6 @@ List all projects you have access to across all organizations.
 
 ```bash
 windkeep projects list
-```
-
-**Output:**
-
-```
-ID              NAME          SLUG         ORGANIZATION      SECRETS
-cm111aaa111     My Project    my-project   My Organization   5
-cm222bbb222     API Service   api-service  Team Workspace    12
 ```
 
 #### `windkeep projects create [NAME]`
@@ -323,14 +229,6 @@ List all secrets in your active project.
 windkeep secrets list
 ```
 
-**Output:**
-
-```
-KEY            ENVIRONMENTS                      DESCRIPTION
-DATABASE_URL   DEVELOPMENT, STAGING, PRODUCTION  Database connection string
-API_KEY        PRODUCTION                        Third-party API key
-```
-
 #### `windkeep secrets get [KEY]`
 
 Retrieve all environment values for a specific secret.
@@ -339,19 +237,6 @@ Retrieve all environment values for a specific secret.
 
 ```bash
 windkeep secrets get DATABASE_URL
-```
-
-**Output:**
-
-```
-Key: DATABASE_URL
-Description: Database connection string
-
-Values:
-ENVIRONMENT   VALUE
-DEVELOPMENT   postgres://localhost:5432/dev
-STAGING       postgres://staging-db:5432/app
-PRODUCTION    postgres://prod-db:5432/app
 ```
 
 #### `windkeep secrets create [KEY]`
@@ -414,6 +299,68 @@ Delete a secret and all its values. This action cannot be undone.
 
 ```bash
 windkeep secrets delete OLD_API_KEY --confirm
+```
+
+---
+
+### Running Commands with Injected Secrets
+
+#### `windkeep run [command] [args...]`
+
+Run a command with environment variables injected from your active project's secrets. This eliminates the need for a `.env` file by fetching secrets directly from WindKeep.
+
+**Flags:**
+
+- `-e, --env`: Environment to use (dev/development, staging, prod/production) - default: development
+- `-p, --project`: Project slug to use (overrides active project)
+- `-v, --verbose`: Show which secrets are being injected
+
+**Examples:**
+
+```bash
+# Run a Node.js app with development secrets
+windkeep run npm run dev
+
+# Run a Python script with production secrets
+windkeep run --env prod python app.py
+
+# Run with staging secrets and show which secrets are injected
+windkeep run -e staging -v node server.js
+
+# Run with short environment names
+windkeep run -e dev npm start
+windkeep run -e prod python manage.py runserver
+
+# Override active project - use a different project temporarily
+windkeep run --project my-other-project npm run dev
+
+# Combine flags: use specific project with production environment
+windkeep run -p api-service -e prod npm start
+```
+
+**Use Cases:**
+
+- **Local Development:** Run your app without maintaining a `.env` file
+- **CI/CD:** Inject secrets in build pipelines without storing them in files
+- **Testing:** Quickly switch between environments without editing config files
+- **Security:** Avoid committing secrets to version control
+
+**Example Workflow:**
+
+```bash
+# Set up your project
+windkeep projects switch my-api
+
+# Add secrets for different environments
+windkeep secrets create DATABASE_URL \
+  --dev "postgres://localhost:5432/dev" \
+  --prod "postgres://prod-db:5432/app"
+
+# Run your app with development secrets (no .env file needed!)
+windkeep run npm run dev
+
+# Deploy to production with production secrets
+windkeep run --env prod npm start
 ```
 
 ---
