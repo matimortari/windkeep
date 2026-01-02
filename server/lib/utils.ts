@@ -3,16 +3,42 @@ import db from "#server/lib/db"
 import { del, put } from "@vercel/blob"
 
 /**
- * Retrieves the authenticated user from the current session.
+ * Retrieves the authenticated user from the current session or API token.
  * Throws 401 if no valid session exists.
  */
 export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
   const session = await getUserSession(event)
-  if (!session?.user?.id) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" })
+  if (session?.user?.id) {
+    return session.user
   }
 
-  return session.user
+  // Fall back to API token auth (for CLI access)
+  const authHeader = getHeader(event, "authorization")
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.substring(7)
+    const user = await db.user.findUnique({
+      where: { apiToken: token },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        apiToken: true,
+      },
+    })
+
+    if (user) {
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        apiToken: user.apiToken,
+      }
+    }
+  }
+
+  throw createError({ statusCode: 401, statusMessage: "Unauthorized" })
 }
 
 /**
