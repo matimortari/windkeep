@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
   }
 
-  const userRole = await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateProjectMemberSchema.safeParse(body)
@@ -25,27 +25,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
   }
 
-  // Prevent non-owners from promoting to owner or demoting an owner
-  if (userRole.role !== "OWNER" && (result.data.role === "OWNER" || targetRole.role === "OWNER")) {
-    throw createError({ statusCode: 403, statusMessage: "You do not have permission to change this member's role." })
+  // Prevent changing OWNER roles
+  if (targetRole.role === "OWNER") {
+    throw createError({ statusCode: 403, statusMessage: "Cannot change the role of project owners" })
   }
 
   // Prevent users from changing their own role
   if (memberId === user.id) {
     throw createError({ statusCode: 400, statusMessage: "You cannot change your own role" })
-  }
-
-  // Prevent demoting the last owner
-  if (targetRole.role === "OWNER" && result.data.role !== "OWNER") {
-    const ownerCount = await db.projectMembership.count({
-      where: {
-        projectId,
-        role: "OWNER",
-      },
-    })
-    if (ownerCount === 1) {
-      throw createError({ statusCode: 400, statusMessage: "Cannot demote the last owner." })
-    }
   }
 
   const updatedRole = await db.projectMembership.update({
