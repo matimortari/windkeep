@@ -62,6 +62,15 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
     activeOrgId: activeMembership?.org?.id ?? null,
   }
 
-  await setUserSession(event, { user: sessionUser, loggedInAt: new Date() })
+  const now = new Date()
+  const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days
+
+  await setUserSession(event, {
+    user: sessionUser,
+    loggedInAt: now,
+    expiresAt,
+    lastActivityAt: now,
+  })
+
   return sendRedirect(event, activeMembership?.org ? "/admin/projects" : "/onboarding/create-org")
 }
