@@ -6,6 +6,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/matimortari/windkeep/cli/api"
+	"github.com/matimortari/windkeep/cli/config"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +22,7 @@ var projectsListCmd = &cobra.Command{
 	Short: "List your projects",
 	Long:  `List all projects you have access to.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(cfg.APIURL, cfg.APIToken)
+		client := api.NewClient(config.APIURL, cfg.APIToken)
 
 		projects, err := client.GetProjects()
 		if err != nil {
@@ -68,7 +69,7 @@ var projectsCreateCmd = &cobra.Command{
 		slug := args[1]
 		description, _ := cmd.Flags().GetString("description")
 
-		client := api.NewClient(cfg.APIURL, cfg.APIToken)
+		client := api.NewClient(config.APIURL, cfg.APIToken)
 
 		req := api.CreateProjectRequest{
 			Name:  name,
@@ -104,7 +105,7 @@ var projectsSwitchCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		projectID := args[0]
-		client := api.NewClient(cfg.APIURL, cfg.APIToken)
+		client := api.NewClient(config.APIURL, cfg.APIToken)
 
 		projects, err := client.GetProjects()
 		if err != nil {
@@ -135,10 +136,97 @@ var projectsSwitchCmd = &cobra.Command{
 	},
 }
 
+var projectsUpdateCmd = &cobra.Command{
+	Use:   "update [PROJECT_ID]",
+	Short: "Update a project",
+	Long:  `Update a project's name, slug, or description.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		projectID := args[0]
+		name, _ := cmd.Flags().GetString("name")
+		slug, _ := cmd.Flags().GetString("slug")
+		description, _ := cmd.Flags().GetString("description")
+
+		if name == "" && slug == "" && description == "" {
+			return fmt.Errorf("at least one field must be provided (--name, --slug, or --description)")
+		}
+
+		client := api.NewClient(config.APIURL, cfg.APIToken)
+
+		req := api.UpdateProjectRequest{}
+		if name != "" {
+			req.Name = &name
+		}
+		if slug != "" {
+			req.Slug = &slug
+		}
+		if description != "" {
+			req.Description = &description
+		}
+
+		project, err := client.UpdateProject(projectID, req)
+		if err != nil {
+			return fmt.Errorf("failed to update project: %w", err)
+		}
+
+		fmt.Printf("✓ Project '%s' updated successfully\n", project.Name)
+
+		// Update config if it's the active project
+		if cfg.ActiveProjectID == projectID {
+			cfg.ActiveProjectName = project.Name
+			if err := cfg.Save(cfgFile); err != nil {
+				fmt.Printf("Warning: Failed to update config: %v\n", err)
+			}
+		}
+
+		return nil
+	},
+}
+
+var projectsDeleteCmd = &cobra.Command{
+	Use:   "delete [PROJECT_ID]",
+	Short: "Delete a project",
+	Long:  `Delete a project and all its secrets. This action cannot be undone.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		projectID := args[0]
+		confirm, _ := cmd.Flags().GetBool("confirm")
+
+		if !confirm {
+			return fmt.Errorf("this action is destructive. Use --confirm flag to proceed")
+		}
+
+		client := api.NewClient(config.APIURL, cfg.APIToken)
+
+		if err := client.DeleteProject(projectID); err != nil {
+			return fmt.Errorf("failed to delete project: %w", err)
+		}
+
+		fmt.Println("✓ Project deleted successfully")
+
+		// Clear from config if it was active
+		if cfg.ActiveProjectID == projectID {
+			cfg.ActiveProjectID = ""
+			cfg.ActiveProjectName = ""
+			if err := cfg.Save(cfgFile); err != nil {
+				fmt.Printf("Warning: Failed to update config: %v\n", err)
+			}
+		}
+
+		return nil
+	},
+}
+
 func init() {
 	projectsCmd.AddCommand(projectsListCmd)
 	projectsCmd.AddCommand(projectsCreateCmd)
 	projectsCmd.AddCommand(projectsSwitchCmd)
+	projectsCmd.AddCommand(projectsUpdateCmd)
+	projectsCmd.AddCommand(projectsDeleteCmd)
 
 	projectsCreateCmd.Flags().StringP("description", "d", "", "Project description")
+	projectsUpdateCmd.Flags().StringP("name", "n", "", "New project name")
+	projectsUpdateCmd.Flags().StringP("slug", "s", "", "New project slug")
+	projectsUpdateCmd.Flags().StringP("description", "d", "", "New project description")
+	projectsDeleteCmd.Flags().Bool("confirm", false, "Confirm destructive action")
 }
