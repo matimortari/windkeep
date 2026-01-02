@@ -93,22 +93,34 @@ var orgsSwitchCmd = &cobra.Command{
 		orgID := args[0]
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		org, err := client.GetOrganization(orgID)
+		user, err := client.GetUser()
 		if err != nil {
-			return fmt.Errorf("failed to get organization: %w", err)
+			return fmt.Errorf("failed to get user: %w", err)
 		}
 
-		cfg.ActiveOrgID = org.ID
-		cfg.ActiveOrgName = org.Name
-		// Clear active project when switching orgs
-		cfg.ActiveProjectID = ""
+		var orgName string
+		found := false
+		for _, membership := range user.OrgMemberships {
+			if membership.OrgID == orgID {
+				orgName = membership.Org.Name
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("organization not found or you are not a member")
+		}
+
+		cfg.ActiveOrgID = orgID
+		cfg.ActiveOrgName = orgName
+		cfg.ActiveProjectSlug = ""
 		cfg.ActiveProjectName = ""
 
 		if err := cfg.Save(cfgFile); err != nil {
 			return fmt.Errorf("failed to save config: %w", err)
 		}
 
-		fmt.Printf("✓ Switched to organization '%s'\n", org.Name)
+		fmt.Printf("✓ Switched to organization '%s'\n", orgName)
 		return nil
 	},
 }
@@ -132,7 +144,6 @@ var orgsUpdateCmd = &cobra.Command{
 
 		fmt.Printf("✓ Organization updated to '%s'\n", org.Name)
 
-		// Update config if it's the active org
 		if cfg.ActiveOrgID == orgID {
 			cfg.ActiveOrgName = org.Name
 			if err := cfg.Save(cfgFile); err != nil {

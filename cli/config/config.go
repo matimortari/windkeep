@@ -112,21 +112,3 @@ func Delete(customPath string) error {
 
 	return nil
 }
-
-// Update modifies specific fields in the config
-func (c *Config) Update(updates map[string]string) {
-	for key, value := range updates {
-		switch key {
-		case "api_token":
-			c.APIToken = value
-		case "active_org_id":
-			c.ActiveOrgID = value
-		case "active_org_name":
-			c.ActiveOrgName = value
-		case "active_project_slug":
-			c.ActiveProjectSlug = value
-		case "active_project_name":
-			c.ActiveProjectName = value
-		}
-	}
-}
