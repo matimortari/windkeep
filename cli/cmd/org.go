@@ -10,6 +10,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func getActiveOrg(client *api.Client) (*api.OrgMembership, error) {
+	user, err := client.GetUser()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	for _, membership := range user.OrgMemberships {
+		if membership.IsActive {
+			return &membership, nil
+		}
+	}
+
+	return nil, nil
+}
+
 var orgsCmd = &cobra.Command{
 	Use:     "orgs",
 	Aliases: []string{"organizations", "org"},
@@ -70,15 +85,7 @@ var orgsCreateCmd = &cobra.Command{
 		}
 
 		fmt.Printf("✓ Organization '%s' created successfully (ID: %s)\n", org.Name, org.ID)
-
-		// Update config to set as active org
-		cfg.ActiveOrgID = org.ID
-		cfg.ActiveOrgName = org.Name
-		if err := cfg.Save(cfgFile); err != nil {
-			fmt.Printf("Warning: Failed to save active organization to config: %v\n", err)
-		} else {
-			fmt.Printf("✓ Set '%s' as active organization\n", org.Name)
-		}
+		fmt.Printf("✓ Set '%s' as active organization\n", org.Name)
 
 		return nil
 	},
@@ -98,11 +105,9 @@ var orgsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("failed to get user: %w", err)
 		}
 
-		var orgName string
-		found := false
+		var found bool
 		for _, membership := range user.OrgMemberships {
 			if membership.OrgID == orgID {
-				orgName = membership.Org.Name
 				found = true
 				break
 			}
@@ -111,31 +116,41 @@ var orgsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("organization not found or you are not a member")
 		}
 
-		cfg.ActiveOrgID = orgID
-		cfg.ActiveOrgName = orgName
-		cfg.ActiveProjectSlug = ""
-		cfg.ActiveProjectName = ""
-
-		if err := cfg.Save(cfgFile); err != nil {
-			return fmt.Errorf("failed to save config: %w", err)
+		org, err := client.SwitchOrganization(orgID)
+		if err != nil {
+			return fmt.Errorf("failed to switch organization: %w", err)
 		}
 
-		fmt.Printf("✓ Switched to organization '%s'\n", orgName)
+		// Clear active project since switching orgs
+		cfg.ActiveProjectSlug = ""
+		cfg.ActiveProjectName = ""
+		if err := cfg.Save(cfgFile); err != nil {
+			fmt.Printf("Warning: Failed to clear active project: %v\n", err)
+		}
+
+		fmt.Printf("✓ Switched to organization '%s'\n", org.Name)
 		return nil
 	},
 }
 
 var orgsUpdateCmd = &cobra.Command{
-	Use:   "update [ORG_ID] [NAME]",
-	Short: "Update an organization's name",
-	Long:  `Update the name of an organization.`,
-	Args:  cobra.ExactArgs(2),
+	Use:   "update [NAME]",
+	Short: "Update the active organization's name",
+	Long:  `Update the name of the active organization.`,
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		orgID := args[0]
-		name := args[1]
+		name := args[0]
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		org, err := client.UpdateOrganization(orgID, api.UpdateOrgRequest{
+		activeOrg, err := getActiveOrg(client)
+		if err != nil {
+			return err
+		}
+		if activeOrg == nil {
+			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
+		}
+
+		org, err := client.UpdateOrganization(activeOrg.OrgID, api.UpdateOrgRequest{
 			Name: name,
 		})
 		if err != nil {
@@ -143,14 +158,6 @@ var orgsUpdateCmd = &cobra.Command{
 		}
 
 		fmt.Printf("✓ Organization updated to '%s'\n", org.Name)
-
-		if cfg.ActiveOrgID == orgID {
-			cfg.ActiveOrgName = org.Name
-			if err := cfg.Save(cfgFile); err != nil {
-				fmt.Printf("Warning: Failed to update config: %v\n", err)
-			}
-		}
-
 		return nil
 	},
 }

@@ -25,9 +25,7 @@ var loginCmd = &cobra.Command{
 
 		// Save configuration
 		cfg := &config.Config{
-			APIToken:      apiToken,
-			ActiveOrgID:   "",
-			ActiveOrgName: "",
+			APIToken: apiToken,
 		}
 
 		if err := cfg.Save(cfgFile); err != nil {

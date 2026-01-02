@@ -190,6 +190,18 @@ func (c *Client) UpdateOrganization(orgID string, req UpdateOrgRequest) (*Organi
 	return &response.UpdatedOrg, nil
 }
 
+// SwitchOrganization sets the active organization for the user
+func (c *Client) SwitchOrganization(orgID string) (*Organization, error) {
+	var response struct {
+		Organization Organization `json:"organization"`
+	}
+	if err := c.Get("/api/orgs/"+orgID, &response); err != nil {
+		return nil, err
+	}
+
+	return &response.Organization, nil
+}
+
 // GetProjects retrieves all projects the user has access to
 func (c *Client) GetProjects() ([]Project, error) {
 	var response struct {
