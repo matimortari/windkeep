@@ -8,70 +8,132 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vi
 
 ---
 
-### User Profile
+### Authentication
 
-#### Get User Profile
+#### Login with Provider
 
-> **GET** `/user`
+> **POST** `/api/auth/{provider}`
 
-Get the current user's profile information.
+Initiates OAuth login with the specified provider.
+
+**Route Parameters**:
+
+- `provider`: OAuth provider name (required). Supported providers: `google`, `github`, `gitlab`.
+
+**Response:**
+
+Navigates to the provider's OAuth consent screen.
+
+#### Logout
+
+> **POST** `/api/auth/logout`
+
+Logs out the authenticated user and clears the session.
 
 **Response:**
 
 ```json
 {
-  "id": "string",
-  "name": "string",
-  "email": "string",
-  "image": "string | null",
-  "createdAt": "Date",
-  "memberships": [
-    {
-      "role": "OWNER | ADMIN | MEMBER",
-      "organizationId": "string",
-      "organization": {
+  "success": true
+}
+```
+
+#### Refresh Session
+
+> **POST** `/api/auth/refresh`
+
+Refreshes the authenticated user's session, extending it by 7 days.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "expiresAt": "string"
+}
+```
+
+#### Validate Session
+
+> **POST** `/api/auth/validate`
+
+Validates the authenticated user's session and checks for inactivity timeout.
+
+**Response:**
+
+```json
+{
+  "valid": true,
+  "expiresAt": "string"
+}
+```
+
+---
+
+### User Profile
+
+#### Get User Profile
+
+> **GET** `/api/user`
+
+Retrieves the authenticated user's profile information, including organization and project memberships.
+
+**Response:**
+
+```json
+{
+  "userData": {
+    "id": "string",
+    "email": "string",
+    "name": "string",
+    "image": "string | null",
+    "apiToken": "string | null",
+    "createdAt": "Date",
+    "updatedAt": "Date",
+    "orgMemberships": [
+      {
         "id": "string",
-        "name": "string",
-        "memberships": [
-          {
-            "role": "OWNER | ADMIN | MEMBER",
-            "user": {
-              "id": "string",
-              "name": "string",
-              "email": "string",
-              "image": "string | null"
-            }
-          }
-        ]
+        "role": "OWNER | ADMIN | MEMBER",
+        "userId": "string",
+        "orgId": "string",
+        "org": {
+          "id": "string",
+          "name": "string",
+          "slug": "string",
+          "createdAt": "Date",
+          "updatedAt": "Date"
+        }
       }
-    }
-  ],
-  "projectRoles": [
-    {
-      "project": {
-        "id": "string",
-        "name": "string",
-        "organizationId": "string"
+    ],
+    "projectMemberships": [
+      {
+        "role": "OWNER | ADMIN | MEMBER",
+        "projectId": "string",
+        "project": {
+          "id": "string",
+          "name": "string",
+          "slug": "string",
+          "orgId": "string"
+        }
       }
-    }
-  ]
+    ]
+  }
 }
 ```
 
 #### Update User Profile
 
-> **PUT** `/user`
+> **PUT** `/api/user`
 
-Update current user's profile information.
+Updates the authenticated user's profile information.
 
 **Request Body**:
 
 ```json
 {
-  "name": "string", // Optional
-  "image": "string", // Optional
-  "activeOrgId": "string | null", // Optional, for switching active org
-  "apiToken": "string" // Optional// For API token regeneration
+  "name": "string", // Optional: 3-50 characters
+  "image": "string | null", // Optional: valid URL or null to remove image
+  "regenerateApiToken": "boolean" // Optional: set to true to regenerate API token
 }
 ```
 
@@ -79,30 +141,27 @@ Update current user's profile information.
 
 ```json
 {
-  "id": "string",
-  "email": "string",
-  "name": "string",
-  "image": "string | null",
-  "activeOrgId": "string | null",
-  "apiToken": "boolean",
-  "createdAt": "Date",
-  "updatedAt": "Date"
+  "updatedUser": {
+    "id": "string",
+    "email": "string",
+    "name": "string",
+    "image": "string | null",
+    "apiToken": "string | null",
+    "createdAt": "Date",
+    "updatedAt": "Date"
+  }
 }
 ```
 
 #### Update User Image
 
-> **PUT** `/user/image-upload`
+> **PUT** `/api/user/image-upload`
 
-Update current user's profile image.
+Uploads and updates the authenticated user's profile image. Replaces the existing image if one exists.
 
-**Request Body**:
+**Request Body:** Multipart form data
 
-```json
-{
-  "file": "binary image file (PNG, JPG, or WebP, max 2MB)" // multipart/form-data
-}
-```
+- `file`: Image file (PNG, JPEG, or WebP format, max 2MB)
 
 **Response:**
 
@@ -114,34 +173,34 @@ Update current user's profile image.
 
 #### Delete User Account
 
-> **DELETE** `/user`
+> **DELETE** `/api/user`
 
-Delete current user account.
+Permanently deletes the authenticated user's account. Also deletes any organizations where the user is the sole owner.
 
 **Response:**
 
 ```json
 {
   "success": true,
-  "message": "Account deleted successfully"
+  "message": "User deleted successfully"
 }
 ```
 
 ---
 
-### Organization
+### Organizations
 
 #### Create Organization
 
-> **POST** `/orgs`
+> **POST** `/api/orgs`
 
-Create a new organization.
+Creates a new organization with the authenticated user as the owner. Automatically sets the new organization as the user's active organization.
 
 **Request Body**:
 
 ```json
 {
-  "name": "string"
+  "name": "string" // 3-50 characters
 }
 ```
 
@@ -149,67 +208,79 @@ Create a new organization.
 
 ```json
 {
-  "id": "string",
-  "name": "string",
-  "memberships": [
-    {
-      "role": "OWNER | ADMIN | MEMBER",
-      "user": {
-        "id": "string",
-        "name": "string",
-        "email": "string",
-        "image": "string | null"
-      }
-    }
-  ]
+  "organization": {
+    "id": "string",
+    "name": "string",
+    "slug": "string",
+    "createdAt": "Date",
+    "updatedAt": "Date"
+  }
 }
 ```
 
 #### Get Organization Details
 
-> **GET** `/orgs/{org}`
+> **GET** `/api/orgs/{org}`
 
-Retrieve details of a specific organization.
+Retrieves details of a specific organization. Requires membership in the organization.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
+- `org`: Organization ID (required).
 
 **Response:**
 
 ```json
 {
-  "id": "string",
-  "name": "string",
-  "memberships": [
-    {
-      "role": "OWNER | ADMIN | MEMBER",
-      "user": {
+  "organization": {
+    "id": "string",
+    "name": "string",
+    "createdAt": "Date",
+    "updatedAt": "Date",
+    "role": "OWNER | ADMIN | MEMBER",
+    "isActive": "boolean",
+    "memberships": [
+      {
+        "userId": "string",
+        "role": "OWNER | ADMIN | MEMBER",
+        "isActive": "boolean",
+        "user": {
+          "id": "string",
+          "name": "string",
+          "image": "string | null"
+        }
+      }
+    ],
+    "projects": [
+      {
         "id": "string",
         "name": "string",
-        "email": "string",
-        "image": "string | null"
+        "slug": "string",
+        "description": "string | null",
+        "orgId": "string",
+        "createdAt": "Date",
+        "updatedAt": "Date"
       }
-    }
-  ]
+    ]
+  }
 }
 ```
 
 #### Update Organization
 
-> **PUT** `/orgs/{org}`
+> **PUT** `/api/orgs/{org}`
 
-Update organization information. Only owners and admins can perform this action.
+Updates organization information. Only organization owners can perform this action.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
+- `org`: Organization ID (required).
 
 **Request Body**:
 
 ```json
 {
-  "name": "string"
+  "name": "string" // Optional: 3-50 characters
 }
 ```
 
@@ -217,31 +288,25 @@ Update organization information. Only owners and admins can perform this action.
 
 ```json
 {
-  "id": "string",
-  "name": "string",
-  "memberships": [
-    {
-      "role": "OWNER | ADMIN | MEMBER",
-      "user": {
-        "id": "string",
-        "name": "string",
-        "email": "string",
-        "image": "string | null"
-      }
-    }
-  ]
+  "updatedOrg": {
+    "id": "string",
+    "name": "string",
+    "slug": "string",
+    "createdAt": "Date",
+    "updatedAt": "Date"
+  }
 }
 ```
 
 #### Delete Organization
 
-> **DELETE** `/orgs/{org}`
+> **DELETE** `/api/orgs/{org}`
 
-Delete an organization.
+Permanently deletes an organization. Only organization owners can perform this action.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
+- `org`: Organization ID (required).
 
 **Response:**
 
@@ -258,20 +323,20 @@ Delete an organization.
 
 #### Update Organization Member Role
 
-> **PUT** `/orgs/{org}/members/{member}`
+> **PUT** `/api/orgs/{org}/members/{member}`
 
-Update a member's role in the organization.
+Updates a member's role in the organization. Only owners and admins can update member roles. Cannot promote users to owner roles or modify existing owners. Users cannot change their own role.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
-- `member`: Member ID to update.
+- `org`: Organization ID (required).
+- `member`: Member user ID (required).
 
 **Request Body**:
 
 ```json
 {
-  "role": "OWNER | ADMIN | MEMBER"
+  "role": "ADMIN | MEMBER"
 }
 ```
 
@@ -279,29 +344,35 @@ Update a member's role in the organization.
 
 ```json
 {
-  "user": {
-    "id": "string",
-    "name": "string",
-    "email": "string",
-    "image": "string | null"
-  },
-  "organization": {
-    "name": "string"
-  },
-  "role": "OWNER | ADMIN | MEMBER"
+  "updatedMembership": {
+    "userId": "string",
+    "orgId": "string",
+    "role": "ADMIN | MEMBER",
+    "isActive": "boolean",
+    "user": {
+      "id": "string",
+      "email": "string",
+      "name": "string",
+      "image": "string | null"
+    },
+    "org": {
+      "id": "string",
+      "name": "string"
+    }
+  }
 }
 ```
 
 #### Remove Organization Member
 
-> **DELETE** `/orgs/{org}/members/{member}`
+> **DELETE** `/api/orgs/{org}/members/{member}`
 
-Remove a member from the organization. Members can also remove themselves. Only organization owners can remove members.
+Removes a member from the organization. Members can remove themselves (leave the organization). Only owners and admins can remove other members. Cannot remove organization owners.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
-- `member`: Member ID to remove.
+- `org`: Organization ID (required).
+- `member`: Member user ID (required).
 
 **Response:**
 
@@ -314,13 +385,13 @@ Remove a member from the organization. Members can also remove themselves. Only 
 
 #### Create Organization Invite
 
-> **POST** `/orgs/{org}/invite/create`
+> **POST** `/api/orgs/{org}/invite/create`
 
-Create an invitation for a new organization member.
+Creates an invitation link for new members to join the organization. Only owners and admins can create invitations. Invitations expire after 12 hours.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
+- `org`: Organization ID (required).
 
 **Response:**
 
@@ -328,17 +399,19 @@ Create an invitation for a new organization member.
 {
   "invitation": {
     "id": "string",
-    "organization": {
+    "orgId": "string",
+    "token": "string",
+    "expiresAt": "Date",
+    "invitedById": "string",
+    "org": {
       "id": "string",
       "name": "string"
     },
     "invitedBy": {
       "id": "string",
-      "name": "string",
-      "email": "string"
-    },
-    "token": "string",
-    "expiresAt": "Date"
+      "email": "string",
+      "name": "string"
+    }
   },
   "inviteUrl": "string"
 }
@@ -346,13 +419,13 @@ Create an invitation for a new organization member.
 
 #### Accept Organization Invite
 
-> **POST** `/orgs/{org}/invite/accept`
+> **POST** `/api/orgs/{org}/invite/accept`
 
-Accept an invite to join an organization.
+Accepts an invitation to join an organization. Adds the authenticated user as a member with the member role.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
+- `org`: Organization ID (required).
 
 **Request Body**:
 
@@ -366,43 +439,52 @@ Accept an invite to join an organization.
 
 ```json
 {
-  "user": {
-    "id": "string",
-    "name": "string",
-    "email": "string",
-    "image": "string | null"
-  },
   "organization": {
     "id": "string",
     "name": "string"
   },
-  "role": "MEMBER"
+  "membership": {
+    "userId": "string",
+    "orgId": "string",
+    "role": "MEMBER",
+    "isActive": "boolean",
+    "org": {
+      "id": "string",
+      "name": "string"
+    },
+    "user": {
+      "id": "string",
+      "email": "string",
+      "name": "string",
+      "image": "string | null"
+    }
+  }
 }
 ```
 
 ---
 
-### Audit
+### Audit Logs
 
 #### Get Organization Audit Logs
 
-> **GET** `/orgs/{org}/audit`
+> **GET** `/api/orgs/{org}/audit`
 
-Retrieve audit logs for an organization with optional filtering and pagination. Only owners and admins can access.
+Retrieves audit logs for an organization with optional filtering and pagination. Only owners and admins can access audit logs.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
+- `org`: Organization ID (required).
 
 **Query Parameters**:
 
-- `page` — Page number, default 1.
-- `limit` — Items per page, default 20.
-- `projectId` — Filter by project ID.
-- `action` — Filter by action string (case-insensitive).
-- `userId` — Filter by user ID.
-- `startDate` — Filter logs created after this date.
-- `endDate` — Filter logs created before this date.
+- `page`: Page number (default: 1)
+- `limit`: Items per page, max 100 (default: 20)
+- `projectId`: Filter by project ID
+- `action`: Filter by action string (case-insensitive partial match)
+- `userId`: Filter by user ID
+- `startDate`: Filter logs created after this date (ISO 8601 datetime)
+- `endDate`: Filter logs created before this date (ISO 8601 datetime)
 
 **Response:**
 
@@ -412,33 +494,46 @@ Retrieve audit logs for an organization with optional filtering and pagination. 
     {
       "id": "string",
       "action": "string",
+      "resource": "string",
+      "description": "string",
+      "metadata": "object | null",
+      "userId": "string",
+      "orgId": "string",
+      "projectId": "string | null",
+      "createdAt": "Date",
       "user": {
         "id": "string",
-        "name": "string",
         "email": "string",
+        "name": "string",
         "image": "string | null"
       },
       "project": {
         "id": "string",
         "name": "string"
-      },
-      "createdAt": "Date"
+      }
     }
   ],
   "pagination": {
-    "page": 1,
-    "limit": 20,
-    "totalPages": 5,
-    "totalItems": 100,
-    "hasNext": true,
-    "hasPrev": false
+    "page": "number",
+    "limit": "number",
+    "totalPages": "number",
+    "totalItems": "number",
+    "hasNext": "boolean",
+    "hasPrev": "boolean"
   },
   "filters": {
     "users": [
-      { "id": "string", "name": "string", "email": "string" }
+      {
+        "id": "string",
+        "name": "string",
+        "email": "string"
+      }
     ],
     "projects": [
-      { "id": "string", "name": "string" }
+      {
+        "id": "string",
+        "name": "string"
+      }
     ],
     "actions": ["string"]
   }
@@ -447,22 +542,22 @@ Retrieve audit logs for an organization with optional filtering and pagination. 
 
 #### Delete Organization Audit Logs
 
-> **DELETE** `/orgs/{org}/audit`
+> **DELETE** `/api/orgs/{org}/audit`
 
-Delete audit logs in an organization. Only owners can perform this action.
+Deletes audit logs in an organization based on specified filters. Only organization owners can perform this action.
 
 **Route Parameters**:
 
-- `org`: Organization ID.
+- `org`: Organization ID (required).
 
 **Request Body**:
 
 ```json
 {
-  "olderThan": "Date", // Filter logs older than this date
-  "projectId": "string", // Filter by project
-  "userId": "string", // Filter by user
-  "action": "string" // Filter by action (partial match)
+  "olderThan": "string", // Optional: ISO 8601 datetime, delete logs older than this date
+  "projectId": "string", // Optional: filter by project ID
+  "userId": "string", // Optional: filter by user ID
+  "action": "string" // Optional: filter by action (case-insensitive partial match)
 }
 ```
 
@@ -471,20 +566,19 @@ Delete audit logs in an organization. Only owners can perform this action.
 ```json
 {
   "success": true,
-  "message": "Deleted 10 audit log(s)",
-  "deletedCount": 10
+  "message": "Deleted 10 audit log(s)"
 }
 ```
 
 ---
 
-### Project
+### Projects
 
 #### Get Projects
 
-> **GET** `/projects`
+> **GET** `/api/projects`
 
-Retrieve all projects the current user has access to.
+Retrieves all projects the authenticated user has access to, including their organization, memberships, and secrets.
 
 **Response:**
 
@@ -496,12 +590,20 @@ Retrieve all projects the current user has access to.
       "name": "string",
       "slug": "string",
       "description": "string | null",
-      "organization": {
+      "orgId": "string",
+      "createdAt": "Date",
+      "updatedAt": "Date",
+      "org": {
         "id": "string",
-        "name": "string"
+        "name": "string",
+        "slug": "string",
+        "createdAt": "Date",
+        "updatedAt": "Date"
       },
-      "roles": [
+      "memberships": [
         {
+          "userId": "string",
+          "projectId": "string",
           "role": "OWNER | ADMIN | MEMBER",
           "user": {
             "id": "string",
@@ -514,12 +616,13 @@ Retrieve all projects the current user has access to.
       "secrets": [
         {
           "id": "string",
-          "name": "string",
-          "type": "string",
-          "createdAt": "Date"
+          "key": "string",
+          "description": "string | null",
+          "projectId": "string",
+          "createdAt": "Date",
+          "updatedAt": "Date"
         }
-      ],
-      "createdAt": "Date"
+      ]
     }
   ]
 }
@@ -527,18 +630,18 @@ Retrieve all projects the current user has access to.
 
 #### Create Project
 
-> **POST** `/projects`
+> **POST** `/api/projects`
 
-Create a new project in an organization. Only owners and admins of the organization can create projects.
+Creates a new project in an organization. Only organization owners and admins can create projects. The authenticated user becomes the project owner.
 
 **Request Body**:
 
 ```json
 {
-  "name": "string",
-  "slug": "string",
-  "description": "string", // Optional
-  "organizationId": "string"
+  "name": "string", // 3-50 characters
+  "slug": "string", // Optional: 3-50 characters, lowercase letters, numbers, and hyphens only
+  "description": "string", // Optional: max 255 characters
+  "orgId": "string"
 }
 ```
 
@@ -546,49 +649,55 @@ Create a new project in an organization. Only owners and admins of the organizat
 
 ```json
 {
-  "id": "string",
-  "name": "string",
-  "slug": "string",
-  "description": "string | null",
-  "organization": {
+  "project": {
     "id": "string",
-    "name": "string"
-  },
-  "roles": [
-    {
-      "role": "OWNER | ADMIN | MEMBER",
-      "user": {
-        "id": "string",
-        "name": "string",
-        "email": "string",
-        "image": "string | null"
+    "name": "string",
+    "slug": "string",
+    "description": "string | null",
+    "orgId": "string",
+    "createdAt": "Date",
+    "updatedAt": "Date",
+    "org": {
+      "id": "string",
+      "name": "string"
+    },
+    "memberships": [
+      {
+        "userId": "string",
+        "projectId": "string",
+        "role": "OWNER",
+        "user": {
+          "id": "string",
+          "email": "string",
+          "name": "string",
+          "image": "string | null"
+        }
       }
+    ],
+    "_count": {
+      "secrets": "number"
     }
-  ],
-  "_count": {
-    "secrets": 0
-  },
-  "createdAt": "Date"
+  }
 }
 ```
 
 #### Update Project
 
-> **PUT** `/projects/{project}`
+> **PUT** `/api/projects/{project}`
 
-Update project details. Only project owners and admins can perform this action.
+Updates project details. Only project owners can perform this action.
 
 **Route Parameters**:
 
-- `project`: Project ID.
+- `project`: Project ID (required).
 
 **Request Body**:
 
 ```json
 {
-  "name": "string", // Optional
-  "slug": "string", // Optional
-  "description": "string" // Optional
+  "name": "string", // Optional: 3-50 characters
+  "slug": "string", // Optional: 3-50 characters, lowercase letters, numbers, and hyphens only
+  "description": "string" // Optional: max 255 characters
 }
 ```
 
@@ -596,35 +705,41 @@ Update project details. Only project owners and admins can perform this action.
 
 ```json
 {
-  "id": "string",
-  "name": "string",
-  "slug": "string",
-  "description": "string | null",
-  "organization": {
+  "project": {
     "id": "string",
-    "name": "string"
-  },
-  "updatedAt": "Date"
+    "name": "string",
+    "slug": "string",
+    "description": "string | null",
+    "orgId": "string",
+    "createdAt": "Date",
+    "updatedAt": "Date",
+    "org": {
+      "id": "string",
+      "name": "string",
+      "slug": "string",
+      "createdAt": "Date",
+      "updatedAt": "Date"
+    }
+  }
 }
 ```
 
 #### Delete Project
 
-> **DELETE** `/projects/{project}`
+> **DELETE** `/api/projects/{project}`
 
-Delete a project. Only project owners can delete. All secrets, secret values, roles, and audit logs are cascade deleted.
+Permanently deletes a project. Only project owners can perform this action. All associated secrets, secret values, memberships, and audit logs are subsequently deleted.
 
 **Route Parameters**:
 
-- `project`: Project ID.
+- `project`: Project ID (required).
 
 **Response:**
 
 ```json
 {
   "success": true,
-  "message": "Project \"string\" deleted successfully",
-  "secretsDeleted": 0
+  "message": "Project deleted successfully"
 }
 ```
 
@@ -634,20 +749,20 @@ Delete a project. Only project owners can delete. All secrets, secret values, ro
 
 #### Add Project Member
 
-> **POST** `/projects/{project}/members`
+> **POST** `/api/projects/{project}/members`
 
-Add a new member to a project. Only project owners and admins can add members.
+Adds a new member to a project. Only project owners and admins can add members. The user must already be a member of the organization. Users can only be added as admins or members (the owner role is assigned during project creation only).
 
 **Route Parameters**:
 
-- `project`: Project ID.
+- `project`: Project ID (required).
 
 **Request Body**:
 
 ```json
 {
   "userId": "string",
-  "role": "ADMIN | MEMBER"
+  "role": "ADMIN | MEMBER" // Optional: defaults to MEMBER
 }
 ```
 
@@ -655,36 +770,40 @@ Add a new member to a project. Only project owners and admins can add members.
 
 ```json
 {
-  "user": {
-    "id": "string",
-    "name": "string",
-    "email": "string",
-    "image": "string | null"
-  },
-  "project": {
-    "id": "string",
-    "name": "string"
-  },
-  "role": "ADMIN | MEMBER"
+  "projectRole": {
+    "userId": "string",
+    "projectId": "string",
+    "role": "ADMIN | MEMBER",
+    "user": {
+      "id": "string",
+      "email": "string",
+      "name": "string",
+      "image": "string | null"
+    },
+    "project": {
+      "id": "string",
+      "name": "string"
+    }
+  }
 }
 ```
 
-#### Update Project Member
+#### Update Project Member Role
 
-> **PUT** `/projects/{project}/members/{member}`
+> **PUT** `/api/projects/{project}/members/{member}`
 
-Update the role of a project member. Owners and admins can update roles, with restrictions: non-owners cannot promote to owner or demote an owner, and members cannot update their own role.
+Updates a member's role in the project. Only owners and admins can update member roles. Cannot promote users to the owner role or modify existing owner roles. Users cannot change their own role.
 
 **Route Parameters**:
 
-- `project`: Project ID
-- `member`: Member ID to update.
+- `project`: Project ID (required).
+- `member`: Member user ID (required).
 
 **Request Body**:
 
 ```json
 {
-  "role": "OWNER | ADMIN | MEMBER"
+  "role": "ADMIN | MEMBER"
 }
 ```
 
@@ -692,31 +811,38 @@ Update the role of a project member. Owners and admins can update roles, with re
 
 ```json
 {
-  "user": {
-    "id": "string",
-    "name": "string",
-    "email": "string",
-    "image": "string | null"
-  },
-  "project": {
-    "id": "string",
-    "name": "string",
-    "organizationId": "string"
-  },
-  "role": "OWNER | ADMIN | MEMBER"
+  "updatedRole": {
+    "userId": "string",
+    "projectId": "string",
+    "role": "ADMIN | MEMBER",
+    "user": {
+      "id": "string",
+      "email": "string",
+      "name": "string",
+      "image": "string | null"
+    },
+    "project": {
+      "id": "string",
+      "name": "string",
+      "org": {
+        "id": "string",
+        "name": "string"
+      }
+    }
+  }
 }
 ```
 
 #### Remove Project Member
 
-> **DELETE** `/projects/{project}/members/{member}`
+> **DELETE** `/api/projects/{project}/members/{member}`
 
-Remove a member from a project. Members can remove themselves, but the last owner cannot leave the project. Only owners can remove other owners.
+Removes a member from a project. Members can remove themselves (leave the project). Only owners and admins can remove other members. Cannot remove project owners.
 
 **Route Parameters**:
 
-- `project`: Project ID.
-- `member`: Member ID to remove.
+- `project`: Project ID (required).
+- `member`: Member user ID (required).
 
 **Response:**
 
@@ -733,61 +859,72 @@ Remove a member from a project. Members can remove themselves, but the last owne
 
 #### Get Project Secrets
 
-> **GET** `/projects/{project}/secrets`
+> **GET** `/api/projects/{project}/secrets`
 
-Get secrets for a project.
+Retrieves all secrets for a project with their decrypted values. All project members can view secrets.
 
 **Route Parameters**:
 
-- `project`: Project ID.
+- `project`: Project ID (required).
 
 **Response:**
 
 ```json
-[
-  {
-    "id": "string",
-    "key": "string",
-    "description": "string | null",
-    "project": {
+{
+  "decryptedSecrets": [
+    {
       "id": "string",
-      "name": "string",
-      "organizationId": "string"
-    },
-    "values": [
-      {
+      "key": "string",
+      "description": "string | null",
+      "projectId": "string",
+      "createdAt": "Date",
+      "updatedAt": "Date",
+      "values": [
+        {
+          "id": "string",
+          "secretId": "string",
+          "environment": "DEVELOPMENT | STAGING | PRODUCTION",
+          "value": "string",
+          "createdAt": "Date",
+          "updatedAt": "Date"
+        }
+      ],
+      "project": {
         "id": "string",
-        "environment": "string",
-        "value": "string"
+        "name": "string",
+        "slug": "string",
+        "description": "string | null",
+        "orgId": "string",
+        "createdAt": "Date",
+        "updatedAt": "Date"
       }
-    ],
-    "createdAt": "Date"
-  }
-]
+    }
+  ]
+}
 ```
 
 #### Create Secret
 
-> **POST** `/projects/{project}/secrets`
+> **POST** `/api/projects/{project}/secrets`
 
-Create a new secret in a project. Only project owners or admins can perform this action.
+Creates a new secret in a project. Only project owners and admins can create secrets. Secret keys must be uppercase with numbers and underscores only.
 
 **Route Parameters**:
 
-- `project`: Project ID.
+- `project`: Project ID (required).
 
 **Request Body**:
 
 ```json
 {
-  "key": "string",
-  "description": "string", // Optional
-  "values": [
+  "key": "string", // 1-50 characters, uppercase letters, numbers, and underscores only, cannot start/end with underscore or contain consecutive underscores
+  "description": "string", // Optional: max 255 characters
+  "values": [ // Optional: at least 1 value if provided
     {
-      "environment": "string",
-      "value": "string"
+      "environment": "DEVELOPMENT | STAGING | PRODUCTION",
+      "value": "string" // 1-1000 characters
     }
-  ] // Optional
+  ]
 }
 ```
 
@@ -798,44 +935,52 @@ Create a new secret in a project. Only project owners or admins can perform this
   "id": "string",
   "key": "string",
   "description": "string | null",
-  "project": {
-    "id": "string",
-    "name": "string",
-    "organizationId": "string"
-  },
+  "projectId": "string",
+  "createdAt": "Date",
+  "updatedAt": "Date",
   "values": [
     {
       "id": "string",
-      "environment": "string",
-      "value": "string"
+      "secretId": "string",
+      "environment": "DEVELOPMENT | STAGING | PRODUCTION",
+      "value": "string",
+      "createdAt": "Date",
+      "updatedAt": "Date"
     }
   ],
-  "createdAt": "Date"
+  "project": {
+    "id": "string",
+    "name": "string",
+    "org": {
+      "id": "string",
+      "name": "string"
+    }
+  }
 }
 ```
 
 #### Update Secret
 
-> **PUT** `/projects/{project}/secrets/{secret}`
+> **PUT** `/api/projects/{project}/secrets/{secret}`
 
-Update a secret's description or its environment values. Only project owners or admins can perform this action.
+Updates a secret's description or environment values. Only project owners and admins can update secrets. Values are upserted (created if not exist, updated if exist).
 
 **Route Parameters**:
 
-- `project`: Project ID.
-- `secret`: Secret ID to update.
+- `project`: Project ID (required).
+- `secret`: Secret ID (required).
 
 **Request Body**:
 
 ```json
 {
-  "description": "string", // Optional
-  "values": [
+  "description": "string | null", // Optional: max 255 characters
+  "values": [ // Optional: at least 1 value if provided
     {
-      "environment": "string",
-      "value": "string"
+      "environment": "DEVELOPMENT | STAGING | PRODUCTION",
+      "value": "string" // 1-1000 characters
     }
-  ] // Optional
+  ]
 }
 ```
 
@@ -846,40 +991,47 @@ Update a secret's description or its environment values. Only project owners or 
   "id": "string",
   "key": "string",
   "description": "string | null",
-  "project": {
-    "id": "string",
-    "name": "string",
-    "organizationId": "string"
-  },
+  "projectId": "string",
+  "createdAt": "Date",
+  "updatedAt": "Date",
   "values": [
     {
       "id": "string",
-      "environment": "string",
-      "value": "string"
+      "secretId": "string",
+      "environment": "DEVELOPMENT | STAGING | PRODUCTION",
+      "value": "string",
+      "createdAt": "Date",
+      "updatedAt": "Date"
     }
   ],
-  "updatedAt": "Date"
+  "project": {
+    "id": "string",
+    "name": "string",
+    "org": {
+      "id": "string",
+      "name": "string"
+    }
+  }
 }
 ```
 
 #### Delete Secret
 
-> **DELETE** `/projects/{project}/secrets/{secret}`
+> **DELETE** `/api/projects/{project}/secrets/{secret}`
 
-Delete a secret. Only project owners can perform this action.
+Permanently deletes a secret and all its environment values. Only project owners and admins can delete secrets.
 
 **Route Parameters**:
 
-- `project`: Project ID.
-- `secret`: Secret ID to delete.
+- `project`: Project ID (required).
+- `secret`: Secret ID (required).
 
 **Response:**
 
 ```json
 {
   "success": true,
-  "message": "Secret \"string\" deleted successfully",
-  "valuesDeleted": 0
+  "message": "Secret deleted successfully"
 }
 ```
 
