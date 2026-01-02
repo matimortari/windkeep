@@ -44,11 +44,11 @@ export const updateProjectSchema = z.object({
 
 export const addProjectMemberSchema = z.object({
   userId: z.cuid(),
-  role: z.enum(["OWNER", "ADMIN", "MEMBER"]).optional().default("MEMBER"),
+  role: z.enum(["ADMIN", "MEMBER"]).optional().default("MEMBER"),
 })
 
 export const updateProjectMemberSchema = z.object({
-  role: z.enum(["OWNER", "ADMIN", "MEMBER"]),
+  role: z.enum(["ADMIN", "MEMBER"]),
 })
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Organization ID and Member ID are required" })
   }
 
-  const userMembership = await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateMemberRoleSchema.safeParse(body)
@@ -25,24 +25,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Member not found in organization" })
   }
 
-  // Prevent non-owners from promoting to owner or demoting an owner
-  if (userMembership.role !== "OWNER" && (result.data.role === "OWNER" || targetRole.role === "OWNER")) {
-    throw createError({ statusCode: 403, statusMessage: "You do not have permission to change this member's role." })
+  // Prevent changing OWNER roles
+  if (targetRole.role === "OWNER") {
+    throw createError({ statusCode: 403, statusMessage: "Cannot change the role of organization owners" })
   }
 
   // Prevent users from changing their own role
   if (memberId === user.id) {
-    throw createError({ statusCode: 400, statusMessage: "You cannot change your own role." })
-  }
-
-  // Prevent demoting the last owner
-  if (targetRole.role === "OWNER" && result.data.role !== "OWNER") {
-    const ownerCount = await db.orgMembership.count({
-      where: { orgId, role: "OWNER" },
-    })
-    if (ownerCount === 1) {
-      throw createError({ statusCode: 400, statusMessage: "Cannot demote the last owner." })
-    }
+    throw createError({ statusCode: 400, statusMessage: "You cannot change your own role" })
   }
 
   const updatedMembership = await db.orgMembership.update({

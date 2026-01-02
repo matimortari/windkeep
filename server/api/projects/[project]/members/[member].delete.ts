@@ -20,22 +20,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
   }
 
-  // If self-removal, allow always but check for last owner
-  if (memberId === user.id) {
-    if (targetRole.role === "OWNER") {
-      const ownerCount = await db.projectMembership.count({
-        where: { projectId, role: "OWNER" },
-      })
-      if (ownerCount === 1) {
-        throw createError({ statusCode: 400, statusMessage: "Cannot leave project as the last owner." })
-      }
-    }
+  // Prevent removing OWNER users
+  if (targetRole.role === "OWNER") {
+    throw createError({ statusCode: 403, statusMessage: "Cannot remove project owners" })
   }
-  else {
-    const userRole = await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
-    if (userRole.role !== "OWNER" && targetRole.role === "OWNER") {
-      throw createError({ statusCode: 403, statusMessage: "Only owners can remove other owners" })
-    }
+
+  // Check permissions for non-self removal
+  if (memberId !== user.id) {
+    await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
   }
 
   await db.projectMembership.delete({
