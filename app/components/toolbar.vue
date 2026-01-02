@@ -69,7 +69,6 @@ defineProps<{
 defineEmits<(e: "toggleSidebar") => void>()
 
 const { toggleTheme, themeIcon } = useTheme()
-const { clear } = useUserSession()
 const { user } = storeToRefs(useUserStore())
 const { activeOrg, organizations } = storeToRefs(useOrgStore())
 const route = useRoute()
@@ -105,11 +104,6 @@ async function handleSetActiveOrg(orgId: string) {
   }
 
   orgStore.setActiveOrg(org.id)
-}
-
-async function signOut() {
-  await clear()
-  return navigateTo("/")
 }
 </script>
 
