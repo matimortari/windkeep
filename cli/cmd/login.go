@@ -18,8 +18,8 @@ var loginCmd = &cobra.Command{
 
 		// Validate token by making a test request
 		client := api.NewClient(config.APIURL, apiToken)
-		var user api.User
-		if err := client.Get("/api/user", &user); err != nil {
+		user, err := client.GetUser()
+		if err != nil {
 			return fmt.Errorf("authentication failed: %w", err)
 		}
 
@@ -35,8 +35,6 @@ var loginCmd = &cobra.Command{
 		}
 
 		fmt.Printf("✓ Successfully authenticated as %s (%s)\n", user.Name, user.Email)
-		configPath, _ := config.GetConfigPath(cfgFile)
-		fmt.Printf("Configuration saved to: %s\n", configPath)
 
 		return nil
 	},
