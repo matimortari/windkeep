@@ -11,6 +11,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func getActiveProjectID(client *api.Client) (string, error) {
+	if cfg.ActiveProjectSlug == "" {
+		return "", fmt.Errorf("no active project. Use 'windkeep projects switch' first")
+	}
+
+	projects, err := client.GetProjects()
+	if err != nil {
+		return "", fmt.Errorf("failed to get projects: %w", err)
+	}
+
+	for _, proj := range projects {
+		if proj.Slug == cfg.ActiveProjectSlug {
+			return proj.ID, nil
+		}
+	}
+
+	return "", fmt.Errorf("active project '%s' not found. Use 'windkeep projects switch' to select a valid project", cfg.ActiveProjectSlug)
+}
+
 var secretsCmd = &cobra.Command{
 	Use:     "secrets",
 	Aliases: []string{"secret"},
@@ -23,13 +42,14 @@ var secretsListCmd = &cobra.Command{
 	Short: "List secrets in active project",
 	Long:  `List all secrets in your active project.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if cfg.ActiveProjectID == "" {
-			return fmt.Errorf("no active project. Use 'windkeep projects switch' first")
-		}
-
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		secrets, err := client.GetSecrets(cfg.ActiveProjectID)
+		projectID, err := getActiveProjectID(client)
+		if err != nil {
+			return err
+		}
+
+		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
@@ -67,14 +87,15 @@ var secretsGetCmd = &cobra.Command{
 	Long:  `Retrieve all environment values for a specific secret.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if cfg.ActiveProjectID == "" {
-			return fmt.Errorf("no active project. Use 'windkeep projects switch' first")
-		}
-
 		key := args[0]
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		secrets, err := client.GetSecrets(cfg.ActiveProjectID)
+		projectID, err := getActiveProjectID(client)
+		if err != nil {
+			return err
+		}
+
+		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
@@ -113,10 +134,6 @@ var secretsCreateCmd = &cobra.Command{
 	Long:  `Create a new secret key in your active project. Use --env flags to set values for specific environments.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if cfg.ActiveProjectID == "" {
-			return fmt.Errorf("no active project. Use 'windkeep projects switch' first")
-		}
-
 		key := args[0]
 		description, _ := cmd.Flags().GetString("description")
 		dev, _ := cmd.Flags().GetString("dev")
@@ -125,9 +142,14 @@ var secretsCreateCmd = &cobra.Command{
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
+		projectID, err := getActiveProjectID(client)
+		if err != nil {
+			return err
+		}
+
 		req := api.CreateSecretRequest{
 			Key:       key,
-			ProjectID: cfg.ActiveProjectID,
+			ProjectID: projectID,
 		}
 
 		if description != "" {
@@ -156,7 +178,7 @@ var secretsCreateCmd = &cobra.Command{
 		}
 		req.Values = values
 
-		secret, err := client.CreateSecret(cfg.ActiveProjectID, req)
+		secret, err := client.CreateSecret(projectID, req)
 		if err != nil {
 			return fmt.Errorf("failed to create secret: %w", err)
 		}
@@ -172,10 +194,6 @@ var secretsSetCmd = &cobra.Command{
 	Long:  `Update values for a specific secret. Use --env flags to set values for specific environments.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if cfg.ActiveProjectID == "" {
-			return fmt.Errorf("no active project. Use 'windkeep projects switch' first")
-		}
-
 		key := args[0]
 		dev, _ := cmd.Flags().GetString("dev")
 		staging, _ := cmd.Flags().GetString("staging")
@@ -187,8 +205,13 @@ var secretsSetCmd = &cobra.Command{
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
+		projectID, err := getActiveProjectID(client)
+		if err != nil {
+			return err
+		}
+
 		// Find the secret first
-		secrets, err := client.GetSecrets(cfg.ActiveProjectID)
+		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
@@ -230,7 +253,7 @@ var secretsSetCmd = &cobra.Command{
 			Values: values,
 		}
 
-		if _, err := client.UpdateSecret(cfg.ActiveProjectID, secretID, req); err != nil {
+		if _, err := client.UpdateSecret(projectID, secretID, req); err != nil {
 			return fmt.Errorf("failed to update secret: %w", err)
 		}
 
@@ -245,10 +268,6 @@ var secretsDeleteCmd = &cobra.Command{
 	Long:  `Delete a secret and all its values. This action cannot be undone.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if cfg.ActiveProjectID == "" {
-			return fmt.Errorf("no active project. Use 'windkeep projects switch' first")
-		}
-
 		key := args[0]
 		confirm, _ := cmd.Flags().GetBool("confirm")
 
@@ -258,8 +277,13 @@ var secretsDeleteCmd = &cobra.Command{
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
+		projectID, err := getActiveProjectID(client)
+		if err != nil {
+			return err
+		}
+
 		// Find the secret first
-		secrets, err := client.GetSecrets(cfg.ActiveProjectID)
+		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
@@ -276,7 +300,7 @@ var secretsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("secret '%s' not found", key)
 		}
 
-		if err := client.DeleteSecret(cfg.ActiveProjectID, secretID); err != nil {
+		if err := client.DeleteSecret(projectID, secretID); err != nil {
 			return fmt.Errorf("failed to delete secret: %w", err)
 		}
 
