@@ -1,5 +1,5 @@
 <template>
-  <nav class="navigation-group w-full flex-1 justify-end">
+  <nav class="navigation-group w-full flex-1 justify-end" aria-label="Audit Filters">
     <nav class="navigation-group" aria-label="Filters">
       <input v-model="dateFilter" type="date" title="Filter by date" @change="updateFilter('date', dateFilter)">
 
