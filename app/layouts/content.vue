@@ -81,9 +81,10 @@ const isSidebarOpen = ref(false)
 
 ::v-deep(.markdown) p,
 ::v-deep(.markdown) ul,
-::v-deep(.markdown) ol {
+::v-deep(.markdown) ol,
+::v-deep(.markdown) li {
   margin: 0.5em 0 !important;
-  font-size: 0.75rem !important;
+  font-size: 0.875rem !important;
   line-height: 1.5 !important;
 }
 
@@ -95,7 +96,7 @@ const isSidebarOpen = ref(false)
   border-left: 4px solid var(--primary);
   font-family: var(--font-mono);
   margin: 1rem 0 !important;
-  padding: 0 0.5rem !important;
+  padding: 0.25rem 0.5rem !important;
 }
 
 ::v-deep(.markdown) pre,
@@ -103,7 +104,7 @@ const isSidebarOpen = ref(false)
   background-color: var(--card) !important;
   font-family: var(--font-mono) !important;
   border-radius: 0.25rem !important;
-  padding: 0.25rem !important;
+  padding: 0.25rem 0.5rem !important;
   font-size: 0.75rem !important;
   margin: 1em 0 !important;
   overflow-x: auto !important;

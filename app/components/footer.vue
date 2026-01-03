@@ -49,13 +49,13 @@ const footerSections = [
       ? [
           { label: "Home", href: "/" },
           { label: "Features", href: "/#features" },
-          { label: "CLI Reference", href: "/cli" },
+          { label: "CLI Guide", href: "/cli-guide" },
           { label: "API Reference", href: "/api-spec" },
           { label: "Sign in", href: "/sign-in" },
         ]
       : [
           { label: "Preferences", href: "/admin/preferences" },
-          { label: "CLI Reference", href: "/cli" },
+          { label: "CLI Guide", href: "/cli-guide" },
           { label: "API Reference", href: "/api-spec" },
           { label: "Sign out", action: signOut },
         ]
