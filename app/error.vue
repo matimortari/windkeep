@@ -6,12 +6,8 @@
       </p>
 
       <p class="flex flex-col text-lg text-muted-foreground">
-        <span class="text-lg">
-          Please try going back to the homepage or refreshing the page.
-        </span>
-        <span class="font-mono text-sm">
-          {{ error.message }}
-        </span>
+        <span class="text-lg">Please try going back to the homepage or refreshing the page.</span>
+        <span class="font-mono text-sm">{{ error.message }}</span>
       </p>
 
       <button class="flex flex-row items-center gap-4 font-semibold" @click="() => clearError({ redirect: '/' })">
@@ -19,22 +15,13 @@
         <span>Go Back</span>
       </button>
     </div>
-
-    <div class="flex items-center justify-center md:items-end md:justify-end">
-      <icon name="ph:smiley-sad-light" size="180" class="md:hidden" />
-      <icon name="ph:smiley-sad-light" size="300" class="hidden md:block" />
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { NuxtError } from "#app"
 
-const props = defineProps<{
+defineProps<{
   error: NuxtError
 }>()
-
-onMounted(() => {
-  console.error(`Error ${props.error.statusCode}: ${props.error.message}`)
-})
 </script>
