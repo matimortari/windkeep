@@ -73,8 +73,8 @@ const copiedColor = ref<string | null>(null)
 
 const LOGOS = [
   { name: "Logo", image: Symbol, bgClass: "bg-background!" },
-  { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-[#040308]!" },
-  { name: "Wordmark (light)", image: WordmarkLight, bgClass: "bg-[#e0dddd]!" },
+  { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-[#e0dddd]!" },
+  { name: "Wordmark (light)", image: WordmarkLight, bgClass: "bg-[#040308]!" },
 ]
 
 const BASE_COLORS = [

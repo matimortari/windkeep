@@ -18,7 +18,7 @@
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
 
-        <nuxt-link to="/cli" class="text-caption group flex flex-row items-center gap-1">
+        <nuxt-link to="/cli-guide" class="text-caption group flex flex-row items-center gap-1">
           <span>Or explore the <span class="font-semibold text-primary group-hover:underline"> WindKeep CLI</span></span>
           <icon name="ph:code-block-bold" size="20" class="text-primary transition-transform group-hover:scale-125" />
         </nuxt-link>
@@ -60,7 +60,7 @@
         <p class="max-w-lg font-semibold text-muted-foreground">
           Manage secrets and projects directly from your terminal. Fast, secure, and open-source.
           Read the
-          <nuxt-link to="/cli" class="text-primary hover:underline">
+          <nuxt-link to="/cli-guide" class="text-primary hover:underline">
             documentation
           </nuxt-link>
           for more details.
