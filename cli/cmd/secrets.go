@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Helper functions
 func getActiveProjectID(client *api.Client) (string, error) {
 	if cfg.ActiveProjectSlug == "" {
 		return "", fmt.Errorf("no active project. Use 'windkeep projects switch' first")
@@ -28,6 +29,38 @@ func getActiveProjectID(client *api.Client) (string, error) {
 	}
 
 	return "", fmt.Errorf("active project '%s' not found. Use 'windkeep projects switch' to select a valid project", cfg.ActiveProjectSlug)
+}
+
+func findSecretByKey(secrets []api.Secret, key string) *api.Secret {
+	for _, s := range secrets {
+		if s.Key == key {
+			return &s
+		}
+	}
+	return nil
+}
+
+func buildSecretValues(dev, staging, prod string) []api.SecretValueInput {
+	var values []api.SecretValueInput
+	if dev != "" {
+		values = append(values, api.SecretValueInput{
+			Environment: api.EnvDevelopment,
+			Value:       dev,
+		})
+	}
+	if staging != "" {
+		values = append(values, api.SecretValueInput{
+			Environment: api.EnvStaging,
+			Value:       staging,
+		})
+	}
+	if prod != "" {
+		values = append(values, api.SecretValueInput{
+			Environment: api.EnvProduction,
+			Value:       prod,
+		})
+	}
+	return values
 }
 
 var secretsCmd = &cobra.Command{
@@ -62,7 +95,7 @@ var secretsListCmd = &cobra.Command{
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 		fmt.Fprintln(w, "KEY\tENVIRONMENTS\tDESCRIPTION")
 		for _, secret := range secrets {
-			envs := []string{}
+			var envs []string
 			for _, val := range secret.Values {
 				envs = append(envs, string(val.Environment))
 			}
@@ -70,13 +103,9 @@ var secretsListCmd = &cobra.Command{
 			if secret.Description != nil {
 				desc = *secret.Description
 			}
-			fmt.Fprintf(w, "%s\t%s\t%s\n",
-				secret.Key,
-				strings.Join(envs, ", "),
-				desc)
+			fmt.Fprintf(w, "%s\t%s\t%s\n", secret.Key, strings.Join(envs, ", "), desc)
 		}
 		w.Flush()
-
 		return nil
 	},
 }
@@ -100,14 +129,7 @@ var secretsGetCmd = &cobra.Command{
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
 
-		var found *api.Secret
-		for _, s := range secrets {
-			if s.Key == key {
-				found = &s
-				break
-			}
-		}
-
+		found := findSecretByKey(secrets, key)
 		if found == nil {
 			return fmt.Errorf("secret '%s' not found", key)
 		}
@@ -123,7 +145,6 @@ var secretsGetCmd = &cobra.Command{
 			fmt.Fprintf(w, "%s\t%s\n", val.Environment, val.Value)
 		}
 		w.Flush()
-
 		return nil
 	},
 }
@@ -141,7 +162,6 @@ var secretsCreateCmd = &cobra.Command{
 		prod, _ := cmd.Flags().GetString("prod")
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
-
 		projectID, err := getActiveProjectID(client)
 		if err != nil {
 			return err
@@ -150,33 +170,12 @@ var secretsCreateCmd = &cobra.Command{
 		req := api.CreateSecretRequest{
 			Key:       key,
 			ProjectID: projectID,
+			Values:    buildSecretValues(dev, staging, prod),
 		}
 
 		if description != "" {
 			req.Description = &description
 		}
-
-		// Add environment values if provided
-		values := []api.SecretValueInput{}
-		if dev != "" {
-			values = append(values, api.SecretValueInput{
-				Environment: api.EnvDevelopment,
-				Value:       dev,
-			})
-		}
-		if staging != "" {
-			values = append(values, api.SecretValueInput{
-				Environment: api.EnvStaging,
-				Value:       staging,
-			})
-		}
-		if prod != "" {
-			values = append(values, api.SecretValueInput{
-				Environment: api.EnvProduction,
-				Value:       prod,
-			})
-		}
-		req.Values = values
 
 		secret, err := client.CreateSecret(projectID, req)
 		if err != nil {
@@ -204,7 +203,6 @@ var secretsSetCmd = &cobra.Command{
 		}
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
-
 		projectID, err := getActiveProjectID(client)
 		if err != nil {
 			return err
@@ -282,25 +280,17 @@ var secretsDeleteCmd = &cobra.Command{
 			return err
 		}
 
-		// Find the secret first
 		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
 
-		var secretID string
-		for _, s := range secrets {
-			if s.Key == key {
-				secretID = s.ID
-				break
-			}
-		}
-
-		if secretID == "" {
+		found := findSecretByKey(secrets, key)
+		if found == nil {
 			return fmt.Errorf("secret '%s' not found", key)
 		}
 
-		if err := client.DeleteSecret(projectID, secretID); err != nil {
+		if err := client.DeleteSecret(projectID, found.ID); err != nil {
 			return fmt.Errorf("failed to delete secret: %w", err)
 		}
 

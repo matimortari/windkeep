@@ -303,6 +303,55 @@ windkeep secrets delete OLD_API_KEY --confirm
 
 ---
 
+### Pull & Push
+
+#### `windkeep pull [OUTPUT_FILE]`
+
+Pull secrets from your active project and save to a local file.
+
+**Flags:**
+
+- `-e, --env`: Environment to pull (default: development)
+
+**Examples:**
+
+```bash
+# Pull to .env
+windkeep pull
+
+# Pull production to custom file
+windkeep pull prod.env -e production
+```
+
+#### `windkeep push [INPUT_FILE]`
+
+Push secrets from a local file to your active project.
+
+**Flags:**
+
+- `-e, --env`: Environment to push to (default: development)
+
+**Examples:**
+
+```bash
+# Push from .env
+windkeep push
+
+# Push to production
+windkeep push prod.env -e production
+```
+
+**Use Cases:**
+
+- Pull secrets to work locally without managing .env files manually
+- Push local secrets to WindKeep for team synchronization
+- Migrate secrets between projects
+- Backup secrets to files
+
+**Security Note:** Pulled files contain plaintext secrets. Store them securely and never commit them to version control.
+
+---
+
 ### Running Commands with Injected Secrets
 
 #### `windkeep run [command] [args...]`
