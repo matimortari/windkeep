@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full overflow-x-auto">
+  <div class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -17,13 +17,13 @@
 
       <tbody>
         <tr v-if="loading">
-          <td :colspan="columns.length" class="text-caption p-8 text-center">
+          <td :colspan="columns.length" class="p-8 text-center">
             Loading audit logs...
           </td>
         </tr>
 
         <tr v-else-if="!auditLogs.length">
-          <td :colspan="columns.length" class="text-caption p-8 text-center">
+          <td :colspan="columns.length" class="p-8 text-center">
             <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus" />
           </td>
         </tr>
@@ -37,23 +37,23 @@
             <td :title="actionLabel(log.action)">
               <div class="navigation-group max-w-xs truncate">
                 <icon :name="resourceIcon(log.resource) || ''" size="15" />
-                <span class="text-caption">{{ actionLabel(log.action) }}</span>
+                <span>{{ actionLabel(log.action) }}</span>
               </div>
             </td>
-            <td class="text-caption max-w-md truncate" :title="log.description || 'No description'">
+            <td class="max-w-md truncate" :title="log.description || 'No description'">
               {{ log.description || 'No description' }}
             </td>
-            <td class="text-caption max-w-sm truncate md:max-w-32" :title="log.user?.name || log.user?.email">
+            <td class="max-w-sm truncate md:max-w-32" :title="log.user?.name || log.user?.email">
               {{ log.user?.name || log.user?.email }}
             </td>
-            <td class="text-caption max-w-sm truncate md:max-w-40" :title="log.createdAt ? formatAuditDate(log.createdAt) : 'N/A'">
+            <td class="max-w-sm truncate md:max-w-40" :title="log.createdAt ? formatAuditDate(log.createdAt) : 'N/A'">
               {{ log.createdAt ? formatAuditDate(log.createdAt) : 'N/A' }}
             </td>
           </tr>
 
-          <tr v-if="expandedRows.has(log.id)" class="cursor-pointer border text-sm hover:bg-muted/20" @click="toggleRow(log.id)">
+          <tr v-if="expandedRows.has(log.id)" class="audit-metadata-row cursor-pointer border text-sm hover:bg-muted/20" @click="toggleRow(log.id)">
             <td :colspan="columns.length" class="max-w-4xl space-y-2">
-              <div class="flex flex-col items-start text-sm font-medium">
+              <div class="audit-metadata-content flex flex-col items-start text-sm font-medium">
                 <div class="text-caption navigation-group">
                   <span class="font-medium whitespace-nowrap">• User Agent:</span>
                   <span class="truncate">{{ log.ua || "unknown" }}</span>
@@ -167,3 +167,32 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
   return stringify(metadata)
 }
 </script>
+
+<style scoped>
+.audit-metadata-row {
+  animation: slideDown 0.2s ease-out;
+}
+.audit-metadata-content {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+</style>

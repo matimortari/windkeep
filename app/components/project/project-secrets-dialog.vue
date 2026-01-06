@@ -26,7 +26,7 @@
       </h5>
 
       <div v-for="env in environments" :key="env" class="flex flex-col items-start gap-1">
-        <label :for="env" class="text-xs font-semibold capitalize">{{ capitalizeFirst(env) }}</label>
+        <label :for="env" class="text-xs font-semibold">{{ capitalizeFirst(env) }}</label>
         <input :id="env" v-model="form.values[env]" type="text">
       </div>
 

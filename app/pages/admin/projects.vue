@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-4">
+    <header class="navigation-group border-b py-2">
       <h2>
         Projects
       </h2>
@@ -34,7 +34,7 @@
 
     <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" />
 
-    <div v-else-if="layout === 'list'" class="scroll-area max-h-screen overflow-y-auto">
+    <div v-else-if="layout === 'list'" class="flex max-h-screen">
       <ProjectTable :projects="filteredProjects" />
     </div>
 
