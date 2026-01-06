@@ -91,16 +91,6 @@ function handleSubmit() {
   }
 
   const normalized = Object.fromEntries(Object.entries(parsed).map(([key, value]) => [normalizeKey(key), value]).filter(([key]) => Boolean(key)))
-  const duplicates = Object.keys(normalized).filter((key) => {
-    const existing = props.secrets.find(s => s.key === key)
-    return existing?.values?.some(v => v.environment === selectedEnv.value)
-  })
-
-  if (duplicates.length) {
-    errors.value.createProjectSecret = `The following keys already exist in the selected environment: ${duplicates.join(", ")}`
-    return
-  }
-
   const payload = Object.entries(normalized).map(([key, value]) =>
     createSecretSchema.parse({
       key,
@@ -111,7 +101,6 @@ function handleSubmit() {
   )
 
   emit("save", payload)
-  emit("close")
 }
 
 watch(() => props.isOpen, (open) => {

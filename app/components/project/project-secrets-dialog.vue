@@ -123,22 +123,16 @@ async function handleSubmit() {
       value: value.trim(),
     }))
 
-  if (isUpdateMode.value) {
-    await projectStore.updateProjectSecret(props.projectId, props.selectedSecret!.id, {
-      description: form.value.description.trim(),
-      values,
-    })
-  }
-  else {
-    await projectStore.createProjectSecret(props.projectId, {
-      key: normalizeKey(form.value.key),
-      description: form.value.description.trim(),
-      projectId: props.projectId,
-      values,
-    })
+  const secret: Secret = {
+    id: props.selectedSecret?.id || "",
+    key: isUpdateMode.value ? form.value.key : normalizeKey(form.value.key),
+    description: form.value.description.trim(),
+    projectId: props.projectId,
+    project: {} as Project,
+    values: values as SecretValue[],
   }
 
-  emit("close")
+  emit("save", secret)
 }
 
 watch(() => props.isOpen, (open) => {

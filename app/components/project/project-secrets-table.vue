@@ -17,8 +17,13 @@
       <tbody>
         <tr v-for="(secret, index) in sortedSecrets" :key="secret.key" class="group hover:bg-muted/20">
           <td v-for="col in columns" :key="col.key" :class="col.class">
-            <div v-if="col.key === 'key'" class="flex items-center gap-2 font-mono text-sm font-semibold text-muted-foreground">
-              <span class="truncate"><span class="text-primary">{{ index + 1 }}.</span> {{ secret.key }}</span>
+            <div v-if="col.key === 'key'" class="flex flex-row items-center gap-2 font-mono text-sm font-semibold" :class="getRowClass(secret.key)">
+              <icon v-if="getPendingChangeType(secret.key) === 'create'" name="ph:plus-circle" size="20" class="shrink-0 text-success" />
+              <icon v-else-if="getPendingChangeType(secret.key) === 'update'" name="ph:pencil-circle" size="20" class="shrink-0 text-secondary" />
+              <icon v-else-if="getPendingChangeType(secret.key) === 'delete'" name="ph:minus-circle" size="20" class="shrink-0 text-danger" />
+
+              <span class="truncate"><span class="text-muted">{{ index + 1 }}.</span> {{ secret.key }}</span>
+
               <icon
                 v-if="secret.description" name="ph:info"
                 :title="secret.description" size="15"
@@ -59,18 +64,24 @@
 </template>
 
 <script setup lang="ts">
+interface PendingChange {
+  type: "create" | "update" | "delete"
+  secret: Secret
+  originalSecret?: Secret
+}
+
 const props = defineProps<{
   secrets: Secret[]
   projectId: string
+  pendingChanges: Map<string, PendingChange>
 }>()
 
 const emit = defineEmits<{
   (e: "edit", secret: Secret): void
-  (e: "deleted", key: string): void
+  (e: "delete", key: string): void
   (e: "update"): void
 }>()
 
-const projectStore = useProjectStore()
 const visibleKeys = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
 const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
@@ -90,13 +101,30 @@ const columns = computed<Record<string, any>[]>(() => {
   return [...base, ...envCols, ...actions]
 })
 
+function getPendingChangeType(key: string): "create" | "update" | "delete" | null {
+  const change = props.pendingChanges.get(key)
+  return change ? change.type : null
+}
+
+function getRowClass(key: string) {
+  const changeType = getPendingChangeType(key)
+  if (changeType === "create") {
+    return "bg-success/20 text-success! rounded"
+  }
+  if (changeType === "update") {
+    return "bg-secondary/20 text-secondary! rounded"
+  }
+  if (changeType === "delete") {
+    return "bg-danger/20 text-danger! rounded line-through"
+  }
+}
+
 function getCopyStateKey(secretKey: string, env: string) {
   return `${secretKey}-${env}`
 }
 
 function getCopyIcon(secretKey: string, env: string) {
-  const key = getCopyStateKey(secretKey, env)
-  return copyStates.value[key] ? "ph:check" : "ph:copy"
+  return copyStates.value[getCopyStateKey(secretKey, env)] ? "ph:check" : "ph:copy"
 }
 
 async function copySecret(secretKey: string, env: string, value: string) {
@@ -105,7 +133,6 @@ async function copySecret(secretKey: string, env: string, value: string) {
   }
 
   await navigator.clipboard.writeText(value)
-
   const key = getCopyStateKey(secretKey, env)
   copyStates.value[key] = true
 
@@ -115,8 +142,7 @@ async function copySecret(secretKey: string, env: string, value: string) {
 }
 
 function getSecretValue(key: string, env: string) {
-  const s = props.secrets.find(s => s.key === key)
-  return s?.values?.find(v => v.environment === env)?.value ?? ""
+  return props.secrets.find(s => s.key === key)?.values?.find(v => v.environment === env)?.value ?? ""
 }
 
 function renderValue(key: string, env: string) {
@@ -131,15 +157,11 @@ function handleUpdateSecret(key: string) {
   }
 }
 
-async function handleDeleteSecret(key: string) {
+function handleDeleteSecret(key: string) {
   if (!confirm(`Are you sure you want to delete "${key}"?`)) {
     return
   }
 
-  const secret = props.secrets.find(s => s.key === key)
-  if (secret?.id) {
-    await projectStore.deleteProjectSecret(props.projectId, secret.id)
-    emit("deleted", key)
-  }
+  emit("delete", key)
 }
 </script>
