@@ -54,4 +54,6 @@ func init() {
 	rootCmd.AddCommand(projectsCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(whoamiCmd)
+	rootCmd.AddCommand(pullCmd)
+	rootCmd.AddCommand(pushCmd)
 }
