@@ -223,6 +223,7 @@ select:hover {
 table {
   background-color: var(--card);
   min-width: 100%;
+  width: 100%;
   table-layout: auto;
   border-collapse: collapse;
   border-radius: 0.25rem;
@@ -240,14 +241,25 @@ th {
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 th {
   background: color-mix(in srgb, var(--muted) 50%, transparent);
-  color: var(--muted-foreground);
   text-align: start;
   border-inline-style: solid;
   z-index: 10;
+  font-weight: 600;
+}
+
+tbody tr {
+  border-bottom: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+}
+tbody tr:last-child {
+  border-bottom: none;
 }
 
 /*
