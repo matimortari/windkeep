@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-4">
+    <header class="navigation-group border-b py-2">
       <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
         <icon name="ph:arrow-left" size="30" class="text-muted-foreground hover:text-primary" />
       </nuxt-link>
@@ -107,7 +107,7 @@
         <div class="navigation-group">
           <input v-model="newMemberId" type="text" placeholder="User ID">
           <select v-model="newMemberRole" class="md:min-w-30">
-            <option v-for="role in [...ROLES].reverse().filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
+            <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
               {{ capitalizeFirst(role.label) }}
             </option>
           </select>
@@ -268,7 +268,7 @@ async function handleAddMember() {
 
   await projectStore.addProjectMember(project.value.id, {
     userId: newMemberId.value.trim(),
-    role: newMemberRole.value as Role,
+    role: newMemberRole.value as "ADMIN" | "MEMBER",
   })
 
   await projectStore.getProjects()
@@ -277,7 +277,7 @@ async function handleAddMember() {
   newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
 }
 
-async function handleUpdateMemberRole(memberId: string, newRole: Role) {
+async function handleUpdateMemberRole(memberId: string, newRole: "ADMIN" | "MEMBER") {
   if (!project.value?.id) {
     return
   }

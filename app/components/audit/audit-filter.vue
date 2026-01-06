@@ -5,12 +5,12 @@
 
       <div ref="userDropdownRef" class="relative">
         <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
-          <span class="capitalize">{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
+          <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
           <icon name="ph:caret-down" size="15" />
         </button>
 
         <transition name="dropdown">
-          <ul v-if="isUserDropdownOpen" class="dropdown-menu scroll-area overflow-y-auto text-sm whitespace-nowrap">
+          <ul v-if="isUserDropdownOpen" class="dropdown-menu overflow-y-auto text-sm whitespace-nowrap">
             <li class="rounded p-2 hover:bg-muted" @click="updateFilter('user', '')">
               All Users
             </li>
@@ -28,7 +28,7 @@
         </button>
 
         <transition name="dropdown">
-          <ul v-if="isActionDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm whitespace-nowrap">
+          <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-28! overflow-y-auto text-sm whitespace-nowrap">
             <li class="rounded p-2 hover:bg-muted" @click="updateFilter('action', '')">
               All Actions
             </li>

@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <h2 class="border-b py-4">
+    <h2 class="border-b py-2">
       Organization
     </h2>
 
@@ -100,13 +100,13 @@
             </div>
 
             <nav v-if="isOwner && orgUser.user.id !== user?.id" class="navigation-group" aria-label="Organization Member Actions">
-              <select v-model="userRoles[orgUser.user.id as string]">
-                <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value" class="capitalize">
+              <select v-model="orgUser.role">
+                <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
                   {{ capitalizeFirst(role.label) }}
                 </option>
               </select>
 
-              <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(orgUser.user.id || '', userRoles[String(orgUser.user.id)] || 'MEMBER')">
+              <button class="btn" aria-label="Update Member Role" @click="orgUser.role !== 'OWNER' && handleUpdateMemberRole(orgUser.user.id || '', orgUser.role)">
                 <icon name="ph:floppy-disk" size="15" />
               </button>
               <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.user.id || '')">
@@ -208,7 +208,6 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, orgMembers, orgProjects, isOwner, isAdmin, errors } = storeToRefs(orgStore)
-const userRoles = ref<Record<string, Role>>({})
 const inviteSuccess = ref<string | null>(null)
 
 const orgFields = [
@@ -262,7 +261,7 @@ async function handleCreateInvite() {
   }
 }
 
-async function handleUpdateMemberRole(memberId: string, newRole: Role) {
+async function handleUpdateMemberRole(memberId: string, newRole: "ADMIN" | "MEMBER") {
   if (!activeOrg.value?.id) {
     return
   }
@@ -318,10 +317,6 @@ async function handleDeleteOrg() {
 
   await orgStore.deleteOrg(activeOrg.value.id)
 }
-
-watch(() => orgMembers.value, (memberships: OrgMembership[] = []) => {
-  userRoles.value = Object.fromEntries(memberships.map(m => [m.userId, m.role]))
-}, { immediate: true })
 
 useHead({
   title: "Organization",

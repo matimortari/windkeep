@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-4">
+    <header class="navigation-group border-b py-2">
       <nuxt-link to="/admin/projects" aria-label="Go back" class="flex items-center">
         <icon name="ph:arrow-left" size="30" class="text-muted-foreground hover:text-primary" />
       </nuxt-link>
@@ -26,7 +26,7 @@
           </button>
 
           <transition name="dropdown" mode="out-in">
-            <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
+            <ul v-if="isDropdownOpen" class="dropdown-menu -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
               <li v-for="env in ENVIRONMENTS" :key="env.value" class="rounded capitalize">
                 <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="exportToEnv(env.value); isDropdownOpen = false">
                   {{ capitalizeFirst(env.label) }}
@@ -44,7 +44,7 @@
 
     <Empty v-if="!secrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" />
 
-    <div v-if="secrets.length" class="scroll-area max-h-screen overflow-y-auto">
+    <div v-if="secrets.length" class="max-h-screen overflow-y-auto">
       <ProjectSecretsTable
         :secrets="secrets" :project-id="project?.id ?? ''"
         @edit="(secret: Secret) => { isSecretsDialogOpen = true; selectedSecret = secret }"

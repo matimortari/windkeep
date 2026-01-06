@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full overflow-x-auto">
+  <div class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -36,7 +36,7 @@
               </span>
 
               <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copySecret(secret.key, col.env, getSecretValue(secret.key, col.env))">
-                <icon :name="getCopyIcon(secret.key, col.env)" size="20" />
+                <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
               </button>
             </div>
 
