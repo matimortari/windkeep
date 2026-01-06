@@ -19,27 +19,23 @@
           <td>
             {{ project.name }}
           </td>
-
-          <td class="line-clamp-3" :title="project.description || 'No description provided.'">
+          <td class="max-w-md" :title="project.description || 'No description provided.'">
             {{ project.description || 'No description provided.' }}
           </td>
-
           <td>
             <div class="navigation-group">
               <icon name="ph:key" size="20" />
               <span>{{ project.secrets?.length }}</span>
             </div>
           </td>
-
           <td>
             <div class="navigation-group">
               <icon name="ph:users" size="20" />
               <span>{{ project.memberships?.length }}</span>
             </div>
           </td>
-
           <td>
-            <div class="navigation-group text-muted-foreground">
+            <div class="navigation-group">
               <nuxt-link :to="`/admin/${project.slug}/settings`" title="Settings">
                 <icon name="ph:gear" size="20" class="hover:text-primary" />
               </nuxt-link>
@@ -62,10 +58,10 @@ const props = defineProps<{
 const { sortedData: sortedProjects, toggleSort, getSortIconName } = useTableSort<Project>(toRef(props, "projects"))
 
 const columns = [
-  { key: "name", label: "Name", class: "w-32", sortable: true },
-  { key: "description", label: "Description", sortable: false },
-  { key: "secrets", label: "Secrets", class: "w-10", sortable: true },
-  { key: "members", label: "Members", class: "w-10", sortable: true },
+  { key: "name", label: "Name", class: "w-40", sortable: true },
+  { key: "description", label: "Description", class: "", sortable: false },
+  { key: "secrets", label: "Secrets", class: "w-24", sortable: true },
+  { key: "members", label: "Members", class: "w-24", sortable: true },
   { key: "actions", label: "Actions", class: "w-24", sortable: false },
 ]
 </script>
