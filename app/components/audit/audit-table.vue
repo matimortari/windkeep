@@ -51,9 +51,9 @@
             </td>
           </tr>
 
-          <tr v-if="expandedRows.has(log.id)" class="audit-metadata-row cursor-pointer border text-sm hover:bg-muted/20" @click="toggleRow(log.id)">
+          <tr v-if="expandedRows.has(log.id)" class="metadata-container cursor-pointer text-sm hover:bg-muted/20" @click="toggleRow(log.id)">
             <td :colspan="columns.length" class="max-w-4xl space-y-2">
-              <div class="audit-metadata-content flex flex-col items-start text-sm font-medium">
+              <div class="metadata-content flex flex-col items-start text-sm font-medium">
                 <div class="text-caption navigation-group">
                   <span class="font-medium whitespace-nowrap">• User Agent:</span>
                   <span class="truncate">{{ log.ua || "unknown" }}</span>
@@ -169,10 +169,10 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
 </script>
 
 <style scoped>
-.audit-metadata-row {
+.metadata-container {
   animation: slideDown 0.2s ease-out;
 }
-.audit-metadata-content {
+.metadata-content {
   animation: fadeIn 0.25s ease-out;
 }
 

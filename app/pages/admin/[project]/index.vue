@@ -45,7 +45,7 @@
         </button>
 
         <button v-if="hasPendingChanges" class="btn-danger" aria-label="Discard Changes" @click="discardAllChanges">
-          <icon name="ph:trash" size="20" />
+          <icon name="ph:x" size="20" />
         </button>
       </nav>
     </header>
@@ -55,8 +55,7 @@
     <div v-if="displayedSecrets.length" class="max-h-screen overflow-y-auto">
       <ProjectSecretsTable
         :secrets="displayedSecrets" :project-id="project?.id ?? ''"
-        :pending-changes="pendingChanges"
-        @edit="handleEditSecret"
+        :pending-changes="pendingChanges" @edit="handleEditSecret"
         @delete="handleDeleteSecret"
       />
     </div>
@@ -76,12 +75,6 @@
 </template>
 
 <script setup lang="ts">
-interface PendingChange {
-  type: "create" | "update" | "delete"
-  secret: Secret
-  originalSecret?: Secret
-}
-
 const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()

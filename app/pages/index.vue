@@ -17,7 +17,6 @@
           <span>Create Account</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
-
         <nuxt-link to="/cli-guide" class="text-caption group flex flex-row items-center gap-1">
           <span>Or explore the <span class="font-semibold text-primary group-hover:underline"> WindKeep CLI</span></span>
           <icon name="ph:code-block-bold" size="20" class="text-primary transition-transform group-hover:scale-125" />
@@ -25,7 +24,7 @@
       </div>
     </header>
 
-    <section id="highlights" class="flex w-full flex-col items-center justify-center gap-8 md:flex-row">
+    <section id="highlights" class="flex w-full flex-col items-center justify-center gap-4 md:flex-row">
       <div
         v-for="(highlight, index) in HIGHLIGHTS" :key="index"
         v-motion :initial="{ opacity: 0, y: 20 }"
@@ -84,14 +83,14 @@
           </button>
         </div>
 
-        <article v-if="activeTab === 'install'" class="card space-y-1">
+        <article v-if="activeTab === 'install'" class="card space-y-1 p-2.5!">
           <p class="text-caption">
             > Install the Go module:
           </p>
           <Shiki lang="bash" :code="INSTALL_COMMAND" class="code-block" />
         </article>
 
-        <article v-if="activeTab === 'commands'" class="card space-y-1">
+        <article v-if="activeTab === 'commands'" class="card space-y-1 p-2.5!">
           <p class="text-caption">
             > After installing, run the following commands to get started:
           </p>
@@ -115,10 +114,10 @@
         v-for="(feature, index) in FEATURES" :key="index"
         v-motion :initial="{ opacity: 0, y: -20 }"
         :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="flex max-w-md flex-col items-center gap-4 text-center"
+        :delay="200 * index" class="flex max-w-sm flex-col items-center gap-4 text-center"
       >
         <div class="card flex items-center justify-center rounded-2xl!">
-          <icon :name="feature.icon" class="text-primary" size="70" />
+          <icon :name="feature.icon" class="text-primary" size="60" />
         </div>
         <h3 class="whitespace-nowrap">
           {{ feature.title }}
@@ -140,9 +139,11 @@
     </h2>
 
     <div class="flex w-full flex-col items-center justify-center divide-y">
-      <div v-for="(item, index) in FAQS" :key="index" class="w-full max-w-xs space-y-2 py-4 md:max-w-xl">
+      <div v-for="(item, index) in FAQS" :key="index" class="w-full max-w-xs space-y-2 p-4 md:max-w-xl">
         <button class="group flex w-full items-start justify-between gap-2 font-semibold hover:text-primary" @click="toggleAccordion(index)">
-          <p>{{ item.question }}</p>
+          <p class="text-sm leading-4 md:text-base">
+            {{ item.question }}
+          </p>
           <icon name="ph:plus-bold" size="25" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
         </button>
 

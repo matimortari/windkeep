@@ -124,3 +124,9 @@ interface AuditFilters {
   projects: Array<{ id: string, name: string }>
   actions: string[]
 }
+
+interface PendingChange {
+  type: "create" | "update" | "delete"
+  secret: Secret
+  originalSecret?: Secret
+}
