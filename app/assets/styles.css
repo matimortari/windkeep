@@ -170,6 +170,8 @@ h6 {
   cursor: pointer;
   max-height: 8rem;
   box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.4);
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) transparent;
 }
 
 .code-block {
@@ -210,6 +212,14 @@ select:hover {
 /*
   Table elements
 */
+.table-wrapper {
+  padding: 0.5rem 0;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) transparent;
+  overflow-x: auto;
+}
+
 table {
   background-color: var(--card);
   min-width: 100%;
@@ -225,11 +235,15 @@ table {
 
 td,
 th {
-  padding: 0.75rem;
+  color: var(--muted-foreground);
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
 }
 
 th {
-  background-color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
   color: var(--muted-foreground);
   text-align: start;
   border-inline-style: solid;

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full overflow-x-auto">
+  <div class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -16,23 +16,23 @@
 
       <tbody>
         <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted/20" @click="$router.push(`/admin/${project.slug}`)">
-          <td class="text-caption">
+          <td>
             {{ project.name }}
           </td>
 
-          <td class="text-caption line-clamp-3" :title="project.description || 'No description provided.'">
+          <td class="line-clamp-3" :title="project.description || 'No description provided.'">
             {{ project.description || 'No description provided.' }}
           </td>
 
           <td>
-            <div class="text-caption navigation-group">
+            <div class="navigation-group">
               <icon name="ph:key" size="20" />
               <span>{{ project.secrets?.length }}</span>
             </div>
           </td>
 
           <td>
-            <div class="text-caption navigation-group">
+            <div class="navigation-group">
               <icon name="ph:users" size="20" />
               <span>{{ project.memberships?.length }}</span>
             </div>

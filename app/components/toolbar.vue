@@ -17,7 +17,7 @@
           </button>
 
           <transition name="dropdown" mode="out-in">
-            <ul v-if="isDropdownOpen" class="dropdown-menu scroll-area space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
+            <ul v-if="isDropdownOpen" class="dropdown-menu space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
               <li v-for="org in orgs" :key="org.id" class="truncate whitespace-nowrap">
                 <button
                   type="button" class="w-full cursor-pointer truncate rounded p-2 text-left hover:bg-muted"
