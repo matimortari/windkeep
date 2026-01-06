@@ -33,22 +33,22 @@ export const CLI_BULLETS = [
 export const FEATURES = [
   {
     title: "Controlled Access",
-    description: "Role-based permissions allow you to control who can view, edit, or manage secrets at both the organization and project levels.",
+    description: "Role-based permissions allow you to control who can manage secrets at both the organization and project levels.",
     icon: "ph:user-check",
   },
   {
     title: "Audit Logs",
-    description: "Every sensitive operation, from secret changes to role updates, is logged with timestamps for full traceability and accountability.",
+    description: "Every sensitive operation, from secret changes to role updates, is logged for full traceability and accountability.",
     icon: "ph:list-magnifying-glass",
   },
   {
     title: "Secure Encryption",
-    description: "Secrets are encrypted from end to end using AES-256-CBC with a unique key for each secret, keeping your data safe and private.",
+    description: "Secrets are encrypted from end to end using AES-256-CBC, keeping your data safe and private.",
     icon: "ph:shield-star",
   },
   {
     title: "Command-Line Tool",
-    description: "Use the open-source CLI to securely access and manage secrets programmatically, integrating seamlessly into scripts or pipelines.",
+    description: "Securely access and manage secrets programmatically, integrating seamlessly into scripts or pipelines.",
     icon: "ph:terminal",
   },
 ]
@@ -77,7 +77,7 @@ export const INSTALL_COMMAND = "go install github.com/matimortari/windkeep/cli@l
 export const CLI_COMMANDS = [
   "windkeep login",
   "windkeep whoami",
-  "windkeep project list-all",
+  "windkeep projects list",
 ]
 
 export const SIDEBAR_NAV_LINKS = [

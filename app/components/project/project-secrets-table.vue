@@ -21,9 +21,7 @@
               <icon v-if="getPendingChangeType(secret.key) === 'create'" name="ph:plus-circle" size="20" class="shrink-0 text-success" />
               <icon v-else-if="getPendingChangeType(secret.key) === 'update'" name="ph:pencil-circle" size="20" class="shrink-0 text-secondary" />
               <icon v-else-if="getPendingChangeType(secret.key) === 'delete'" name="ph:minus-circle" size="20" class="shrink-0 text-danger" />
-
               <span class="truncate"><span class="text-muted">{{ index + 1 }}.</span> {{ secret.key }}</span>
-
               <icon
                 v-if="secret.description" name="ph:info"
                 :title="secret.description" size="15"
@@ -32,20 +30,13 @@
             </div>
 
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
-              <span
-                class="max-w-[80%] truncate select-none"
-                :class="[getSecretValue(secret.key, col.env) ? 'cursor-pointer rounded bg-muted px-1 transition-colors group-hover:bg-card! hover:text-secondary!' : '']"
-                @click="copyToClipboard(getSecretValue(secret.key, col.env))"
-              >
-                {{ renderValue(secret.key, col.env) }}
-              </span>
-
+              <span class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, col.env) ? 'rounded bg-muted px-1 transition-colors group-hover:bg-card! hover:text-secondary!' : '']">{{ renderValue(secret.key, col.env) }}</span>
               <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copySecret(secret.key, col.env, getSecretValue(secret.key, col.env))">
                 <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
               </button>
             </div>
 
-            <div v-else-if="col.key === 'actions'" class="navigation-group text-muted-foreground">
+            <div v-else-if="col.key === 'actions'" class="navigation-group">
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
                 <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed' : 'ph:eye'" size="20" class="hover:text-primary" />
               </button>
@@ -64,12 +55,6 @@
 </template>
 
 <script setup lang="ts">
-interface PendingChange {
-  type: "create" | "update" | "delete"
-  secret: Secret
-  originalSecret?: Secret
-}
-
 const props = defineProps<{
   secrets: Secret[]
   projectId: string
