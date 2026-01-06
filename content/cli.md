@@ -37,10 +37,5 @@ Now that you're set up, explore the documentation:
 - **[Organizations](/cli-guide/organizations)** - Create and manage organizations
 - **[Projects](/cli-guide/projects)** - Create and manage projects
 - **[Secrets Management](/cli-guide/secrets)** - Create secrets and use `windkeep run`
+- **[Pull & Push](/cli-guide/pull-push)** - Synchronize secrets with local files
 - **[Guides & Troubleshooting](/cli-guide/guides)** - Common workflows and troubleshooting
-
-## Need Help?
-
-- Visit the [WindKeep Dashboard](https://windkeep.vercel.app) to manage via web interface
-- Check the [API Specification](/api-spec) for programmatic access
-- Review your organization's [audit logs](/admin/audit-logs) for security monitoring
