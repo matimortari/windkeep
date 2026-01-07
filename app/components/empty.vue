@@ -4,7 +4,7 @@
       <icon :name="iconName || 'ph:empty'" :size="30" />
     </div>
 
-    <p class="max-w-md text-lg leading-5 font-semibold">
+    <p class="max-w-xs text-lg leading-5 font-semibold">
       {{ message }}
     </p>
   </div>

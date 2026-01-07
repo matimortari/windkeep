@@ -360,7 +360,6 @@ tbody tr:last-child {
 .scroll-area {
   scrollbar-width: thin;
   scrollbar-color: var(--muted-foreground) transparent;
-  padding: 0.5rem;
 }
 
 ::selection {

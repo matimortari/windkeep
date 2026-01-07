@@ -39,8 +39,8 @@
       <nav v-else aria-label="Projects Navigation" class="text-caption flex flex-col gap-2">
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
-          :to="`/admin/${project.slug}`" class="truncate hover:underline"
-          :class="{ 'font-semibold text-primary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="$emit('update:isOpen', false)"
+          :to="`/admin/${project.slug}`" class="truncate hover:text-primary hover:underline"
+          :class="{ 'font-semibold text-secondary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="$emit('update:isOpen', false)"
         >
           {{ project.name }}
         </nuxt-link>
