@@ -40,7 +40,7 @@ sudo mv windkeep /usr/local/bin/
 
 **Windows (PowerShell as Administrator):**
 
-```powershell
+```bash
 Move-Item windkeep.exe C:\Windows\System32\windkeep.exe
 ```
 
