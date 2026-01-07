@@ -1,12 +1,12 @@
 <template>
-  <div class="fixed top-0 left-0 z-30 navigation-group w-full justify-between border-b-2 bg-card p-2">
-    <div class="navigation-group">
-      <Logo class="hidden md:flex" />
+  <div class="fixed top-0 left-1/2 z-50 w-full -translate-x-1/2">
+    <div class="flex flex-row items-center justify-between border-b-2 bg-card/50 p-2 backdrop-blur-xl">
+      <nav class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
+        <img src="/assets/symbol.png" alt="Logo" width="30">
 
-      <nav v-if="user" class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
         <div class="text-caption hidden md:navigation-group">
           <span>/</span>
-          <span>{{ user.name }}</span>
+          <span>{{ user?.name }}</span>
           <span>/</span>
         </div>
 
@@ -42,22 +42,22 @@
           <span class="capitalize">{{ currentPage }}</span>
         </div>
       </nav>
-    </div>
 
-    <nav class="navigation-group" aria-label="User Actions">
-      <nuxt-link to="/admin/preferences" title="User Preferences" aria-label="User Preferences" class="btn hidden! md:block!">
-        <icon name="ph:user-circle-gear" size="20" />
-      </nuxt-link>
-      <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
-        <icon :name="themeIcon" size="20" />
-      </button>
-      <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="$emit('toggleSidebar')">
-        <icon name="ph:list" size="20" />
-      </button>
-      <button class="btn" aria-label="Sign Out" @click="signOut">
-        <icon name="ph:sign-out" size="20" />
-      </button>
-    </nav>
+      <nav class="navigation-group" aria-label="User Actions">
+        <nuxt-link to="/admin/preferences" title="User Preferences" aria-label="User Preferences" class="btn hidden! md:block!">
+          <icon name="ph:user-circle-gear" size="20" />
+        </nuxt-link>
+        <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
+          <icon :name="themeIcon" size="20" />
+        </button>
+        <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="$emit('toggleSidebar')">
+          <icon name="ph:list" size="20" />
+        </button>
+        <button class="btn" aria-label="Sign Out" @click="signOut">
+          <icon name="ph:sign-out" size="20" />
+        </button>
+      </nav>
+    </div>
   </div>
 </template>
 
