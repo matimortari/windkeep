@@ -24,20 +24,6 @@ windkeep pull
 windkeep pull prod.env -e production
 ```
 
-**Output (.env format):**
-
-```
-Pulled development secrets to .env
-```
-
-**.env File Example:**
-
-```env
-DATABASE_URL=postgresql://localhost:5432/dev
-API_KEY=dev-api-key-123
-SMTP_PASSWORD=test-password
-```
-
 ---
 
 ### `windkeep push [INPUT_FILE]`
@@ -58,17 +44,11 @@ windkeep push
 windkeep push prod.env -e production
 ```
 
-**Output:**
-
-```
-Successfully pushed 15/15 secret(s) to development environment
-```
-
 **Notes:**
 
 - Existing secrets with the same key will not be overwritten
 - Invalid or duplicate secrets will be skipped with a warning
-- For .env files, blank lines and comments (starting with #) are ignored
+- Blank lines and comments (starting with #) are ignored in the input file
 
 ---
 
@@ -115,3 +95,11 @@ windkeep push prod.env -e production
 - **Pulled files contain plaintext secrets** - store them securely
 - Never commit secret files to version control
 - Consider encrypting pulled files before sharing
+
+---
+
+## Related Documentation
+
+- **[Organizations](/cli-guide/organizations)** - Manage organizations and their projects
+- **[Projects](/cli-guide/projects)** - Create and manage projects within organizations
+- **[Secrets Management](/cli-guide/secrets)** - Manage secrets within projects

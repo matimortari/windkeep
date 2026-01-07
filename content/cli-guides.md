@@ -249,6 +249,41 @@ windkeep projects switch api-gateway && windkeep run npm run dev
 windkeep projects switch payment-service && windkeep run npm run dev
 ```
 
+### Quick Context Switching
+
+```bash
+# Create aliases for common workflows
+alias dev-backend='windkeep orgs switch cm123 && windkeep projects switch backend && windkeep run npm run dev'
+alias dev-frontend='windkeep orgs switch cm123 && windkeep projects switch frontend && windkeep run npm start'
+
+# Use them
+dev-backend
+dev-frontend
+```
+
+### Use Project Flags for One-Off Commands
+
+```bash
+# Run a command in a different project without switching
+windkeep run -p other-project npm run task
+
+# Your active project remains unchanged
+windkeep whoami
+```
+
+### Combine with Other Tools
+
+```bash
+# Use with docker-compose
+windkeep run docker-compose up
+
+# Use with make
+windkeep run make build
+
+# Use with custom scripts
+windkeep run ./scripts/deploy.sh
+```
+
 ---
 
 ## Real-World Use Cases
@@ -503,56 +538,22 @@ windkeep secrets set DATABASE_URL --dev "postgres://localhost:5432/dev"
 
 ---
 
-## Security Best Practices
+## Security Considerations
 
-### Secret Management
+### Secrets Management
 
-- ✅ **Use environment-specific values** (different for dev/staging/prod)
-- ✅ **Rotate secrets regularly** (especially after incidents)
-- ✅ **Delete unused secrets** to reduce attack surface
-- ✅ **Never log secret values** in your application
-- ✅ **Use `--verbose` carefully** (shows keys but not values)
+- **Never log secret values** in your application
+- **Rotate secrets regularly** (especially API keys)
+- **Use different secrets** for each environment
+- **Delete unused secrets** to reduce attack surface
+- **Monitor audit logs** for secret access
+- **Use `--verbose` carefully** - it shows secret keys but not values
 
 ### Team Collaboration
 
-- ✅ **Remove team members** when they leave the organization
-- ✅ **Use appropriate roles** (OWNER, ADMIN, MEMBER)
-- ✅ **Separate organizations** for different clients/contexts
-- ✅ **Review audit logs regularly** in the dashboard
+- **Remove team members** when they leave the organization
+- **Use appropriate roles** (OWNER, ADMIN, MEMBER)
+- **Separate organizations** for different clients/contexts
+- **Review audit logs regularly** in the dashboard
 
 ---
-
-### Quick Context Switching
-
-```bash
-# Create aliases for common workflows
-alias dev-backend='windkeep orgs switch cm123 && windkeep projects switch backend && windkeep run npm run dev'
-alias dev-frontend='windkeep orgs switch cm123 && windkeep projects switch frontend && windkeep run npm start'
-
-# Use them
-dev-backend
-dev-frontend
-```
-
-### Use Project Flags for One-Off Commands
-
-```bash
-# Run a command in a different project without switching
-windkeep run -p other-project npm run task
-
-# Your active project remains unchanged
-windkeep whoami
-```
-
-### Combine with Other Tools
-
-```bash
-# Use with docker-compose
-windkeep run docker-compose up
-
-# Use with make
-windkeep run make build
-
-# Use with custom scripts
-windkeep run ./scripts/deploy.sh
-```
