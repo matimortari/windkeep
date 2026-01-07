@@ -53,7 +53,3 @@ var whoamiCmd = &cobra.Command{
 		return nil
 	},
 }
-
-func init() {
-	rootCmd.AddCommand(whoamiCmd)
-}
