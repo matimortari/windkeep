@@ -55,19 +55,6 @@ Create a new organization. You will automatically become the owner and it will b
 windkeep orgs create "My Company"
 ```
 
-**Output:**
-
-```
-✓ Created organization 'My Company' (ID: cm123abc456)
-✓ Set as active organization
-```
-
-**What Happens:**
-
-1. A new organization is created with you as the owner
-2. The organization becomes your active organization
-3. Any projects you create will belong to this organization
-
 ---
 
 ### `windkeep orgs switch [ORG_ID]`
@@ -91,7 +78,7 @@ windkeep orgs switch cm789def012
 ℹ Active project cleared (projects are organization-specific)
 ```
 
-> **Tip:** Use `windkeep orgs list` to see all available organization IDs.
+> **Tip:** Use `windkeep orgs list` to see all available organizations.
 
 ---
 
@@ -108,12 +95,6 @@ Update an organization's name. Requires OWNER or ADMIN role.
 
 ```bash
 windkeep orgs update cm123abc456 "New Company Name"
-```
-
-**Output:**
-
-```
-✓ Updated organization name to 'New Company Name'
 ```
 
 ---
@@ -189,5 +170,5 @@ windkeep orgs list
 ## Related Documentation
 
 - **[Projects](/cli-guide/projects)** - Create and manage projects within organizations
-- **[Secrets Management](/cli-guide/secrets)** - Manage secrets in organization projects
+- **[Secrets Management](/cli-guide/secrets)** - Manage secrets within projects
 - **[Guides & Troubleshooting](/cli-guide/guides)** - Common workflows and troubleshooting

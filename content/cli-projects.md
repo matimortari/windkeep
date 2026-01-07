@@ -71,20 +71,6 @@ windkeep projects create "E-Commerce Platform"
 # Creates project with slug: e-commerce-platform
 ```
 
-**Output:**
-
-```
-✓ Created project 'API Service' (slug: api-service)
-✓ Set as active project
-```
-
-**What Happens:**
-
-1. A new project is created in your active organization
-2. The slug is auto-generated from the name
-3. The project becomes your active project
-4. You can immediately start adding secrets
-
 ---
 
 ### `windkeep projects switch [PROJECT_SLUG]`
@@ -107,7 +93,7 @@ windkeep projects switch api-service
 ✓ Switched to project 'API Service' (slug: api-service)
 ```
 
-> **Tip:** Use `windkeep projects list` to see all available project slugs.
+> **Tip:** Use `windkeep projects list` to see all available projects.
 
 ---
 
@@ -144,14 +130,6 @@ windkeep projects update my-project \
   --description "Updated backend API"
 ```
 
-**Output:**
-
-```
-✓ Updated project 'API Service v2'
-```
-
-**Important:** If you update the slug, you'll need to use the new slug in future commands.
-
 ---
 
 ### `windkeep projects delete [PROJECT_SLUG] --confirm`
@@ -171,19 +149,6 @@ Delete a project and all its secrets. **This action cannot be undone.**
 ```bash
 windkeep projects delete old-project --confirm
 ```
-
-**Output:**
-
-```
-⚠ This will permanently delete the project 'Old Project' and all its secrets
-✓ Project deleted successfully
-```
-
-**Warning:** This will delete:
-
-- The project
-- All secrets in all environments
-- All project configuration
 
 ---
 
@@ -292,17 +257,8 @@ windkeep projects delete old-project --confirm
 
 ---
 
-### Security Tips
-
-- Delete unused projects to reduce attack surface
-- Regularly review project members in the web dashboard
-- Use separate projects for different security contexts
-- Monitor the [audit logs](/admin/audit-logs) for project changes
-
----
-
 ## Related Documentation
 
-- **[Organizations](/cli-guide/organizations)** - Manage organizations that contain projects
+- **[Organizations](/cli-guide/organizations)** - Manage organizations and their projects
 - **[Secrets Management](/cli-guide/secrets)** - Manage secrets within projects
 - **[Guides & Troubleshooting](/cli-guide/guides)** - Common workflows and troubleshooting

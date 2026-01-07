@@ -204,13 +204,6 @@ Delete a secret and all its values across all environments. **This action cannot
 windkeep secrets delete OLD_API_KEY --confirm
 ```
 
-**Output:**
-
-```
-⚠ This will permanently delete the secret 'OLD_API_KEY' and all its values
-✓ Secret deleted successfully
-```
-
 ---
 
 ## Running Commands with Secrets
@@ -267,24 +260,7 @@ windkeep run -e prod npm run migrate
 windkeep run -v -e dev npm run dev
 ```
 
-**Output (normal mode):**
-
-```
-[your command output...]
-```
-
-**Output (with `--verbose` flag):**
-
-```
-✓ Injecting 5 secret(s) from environment 'DEVELOPMENT'
-  • DATABASE_URL
-  • API_KEY
-  • STRIPE_SECRET_KEY
-  • JWT_SECRET
-  • SMTP_PASSWORD
-
-[your command output...]
-```
+> **Tip:** Use the --verbose flag to see which secrets are being injected, but be cautious as it may expose sensitive information in logs.
 
 ---
 
@@ -426,7 +402,7 @@ windkeep run python worker.py
 
 ---
 
-### Security Best Practices
+## Security Considerations
 
 - **Never log secret values** in your application
 - **Rotate secrets regularly** (especially API keys)
@@ -439,6 +415,7 @@ windkeep run python worker.py
 
 ## Related Documentation
 
-- **[Organizations](/cli-guide/organizations)** - Manage organizations that contain projects
-- **[Projects](/cli-guide/projects)** - Manage projects that contain secrets
+- **[Organizations](/cli-guide/organizations)** - Manage organizations and their projects
+- **[Projects](/cli-guide/projects)** - Create and manage projects within organizations
+- **[Pull & Push Secrets](/cli-guide/pull-push)** - Import and export secrets in bulk
 - **[Guides & Troubleshooting](/cli-guide/guides)** - Common workflows and troubleshooting
