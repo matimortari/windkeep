@@ -122,6 +122,25 @@ export function getInviteBaseUrl(event: any) {
 }
 
 /**
+ * Retrieves the download URL for a specified Windkeep binary.
+ */
+export async function getBinaryBlobUrl(binaryKey: string) {
+  const BINARIES: Record<string, string | undefined> = {
+    "windkeep-darwin-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-darwin-amd64",
+    "windkeep-darwin-arm64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-darwin-arm64",
+    "windkeep-linux-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-linux-amd64",
+    "windkeep-windows-amd64.exe": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-windows-amd64.exe",
+  }
+
+  const blobUrl = BINARIES[binaryKey]
+  if (!blobUrl) {
+    throw createError({ statusCode: 404, message: "Binary not found" })
+  }
+
+  return blobUrl
+}
+
+/**
  * Uploads a file to Blob storage and removes the previous file if provided.
  * Validates file size and MIME type before upload.
  */
