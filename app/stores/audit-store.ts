@@ -80,7 +80,7 @@ export const useAuditStore = defineStore("audit", () => {
   }
 
   function updateFilters(newFilters: Partial<GetAuditLogsInput>) {
-    currentFilters.value = { ...currentFilters.value, ...newFilters }
+    currentFilters.value = { ...currentFilters.value, ...newFilters, page: newFilters.page ?? 1 }
   }
 
   async function nextPage(orgId: string) {
