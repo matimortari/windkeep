@@ -79,16 +79,17 @@ function getUserDisplayName(userId?: string) {
 }
 
 function updateFilter(type: "date" | "user" | "action", value: string) {
-  const updated = { ...currentFilters.value }
+  const updated = { ...currentFilters.value, page: 1 }
+
   if (type === "date") {
-    updated.startDate = value
+    updated.startDate = value ? new Date(value).toISOString() : undefined
   }
   else if (type === "user") {
-    updated.userId = value
+    updated.userId = value || undefined
     isUserDropdownOpen.value = false
   }
   else if (type === "action") {
-    updated.action = value
+    updated.action = value || undefined
     isActionDropdownOpen.value = false
   }
 
@@ -97,17 +98,21 @@ function updateFilter(type: "date" | "user" | "action", value: string) {
 }
 
 async function handleDeleteLogs() {
-  if (!confirm(`Are you sure you want to delete ${auditLogs.value.length} ${auditLogs.value.length === 1 ? "log" : "logs"}? This action cannot be undone.`)) {
+  const hasFilters = dateFilter.value || currentFilters.value.action || currentFilters.value.userId
+  const filterDesc = hasFilters ? "matching the current filters" : "in this organization"
+  if (!confirm(`Are you sure you want to delete all audit logs ${filterDesc}? This action cannot be undone.`)) {
     return
   }
 
   await auditStore.deleteAuditLogs(activeOrg.value!.id, {
     olderThan: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined,
-    action: currentFilters.value.action,
-    userId: currentFilters.value.userId,
+    action: currentFilters.value.action || undefined,
+    userId: currentFilters.value.userId || undefined,
   })
 
-  auditStore.getAuditLogs(activeOrg.value!.id, currentFilters.value)
+  const resetFilters = { ...currentFilters.value, page: 1 }
+  auditStore.updateFilters(resetFilters)
+  await auditStore.getAuditLogs(activeOrg.value!.id, resetFilters)
 }
 </script>
 
