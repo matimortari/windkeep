@@ -36,15 +36,12 @@ export default defineEventHandler(async (event) => {
   if (result.data.projectId) {
     where.projectId = result.data.projectId
   }
-
   if (result.data.action) {
-    where.action = { contains: result.data.action, mode: "insensitive" }
+    where.action = result.data.action
   }
-
   if (result.data.userId) {
     where.userId = result.data.userId
   }
-
   if (result.data.startDate || result.data.endDate) {
     where.createdAt = {}
     if (result.data.startDate) {
