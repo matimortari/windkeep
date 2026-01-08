@@ -115,35 +115,3 @@ async function handleDeleteLogs() {
   await auditStore.getAuditLogs(activeOrg.value!.id, resetFilters)
 }
 </script>
-
-<style scoped>
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.2s ease;
-}
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(0.25rem);
-}
-.dropdown-enter-to,
-.dropdown-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-input[type="date"] {
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  white-space: nowrap;
-  color: var(--muted-foreground);
-  color-scheme: dark;
-}
-input[type="date"]::-webkit-inner-spin-button,
-input[type="date"]::-webkit-clear-button {
-  display: none;
-}
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5);
-  cursor: pointer;
-}
-</style>
