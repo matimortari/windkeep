@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
+    <header class="flex flex-col items-start gap-4 border-b py-2 md:flex-row md:items-center md:justify-between">
       <h2>
         Audit Logs
       </h2>

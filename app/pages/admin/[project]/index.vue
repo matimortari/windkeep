@@ -1,27 +1,29 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
-      <nuxt-link to="/admin/projects" aria-label="Go back" class="flex items-center">
-        <icon name="ph:arrow-left" size="30" class="text-muted-foreground hover:text-primary" />
-      </nuxt-link>
-      <h2 class="max-w-lg truncate">
-        {{ project?.name }}
-      </h2>
+    <header class="flex flex-col items-start gap-4 border-b py-2 md:flex-row md:items-center md:justify-between">
+      <div class="navigation-group">
+        <nuxt-link to="/admin/projects" aria-label="Go back" class="flex items-center">
+          <icon name="ph:arrow-left" size="30" class="text-muted-foreground hover:text-primary" />
+        </nuxt-link>
+        <h2 class="max-w-lg truncate">
+          {{ project?.name }}
+        </h2>
+      </div>
 
-      <nav class="navigation-group w-full flex-1 justify-end" aria-label="Project Actions">
+      <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
         <button class="btn-primary" aria-label="Add New Secret" @click="() => { isSecretsDialogOpen = true; selectedSecret = null }">
-          <span class="hidden md:inline">Add New Secret</span>
+          <span>Add New Secret</span>
           <icon name="ph:plus" size="20" />
         </button>
 
         <button class="btn-secondary" aria-label="Import Secrets from .env File" @click="() => { isEnvDialogOpen = true; selectedSecret = null }">
-          <span class="hidden md:block">Import</span>
+          <span>Import</span>
           <icon name="ph:upload" size="20" />
         </button>
 
         <div ref="dropdownRef" class="relative">
           <button class="btn-secondary" aria-label="Export Secrets to .env File" @click="isDropdownOpen = !isDropdownOpen">
-            <span class="hidden md:block">Export</span>
+            <span>Export</span>
             <icon name="ph:download" size="20" />
           </button>
 
@@ -278,20 +280,3 @@ definePageMeta({
   middleware: auth,
 })
 </script>
-
-<style scoped>
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.2s ease;
-}
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(0.25rem);
-}
-.dropdown-enter-to,
-.dropdown-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>

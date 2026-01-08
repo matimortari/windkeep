@@ -1,22 +1,22 @@
 <template>
-  <div class="space-y-8 py-32">
+  <div class="mx-auto w-full max-w-5xl space-y-8 px-4 py-32">
     <header class="flex flex-col items-center gap-2 text-center">
       <h2>
         Brand Assets
       </h2>
       <p class="text-caption">
-        Visual language and assets for WindKeep branding, including logos and color palette.
+        Visual language and assets for WindKeep, including logos and color palette.
       </p>
     </header>
 
-    <div class="container mx-auto flex w-full flex-col items-center gap-4">
+    <div class="flex flex-col items-center gap-4">
       <section class="grid w-full grid-cols-1 gap-2 md:grid-cols-3">
-        <div v-for="(symbol, index) in SYMBOLS" :key="symbol.name" class="card flex flex-col items-center p-0!" :class="symbol.bgClass">
-          <div class="m-4 flex size-20 items-center justify-center">
+        <div v-for="(symbol, index) in SYMBOLS" :key="symbol.name" class="card flex flex-col items-center overflow-hidden p-0!" :class="symbol.bgClass">
+          <div class="m-4 flex size-20 items-center justify-center rounded-t">
             <img :src="symbol.image" :alt="symbol.name" class="size-full object-contain">
           </div>
 
-          <div class="flex w-full flex-row items-center justify-between bg-card p-2">
+          <div class="flex w-full flex-row items-center justify-between border-t bg-card p-2">
             <span class="text-sm font-medium">{{ symbol.name }}</span>
             <button :title="`Download ${symbol.name}`" class="transition-transform hover:scale-110" @click="handleDownloadImage(symbol, index, symbolActions)">
               <icon :name="symbolActions[index]!.icon.value" size="25" />
@@ -26,12 +26,12 @@
       </section>
 
       <section class="grid w-full grid-cols-1 gap-2 md:grid-cols-2">
-        <div v-for="(wordmark, index) in WORDMARKS" :key="wordmark.name" class="card flex flex-col items-center p-0!" :class="wordmark.bgClass">
-          <div class="m-4 flex h-20 w-36 items-center justify-center">
+        <div v-for="(wordmark, index) in WORDMARKS" :key="wordmark.name" class="card flex flex-col items-center overflow-hidden p-0!" :class="wordmark.bgClass">
+          <div class="m-4 flex h-20 w-36 items-center justify-center rounded-t">
             <img :src="wordmark.image" :alt="wordmark.name" class="size-full object-contain">
           </div>
 
-          <div class="flex w-full flex-row items-center justify-between bg-card p-2">
+          <div class="flex w-full flex-row items-center justify-between border-t bg-card p-2">
             <span class="text-sm font-medium">{{ wordmark.name }}</span>
             <button :title="`Download ${wordmark.name}`" class="transition-transform hover:scale-110" @click="handleDownloadImage(wordmark, index, wordmarkActions)">
               <icon :name="wordmarkActions[index]!.icon.value" size="25" />
@@ -41,7 +41,7 @@
       </section>
     </div>
 
-    <div class="container mx-auto flex w-full flex-col items-center gap-4">
+    <div class="flex flex-col items-center gap-4">
       <div class="flex flex-col items-center gap-2 text-center">
         <h3>
           Colors
@@ -51,22 +51,22 @@
         </p>
       </div>
 
-      <div class="grid w-full grid-cols-2 gap-2 md:grid-cols-5">
+      <section class="grid w-full grid-cols-2 gap-2 md:grid-cols-5">
         <div v-for="(color, index) in COLORS" :key="color.name" class="card flex flex-col items-center p-0!">
-          <div class="h-24 w-full" :style="{ backgroundColor: `var(${color.var})` }" @click="handleCopyColor(color.var, index)" />
+          <div class="h-24 w-full rounded-t border-b" :style="{ backgroundColor: `var(${color.var})` }" @click="handleCopyColor(color.var, index)" />
 
-          <div class="flex w-full flex-row items-center justify-between bg-card p-2">
-            <p class="flex flex-row items-center gap-1">
+          <div class="flex w-full flex-col p-2">
+            <div class="flex w-full items-center justify-between">
               <span class="text-sm font-medium">{{ color.name }}</span>
-              <span class="text-xs text-muted-foreground">{{ colorValues[color.var] }}</span>
-            </p>
+              <button :title="`Copy ${color.name}`" class="transition-transform hover:scale-110" @click="handleCopyColor(color.var, index)">
+                <icon :name="colorActions[index]!.icon.value" size="20" />
+              </button>
+            </div>
 
-            <button :title="`Copy ${color.name}`" class="transition-transform hover:scale-110" @click="handleCopyColor(color.var, index)">
-              <icon :name="colorActions[index]!.icon.value" size="20" />
-            </button>
+            <span class="text-xs text-muted-foreground">{{ colorValues[color.var] }}</span>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>

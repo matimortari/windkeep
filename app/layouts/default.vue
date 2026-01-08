@@ -1,22 +1,13 @@
 <template>
   <Navbar />
 
-  <main class="relative flex min-h-screen flex-col items-center justify-center">
+  <main class="relative flex min-h-screen flex-col items-center">
     <div class="grid-backdrop" />
     <slot />
   </main>
 
   <Footer />
 </template>
-
-<script setup lang="ts">
-const isLoading = ref(true)
-
-onMounted(async () => {
-  await nextTick()
-  isLoading.value = false
-})
-</script>
 
 <style scoped>
 .grid-backdrop {

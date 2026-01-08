@@ -1,6 +1,6 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <h2 class="border-b py-2">
+    <h2 class="navigation-group border-b py-2">
       Preferences
     </h2>
 
