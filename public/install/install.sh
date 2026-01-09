@@ -19,5 +19,5 @@ mkdir -p "$INSTALL_DIR"
 curl -fsSL "$URL" -o "$INSTALL_DIR/windkeep"
 chmod +x "$INSTALL_DIR/windkeep"
 
-echo "✅ WindKeep installed at $INSTALL_DIR/windkeep"
+echo "WindKeep installed at $INSTALL_DIR/windkeep"
 echo "Make sure $INSTALL_DIR is in your PATH"

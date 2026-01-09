@@ -1,7 +1,7 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="flex flex-col items-start gap-4 border-b py-2 md:flex-row md:items-center md:justify-between">
-      <h2>
+    <header class="flex flex-col items-start gap-4 border-b py-2 whitespace-nowrap md:flex-row md:items-center md:justify-between">
+      <h2 class="">
         Audit Logs
       </h2>
 
