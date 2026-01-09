@@ -7,18 +7,16 @@
   --background: #0a0a0a;
   --foreground: #e5e5e5;
   --card: #171717;
-  --overlay: #262626;
+  --input: #262626;
   --muted: #404040;
   --muted-foreground: #a3a3a3;
+  --surface-foreground: #e5e5e5;
 
   /* Surfaces */
   --primary: #64748b;
   --secondary: #334155;
   --danger: #b91c1c;
   --success: #047857;
-
-  /* Content on surfaces */
-  --surface-foreground: #e5e5e5;
 
   background-color: var(--background);
   color: var(--foreground);
@@ -36,18 +34,16 @@ html.light {
   --background: #fafafa;
   --foreground: #262626;
   --card: #f5f5f5;
-  --overlay: #e5e5e5;
+  --input: #e5e5e5;
   --muted: #d4d4d4;
   --muted-foreground: #737373;
+  --surface-foreground: #e5e5e5;
 
   /* Surfaces */
   --primary: #64748b;
   --secondary: #334155;
   --danger: #b91c1c;
   --success: #047857;
-
-  /* Content on surfaces */
-  --surface-foreground: #e5e5e5;
 }
 
 /*
@@ -57,15 +53,14 @@ html.light {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
-  --color-overlay: var(--overlay);
+  --color-input: var(--input);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-
+  --color-surface-foreground: var(--surface-foreground);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
   --color-danger: var(--danger);
   --color-success: var(--success);
-  --color-surface-foreground: var(--surface-foreground);
 
   --font-default: "Roboto", sans-serif;
   --font-display: "Russo One", sans-serif;
@@ -152,7 +147,7 @@ h6 {
 }
 
 .overlay {
-  background-color: var(--overlay);
+  background-color: var(--card);
   border: 2px solid var(--muted);
   border-radius: 0.25rem;
   padding: 1.5rem;
@@ -162,7 +157,7 @@ h6 {
 
 .dropdown-menu {
   position: absolute;
-  background-color: var(--overlay);
+  background-color: var(--card);
   border-radius: 0.25rem;
   padding: 0.5rem;
   margin: 0.5rem;
@@ -207,7 +202,7 @@ input,
 textarea,
 select {
   appearance: none;
-  background-color: var(--card);
+  background-color: var(--input);
   color: var(--muted-foreground);
   border: 2px solid var(--muted);
   accent-color: var(--muted);
@@ -216,12 +211,6 @@ select {
   font-size: 0.875rem;
   width: 100%;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-input:hover,
-textarea:hover,
-select:hover {
-  border-color: var(--muted);
 }
 
 /*

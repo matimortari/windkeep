@@ -12,7 +12,7 @@
 
       <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
         <button class="btn-primary" aria-label="Add New Secret" @click="() => { isSecretsDialogOpen = true; selectedSecret = null }">
-          <span>Add New Secret</span>
+          <span class="hidden md:block">Add New Secret</span>
           <icon name="ph:plus" size="20" />
         </button>
 
