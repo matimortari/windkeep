@@ -8,17 +8,13 @@
       <div class="flex flex-col items-start gap-1">
         <label for="key" class="text-sm font-semibold">Key</label>
         <input id="key" v-model="form.key" type="text" :disabled="isUpdateMode">
-        <span class="text-xs text-muted-foreground">
-          The name for the secret.
-        </span>
+        <span class="text-xs text-muted-foreground">The name for the secret.</span>
       </div>
 
       <div class="flex flex-col items-start gap-1">
         <label for="description" class="text-sm font-semibold">Description (optional)</label>
         <input id="description" v-model="form.description" type="text">
-        <span class="text-xs text-muted-foreground">
-          An optional description for the secret usage.
-        </span>
+        <span class="text-xs text-muted-foreground">An optional description for the secret usage.</span>
       </div>
 
       <h5 class="border-t py-2">

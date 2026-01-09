@@ -1,48 +1,46 @@
 <template>
-  <nav class="navigation-group w-full flex-1 justify-end" aria-label="Audit Filters">
-    <nav class="navigation-group" aria-label="Filters">
-      <input v-model="dateFilter" type="date" title="Filter by date" @change="updateFilter('date', dateFilter)">
+  <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Audit Filters">
+    <AuditDatePicker v-model="dateFilter" @update:model-value="updateFilter('date', $event)" />
 
-      <div ref="userDropdownRef" class="relative">
-        <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
-          <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
-          <icon name="ph:caret-down" size="15" />
-        </button>
-
-        <transition name="dropdown">
-          <ul v-if="isUserDropdownOpen" class="dropdown-menu overflow-y-auto text-sm whitespace-nowrap">
-            <li class="rounded p-2 hover:bg-muted" @click="updateFilter('user', '')">
-              All Users
-            </li>
-            <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded p-2 hover:bg-muted" @click="updateFilter('user', user.id)">
-              <span>{{ user.name }}</span>
-            </li>
-          </ul>
-        </transition>
-      </div>
-
-      <div ref="actionDropdownRef" class="relative">
-        <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
-          <span>{{ auditActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
-          <icon name="ph:caret-down" size="15" />
-        </button>
-
-        <transition name="dropdown">
-          <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-28! overflow-y-auto text-sm whitespace-nowrap">
-            <li class="rounded p-2 hover:bg-muted" @click="updateFilter('action', '')">
-              All Actions
-            </li>
-            <li v-for="action in auditActions" :key="action.value" class="rounded p-2 hover:bg-muted" @click="updateFilter('action', action.value)">
-              {{ action.label }}
-            </li>
-          </ul>
-        </transition>
-      </div>
-
-      <button class="btn-danger" :disabled="!auditLogs.length" title="Delete Logs" @click="handleDeleteLogs">
-        <icon name="ph:trash" size="20" />
+    <div ref="userDropdownRef" class="relative">
+      <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
+        <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
+        <icon name="ph:caret-down" size="15" />
       </button>
-    </nav>
+
+      <transition name="dropdown">
+        <ul v-if="isUserDropdownOpen" class="dropdown-menu overflow-y-auto text-sm whitespace-nowrap">
+          <li class="rounded p-2 hover:bg-muted" @click="updateFilter('user', '')">
+            All Users
+          </li>
+          <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded p-2 hover:bg-muted" @click="updateFilter('user', user.id)">
+            <span>{{ user.name }}</span>
+          </li>
+        </ul>
+      </transition>
+    </div>
+
+    <div ref="actionDropdownRef" class="relative">
+      <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
+        <span>{{ auditActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
+        <icon name="ph:caret-down" size="15" />
+      </button>
+
+      <transition name="dropdown">
+        <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-28! overflow-y-auto text-sm whitespace-nowrap">
+          <li class="rounded p-2 hover:bg-muted" @click="updateFilter('action', '')">
+            All Actions
+          </li>
+          <li v-for="action in auditActions" :key="action.value" class="rounded p-2 hover:bg-muted" @click="updateFilter('action', action.value)">
+            {{ action.label }}
+          </li>
+        </ul>
+      </transition>
+    </div>
+
+    <button class="btn-danger" :disabled="!auditLogs.length" title="Delete Logs" @click="handleDeleteLogs">
+      <icon name="ph:trash" size="20" />
+    </button>
   </nav>
 </template>
 
@@ -54,7 +52,7 @@ defineProps<{
 const auditStore = useAuditStore()
 const { auditLogs, auditActions, filters, currentFilters } = storeToRefs(auditStore)
 const { activeOrg } = storeToRefs(useOrgStore())
-const dateFilter = ref("")
+const dateFilter = ref<{ start?: string, end?: string }>({})
 const isUserDropdownOpen = ref(false)
 const isActionDropdownOpen = ref(false)
 const userDropdownRef = ref<HTMLElement | null>(null)
@@ -82,7 +80,8 @@ function updateFilter(type: "date" | "user" | "action", value: string) {
   const updated = { ...currentFilters.value, page: 1 }
 
   if (type === "date") {
-    updated.startDate = value ? new Date(value).toISOString() : undefined
+    updated.startDate = value?.start ? `${value.start}T00:00:00.000Z` : undefined
+    updated.endDate = value?.end ? `${value.end}T23:59:59.999Z` : undefined
   }
   else if (type === "user") {
     updated.userId = value || undefined
@@ -98,14 +97,14 @@ function updateFilter(type: "date" | "user" | "action", value: string) {
 }
 
 async function handleDeleteLogs() {
-  const hasFilters = dateFilter.value || currentFilters.value.action || currentFilters.value.userId
+  const hasFilters = dateFilter.value.start || dateFilter.value.end || currentFilters.value.action || currentFilters.value.userId
   const filterDesc = hasFilters ? "matching the current filters" : "in this organization"
   if (!confirm(`Are you sure you want to delete all audit logs ${filterDesc}? This action cannot be undone.`)) {
     return
   }
 
   await auditStore.deleteAuditLogs(activeOrg.value!.id, {
-    olderThan: dateFilter.value ? new Date(dateFilter.value).toISOString() : undefined,
+    olderThan: dateFilter.value.end ? new Date(dateFilter.value.end).toISOString() : undefined,
     action: currentFilters.value.action || undefined,
     userId: currentFilters.value.userId || undefined,
   })
