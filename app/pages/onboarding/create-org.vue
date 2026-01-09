@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full flex-col items-center justify-center">
+  <div class="flex min-h-screen w-full flex-col items-center justify-center">
     <header
       v-motion class="flex flex-col items-center gap-4 border-b-2 p-4 text-center"
       :initial="{ opacity: 0, y: -10, scale: 0.8 }" :visible="{ opacity: 1, y: 0, scale: 1 }"

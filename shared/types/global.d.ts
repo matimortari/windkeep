@@ -130,3 +130,11 @@ interface PendingChange {
   secret: Secret
   originalSecret?: Secret
 }
+
+interface CalendarDay {
+  date: Date
+  day: number
+  isCurrentMonth: boolean
+  isSelected: boolean
+  isToday: boolean
+}
