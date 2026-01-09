@@ -85,19 +85,13 @@ export const useAuditStore = defineStore("audit", () => {
 
   async function nextPage(orgId: string) {
     if (pagination.value?.hasNext) {
-      return await getAuditLogs(orgId, {
-        ...currentFilters.value,
-        page: currentFilters.value.page! + 1,
-      })
+      return await getAuditLogs(orgId, { ...currentFilters.value, page: currentFilters.value.page! + 1 })
     }
   }
 
   async function prevPage(orgId: string) {
     if (pagination.value?.hasPrev) {
-      return await getAuditLogs(orgId, {
-        ...currentFilters.value,
-        page: Math.max(1, currentFilters.value.page! - 1),
-      })
+      return await getAuditLogs(orgId, { ...currentFilters.value, page: Math.max(1, currentFilters.value.page! - 1) })
     }
   }
 

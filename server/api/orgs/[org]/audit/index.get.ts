@@ -30,7 +30,6 @@ export default defineEventHandler(async (event) => {
   const page = result.data.page
   const limit = result.data.limit
   const offset = (page - 1) * limit
-
   const where: any = { orgId }
 
   if (result.data.projectId) {
