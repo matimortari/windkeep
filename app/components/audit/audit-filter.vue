@@ -1,24 +1,6 @@
 <template>
-  <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Audit Filters">
+  <nav class="navigation-group w-full flex-wrap justify-start gap-2 md:justify-end" aria-label="Audit Filters">
     <AuditDatePicker v-model="dateFilter" @update:model-value="updateFilter('date', $event)" />
-
-    <div ref="userDropdownRef" class="relative">
-      <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
-        <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
-        <icon name="ph:caret-down" size="15" />
-      </button>
-
-      <transition name="dropdown">
-        <ul v-if="isUserDropdownOpen" class="dropdown-menu overflow-y-auto text-sm whitespace-nowrap">
-          <li class="rounded p-2 hover:bg-muted" @click="updateFilter('user', '')">
-            All Users
-          </li>
-          <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded p-2 hover:bg-muted" @click="updateFilter('user', user.id)">
-            <span>{{ user.name }}</span>
-          </li>
-        </ul>
-      </transition>
-    </div>
 
     <div ref="actionDropdownRef" class="relative">
       <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
@@ -33,6 +15,24 @@
           </li>
           <li v-for="action in auditActions" :key="action.value" class="rounded p-2 hover:bg-muted" @click="updateFilter('action', action.value)">
             {{ action.label }}
+          </li>
+        </ul>
+      </transition>
+    </div>
+
+    <div ref="userDropdownRef" class="relative">
+      <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
+        <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
+        <icon name="ph:caret-down" size="15" />
+      </button>
+
+      <transition name="dropdown">
+        <ul v-if="isUserDropdownOpen" class="dropdown-menu overflow-y-auto text-sm whitespace-nowrap">
+          <li class="rounded p-2 hover:bg-muted" @click="updateFilter('user', '')">
+            All Users
+          </li>
+          <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded p-2 hover:bg-muted" @click="updateFilter('user', user.id)">
+            <span>{{ user.name }}</span>
           </li>
         </ul>
       </transition>
