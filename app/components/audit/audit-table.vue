@@ -125,46 +125,7 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
     return "{}"
   }
 
-  // Custom stringify that preserves key insertion order
-  const indent = " ".repeat(2)
-  function stringify(value: any, depth: number = 0): string {
-    const currentIndent = indent.repeat(depth)
-    const nextIndent = indent.repeat(depth + 1)
-
-    if (value === null) {
-      return "null"
-    }
-    if (value === undefined) {
-      return "undefined"
-    }
-    if (typeof value === "string") {
-      return `"${value}"`
-    }
-    if (typeof value === "number" || typeof value === "boolean") {
-      return String(value)
-    }
-
-    if (Array.isArray(value)) {
-      if (value.length === 0) {
-        return "[]"
-      }
-      const items = value.map(item => `${nextIndent}${stringify(item, depth + 1)}`).join(",\n")
-      return `[\n${items}\n${currentIndent}]`
-    }
-    if (typeof value === "object") {
-      const keys = Object.keys(value)
-      if (keys.length === 0) {
-        return "{}"
-      }
-
-      const items = keys.map(key => `${nextIndent}"${key}": ${stringify(value[key], depth + 1)}`).join(",\n")
-      return `{\n${items}\n${currentIndent}}`
-    }
-
-    return String(value)
-  }
-
-  return stringify(metadata)
+  return JSON.stringify(metadata, null, 2)
 }
 </script>
 

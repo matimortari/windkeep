@@ -38,7 +38,7 @@
       <ProjectTable :projects="filteredProjects" />
     </div>
 
-    <ul v-else class="scroll-area grid max-h-screen gap-2 overflow-y-auto md:grid-cols-3">
+    <ul v-else class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3">
       <li
         v-for="(project, index) in filteredProjects" :key="project.id"
         v-motion :initial="{ opacity: 0 }"

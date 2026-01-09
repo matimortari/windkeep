@@ -9,17 +9,13 @@
       <div class="flex flex-col items-start gap-1">
         <label for="slug" class="text-sm font-semibold">Project Slug</label>
         <input id="slug" v-model="form.slug" type="text" :placeholder="suggestedSlug">
-        <span class="text-xs text-muted-foreground">
-          Lowercase alphanumeric with hyphens only.
-        </span>
+        <span class="text-xs text-muted-foreground">Lowercase alphanumeric with hyphens only.</span>
       </div>
 
       <div class="flex flex-col items-start gap-1">
         <label for="description" class="text-sm font-semibold">Description</label>
         <input id="description" v-model="form.description" type="text">
-        <span class="text-xs text-muted-foreground">
-          An optional description for your project.
-        </span>
+        <span class="text-xs text-muted-foreground">An optional description for your project.</span>
       </div>
 
       <footer class="flex flex-row items-center justify-between">

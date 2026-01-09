@@ -14,9 +14,7 @@
             {{ capitalizeFirst(env) }}
           </option>
         </select>
-        <span class="text-xs text-muted-foreground">
-          Select the environment for the imported secrets.
-        </span>
+        <span class="text-xs text-muted-foreground">Select the environment for the imported secrets.</span>
       </div>
 
       <footer class="flex flex-row items-center justify-between">
