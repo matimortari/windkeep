@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   const secretId = getRouterParam(event, "secret")
   if (!projectId || !secretId) {
-    throw createError({ statusCode: 400, statusMessage: "Project ID and Secret ID are required" })
+    throw createError({ status: 400, statusText: "Project ID and Secret ID are required" })
   }
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
@@ -37,10 +37,10 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!secretData) {
-    throw createError({ statusCode: 404, statusMessage: "Secret not found" })
+    throw createError({ status: 404, statusText: "Secret not found" })
   }
   if (secretData.projectId !== projectId) {
-    throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
+    throw createError({ status: 403, statusText: "Secret does not belong to this project" })
   }
 
   // Create audit log before deletion

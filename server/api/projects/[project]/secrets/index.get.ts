@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
+    throw createError({ status: 400, statusText: "Project ID is required" })
   }
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])

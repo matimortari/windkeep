@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
+    throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
   await requireRole(user.id, { type: "organization", orgId }, ["OWNER"])
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateOrgSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const existingOrg = await db.organization.findUnique({
