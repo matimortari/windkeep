@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
+    throw createError({ status: 400, statusText: "Project ID is required" })
   }
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER"])
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!projectData) {
-    throw createError({ statusCode: 404, statusMessage: "Project not found" })
+    throw createError({ status: 404, statusText: "Project not found" })
   }
 
   // Create audit log before deletion

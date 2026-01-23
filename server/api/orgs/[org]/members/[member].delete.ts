@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const orgId = getRouterParam(event, "org")
   const memberId = getRouterParam(event, "member")
   if (!orgId || !memberId) {
-    throw createError({ statusCode: 400, statusMessage: "Organization ID and Member ID are required" })
+    throw createError({ status: 400, statusText: "Organization ID and Member ID are required" })
   }
 
   const targetRole = await db.orgMembership.findUnique({
@@ -17,12 +17,12 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!targetRole) {
-    throw createError({ statusCode: 404, statusMessage: "Member not found in organization" })
+    throw createError({ status: 404, statusText: "Member not found in organization" })
   }
 
   // Prevent removing OWNER users
   if (targetRole.role === "OWNER") {
-    throw createError({ statusCode: 403, statusMessage: "Cannot remove organization owners" })
+    throw createError({ status: 403, statusText: "Cannot remove organization owners" })
   }
 
   // Check permissions for non-self removal

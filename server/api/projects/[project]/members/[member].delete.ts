@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   const memberId = getRouterParam(event, "member")
   if (!projectId || !memberId) {
-    throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
+    throw createError({ status: 400, statusText: "Project ID and Member ID are required" })
   }
 
   const targetRole = await db.projectMembership.findUnique({
@@ -17,12 +17,12 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!targetRole) {
-    throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
+    throw createError({ status: 404, statusText: "Member not found in project" })
   }
 
   // Prevent removing OWNER users
   if (targetRole.role === "OWNER") {
-    throw createError({ statusCode: 403, statusMessage: "Cannot remove project owners" })
+    throw createError({ status: 403, statusText: "Cannot remove project owners" })
   }
 
   // Check permissions for non-self removal
