@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const result = createOrgSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const organization = await db.$transaction(async (tx) => {

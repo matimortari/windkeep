@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
+    throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
   await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "MEMBER", "ADMIN"])
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!membership) {
-    throw createError({ statusCode: 404, statusMessage: "Organization not found" })
+    throw createError({ status: 404, statusText: "Organization not found" })
   }
 
   const organization = { ...membership.org, role: membership.role, isActive: membership.isActive }

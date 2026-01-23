@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const result = acceptInviteSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const invitation = await db.invitation.findUnique({
@@ -23,10 +23,10 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!invitation) {
-    throw createError({ statusCode: 404, statusMessage: "Invitation not found or already used" })
+    throw createError({ status: 404, statusText: "Invitation not found or already used" })
   }
   if (invitation.expiresAt < new Date()) {
-    throw createError({ statusCode: 410, statusMessage: "Invitation has expired" })
+    throw createError({ status: 410, statusText: "Invitation has expired" })
   }
 
   const existingMembership = await db.orgMembership.findUnique({
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     await db.invitation.delete({
       where: { id: invitation.id },
     })
-    throw createError({ statusCode: 409, statusMessage: "You are already a member of this organization" })
+    throw createError({ status: 409, statusText: "You are already a member of this organization" })
   }
 
   const [newMembership] = await db.$transaction([

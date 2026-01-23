@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
+    throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
   await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
   const result = getAuditLogsSchema.safeParse(parsedQuery)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid query parameters" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid query parameters" })
   }
 
   const page = result.data.page

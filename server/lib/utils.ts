@@ -38,7 +38,7 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
     }
   }
 
-  throw createError({ statusCode: 401, statusMessage: "Unauthorized" })
+  throw createError({ status: 401, statusText: "Unauthorized" })
 }
 
 /**
@@ -47,7 +47,7 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
  */
 export async function requireRole(userId: string, scope: { type: "organization", orgId: string } | { type: "project", projectId: string }, roles: Role[]) {
   if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" })
+    throw createError({ status: 401, statusText: "Unauthorized" })
   }
 
   let membership
@@ -72,7 +72,7 @@ export async function requireRole(userId: string, scope: { type: "organization",
     })
   }
   if (!membership || !roles.includes(membership.role)) {
-    throw createError({ statusCode: 403, statusMessage: "Forbidden: insufficient permissions" })
+    throw createError({ status: 403, statusText: "Forbidden: insufficient permissions" })
   }
 
   return membership
@@ -134,7 +134,7 @@ export async function getBinaryBlobUrl(binaryKey: string) {
 
   const blobUrl = BINARIES[binaryKey]
   if (!blobUrl) {
-    throw createError({ statusCode: 404, message: "Binary not found" })
+    throw createError({ status: 404, message: "Binary not found" })
   }
 
   return blobUrl
@@ -152,13 +152,13 @@ export async function uploadFile({ path, file, maxSize, allowedMimeTypes, oldFil
   oldFileUrl?: string
 }) {
   if (!file || !(file instanceof File)) {
-    throw createError({ statusCode: 400, statusMessage: "No file uploaded" })
+    throw createError({ status: 400, statusText: "No file uploaded" })
   }
   if (allowedMimeTypes.length && !allowedMimeTypes.includes(file.type)) {
-    throw createError({ statusCode: 415, statusMessage: `Unsupported file type: ${file.type}` })
+    throw createError({ status: 415, statusText: `Unsupported file type: ${file.type}` })
   }
   if (file.size > maxSize) {
-    throw createError({ statusCode: 413, statusMessage: "File too large" })
+    throw createError({ status: 413, statusText: "File too large" })
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase()

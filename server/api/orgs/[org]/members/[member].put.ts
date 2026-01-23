@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const orgId = getRouterParam(event, "org")
   const memberId = getRouterParam(event, "member")
   if (!orgId || !memberId) {
-    throw createError({ statusCode: 400, statusMessage: "Organization ID and Member ID are required" })
+    throw createError({ status: 400, statusText: "Organization ID and Member ID are required" })
   }
 
   await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
@@ -15,24 +15,24 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateMemberRoleSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const targetRole = await db.orgMembership.findUnique({
     where: { userId_orgId: { userId: memberId, orgId } },
   })
   if (!targetRole) {
-    throw createError({ statusCode: 404, statusMessage: "Member not found in organization" })
+    throw createError({ status: 404, statusText: "Member not found in organization" })
   }
 
   // Prevent changing OWNER roles
   if (targetRole.role === "OWNER") {
-    throw createError({ statusCode: 403, statusMessage: "Cannot change the role of organization owners" })
+    throw createError({ status: 403, statusText: "Cannot change the role of organization owners" })
   }
 
   // Prevent users from changing their own role
   if (memberId === user.id) {
-    throw createError({ statusCode: 400, statusMessage: "You cannot change your own role" })
+    throw createError({ status: 400, statusText: "You cannot change your own role" })
   }
 
   const updatedMembership = await db.orgMembership.update({

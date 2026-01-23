@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
+    throw createError({ status: 400, statusText: "Project ID is required" })
   }
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = createSecretSchema.safeParse({ ...body, projectId })
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const existingSecret = await db.secret.findUnique({
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (existingSecret) {
-    throw createError({ statusCode: 409, statusMessage: "A secret with this key already exists in the project" })
+    throw createError({ status: 409, statusText: "A secret with this key already exists in the project" })
   }
 
   const secretData: any = {

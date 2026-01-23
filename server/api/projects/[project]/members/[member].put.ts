@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   const memberId = getRouterParam(event, "member")
   if (!projectId || !memberId) {
-    throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
+    throw createError({ status: 400, statusText: "Project ID and Member ID are required" })
   }
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
@@ -15,24 +15,24 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateProjectMemberSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const targetRole = await db.projectMembership.findUnique({
     where: { userId_projectId: { userId: memberId, projectId } },
   })
   if (!targetRole) {
-    throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
+    throw createError({ status: 404, statusText: "Member not found in project" })
   }
 
   // Prevent changing OWNER roles
   if (targetRole.role === "OWNER") {
-    throw createError({ statusCode: 403, statusMessage: "Cannot change the role of project owners" })
+    throw createError({ status: 403, statusText: "Cannot change the role of project owners" })
   }
 
   // Prevent users from changing their own role
   if (memberId === user.id) {
-    throw createError({ statusCode: 400, statusMessage: "You cannot change your own role" })
+    throw createError({ status: 400, statusText: "You cannot change your own role" })
   }
 
   const updatedRole = await db.projectMembership.update({

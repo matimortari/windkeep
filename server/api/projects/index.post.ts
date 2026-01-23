@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const result = createProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   await requireRole(user.id, { type: "organization", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (conflictingProject) {
-    throw createError({ statusCode: 409, statusMessage: "A project with this name or slug already exists in the organization" })
+    throw createError({ status: 409, statusText: "A project with this name or slug already exists in the organization" })
   }
 
   const newProject = await db.project.create({

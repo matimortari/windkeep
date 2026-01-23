@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
+    throw createError({ status: 400, statusText: "Project ID is required" })
   }
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = addProjectMemberSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const project = await db.project.findUnique({
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!project) {
-    throw createError({ statusCode: 404, statusMessage: "Project not found" })
+    throw createError({ status: 404, statusText: "Project not found" })
   }
 
   const targetUser = await db.user.findUnique({
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!targetUser) {
-    throw createError({ statusCode: 404, statusMessage: "User not found" })
+    throw createError({ status: 404, statusText: "User not found" })
   }
 
   const orgMembership = await db.orgMembership.findUnique({
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!orgMembership) {
-    throw createError({ statusCode: 403, statusMessage: "User must be a member of the organization first" })
+    throw createError({ status: 403, statusText: "User must be a member of the organization first" })
   }
 
   const existingRole = await db.projectMembership.findUnique({
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (existingRole) {
-    throw createError({ statusCode: 409, statusMessage: "User is already a member of this project" })
+    throw createError({ status: 409, statusText: "User is already a member of this project" })
   }
 
   const projectRole = await db.projectMembership.create({
