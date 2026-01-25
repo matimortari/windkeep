@@ -66,4 +66,7 @@ export default defineNuxtConfig({
       theme: "nord",
     },
   },
+  build: {
+    transpile: ['shiki'],
+  },
 })
