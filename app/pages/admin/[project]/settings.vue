@@ -369,6 +369,6 @@ watch(() => project.value?.id, async (id: string | undefined) => {
 
 definePageMeta({
   layout: "admin",
-  middleware: auth,
+  middleware: "auth",
 })
 </script>
