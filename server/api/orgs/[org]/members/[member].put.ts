@@ -1,5 +1,5 @@
-import db from "#server/lib/db"
-import { createAuditLog, getUserFromSession, requireRole } from "#server/lib/utils"
+import db from "#server/utils/db"
+import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
 import { updateMemberRoleSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {

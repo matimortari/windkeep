@@ -1,5 +1,5 @@
-import db from "#server/lib/db"
-import { createAuditLog, getUserFromSession } from "#server/lib/utils"
+import db from "#server/utils/db"
+import { createAuditLog, getUserFromSession } from "#server/utils/helpers"
 import { createOrgSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
