@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto"
-import db from "#server/lib/db"
-import { getUserFromSession } from "#server/lib/utils"
+import db from "#server/utils/db"
+import { getUserFromSession } from "#server/utils/helpers"
 import { updateUserSchema } from "#shared/schemas/user-schema"
 
 export default defineEventHandler(async (event) => {

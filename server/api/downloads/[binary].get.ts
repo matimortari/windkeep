@@ -1,4 +1,4 @@
-import { getBinaryBlobUrl } from "#server/lib/utils"
+import { getBinaryBlobUrl } from "#server/utils/helpers"
 import { defineEventHandler, getRouterParam, sendRedirect } from "h3"
 
 export default defineEventHandler(async (event) => {

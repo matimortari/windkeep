@@ -1,6 +1,6 @@
-import db from "#server/lib/db"
-import { decrypt } from "#server/lib/encryption"
-import { getUserFromSession, requireRole } from "#server/lib/utils"
+import db from "#server/utils/db"
+import { decrypt } from "#server/utils/encryption"
+import { getUserFromSession, requireRole } from "#server/utils/helpers"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)

@@ -29,7 +29,7 @@
 
           <transition name="dropdown" mode="out-in">
             <ul v-if="isDropdownOpen" class="dropdown-menu -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
-              <li v-for="env in ENVIRONMENTS" :key="env.value" class="rounded capitalize">
+              <li v-for="env in ENVIRONMENTS" :key="env.value" class="rounded-sm capitalize">
                 <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="exportToEnv(env.value); isDropdownOpen = false">
                   {{ capitalizeFirst(env.label) }}
                 </button>
@@ -277,6 +277,6 @@ watch(() => project.value?.id, async (id: string | undefined) => {
 
 definePageMeta({
   layout: "admin",
-  middleware: auth,
+  middleware: "auth",
 })
 </script>

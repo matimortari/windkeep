@@ -1,6 +1,6 @@
 import type { H3Event } from "h3"
 import { randomBytes } from "node:crypto"
-import db from "#server/lib/db"
+import db from "#server/utils/db"
 
 export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
   const { id: providerAccountId, name, email, image, provider } = userData

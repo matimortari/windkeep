@@ -141,7 +141,7 @@
     <div class="flex w-full flex-col items-center justify-center divide-y">
       <div v-for="(item, index) in FAQS" :key="index" class="w-full max-w-xs space-y-2 p-4 md:max-w-xl">
         <button class="group flex w-full items-start justify-between gap-2 font-semibold hover:text-primary" @click="toggleAccordion(index)">
-          <p class="text-sm leading-4 md:text-base">
+          <p class="text-sm/4 md:text-base">
             {{ item.question }}
           </p>
           <icon name="ph:plus-bold" size="25" class="shrink-0 transition-transform group-hover:scale-125" :class="openIndex === index ? 'rotate-45 text-primary' : 'rotate-0'" />
@@ -172,7 +172,7 @@ useHead({
 })
 
 definePageMeta({
-  middleware: guest,
+  middleware: "guest",
 })
 </script>
 

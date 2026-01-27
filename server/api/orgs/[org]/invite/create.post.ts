@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto"
-import db from "#server/lib/db"
-import { createAuditLog, getInviteBaseUrl, getUserFromSession, requireRole } from "#server/lib/utils"
+import db from "#server/utils/db"
+import { createAuditLog, getInviteBaseUrl, getUserFromSession, requireRole } from "#server/utils/helpers"
 import { createInviteSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {

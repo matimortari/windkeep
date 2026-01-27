@@ -11,9 +11,6 @@ export default defineNuxtConfig({
     "nuxt-auth-utils",
     "nuxt-shiki",
   ],
-  imports: {
-    dirs: ["lib/**"],
-  },
   runtimeConfig: {
     session: {
       maxAge: 60 * 60 * 24 * 7, // 7 days
@@ -67,6 +64,6 @@ export default defineNuxtConfig({
     },
   },
   build: {
-    transpile: ['shiki'],
+    transpile: ["shiki"],
   },
 })
