@@ -1,4 +1,5 @@
 import type { EventHandlerRequest, H3Event } from "h3"
+import { randomBytes } from "node:crypto"
 import db from "#server/utils/db"
 import { del, put } from "@vercel/blob"
 
@@ -76,6 +77,14 @@ export async function requireRole(userId: string, scope: { type: "organization",
   }
 
   return membership
+}
+
+/**
+ * Generates a secure random token as a hexadecimal string.
+ * Default length is 12 bytes (24 hex characters).
+ */
+export function generateToken(byteLength: number = 12): string {
+  return randomBytes(byteLength).toString("hex")
 }
 
 /**

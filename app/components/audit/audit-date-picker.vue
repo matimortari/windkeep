@@ -37,8 +37,8 @@
         <div class="grid grid-cols-7 gap-1">
           <button
             v-for="day in calendarDays" :key="`${day.date}-${day.isCurrentMonth}`"
-            class="aspect-square rounded text-xs transition-colors" :disabled="!day.isCurrentMonth"
-            :class="{ 'bg-secondary': day.isInRange, 'bg-primary': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }" @mouseenter="hoverDate = day.date"
+            class="aspect-square rounded-sm text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-primary': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
+            :disabled="!day.isCurrentMonth" @mouseenter="hoverDate = day.date"
             @mouseleave="hoverDate = null" @click="selectDate(day)"
           >
             {{ day.day }}
@@ -72,17 +72,18 @@ const years = computed(() => {
   return Array.from({ length: 10 }, (_, i) => currentY - 5 + i)
 })
 
+useClickOutside(datePickerRef, () => {
+  isOpen.value = false
+}, { escapeKey: true })
+
 function parseDate(dateStr?: string) {
   if (!dateStr) {
     return null
   }
-  const [y, m, d] = dateStr.split("-").map(Number)
+
+  const [y, m, d] = dateStr.split("-").map(Number) as [number, number, number]
   return new Date(y, m - 1, d)
 }
-
-useClickOutside(datePickerRef, () => {
-  isOpen.value = false
-}, { escapeKey: true })
 
 function formatDateString(date: Date) {
   const y = date.getFullYear()
@@ -137,10 +138,10 @@ function selectDate(day: any) {
 
 const displayLabel = computed(() => {
   const format = (dateStr?: string) => dateStr ? parseDate(dateStr)!.toLocaleDateString("en-GB") : ""
-
   if (props.modelValue?.start && props.modelValue?.end) {
     return `${format(props.modelValue.start)} → ${format(props.modelValue.end)}`
   }
+
   return props.modelValue?.start ? `From ${format(props.modelValue.start)}` : "Date"
 })
 </script>
