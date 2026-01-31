@@ -30,7 +30,7 @@
             </div>
 
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
-              <span class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, col.env) ? 'rounded bg-muted px-1 transition-colors group-hover:bg-card! hover:text-secondary!' : '']">{{ renderValue(secret.key, col.env) }}</span>
+              <span class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, col.env) ? 'rounded-sm bg-muted px-1 transition-colors group-hover:bg-card! hover:text-secondary!' : '']">{{ renderValue(secret.key, col.env) }}</span>
               <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copySecret(secret.key, col.env, getSecretValue(secret.key, col.env))">
                 <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
               </button>

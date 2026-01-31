@@ -33,7 +33,6 @@
             <td>
               <icon name="ph:caret-right" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
-
             <td :title="actionLabel(log.action)">
               <div class="navigation-group max-w-xs truncate">
                 <icon :name="resourceIcon(log.resource) || ''" size="15" />

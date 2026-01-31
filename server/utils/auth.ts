@@ -1,6 +1,6 @@
 import type { H3Event } from "h3"
-import { randomBytes } from "node:crypto"
 import db from "#server/utils/db"
+import { generateToken } from "#server/utils/helpers"
 
 export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
   const { id: providerAccountId, name, email, image, provider } = userData
@@ -29,9 +29,9 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
     user = await db.user.create({
       data: {
         email,
-        name: name?.trim() || email.split("@")[0],
+        name: name?.trim() ?? email.split("@")[0],
         image: image || undefined,
-        apiToken: randomBytes(12).toString("hex"),
+        apiToken: generateToken(),
       },
     })
   }
