@@ -10,7 +10,7 @@
     <nav class="text-caption flex flex-col gap-1" aria-label="Main Navigation">
       <nuxt-link
         v-for="link in SIDEBAR_NAV_LINKS" :key="link.url"
-        :to="link.url" class="group navigation-group rounded p-2 transition-colors hover:bg-muted"
+        :to="link.url" class="group navigation-group rounded-sm p-2 transition-colors hover:bg-muted"
         :class="{ 'bg-muted/50': route.path === link.url }" @click="$emit('update:isOpen', false)"
       >
         <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />

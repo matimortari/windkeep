@@ -1,6 +1,5 @@
-import { randomBytes } from "node:crypto"
 import db from "#server/utils/db"
-import { createAuditLog, getInviteBaseUrl, getUserFromSession, requireRole } from "#server/utils/helpers"
+import { createAuditLog, generateToken, getInviteBaseUrl, getUserFromSession, requireRole } from "#server/utils/helpers"
 import { createInviteSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
@@ -19,7 +18,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Generate invitation token
-  const token = randomBytes(12).toString("hex")
+  const token = generateToken()
   const expiresAt = new Date()
   expiresAt.setHours(expiresAt.getHours() + 12) // 12 hours expiration
 

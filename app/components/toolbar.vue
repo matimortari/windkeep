@@ -20,7 +20,7 @@
             <ul v-if="isDropdownOpen" class="dropdown-menu space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
               <li v-for="org in orgs" :key="org.id" class="truncate whitespace-nowrap">
                 <button
-                  type="button" class="w-full cursor-pointer truncate rounded p-2 text-left hover:bg-muted"
+                  type="button" class="w-full cursor-pointer truncate rounded-sm p-2 text-left hover:bg-muted"
                   :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)"
                 >
                   {{ org.name }}
@@ -28,7 +28,7 @@
               </li>
 
               <li class="truncate whitespace-nowrap">
-                <nuxt-link to="/onboarding/create-org" class="group navigation-group block rounded p-2 hover:bg-muted" role="menuitem">
+                <nuxt-link to="/onboarding/create-org" class="group navigation-group block rounded-sm p-2 hover:bg-muted" role="menuitem">
                   <icon name="ph:plus" size="20" class="text-primary transition-transform group-hover:scale-125" />
                   <span>Create Organization</span>
                 </nuxt-link>

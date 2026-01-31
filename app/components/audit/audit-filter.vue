@@ -10,10 +10,10 @@
 
       <transition name="dropdown">
         <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-28! overflow-y-auto text-sm whitespace-nowrap">
-          <li class="rounded p-2 hover:bg-muted" @click="updateFilter('action', '')">
+          <li class="rounded-sm p-2 hover:bg-muted" @click="updateFilter('action', '')">
             All Actions
           </li>
-          <li v-for="action in auditActions" :key="action.value" class="rounded p-2 hover:bg-muted" @click="updateFilter('action', action.value)">
+          <li v-for="action in auditActions" :key="action.value" class="rounded-sm p-2 hover:bg-muted" @click="updateFilter('action', action.value)">
             {{ action.label }}
           </li>
         </ul>
@@ -28,10 +28,10 @@
 
       <transition name="dropdown">
         <ul v-if="isUserDropdownOpen" class="dropdown-menu overflow-y-auto text-sm whitespace-nowrap">
-          <li class="rounded p-2 hover:bg-muted" @click="updateFilter('user', '')">
+          <li class="rounded-sm p-2 hover:bg-muted" @click="updateFilter('user', '')">
             All Users
           </li>
-          <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded p-2 hover:bg-muted" @click="updateFilter('user', user.id)">
+          <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded-sm p-2 hover:bg-muted" @click="updateFilter('user', user.id)">
             <span>{{ user.name }}</span>
           </li>
         </ul>
@@ -76,7 +76,7 @@ function getUserDisplayName(userId?: string) {
   return user?.name
 }
 
-function updateFilter(type: "date" | "user" | "action", value: string) {
+function updateFilter(type: "date" | "user" | "action", value: any) {
   const updated = { ...currentFilters.value, page: 1 }
 
   if (type === "date") {
