@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { generateToken, getUserFromSession } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { updateUserSchema } from "#shared/schemas/user-schema"
 
 export default defineEventHandler(async (event) => {
@@ -34,6 +35,9 @@ export default defineEventHandler(async (event) => {
       updatedAt: true,
     },
   })
+
+  // Invalidate cache for user data
+  await deleteCached(CacheKeys.userData(user.id))
 
   return { updatedUser }
 })

@@ -1,8 +1,16 @@
 import db from "#server/utils/db"
 import { getUserFromSession } from "#server/utils/helpers"
+import { CacheKeys, CacheTTL, getCached, setCached } from "#server/utils/redis"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Try to get from cache first
+  const cacheKey = CacheKeys.userProjects(user.id)
+  const cached = await getCached<any>(cacheKey)
+  if (cached) {
+    return { projects: cached }
+  }
 
   const projects = await db.project.findMany({
     where: {
@@ -31,6 +39,8 @@ export default defineEventHandler(async (event) => {
       createdAt: "desc",
     },
   })
+
+  await setCached(cacheKey, projects, CacheTTL.SHORT)
 
   return { projects }
 })

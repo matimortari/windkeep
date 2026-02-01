@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { updateProjectMemberSchema } from "#shared/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
@@ -77,6 +78,9 @@ export default defineEventHandler(async (event) => {
       orgName: updatedRole.project.org.name,
     },
   })
+
+  // Invalidate cache for affected user's data and projects
+  await deleteCached(CacheKeys.userData(memberId), CacheKeys.userProjects(memberId))
 
   return { updatedRole }
 })

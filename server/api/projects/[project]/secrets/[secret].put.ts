@@ -1,6 +1,7 @@
 import db from "#server/utils/db"
 import { decrypt, encrypt } from "#server/utils/encryption"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { updateSecretSchema } from "#shared/schemas/secret-schema"
 
 export default defineEventHandler(async (event) => {
@@ -111,6 +112,9 @@ export default defineEventHandler(async (event) => {
       updatedEnvs: result.data.values?.map(v => v.environment) || [],
     },
   })
+
+  // Invalidate cache for project secrets
+  await deleteCached(CacheKeys.projectSecrets(projectId))
 
   return {
     ...updatedSecret,

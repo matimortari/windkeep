@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -57,6 +58,9 @@ export default defineEventHandler(async (event) => {
   await db.project.delete({
     where: { id: projectId },
   })
+
+  // Invalidate cache for user projects, org data, and project secrets
+  await deleteCached(CacheKeys.userProjects(user.id), CacheKeys.orgData(user.id, projectData.orgId), CacheKeys.projectSecrets(projectId))
 
   return { success: true, message: "Project deleted successfully" }
 })
