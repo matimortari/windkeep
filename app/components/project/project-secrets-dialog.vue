@@ -1,13 +1,9 @@
 <template>
-  <Dialog
-    :is-open="isOpen"
-    :title="isUpdateMode ? 'Edit Secret' : 'Create New Secret'"
-    @update:is-open="emit('close')"
-  >
+  <Dialog :is-open="isOpen" :title="isUpdateMode ? 'Edit Secret' : 'Create New Secret'" @update:is-open="emit('close')">
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="key" class="text-sm font-semibold">Key</label>
-        <input id="key" v-model="form.key" type="text" :disabled="isUpdateMode">
+        <input id="key" v-model="form.key" type="text">
         <span class="text-xs text-muted-foreground">The name for the secret.</span>
       </div>
 
@@ -121,7 +117,7 @@ async function handleSubmit() {
 
   const secret: Secret = {
     id: props.selectedSecret?.id || "",
-    key: isUpdateMode.value ? form.value.key : normalizeKey(form.value.key),
+    key: normalizeKey(form.value.key),
     description: form.value.description.trim(),
     projectId: props.projectId,
     project: {} as Project,

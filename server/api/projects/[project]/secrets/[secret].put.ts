@@ -85,12 +85,10 @@ export default defineEventHandler(async (event) => {
     },
   })
 
+  const updatedEnvironments = result.data.values?.map(v => v.environment) || []
   const changes = []
-  if (result.data.description !== undefined && result.data.description !== existingSecret.description) {
-    changes.push("description")
-  }
-  if (result.data.values && result.data.values.length > 0) {
-    changes.push(`${result.data.values.length} environment value(s)`)
+  if (updatedEnvironments.length > 0) {
+    changes.push(`${updatedEnvironments.length} environment value(s)`)
   }
 
   await createAuditLog({
@@ -108,8 +106,8 @@ export default defineEventHandler(async (event) => {
       projectName: updatedSecret.project.name,
       orgId: updatedSecret.project.org.id,
       orgName: updatedSecret.project.org.name,
-      changedFields: changes,
-      updatedEnvs: result.data.values?.map(v => v.environment) || [],
+      descriptionChanged: result.data.description !== undefined && result.data.description !== existingSecret.description,
+      environments: updatedEnvironments,
     },
   })
 
