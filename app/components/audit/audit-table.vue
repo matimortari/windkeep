@@ -63,7 +63,12 @@
                 </div>
               </div>
 
-              <Shiki v-if="(log.metadata || {})" lang="json" :code="formatMetadata(log.metadata)" class="code-block" />
+              <div v-if="(log.metadata || {})" class="relative">
+                <button class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="copyMetadataActions.get(log.id)?.triggerCopy(formatMetadata(log.metadata))">
+                  <icon :name="copyMetadataActions.get(log.id)?.icon.value || 'ph:copy'" size="15" />
+                </button>
+                <Shiki lang="json" :code="formatMetadata(log.metadata)" class="code-block" />
+              </div>
             </td>
           </tr>
         </template>
@@ -77,6 +82,14 @@ const auditStore = useAuditStore()
 const { auditLogs, auditActions, loading } = storeToRefs(auditStore)
 const expandedRows = ref<Set<string>>(new Set())
 const { sortedData: sortedLogs, toggleSort, getSortIconName } = useTableSort(auditLogs)
+const { createActionHandler } = useActionIcon()
+
+const copyMetadataActions = computed(() => {
+  const actions = new Map()
+  auditLogs.value.forEach(log => actions.set(log.id, createActionHandler("ph:copy")))
+
+  return actions
+})
 
 const columns = [
   { key: "expand", label: "", icon: "ph:eye", class: "w-10", sortable: false },

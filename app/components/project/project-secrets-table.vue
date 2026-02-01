@@ -15,9 +15,9 @@
       </thead>
 
       <tbody>
-        <tr v-for="(secret, index) in sortedSecrets" :key="secret.key" class="group hover:bg-muted/20">
+        <tr v-for="(secret, index) in sortedSecrets" :key="`${secret.key}-${index}`" class="group hover:bg-muted/20" :class="getRowClass(secret.key)">
           <td v-for="col in columns" :key="col.key" :class="col.class">
-            <div v-if="col.key === 'key'" class="flex flex-row items-center gap-2 font-mono text-sm font-semibold" :class="getRowClass(secret.key)">
+            <div v-if="col.key === 'key'" class="flex flex-row items-center gap-2 font-mono text-sm font-semibold">
               <icon v-if="getPendingChangeType(secret.key) === 'create'" name="ph:plus-circle" size="20" class="shrink-0 text-success" />
               <icon v-else-if="getPendingChangeType(secret.key) === 'update'" name="ph:pencil-circle" size="20" class="shrink-0 text-secondary" />
               <icon v-else-if="getPendingChangeType(secret.key) === 'delete'" name="ph:minus-circle" size="20" class="shrink-0 text-danger" />
@@ -30,7 +30,7 @@
             </div>
 
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
-              <span class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, col.env) ? 'rounded-sm bg-muted px-1 transition-colors group-hover:bg-card! hover:text-secondary!' : '']">{{ renderValue(secret.key, col.env) }}</span>
+              <span class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, col.env) ? getSecretValueClass(secret.key) : '']">{{ renderValue(secret.key, col.env) }}</span>
               <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copySecret(secret.key, col.env, getSecretValue(secret.key, col.env))">
                 <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
               </button>
@@ -82,6 +82,7 @@ const columns = computed<Record<string, any>[]>(() => {
     class: "max-w-40 md:max-w-52",
     sortable: false,
   }))
+
   const actions = [{ key: "actions", label: "Actions", class: "w-20 text-right", type: "actions", sortable: false }]
   return [...base, ...envCols, ...actions]
 })
@@ -94,14 +95,31 @@ function getPendingChangeType(key: string): "create" | "update" | "delete" | nul
 function getRowClass(key: string) {
   const changeType = getPendingChangeType(key)
   if (changeType === "create") {
-    return "bg-success/20 text-success! rounded"
+    return "bg-success/20"
   }
   if (changeType === "update") {
-    return "bg-secondary/20 text-secondary! rounded"
+    return "bg-secondary/20"
   }
   if (changeType === "delete") {
-    return "bg-danger/20 text-danger! rounded line-through"
+    return "bg-danger/20 line-through decoration-danger"
   }
+}
+
+function getSecretValueClass(key: string) {
+  const changeType = getPendingChangeType(key)
+  const baseClasses = "rounded-sm px-1 transition-colors group-hover:bg-card! hover:text-secondary!"
+
+  if (changeType === "create") {
+    return `${baseClasses} bg-success/40`
+  }
+  if (changeType === "update") {
+    return `${baseClasses} bg-secondary/40`
+  }
+  if (changeType === "delete") {
+    return `${baseClasses} bg-danger/40`
+  }
+
+  return `${baseClasses} bg-muted`
 }
 
 function getCopyStateKey(secretKey: string, env: string) {
@@ -143,10 +161,6 @@ function handleUpdateSecret(key: string) {
 }
 
 function handleDeleteSecret(key: string) {
-  if (!confirm(`Are you sure you want to delete "${key}"?`)) {
-    return
-  }
-
   emit("delete", key)
 }
 </script>

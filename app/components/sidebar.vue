@@ -40,9 +40,9 @@
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
           :to="`/admin/${project.slug}`" class="truncate hover:text-primary hover:underline"
-          :class="{ 'font-semibold text-secondary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="$emit('update:isOpen', false)"
+          :class="{ 'font-semibold text-primary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="$emit('update:isOpen', false)"
         >
-          {{ project.name }}
+          > {{ project.name }}
         </nuxt-link>
       </nav>
     </div>
