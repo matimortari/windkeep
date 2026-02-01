@@ -20,13 +20,13 @@ irm https://windkeep.vercel.app/install/install.ps1 | iex
 
 ### Manual Download
 
-> [**Linux (x64)**](https://windkeep.vercel.app/api/downloads/windkeep-linux-amd64) - For Ubuntu, Debian, Fedora, and other Linux distributions
+- [**Linux (x64)**](https://windkeep.vercel.app/api/downloads/windkeep-linux-amd64) - For Ubuntu, Debian, Fedora, and other Linux distributions
 
-> [**macOS (Intel)**](https://windkeep.vercel.app/api/downloads/windkeep-darwin-amd64) - For Macs with Intel processors
+- [**macOS (Intel)**](https://windkeep.vercel.app/api/downloads/windkeep-darwin-amd64) - For Macs with Intel processors
 
-> [**macOS (Apple Silicon)**](https://windkeep.vercel.app/api/downloads/windkeep-darwin-arm64) - For Macs with M1, M2, M3, or M4 chips
+- [**macOS (Apple Silicon)**](https://windkeep.vercel.app/api/downloads/windkeep-darwin-arm64) - For Macs with M1, M2, M3, or M4 chips
 
-> [**Windows (x64)**](https://windkeep.vercel.app/api/downloads/windkeep-windows-amd64.exe) - For Windows 10/11
+- [**Windows (x64)**](https://windkeep.vercel.app/api/downloads/windkeep-windows-amd64.exe) - For Windows 10/11
 
 ### Installation Steps
 
@@ -52,13 +52,55 @@ First, sign in to WindKeep and retrieve your API token:
 
 1. Navigate to your **[preferences page](https://windkeep.com/admin/preferences)**
 2. Copy your API token
-3. Run the login command, passing your token as an argument:
+3. Run the login command:
 
 ```bash
+# Pass token as argument
 windkeep login YOUR_API_TOKEN
+
+# Or use interactive mode (token input will be hidden)
+windkeep login
 ```
 
 > This validates your token and saves your configuration in `~/.windkeep/config.yaml`.
+
+### Logout
+
+Remove stored authentication credentials by running:
+
+```bash
+windkeep logout
+```
+
+This deletes your local configuration file. You'll need to run `windkeep login` again to use the CLI.
+
+---
+
+## Utility Commands
+
+### `windkeep whoami`
+
+Display information about your currently authenticated user and active context.
+
+**Example:**
+
+```bash
+windkeep whoami
+```
+
+### `windkeep upgrade`
+
+Upgrade the WindKeep CLI to the latest version.
+
+**Example:**
+
+```bash
+windkeep upgrade
+```
+
+This downloads and installs the latest version for your operating system.
+
+**Advanced:** Use `--config` flag to specify a custom configuration file location (default: `~/.windkeep/config.yaml`).
 
 ---
 

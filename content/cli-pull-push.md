@@ -1,6 +1,30 @@
 # Pull & Push
 
-Pull secrets from WindKeep to local files or push local secrets to WindKeep.
+Synchronize secrets between WindKeep and local `.env` files. Pull downloads secrets to a file, while push uploads secrets from a file to WindKeep.
+
+---
+
+## Understanding Pull & Push
+
+### When to Use Pull
+
+- Setting up a new development environment
+- Creating backup files of your secrets
+- Working with tools that require `.env` files
+- Sharing environment-specific configurations with team members
+
+### When to Use Push
+
+- Migrating from `.env` files to WindKeep
+- Bulk importing secrets from another source
+- Synchronizing local changes to WindKeep
+
+### Important Notes
+
+- Pull and push operations work with your **active project**
+- Files are in standard `.env` format: `KEY=value`
+- Default file is `.env` if no file is specified
+- Default environment is `development` if not specified
 
 ---
 
@@ -10,9 +34,13 @@ Pull secrets from WindKeep to local files or push local secrets to WindKeep.
 
 Pull secrets from your active project in WindKeep and save to a local file.
 
+**Arguments:**
+
+- `OUTPUT_FILE` - File to save secrets to (optional, default: `.env`)
+
 **Flags:**
 
-- `-e, --env`: Environment to pull (dev/development, staging, prod/production) - default: development
+- `-e, --env` - Environment to pull (dev/development, staging, prod/production) - default: development
 
 **Examples:**
 
@@ -30,9 +58,13 @@ windkeep pull prod.env -e production
 
 Push secrets from a local file to your active project.
 
+**Arguments:**
+
+- `INPUT_FILE` - File to read secrets from (optional, default: `.env`)
+
 **Flags:**
 
-- `-e, --env`: Environment to push to (dev/development, staging, prod/production) - default: development
+- `-e, --env` - Environment to push to (dev/development, staging, prod/production) - default: development
 
 **Examples:**
 
