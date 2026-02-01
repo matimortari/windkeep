@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { updateMemberRoleSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
@@ -68,6 +69,9 @@ export default defineEventHandler(async (event) => {
       orgName: updatedMembership.org.name,
     },
   })
+
+  // Invalidate cache for affected user's data
+  await deleteCached(CacheKeys.userData(memberId))
 
   return { updatedMembership }
 })

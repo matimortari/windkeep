@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { createAuditLog, getUserFromSession } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { createOrgSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
@@ -55,6 +56,9 @@ export default defineEventHandler(async (event) => {
       creatorEmail: user.email,
     },
   })
+
+  // Invalidate cache for user data
+  await deleteCached(CacheKeys.userData(user.id))
 
   return { organization }
 })

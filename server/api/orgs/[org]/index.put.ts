@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { updateOrgSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
@@ -47,6 +48,9 @@ export default defineEventHandler(async (event) => {
       changes: Object.fromEntries(Object.entries(result.data).map(([key, value]) => [key, { from: existingOrg?.[key], to: value }])),
     },
   })
+
+  // Invalidate cache for org data
+  await deleteCached(CacheKeys.orgData(user.id, orgId))
 
   return { updatedOrg }
 })
