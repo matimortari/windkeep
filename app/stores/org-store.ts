@@ -16,6 +16,7 @@ export const useOrgStore = defineStore("org", () => {
     removeOrgMember: null,
     createInvite: null,
     acceptInvite: null,
+    transferOrgOwnership: null,
   })
 
   const orgMembers = computed(() => activeOrg.value?.memberships ?? [])
@@ -91,6 +92,25 @@ export const useOrgStore = defineStore("org", () => {
     catch (err: any) {
       errors.value.updateOrg = err.data?.message || "Failed to update organization"
       console.error("updateOrg error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
+  async function transferOrgOwnership(orgId: string, data: { newOwnerId: string }) {
+    loading.value = true
+    errors.value.transferOrgOwnership = null
+
+    try {
+      const res = await $fetch(`/api/orgs/${orgId}/transfer-ownership`, { method: "POST", body: data, credentials: "include" })
+      await getOrg(orgId)
+      return res
+    }
+    catch (err: any) {
+      errors.value.transferOrgOwnership = err.data?.message || "Failed to transfer organization ownership"
+      console.error("transferOrgOwnership error:", err)
       throw err
     }
     finally {
@@ -206,6 +226,7 @@ export const useOrgStore = defineStore("org", () => {
     getOrg,
     createOrg,
     updateOrg,
+    transferOrgOwnership,
     deleteOrg,
     updateOrgMember,
     removeOrgMember,
