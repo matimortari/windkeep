@@ -202,7 +202,7 @@ Uploads and updates the authenticated user's profile image. Replaces the existin
 
 > **DELETE** `/api/user`
 
-Deletes the authenticated user's account. Also deletes any organizations where the user is the sole owner. This action cannot be undone.
+Deletes the authenticated user's account. Also deletes any organizations where the user is the sole owner with no other members. If the user is the sole owner of organizations that have other members, the user must transfer ownership or delete those organizations before deleting their account. This action cannot be undone.
 
 **Response:**
 
@@ -390,7 +390,7 @@ Updates a member's role in the organization. Only owners and admins can update m
 
 > **DELETE** `/api/orgs/{org}/members/{member}`
 
-Removes a member from the organization. Members can remove themselves (leave the organization). Only owners and admins can remove other members. Cannot remove organization owners.
+Removes a member from the organization. Members can remove themselves (leave the organization). Only owners and admins can remove other members. If other members exist, organization owners must transfer ownership. If the owner is the last remaining member, they can leave and the organization will be deleted.
 
 **Route Parameters**:
 
@@ -470,6 +470,47 @@ Accepts an invitation to join an organization. Adds the authenticated user to th
     "org": {
       // ... Organization details
     },
+    "user": {
+      // ... User details
+    }
+  }
+}
+```
+
+#### Transfer Organization Ownership
+
+> **POST** `/api/orgs/{org}/transfer-ownership`
+
+Transfers organization ownership to another member. Only the current organization owner can perform this action. The current owner will be demoted to the admin role, and the specified member will become the new owner.
+
+**Route Parameters**:
+
+- `org`: Organization ID (required).
+
+**Request Body**:
+
+```json
+{
+  "newOwnerId": "string" // Required: user ID of the member who will become the new owner
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Ownership transferred successfully",
+  "previousOwner": {
+    "userId": "string",
+    "role": "ADMIN",
+    "user": {
+      // ... User details
+    }
+  },
+  "newOwner": {
+    "userId": "string",
+    "role": "OWNER",
     "user": {
       // ... User details
     }
@@ -636,14 +677,13 @@ Retrieves all projects the authenticated user has access to, including their org
 
 > **POST** `/api/projects`
 
-Creates a new project in an organization. Only organization owners and admins can create projects. The authenticated user becomes the project owner.
+Creates a new project in an organization. Only organization owners and admins can create projects. The authenticated user becomes the project owner. The project slug is automatically generated from the project name.
 
 **Request Body**:
 
 ```json
 {
   "name": "string", // Required: 3-50 characters
-  "slug": "string", // Optional: 3-50 characters, lowercase letters, numbers, and hyphens only
   "description": "string", // Optional: max 255 characters
   "orgId": "string" // Required: organization ID where the project will be created
 }

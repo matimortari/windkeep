@@ -14,6 +14,7 @@ export const useAuditStore = defineStore("audit", () => {
   const auditActions = computed(() => [
     { label: "Organization Created", value: "CREATE.ORG" },
     { label: "Organization Updated", value: "UPDATE.ORG" },
+    { label: "Organization Ownership Transferred", value: "TRANSFER.ORG_OWNERSHIP" },
     { label: "Organization Invite Accepted", value: "ACCEPT.ORG_INVITE" },
     { label: "Organization Invite Created", value: "CREATE.ORG_INVITE" },
     { label: "Organization Member Removed", value: "REMOVE.ORG_MEMBER" },
