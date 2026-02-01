@@ -60,9 +60,9 @@ export default defineEventHandler(async (event) => {
     resource: "organization_member",
     description: `Updated ${updatedMembership.user.name} (${updatedMembership.user.email}) role from ${targetRole.role} to ${updatedMembership.role} in organization "${updatedMembership.org.name}"`,
     metadata: {
-      userId: updatedMembership.user.id,
-      userEmail: updatedMembership.user.email,
-      userName: updatedMembership.user.name,
+      memberId: updatedMembership.user.id,
+      memberName: updatedMembership.user.name,
+      memberEmail: updatedMembership.user.email,
       oldRole: targetRole.role,
       newRole: updatedMembership.role,
       orgId: updatedMembership.org.id,

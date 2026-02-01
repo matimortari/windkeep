@@ -80,7 +80,6 @@ export default defineEventHandler(async (event) => {
       projectName: secret.project.name,
       orgId: secret.project.org.id,
       orgName: secret.project.org.name,
-      environmentCount: secret.values.length,
       environments: secret.values.map(v => v.environment),
     },
   })

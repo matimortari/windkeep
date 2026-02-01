@@ -56,11 +56,10 @@ export default defineEventHandler(async (event) => {
     resource: "organization_invite",
     description: `Created invite link for organization "${invitation.org.name}"`,
     metadata: {
+      inviteId: invitation.id,
       orgId: invitation.org.id,
       orgName: invitation.org.name,
-      invitedById: invitation.invitedBy.id,
       expiresAt: invitation.expiresAt.toISOString(),
-      tokenPrefix: token.substring(0, 8),
     },
   })
 

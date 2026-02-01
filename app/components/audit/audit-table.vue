@@ -124,7 +124,49 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
     return "{}"
   }
 
-  return JSON.stringify(metadata, null, 2)
+  const keyOrder = [
+    "secretId",
+    "secretKey",
+    "memberId",
+    "memberName",
+    "memberEmail",
+    "memberRole",
+    "inviteId",
+    "userId",
+    "userName",
+    "userEmail",
+    "projectId",
+    "projectName",
+    "orgId",
+    "orgName",
+    "oldName",
+    "newName",
+    "oldSlug",
+    "oldRole",
+    "newRole",
+    "descriptionChanged",
+    "nameChanged",
+    "environmentCount",
+    "environments",
+    "secretsDeleted",
+    "membersRemoved",
+    "valuesDeleted",
+    "expiresAt",
+  ]
+
+  const sortedMetadata: Record<string, any> = {}
+  for (const key of keyOrder) {
+    if (key in metadata) {
+      sortedMetadata[key] = metadata[key]
+    }
+  }
+  for (const key of Object.keys(metadata)) {
+    if (!(key in sortedMetadata)) {
+      sortedMetadata[key] = metadata[key]
+    }
+  }
+
+  return JSON.stringify(sortedMetadata, null, 2)
 }
 </script>
 

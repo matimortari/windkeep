@@ -20,11 +20,13 @@ export default defineEventHandler(async (event) => {
 
   const existingProject = await db.project.findUnique({
     where: { id: projectId },
-    select: Object.keys(result.data).reduce((acc, key) => {
-      acc[key] = true
-      return acc
-    }, {} as Record<string, true>),
-  }) as Record<string, unknown> | null
+    select: {
+      name: true,
+      slug: true,
+      description: true,
+      orgId: true,
+    },
+  })
   if (!existingProject) {
     throw createError({ status: 404, statusText: "Project not found" })
   }
@@ -33,7 +35,7 @@ export default defineEventHandler(async (event) => {
   if (result.data.name || result.data.slug) {
     const projectWithConflict = await db.project.findFirst({
       where: {
-        orgId: existingProject.orgId as string,
+        orgId: existingProject.orgId,
         OR: [
           result.data.name ? { name: result.data.name } : {},
           result.data.slug ? { slug: result.data.slug } : {},
@@ -56,9 +58,16 @@ export default defineEventHandler(async (event) => {
     include: { org: true },
   })
 
-  const changes = Object.entries(result.data).map(([key, newValue]) => {
-    return `${key} from "${existingProject[key]}" to "${newValue}"`
-  })
+  const changes = []
+  if (result.data.name && result.data.name !== existingProject.name) {
+    changes.push(`name to "${result.data.name}"`)
+  }
+  if (result.data.slug && result.data.slug !== existingProject.slug) {
+    changes.push(`slug to "${result.data.slug}"`)
+  }
+  if (result.data.description !== undefined && result.data.description !== existingProject.description) {
+    changes.push(`description`)
+  }
 
   await createAuditLog({
     event,
@@ -67,16 +76,13 @@ export default defineEventHandler(async (event) => {
     projectId,
     action: "UPDATE.PROJECT",
     resource: "project",
-    description: `Updated project ${changes.join(", ")}`,
+    description: `Updated project "${updatedProject.name}"${changes.length ? ` (${changes.join(", ")})` : ""}`,
     metadata: {
       projectId,
       projectName: updatedProject.name,
-      changes: Object.fromEntries(
-        Object.entries(result.data).map(([key, value]) => [
-          key,
-          { from: existingProject[key], to: value },
-        ]),
-      ),
+      oldName: existingProject.name !== updatedProject.name ? existingProject.name : undefined,
+      oldSlug: existingProject.slug !== updatedProject.slug ? existingProject.slug : undefined,
+      descriptionChanged: result.data.description !== undefined && result.data.description !== existingProject.description,
       orgId: updatedProject.org.id,
       orgName: updatedProject.org.name,
     },
