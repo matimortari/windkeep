@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, CacheTTL, getCached, setCached } from "#server/utils/redis"
 import { getAuditLogsSchema } from "#shared/schemas/audit-schema"
 
 export default defineEventHandler(async (event) => {
@@ -31,6 +32,19 @@ export default defineEventHandler(async (event) => {
   const limit = result.data.limit
   const offset = (page - 1) * limit
   const where: any = { orgId }
+
+  const filterHash = JSON.stringify({
+    projectId: result.data.projectId,
+    action: result.data.action,
+    userId: result.data.userId,
+    startDate: result.data.startDate,
+    endDate: result.data.endDate,
+  })
+  const cacheKey = CacheKeys.orgAuditLogs(orgId, page, filterHash)
+  const cached = await getCached<any>(cacheKey)
+  if (cached) {
+    return cached
+  }
 
   if (result.data.projectId) {
     where.projectId = result.data.projectId
@@ -123,7 +137,7 @@ export default defineEventHandler(async (event) => {
 
   const actions = actionsResult.map(log => log.action)
 
-  return {
+  const response = {
     auditLogs,
     pagination: {
       page,
@@ -133,10 +147,10 @@ export default defineEventHandler(async (event) => {
       hasNext: page < totalPages,
       hasPrev: page > 1,
     },
-    filters: {
-      users,
-      projects,
-      actions,
-    },
+    filters: { users, projects, actions },
   }
+
+  await setCached(cacheKey, response, CacheTTL.SHORT)
+
+  return response
 })

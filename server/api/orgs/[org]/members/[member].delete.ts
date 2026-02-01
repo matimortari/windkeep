@@ -1,5 +1,6 @@
 import db from "#server/utils/db"
 import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, deleteCached } from "#server/utils/redis"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -72,6 +73,9 @@ export default defineEventHandler(async (event) => {
       orgName: targetRole.org.name,
     },
   })
+
+  // Invalidate cache for affected user's data
+  await deleteCached(CacheKeys.userData(memberId))
 
   return { success: true, message: "Member removed successfully" }
 })

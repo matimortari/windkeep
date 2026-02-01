@@ -1,6 +1,7 @@
 import db from "#server/utils/db"
 import { decrypt } from "#server/utils/encryption"
 import { getUserFromSession, requireRole } from "#server/utils/helpers"
+import { CacheKeys, CacheTTL, getCached, setCached } from "#server/utils/redis"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -10,6 +11,13 @@ export default defineEventHandler(async (event) => {
   }
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
+
+  // Try to get from cache first
+  const cacheKey = CacheKeys.projectSecrets(projectId)
+  const cached = await getCached<any>(cacheKey)
+  if (cached) {
+    return { decryptedSecrets: cached }
+  }
 
   const secrets = await db.secret.findMany({
     where: { projectId },
@@ -33,6 +41,8 @@ export default defineEventHandler(async (event) => {
       value: decrypt(val.value),
     })),
   }))
+
+  await setCached(cacheKey, decryptedSecrets, CacheTTL.SHORT)
 
   return { decryptedSecrets }
 })
