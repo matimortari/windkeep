@@ -69,8 +69,9 @@ export default defineEventHandler(async (event) => {
     where: { id: secretId },
   })
 
-  // Invalidate cache for project secrets
+  // Invalidate cache for project secrets and user projects list
   await deleteCached(CacheKeys.projectSecrets(projectId))
+  await deleteCached(CacheKeys.userProjects(user.id))
 
   return { success: true, message: `Secret deleted successfully` }
 })

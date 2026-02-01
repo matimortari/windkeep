@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
-	"text/tabwriter"
 
+	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -61,26 +61,28 @@ var projectsListCmd = &cobra.Command{
 		}
 
 		if len(orgProjects) == 0 {
-			fmt.Printf("No projects found in '%s'. Create one with 'windkeep projects create'\n", activeOrg.Org.Name)
+			ui.PrintWarning("No projects found in '%s'.", activeOrg.Org.Name)
+			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep projects create"))
 			return nil
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tNAME\tSLUG\tORGANIZATION\tSECRETS")
+		table := ui.CreateTable([]string{"ID", "Name", "Slug", "Organization", "Secrets"})
+
 		for _, proj := range orgProjects {
 			orgName := "N/A"
 			if proj.Org != nil {
 				orgName = proj.Org.Name
 			}
-			secretsCount := len(proj.Secrets)
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\n",
+			secretsCount := fmt.Sprintf("%d", len(proj.Secrets))
+			table.Append([]string{
 				proj.ID,
 				proj.Name,
 				proj.Slug,
 				orgName,
-				secretsCount)
+				secretsCount,
+			})
 		}
-		w.Flush()
+		table.Render()
 
 		return nil
 	},
@@ -120,13 +122,13 @@ var projectsCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to create project: %w", err)
 		}
 
-		fmt.Printf("✓ Project '%s' created successfully (slug: %s)\n", project.Name, project.Slug)
+		ui.PrintSuccess("Project '%s' created (slug: %s)", ui.Highlight(project.Name), ui.Info(project.Slug))
 
 		cfg.ActiveProjectID = project.ID
 		cfg.ActiveProjectSlug = project.Slug
 		cfg.ActiveProjectName = project.Name
 		if err := cfg.Save(cfgFile); err != nil {
-			fmt.Printf("Warning: Failed to save active project to config: %v\n", err)
+			ui.PrintWarning("Failed to save active project to config: %v", err)
 		}
 
 		return nil
@@ -136,10 +138,9 @@ var projectsCreateCmd = &cobra.Command{
 var projectsSwitchCmd = &cobra.Command{
 	Use:   "switch [PROJECT_SLUG]",
 	Short: "Switch to a different project",
-	Long:  `Set the active project for future commands.`,
-	Args:  cobra.ExactArgs(1),
+	Long:  `Set the active project for future commands. If no slug is provided, shows an interactive selector.`,
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		projectSlug := args[0]
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
 		projects, err := client.GetProjects()
@@ -147,16 +148,46 @@ var projectsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("failed to get projects: %w", err)
 		}
 
-		var selectedProject *api.Project
-		for _, proj := range projects {
-			if proj.Slug == projectSlug {
-				selectedProject = &proj
-				break
-			}
+		if len(projects) == 0 {
+			ui.PrintWarning("No projects found.")
+			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep projects create"))
+			return nil
 		}
 
-		if selectedProject == nil {
-			return fmt.Errorf("project not found or you don't have access to it")
+		var selectedProject *api.Project
+
+		// Interactive mode if no arg provided
+		if len(args) == 0 {
+			templates := &promptui.SelectTemplates{
+				Label:    "{{ . }}?",
+				Active:   "▸ {{ .Name | cyan }} ({{ .Slug | yellow }})",
+				Inactive: "  {{ .Name | white }} ({{ .Slug | faint }})",
+				Selected: "{{ .Name | green | bold }}",
+			}
+
+			prompt := promptui.Select{
+				Label:     "Select Project",
+				Items:     projects,
+				Templates: templates,
+			}
+
+			idx, _, err := prompt.Run()
+			if err != nil {
+				return fmt.Errorf("selection cancelled")
+			}
+			selectedProject = &projects[idx]
+		} else {
+			projectSlug := args[0]
+			for _, proj := range projects {
+				if proj.Slug == projectSlug {
+					selectedProject = &proj
+					break
+				}
+			}
+
+			if selectedProject == nil {
+				return fmt.Errorf("project not found or you don't have access to it")
+			}
 		}
 
 		cfg.ActiveProjectID = selectedProject.ID
@@ -167,7 +198,7 @@ var projectsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("failed to save config: %w", err)
 		}
 
-		fmt.Printf("✓ Switched to project '%s' (slug: %s)\n", selectedProject.Name, selectedProject.Slug)
+		ui.PrintSuccess("Switched to project '%s' (slug: %s)", ui.Highlight(selectedProject.Name), ui.Info(selectedProject.Slug))
 		return nil
 	},
 }
@@ -223,7 +254,7 @@ var projectsUpdateCmd = &cobra.Command{
 			return fmt.Errorf("failed to update project: %w", err)
 		}
 
-		fmt.Printf("✓ Project '%s' updated successfully\n", project.Name)
+		ui.PrintSuccess("Project '%s' updated", ui.Highlight(project.Name))
 
 		// Update config if it's the active project
 		if cfg.ActiveProjectSlug == projectSlug {
@@ -231,7 +262,7 @@ var projectsUpdateCmd = &cobra.Command{
 			cfg.ActiveProjectSlug = project.Slug
 			cfg.ActiveProjectName = project.Name
 			if err := cfg.Save(cfgFile); err != nil {
-				fmt.Printf("Warning: Failed to update config: %v\n", err)
+				ui.PrintWarning("Failed to update config: %v", err)
 			}
 		}
 
@@ -249,7 +280,15 @@ var projectsDeleteCmd = &cobra.Command{
 		confirm, _ := cmd.Flags().GetBool("confirm")
 
 		if !confirm {
-			return fmt.Errorf("this action is destructive. Use --confirm flag to proceed")
+			prompt := promptui.Prompt{
+				Label:     fmt.Sprintf("Delete project '%s' and all its secrets", projectSlug),
+				IsConfirm: true,
+			}
+			_, err := prompt.Run()
+			if err != nil {
+				ui.PrintInfo("Deletion cancelled")
+				return nil
+			}
 		}
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
@@ -276,7 +315,7 @@ var projectsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete project: %w", err)
 		}
 
-		fmt.Println("✓ Project deleted successfully")
+		ui.PrintSuccess("Project deleted")
 
 		// Clear from config if it was active
 		if cfg.ActiveProjectSlug == projectSlug {
@@ -284,7 +323,7 @@ var projectsDeleteCmd = &cobra.Command{
 			cfg.ActiveProjectSlug = ""
 			cfg.ActiveProjectName = ""
 			if err := cfg.Save(cfgFile); err != nil {
-				fmt.Printf("Warning: Failed to update config: %v\n", err)
+				ui.PrintWarning("Failed to update config: %v", err)
 			}
 		}
 

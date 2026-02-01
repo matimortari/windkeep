@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +17,7 @@ var logoutCmd = &cobra.Command{
 			return fmt.Errorf("failed to logout: %w", err)
 		}
 
-		fmt.Println("✓ Successfully logged out")
+		ui.PrintSuccess("Successfully logged out")
 		return nil
 	},
 }

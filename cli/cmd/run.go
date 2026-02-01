@@ -8,6 +8,7 @@ import (
 
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -76,7 +77,7 @@ with secrets without needing a .env file.`,
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
 		if len(secrets) == 0 {
-			fmt.Printf("No secrets found in project '%s'\n", projectName)
+			ui.PrintWarning("No secrets found in project '%s'", projectName)
 		}
 
 		// Build environment variables map
@@ -93,13 +94,13 @@ with secrets without needing a .env file.`,
 		}
 
 		if secretsInjected == 0 {
-			fmt.Printf("No secrets found for environment '%s'\n", env)
+			ui.PrintWarning("No secrets found for environment '%s'", env)
 		} else {
 			verbose, _ := cmd.Flags().GetBool("verbose")
 			if verbose {
-				fmt.Printf("✓ Injecting %d secret(s) from environment '%s'\n", secretsInjected, env)
+				ui.PrintSuccess("Injecting %d secret(s) from %s environment", secretsInjected, string(env))
 				for key := range envVars {
-					fmt.Printf("  • %s\n", key)
+					ui.PrintInfo("%s", key)
 				}
 				fmt.Println()
 			}

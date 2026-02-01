@@ -13,16 +13,17 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "windkeep",
-	Short: "WindKeep CLI - Manage your secrets from the terminal",
+	Use:     "windkeep",
+	Aliases: []string{"wk"},
+	Short:   "WindKeep CLI - Manage your secrets from the terminal",
 	Long: `WindKeep CLI is a command-line interface for managing secrets,
 organizations, and projects in your WindKeep instance.
 
 Securely store, retrieve, and manage sensitive information across
 multiple environments with ease.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// Skip config loading for login and init commands
-		if cmd.Name() == "login" || cmd.Name() == "init" {
+		// Skip config loading for login, logout, and init commands
+		if cmd.Name() == "login" || cmd.Name() == "logout" || cmd.Name() == "init" {
 			return nil
 		}
 
@@ -49,11 +50,11 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)
-	rootCmd.AddCommand(secretsCmd)
 	rootCmd.AddCommand(orgsCmd)
 	rootCmd.AddCommand(projectsCmd)
+	rootCmd.AddCommand(secretsCmd)
 	rootCmd.AddCommand(runCmd)
-	rootCmd.AddCommand(whoamiCmd)
 	rootCmd.AddCommand(pullCmd)
 	rootCmd.AddCommand(pushCmd)
+	rootCmd.AddCommand(whoamiCmd)
 }
