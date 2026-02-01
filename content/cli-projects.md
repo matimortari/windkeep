@@ -79,12 +79,16 @@ Set a project as your active project for future commands.
 
 **Arguments:**
 
-- `PROJECT_SLUG` - The slug of the project to switch to (required)
+- `PROJECT_SLUG` - The slug of the project to switch to (optional - if not provided, shows interactive selector)
 
 **Example:**
 
 ```bash
+# Switch to a specific project by slug
 windkeep projects switch api-service
+
+# Or use interactive mode (no argument)
+windkeep projects switch
 ```
 
 **Output:**
@@ -93,7 +97,7 @@ windkeep projects switch api-service
 ✓ Switched to project 'API Service' (slug: api-service)
 ```
 
-> **Tip:** Use `windkeep projects list` to see all available projects.
+> **Tip:** Use `windkeep projects list` to see all available projects and their slugs.
 
 ---
 
@@ -132,7 +136,7 @@ windkeep projects update my-project \
 
 ---
 
-### `windkeep projects delete [PROJECT_SLUG] --confirm`
+### `windkeep projects delete [PROJECT_SLUG]`
 
 Delete a project and all its secrets. **This action cannot be undone.**
 
@@ -142,11 +146,15 @@ Delete a project and all its secrets. **This action cannot be undone.**
 
 **Flags:**
 
-- `--confirm` - Required flag to confirm deletion (required)
+- `--confirm` - Skip confirmation prompt (optional)
 
 **Example:**
 
 ```bash
+# With interactive confirmation
+windkeep projects delete old-project
+
+# Skip confirmation prompt
 windkeep projects delete old-project --confirm
 ```
 
