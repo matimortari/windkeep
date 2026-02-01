@@ -21,14 +21,26 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, statusText: "Member not found in organization" })
   }
 
-  // Prevent removing OWNER users
-  if (targetRole.role === "OWNER") {
-    throw createError({ status: 403, statusText: "Cannot remove organization owners" })
-  }
-
   // Check permissions for non-self removal
   if (memberId !== user.id) {
     await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
+    if (targetRole.role === "OWNER") {
+      throw createError({ status: 403, statusText: "Cannot remove organization owners. Use transfer ownership instead." })
+    }
+  }
+  else if (targetRole.role === "OWNER") {
+    const allMembers = await db.orgMembership.findMany({
+      where: { orgId },
+    })
+
+    const otherMembers = allMembers.filter(m => m.userId !== memberId)
+    if (otherMembers.length === 0) {
+      await db.organization.delete({ where: { id: orgId } })
+      await deleteCached(CacheKeys.userData(memberId))
+      return { success: true, message: "Left organization. Organization was deleted as you were the last member." }
+    }
+
+    throw createError({ status: 400, statusText: "Cannot leave organization as owner. Please transfer ownership to another member first, or delete the organization." })
   }
 
   // Ensure no dangling active org
