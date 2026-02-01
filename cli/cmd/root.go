@@ -10,6 +10,7 @@ import (
 var (
 	cfgFile string
 	cfg     *config.Config
+	Version = "dev"
 )
 
 var rootCmd = &cobra.Command{
@@ -22,7 +23,6 @@ organizations, and projects in your WindKeep instance.
 Securely store, retrieve, and manage sensitive information across
 multiple environments with ease.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// Skip config loading for login, logout, and init commands
 		if cmd.Name() == "login" || cmd.Name() == "logout" || cmd.Name() == "init" {
 			return nil
 		}
@@ -46,6 +46,7 @@ func Execute() error {
 }
 
 func init() {
+	rootCmd.Version = Version
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.windkeep/config.yaml)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	rootCmd.AddCommand(loginCmd)
