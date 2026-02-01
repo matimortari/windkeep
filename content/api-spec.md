@@ -202,7 +202,7 @@ Uploads and updates the authenticated user's profile image. Replaces the existin
 
 > **DELETE** `/api/user`
 
-Permanently deletes the authenticated user's account. Also deletes any organizations where the user is the sole owner.
+Deletes the authenticated user's account. Also deletes any organizations where the user is the sole owner. This action cannot be undone.
 
 **Response:**
 
@@ -410,7 +410,7 @@ Removes a member from the organization. Members can remove themselves (leave the
 
 > **POST** `/api/orgs/{org}/invite/create`
 
-Creates an invitation link for new members to join the organization. Only owners and admins can create invitations. Invitations expire after 12 hours.
+Creates an invitation link for new members to join the organization. Only owners and admins can create invitations.
 
 **Route Parameters**:
 
@@ -441,7 +441,7 @@ Creates an invitation link for new members to join the organization. Only owners
 
 > **POST** `/api/orgs/{org}/invite/accept`
 
-Accepts an invitation to join an organization. Adds the authenticated user as a member with the member role.
+Accepts an invitation to join an organization. Adds the authenticated user to the organization with the member role.
 
 **Route Parameters**:
 
@@ -747,7 +747,7 @@ Permanently deletes a project. Only project owners can perform this action. All 
 
 > **POST** `/api/projects/{project}/members`
 
-Adds a new member to a project. Only project owners and admins can add members. The user must already be a member of the organization. Users can only be added as admins or members (the owner role is assigned during project creation only).
+Adds a new member to a project. Only project owners and admins can add members. The user must already be a member of the organization. Users can only be added as members or admins (the owner role is assigned during project creation only).
 
 **Route Parameters**:
 
@@ -889,7 +889,7 @@ Retrieves all secrets for a project with their decrypted values. All project mem
 
 > **POST** `/api/projects/{project}/secrets`
 
-Creates a new secret in a project. Only project owners and admins can create secrets. Secret keys must be uppercase with numbers and underscores only.
+Creates a new secret in a project. Only project owners and admins can create secrets.
 
 **Route Parameters**:
 
@@ -944,7 +944,7 @@ Creates a new secret in a project. Only project owners and admins can create sec
 
 > **PUT** `/api/projects/{project}/secrets/{secret}`
 
-Updates a secret's description or environment values. Only project owners and admins can update secrets. Values are upserted (created if not exist, updated if exist).
+Updates a secret's description or environment values. Only project owners and admins can update secrets.
 
 **Route Parameters**:
 
