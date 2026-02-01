@@ -17,10 +17,23 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  // Generate invitation token
-  const token = generateToken()
+  // Generate unique invitation token with retry on collision
+  let token = ""
+  let attempts = 0
+  while (attempts < 5) {
+    token = generateToken()
+    const existing = await db.invitation.findUnique({ where: { token } })
+    if (!existing) {
+      break
+    }
+    attempts++
+  }
+  if (attempts === 5) {
+    throw createError({ status: 500, statusText: "Failed to generate unique invitation token" })
+  }
+
   const expiresAt = new Date()
-  expiresAt.setHours(expiresAt.getHours() + 12) // 12 hours expiration
+  expiresAt.setHours(expiresAt.getHours() + 12) // 12 hours
 
   const invitation = await db.invitation.create({
     data: {
