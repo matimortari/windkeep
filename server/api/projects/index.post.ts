@@ -14,24 +14,23 @@ export default defineEventHandler(async (event) => {
 
   await requireRole(user.id, { type: "organization", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
 
-  // Check if project with same name or slug already exists in this organization
-  const conflictingProject = await db.project.findFirst({
-    where: {
-      orgId: result.data.orgId,
-      OR: [
-        { name: result.data.name },
-        { slug: result.data.slug },
-      ],
-    },
-  })
+  const slug = result.data.name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/(^-+)|(-+$)/g, "")
+    .substring(0, 50)
+
+  const conflictingProject = await db.project.findFirst({ where: { orgId: result.data.orgId, name: result.data.name } })
   if (conflictingProject) {
-    throw createError({ status: 409, statusText: "A project with this name or slug already exists in the organization" })
+    throw createError({ status: 409, statusText: "A project with this name already exists in the organization" })
   }
 
   const newProject = await db.project.create({
     data: {
       name: result.data.name,
-      slug: result.data.slug!,
+      slug,
       description: result.data.description ?? null,
       orgId: result.data.orgId,
       memberships: {

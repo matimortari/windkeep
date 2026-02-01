@@ -7,12 +7,6 @@
       </div>
 
       <div class="flex flex-col items-start gap-1">
-        <label for="slug" class="text-sm font-semibold">Project Slug</label>
-        <input id="slug" v-model="form.slug" type="text" :placeholder="suggestedSlug">
-        <span class="text-xs text-muted-foreground">Lowercase alphanumeric with hyphens only.</span>
-      </div>
-
-      <div class="flex flex-col items-start gap-1">
         <label for="description" class="text-sm font-semibold">Description</label>
         <input id="description" v-model="form.description" type="text">
         <span class="text-xs text-muted-foreground">An optional description for your project.</span>
@@ -43,34 +37,18 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void
-  (e: "save", payload: { name: string, slug: string, description: string }): void
+  (e: "save", payload: { name: string, description: string }): void
 }>()
 
 const { errors } = storeToRefs(useProjectStore())
-const form = ref<{ name: string, slug: string, description: string }>({
+const form = ref<{ name: string, description: string }>({
   name: "",
-  slug: "",
   description: "",
-})
-
-const suggestedSlug = computed(() => {
-  if (!form.value.name) {
-    return "my-project"
-  }
-
-  return form.value.name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/(^-+)|(-+$)/g, "")
 })
 
 async function handleSubmit() {
   const payload = {
     name: form.value.name.trim(),
-    slug: form.value.slug.trim() || suggestedSlug.value,
     description: form.value.description.trim(),
   }
 
@@ -81,7 +59,6 @@ async function handleSubmit() {
 watch(() => props.isOpen, (open) => {
   if (open) {
     form.value.name = ""
-    form.value.slug = ""
     form.value.description = ""
   }
 }, { immediate: true })

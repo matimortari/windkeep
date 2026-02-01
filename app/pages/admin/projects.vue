@@ -102,14 +102,13 @@ function toggleSort() {
   setSort("name", sortDirection.value === "asc" ? "desc" : "asc")
 }
 
-async function handleCreateProject(payload: { name: string, slug: string, description: string }) {
+async function handleCreateProject(payload: { name: string, description: string }) {
   if (!activeOrg.value) {
     return
   }
 
   await projectStore.createProject({
     name: payload.name,
-    slug: payload.slug,
     description: payload.description || undefined,
     orgId: activeOrg.value.id,
   })
