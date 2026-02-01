@@ -1,7 +1,7 @@
 import db from "#server/utils/db"
 import { decrypt } from "#server/utils/encryption"
 import { getUserFromSession, requireRole } from "#server/utils/helpers"
-import { CacheKeys, CacheTTL, getCached, setCached } from "#server/utils/redis"
+import { CACHE_TTL, CacheKeys, getCached, setCached } from "#server/utils/redis"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     })),
   }))
 
-  await setCached(cacheKey, decryptedSecrets, CacheTTL.SHORT)
+  await setCached(cacheKey, decryptedSecrets, CACHE_TTL.SHORT)
 
   return { decryptedSecrets }
 })

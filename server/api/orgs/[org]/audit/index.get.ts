@@ -1,6 +1,6 @@
 import db from "#server/utils/db"
 import { getUserFromSession, requireRole } from "#server/utils/helpers"
-import { CacheKeys, CacheTTL, getCached, setCached } from "#server/utils/redis"
+import { CACHE_TTL, CacheKeys, getCached, setCached } from "#server/utils/redis"
 import { getAuditLogsSchema } from "#shared/schemas/audit-schema"
 
 export default defineEventHandler(async (event) => {
@@ -150,7 +150,7 @@ export default defineEventHandler(async (event) => {
     filters: { users, projects, actions },
   }
 
-  await setCached(cacheKey, response, CacheTTL.SHORT)
+  await setCached(cacheKey, response, CACHE_TTL.SHORT)
 
   return response
 })
