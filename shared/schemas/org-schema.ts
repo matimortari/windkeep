@@ -34,8 +34,13 @@ export const acceptInviteSchema = z.object({
     .transform(val => val.trim()),
 })
 
+export const transferOwnershipSchema = z.object({
+  newOwnerId: z.cuid(),
+})
+
 export type CreateOrgInput = z.infer<typeof createOrgSchema>
 export type UpdateOrgInput = z.infer<typeof updateOrgSchema>
 export type UpdateOrgMemberInput = z.infer<typeof updateMemberRoleSchema>
 export type CreateInviteInput = z.infer<typeof createInviteSchema>
 export type AcceptInviteInput = z.infer<typeof acceptInviteSchema>
+export type TransferOwnershipInput = z.infer<typeof transferOwnershipSchema>
