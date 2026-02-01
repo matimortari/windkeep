@@ -5,6 +5,7 @@ import (
 
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -19,8 +20,10 @@ var whoamiCmd = &cobra.Command{
 			return fmt.Errorf("failed to get user information: %w", err)
 		}
 
-		fmt.Printf("Name:  %s\n", user.Name)
-		fmt.Printf("Email: %s\n", user.Email)
+		ui.PrintInfo("User Information")
+		fmt.Printf("Name:  %s\n", ui.Highlight(user.Name))
+		fmt.Printf("Email: %s\n", ui.Info(user.Email))
+		fmt.Println()
 
 		var activeOrgName, activeOrgID string
 		for _, membership := range user.OrgMemberships {
@@ -31,24 +34,28 @@ var whoamiCmd = &cobra.Command{
 			}
 		}
 
+		ui.PrintInfo("Active Context")
 		if activeOrgID != "" {
-			fmt.Printf("Active Organization: %s (ID: %s)\n", activeOrgName, activeOrgID)
+			fmt.Printf("Organization: %s\n", ui.Highlight(activeOrgName))
+			fmt.Printf("ID:           %s\n", ui.Info(activeOrgID))
 		} else {
-			fmt.Println("Active Organization: None")
+			ui.PrintWarning("No active organization")
 		}
 
 		if cfg.ActiveProjectSlug != "" {
-			fmt.Printf("Active Project: %s (id: %s, slug: %s)\n", cfg.ActiveProjectName, cfg.ActiveProjectID, cfg.ActiveProjectSlug)
+			fmt.Printf("Project:      %s\n", ui.Highlight(cfg.ActiveProjectName))
+			fmt.Printf("Slug:         %s\n", ui.Info(cfg.ActiveProjectSlug))
 		} else {
-			fmt.Println("Active Project: None")
+			ui.PrintWarning("No active project")
 		}
+		fmt.Println()
 
 		configPath, err := config.GetConfigPath(cfgFile)
 		if err != nil {
 			return fmt.Errorf("failed to get config path: %w", err)
 		}
 
-		fmt.Printf("\nConfiguration file is located at %s\n", configPath)
+		fmt.Printf("Config: %s\n", configPath)
 
 		return nil
 	},

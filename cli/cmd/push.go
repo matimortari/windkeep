@@ -8,6 +8,7 @@ import (
 
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -63,9 +64,10 @@ var pushCmd = &cobra.Command{
 					},
 				},
 			})
-			if err := scanner.Err(); err != nil {
-				return fmt.Errorf("failed to parse .env file: %w", err)
-			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			return fmt.Errorf("failed to parse .env file: %w", err)
 		}
 
 		successCount := 0
@@ -87,13 +89,13 @@ var pushCmd = &cobra.Command{
 
 			_, err := client.CreateSecret(projectID, req)
 			if err != nil {
-				fmt.Printf("Warning: failed to push secret '%s': %v\n", secret.Key, err)
+				ui.PrintWarning("Failed to push secret '%s': %v", secret.Key, err)
 				continue
 			}
 			successCount++
 		}
 
-		fmt.Printf("Successfully pushed %d/%d secret(s) to %s environment\n", successCount, len(secrets), pushEnv)
+		ui.PrintSuccess("Pushed %d/%d secret(s) to %s environment", successCount, len(secrets), pushEnv)
 		return nil
 	},
 }

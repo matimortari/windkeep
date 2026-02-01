@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"text/tabwriter"
 
+	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -45,24 +45,25 @@ var orgsListCmd = &cobra.Command{
 		}
 
 		if len(user.OrgMemberships) == 0 {
-			fmt.Println("No organizations found. Create one with 'windkeep orgs create'")
+			ui.PrintWarning("No organizations found.")
+			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep orgs create"))
 			return nil
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tNAME\tROLE\tACTIVE")
+		table := ui.CreateTable([]string{"ID", "Name", "Role", "Active"})
 		for _, membership := range user.OrgMemberships {
 			active := ""
 			if membership.IsActive {
-				active = "✓"
+				active = ui.Success("✓")
 			}
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
+			table.Append([]string{
 				membership.OrgID,
 				membership.Org.Name,
-				membership.Role,
-				active)
+				string(membership.Role),
+				active,
+			})
 		}
-		w.Flush()
+		table.Render()
 
 		return nil
 	},
@@ -84,8 +85,8 @@ var orgsCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to create organization: %w", err)
 		}
 
-		fmt.Printf("✓ Organization '%s' created successfully (ID: %s)\n", org.Name, org.ID)
-		fmt.Printf("✓ Set '%s' as active organization\n", org.Name)
+		ui.PrintSuccess("Organization '%s' created (ID: %s)", ui.Highlight(org.Name), ui.Info(org.ID))
+		ui.PrintSuccess("Set '%s' as active organization", org.Name)
 
 		return nil
 	},
@@ -94,10 +95,9 @@ var orgsCreateCmd = &cobra.Command{
 var orgsSwitchCmd = &cobra.Command{
 	Use:   "switch [ORG_ID]",
 	Short: "Switch to a different organization",
-	Long:  `Set the active organization for future commands.`,
-	Args:  cobra.ExactArgs(1),
+	Long:  `Set the active organization for future commands. If no ID is provided, shows an interactive selector.`,
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		orgID := args[0]
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
 		user, err := client.GetUser()
@@ -105,15 +105,47 @@ var orgsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("failed to get user: %w", err)
 		}
 
-		var found bool
-		for _, membership := range user.OrgMemberships {
-			if membership.OrgID == orgID {
-				found = true
-				break
-			}
+		if len(user.OrgMemberships) == 0 {
+			ui.PrintWarning("No organizations found.")
+			return nil
 		}
-		if !found {
-			return fmt.Errorf("organization not found or you are not a member")
+
+		var orgID string
+
+		// Interactive mode if no arg provided
+		if len(args) == 0 {
+			templates := &promptui.SelectTemplates{
+				Label:    "{{ . }}?",
+				Active:   "▸ {{ .Org.Name | cyan }} ({{ .Role | yellow }})",
+				Inactive: "  {{ .Org.Name | white }} ({{ .Role | faint }})",
+				Selected: "{{ .Org.Name | green | bold }}",
+			}
+
+			prompt := promptui.Select{
+				Label:     "Select Organization",
+				Items:     user.OrgMemberships,
+				Templates: templates,
+			}
+
+			idx, _, err := prompt.Run()
+			if err != nil {
+				return fmt.Errorf("selection cancelled")
+			}
+			orgID = user.OrgMemberships[idx].OrgID
+		} else {
+			orgID = args[0]
+
+			// Verify user has access
+			var found bool
+			for _, membership := range user.OrgMemberships {
+				if membership.OrgID == orgID {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return fmt.Errorf("organization not found or you are not a member")
+			}
 		}
 
 		org, err := client.GetOrganization(orgID)
@@ -125,10 +157,10 @@ var orgsSwitchCmd = &cobra.Command{
 		cfg.ActiveProjectSlug = ""
 		cfg.ActiveProjectName = ""
 		if err := cfg.Save(cfgFile); err != nil {
-			fmt.Printf("Warning: Failed to clear active project: %v\n", err)
+			ui.PrintWarning("Failed to clear active project: %v", err)
 		}
 
-		fmt.Printf("✓ Switched to organization '%s'\n", org.Name)
+		ui.PrintSuccess("Switched to organization '%s'", ui.Highlight(org.Name))
 		return nil
 	},
 }
@@ -157,7 +189,7 @@ var orgsUpdateCmd = &cobra.Command{
 			return fmt.Errorf("failed to update organization: %w", err)
 		}
 
-		fmt.Printf("✓ Organization updated to '%s'\n", org.Name)
+		ui.PrintSuccess("Organization updated to '%s'", ui.Highlight(org.Name))
 		return nil
 	},
 }
