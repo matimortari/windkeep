@@ -7,6 +7,7 @@ import (
 
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -57,7 +58,7 @@ var pullCmd = &cobra.Command{
 			return fmt.Errorf("failed to write file: %w", err)
 		}
 
-		fmt.Printf("Pulled %s secrets to %s\n", pullEnv, outputFile)
+		ui.PrintSuccess("Pulled %s secrets to %s", ui.Info(pullEnv), ui.Highlight(outputFile))
 		return nil
 	},
 }

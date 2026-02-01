@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"strings"
-	"text/tabwriter"
 
+	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
+	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -88,12 +88,12 @@ var secretsListCmd = &cobra.Command{
 		}
 
 		if len(secrets) == 0 {
-			fmt.Println("No secrets found. Create one with 'windkeep secrets create'")
+			ui.PrintWarning("No secrets found.")
+			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep secrets create"))
 			return nil
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "KEY\tENVIRONMENTS\tDESCRIPTION")
+		table := ui.CreateTable([]string{"Key", "Environments", "Description"})
 		for _, secret := range secrets {
 			var envs []string
 			for _, val := range secret.Values {
@@ -103,9 +103,13 @@ var secretsListCmd = &cobra.Command{
 			if secret.Description != nil {
 				desc = *secret.Description
 			}
-			fmt.Fprintf(w, "%s\t%s\t%s\n", secret.Key, strings.Join(envs, ", "), desc)
+			table.Append([]string{
+				secret.Key,
+				strings.Join(envs, ", "),
+				desc,
+			})
 		}
-		w.Flush()
+		table.Render()
 		return nil
 	},
 }
@@ -134,17 +138,19 @@ var secretsGetCmd = &cobra.Command{
 			return fmt.Errorf("secret '%s' not found", key)
 		}
 
-		fmt.Printf("Key: %s\n", found.Key)
+		ui.CyanBold.Printf("Key: %s\n", found.Key)
 		if found.Description != nil {
 			fmt.Printf("Description: %s\n", *found.Description)
 		}
-		fmt.Println("\nValues:")
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ENVIRONMENT\tVALUE")
+		fmt.Println()
+		table := ui.CreateTable([]string{"Environment", "Value"})
 		for _, val := range found.Values {
-			fmt.Fprintf(w, "%s\t%s\n", val.Environment, val.Value)
+			table.Append([]string{
+				string(val.Environment),
+				val.Value,
+			})
 		}
-		w.Flush()
+		table.Render()
 		return nil
 	},
 }
@@ -182,7 +188,7 @@ var secretsCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to create secret: %w", err)
 		}
 
-		fmt.Printf("✓ Secret '%s' created successfully\n", secret.Key)
+		ui.PrintSuccess("Secret '%s' created", ui.Highlight(secret.Key))
 		return nil
 	},
 }
@@ -255,7 +261,7 @@ var secretsSetCmd = &cobra.Command{
 			return fmt.Errorf("failed to update secret: %w", err)
 		}
 
-		fmt.Printf("✓ Secret '%s' updated successfully\n", key)
+		ui.PrintSuccess("Secret '%s' updated", ui.Highlight(key))
 		return nil
 	},
 }
@@ -270,7 +276,15 @@ var secretsDeleteCmd = &cobra.Command{
 		confirm, _ := cmd.Flags().GetBool("confirm")
 
 		if !confirm {
-			return fmt.Errorf("this action is destructive. Use --confirm flag to proceed")
+			prompt := promptui.Prompt{
+				Label:     fmt.Sprintf("Delete secret '%s' and all its values", key),
+				IsConfirm: true,
+			}
+			_, err := prompt.Run()
+			if err != nil {
+				ui.PrintInfo("Deletion cancelled")
+				return nil
+			}
 		}
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
@@ -294,7 +308,7 @@ var secretsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete secret: %w", err)
 		}
 
-		fmt.Printf("✓ Secret '%s' deleted successfully\n", key)
+		ui.PrintSuccess("Secret '%s' deleted", ui.Highlight(key))
 		return nil
 	},
 }
