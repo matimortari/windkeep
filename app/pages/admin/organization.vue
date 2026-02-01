@@ -84,9 +84,14 @@
 
       <!-- Organization Members List -->
       <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
-        <h5>
-          Organization Members
-        </h5>
+        <div class="flex items-center justify-between">
+          <h5>
+            Organization Members
+          </h5>
+          <p v-if="errors.transferOrgOwnership" class="text-danger">
+            {{ errors.transferOrgOwnership }}
+          </p>
+        </div>
 
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
           <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 last:border-b-0">
@@ -108,6 +113,9 @@
 
               <button class="btn" aria-label="Update Member Role" @click="orgUser.role !== 'OWNER' && handleUpdateMemberRole(orgUser.user.id || '', orgUser.role)">
                 <icon name="ph:floppy-disk" size="15" />
+              </button>
+              <button class="btn" aria-label="Transfer Ownership" title="Transfer Ownership" @click="handleTransferOwnership(orgUser.user.id || '')">
+                <icon name="ph:arrow-u-up-right" size="15" />
               </button>
               <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.user.id || '')">
                 <icon name="ph:x" size="15" />
@@ -280,6 +288,19 @@ async function handleRemoveMember(memberId: string) {
 
   await orgStore.removeOrgMember(activeOrg.value.id, memberId)
   await userStore.getUser()
+}
+
+async function handleTransferOwnership(newOwnerId: string) {
+  if (!activeOrg.value?.id) {
+    return
+  }
+  if (!confirm("Are you sure you want to transfer ownership to this member? You will be demoted to admin.")) {
+    return
+  }
+
+  await orgStore.transferOrgOwnership(activeOrg.value.id, { newOwnerId })
+  await userStore.getUser()
+  await orgStore.getOrg(activeOrg.value.id)
 }
 
 async function handleSubmit(index: number) {
