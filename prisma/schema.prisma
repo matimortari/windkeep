@@ -153,4 +153,6 @@ model AuditLog {
   @@index([orgId, createdAt])
   @@index([projectId, createdAt])
   @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@index([resource, createdAt])
 }
