@@ -51,9 +51,6 @@ export default defineEventHandler(async (event) => {
     metadata: {
       orgId: organization.id,
       orgName: organization.name,
-      creatorId: user.id,
-      creatorName: user.name,
-      creatorEmail: user.email,
     },
   })
 

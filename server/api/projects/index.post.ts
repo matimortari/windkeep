@@ -79,12 +79,8 @@ export default defineEventHandler(async (event) => {
     metadata: {
       projectId: newProject.id,
       projectName: newProject.name,
-      projectSlug: newProject.slug,
       orgId: newProject.org.id,
       orgName: newProject.org.name,
-      creatorId: user.id,
-      creatorEmail: user.email,
-      creatorName: user.name,
     },
   })
 
