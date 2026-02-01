@@ -63,12 +63,16 @@ Switch to a different organization as your active organization. This clears your
 
 **Arguments:**
 
-- `ORG_ID` - The ID of the organization to switch to (required)
+- `ORG_ID` - The ID of the organization to switch to (optional - if not provided, shows interactive selector)
 
 **Example:**
 
 ```bash
+# Switch to a specific organization by ID
 windkeep orgs switch cm789def012
+
+# Or use interactive mode (no argument)
+windkeep orgs switch
 ```
 
 **Output:**
@@ -78,23 +82,26 @@ windkeep orgs switch cm789def012
 ℹ Active project cleared (projects are organization-specific)
 ```
 
-> **Tip:** Use `windkeep orgs list` to see all available organizations.
+> **Tip:** Use `windkeep orgs list` to see all available organizations and their IDs.
 
 ---
 
-### `windkeep orgs update [ORG_ID] [NAME]`
+### `windkeep orgs update [NAME]`
 
-Update an organization's name. Requires OWNER or ADMIN role.
+Update your active organization's name. Requires OWNER or ADMIN role.
 
 **Arguments:**
 
-- `ORG_ID` - The ID of the organization to update (required)
 - `NAME` - The new name for the organization (required)
 
 **Example:**
 
 ```bash
-windkeep orgs update cm123abc456 "New Company Name"
+# First, switch to the organization you want to update
+windkeep orgs switch cm123abc456
+
+# Then update its name
+windkeep orgs update "New Company Name"
 ```
 
 ---
@@ -156,10 +163,14 @@ windkeep run --env prod npm start
 ### Renaming an Organization
 
 ```bash
+# List your organizations
 windkeep orgs list
 
+# Switch to the organization you want to rename
+windkeep orgs switch cm123abc456
+
 # Update the name
-windkeep orgs update cm123abc456 "Updated Company Name"
+windkeep orgs update "Updated Company Name"
 
 # Verify the change
 windkeep orgs list

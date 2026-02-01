@@ -186,7 +186,7 @@ windkeep secrets set JWT_SECRET \
 
 ---
 
-### `windkeep secrets delete [KEY] --confirm`
+### `windkeep secrets delete [KEY]`
 
 Delete a secret and all its values across all environments. **This action cannot be undone.**
 
@@ -196,11 +196,15 @@ Delete a secret and all its values across all environments. **This action cannot
 
 **Flags:**
 
-- `--confirm` - Required flag to confirm deletion (required)
+- `--confirm` - Skip confirmation prompt (optional)
 
 **Example:**
 
 ```bash
+# With interactive confirmation
+windkeep secrets delete OLD_API_KEY
+
+# Skip confirmation prompt
 windkeep secrets delete OLD_API_KEY --confirm
 ```
 

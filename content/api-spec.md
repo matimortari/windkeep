@@ -1,12 +1,38 @@
 # WindKeep API Specification
 
-This document provides documentation for the WindKeep API.
+This document provides comprehensive documentation for the WindKeep REST API, which is used by the WindKeep web application and CLI to manage organizations, projects, secrets, and user profiles. The WindKeep API is organized around REST principles with predictable resource-oriented URLs, JSON request/response bodies, and standard HTTP response codes.
 
 ## Overview
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.
+### Authentication
+
+The API uses OAuth 2.0 for user authentication via third-party providers (Google, GitHub and GitLab). Sessions are managed using secure HTTP-only cookies.
+
+For CLI and programmatic access, an API token is used for authentication. The token can be obtained from the [preferences page](https://windkeep.vercel.app/admin/preferences). Include the token in the `Authorization` header:
+
+```
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+### Response Format
+
+All responses are returned in JSON format. Successful responses return a `2xx` status code. Error responses include an error message in the response body.
+
+### Error Handling
+
+The API uses standard HTTP response codes to indicate success or failure:
+
+- `200 OK` - Request succeeded
+- `400 Bad Request` - Invalid request parameters or validation error
+- `401 Unauthorized` - Authentication required or invalid credentials
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Resource not found
+- `409 Conflict` - Resource conflict
+- `500 Internal Server Error` - Server error
 
 ---
+
+## Endpoints
 
 ### Authentication
 
@@ -49,7 +75,7 @@ Refreshes the authenticated user's session, extending it by 7 days.
 ```json
 {
   "success": true,
-  "expiresAt": "string"
+  "expiresAt": "Date"
 }
 ```
 
@@ -57,14 +83,14 @@ Refreshes the authenticated user's session, extending it by 7 days.
 
 > **POST** `/api/auth/validate`
 
-Validates the authenticated user's session and checks for inactivity timeout.
+Validates the authenticated user's session and checks for inactivity timeout. Updates the last activity timestamp.
 
 **Response:**
 
 ```json
 {
   "valid": true,
-  "expiresAt": "string"
+  "expiresAt": "Date"
 }
 ```
 
@@ -94,6 +120,7 @@ Retrieves the authenticated user's profile information, including organization a
       {
         "id": "string",
         "role": "OWNER | ADMIN | MEMBER",
+        "isActive": "boolean",
         "userId": "string",
         "orgId": "string",
         "org": {
@@ -200,7 +227,7 @@ Creates a new organization with the authenticated user as the owner. Automatical
 
 ```json
 {
-  "name": "string" // 3-50 characters
+  "name": "string" // Required: 3-50 characters
 }
 ```
 
@@ -336,7 +363,7 @@ Updates a member's role in the organization. Only owners and admins can update m
 
 ```json
 {
-  "role": "ADMIN | MEMBER"
+  "role": "ADMIN | MEMBER" // Required: the new role for the member
 }
 ```
 
@@ -350,14 +377,10 @@ Updates a member's role in the organization. Only owners and admins can update m
     "role": "ADMIN | MEMBER",
     "isActive": "boolean",
     "user": {
-      "id": "string",
-      "email": "string",
-      "name": "string",
-      "image": "string | null"
+      // ... User details
     },
     "org": {
-      "id": "string",
-      "name": "string"
+      // ... Organization details
     }
   }
 }
@@ -404,13 +427,10 @@ Creates an invitation link for new members to join the organization. Only owners
     "expiresAt": "Date",
     "invitedById": "string",
     "org": {
-      "id": "string",
-      "name": "string"
+      // ... Organization details
     },
     "invitedBy": {
-      "id": "string",
-      "email": "string",
-      "name": "string"
+      // ... User details
     }
   },
   "inviteUrl": "string"
@@ -431,7 +451,7 @@ Accepts an invitation to join an organization. Adds the authenticated user as a 
 
 ```json
 {
-  "token": "string"
+  "token": "string" // Required: invitation token
 }
 ```
 
@@ -440,8 +460,7 @@ Accepts an invitation to join an organization. Adds the authenticated user as a 
 ```json
 {
   "organization": {
-    "id": "string",
-    "name": "string"
+    // ... Organization details
   },
   "membership": {
     "userId": "string",
@@ -449,14 +468,10 @@ Accepts an invitation to join an organization. Adds the authenticated user as a 
     "role": "MEMBER",
     "isActive": "boolean",
     "org": {
-      "id": "string",
-      "name": "string"
+      // ... Organization details
     },
     "user": {
-      "id": "string",
-      "email": "string",
-      "name": "string",
-      "image": "string | null"
+      // ... User details
     }
   }
 }
@@ -502,14 +517,10 @@ Retrieves audit logs for an organization with optional filtering and pagination.
       "projectId": "string | null",
       "createdAt": "Date",
       "user": {
-        "id": "string",
-        "email": "string",
-        "name": "string",
-        "image": "string | null"
+        // ... User details
       },
       "project": {
-        "id": "string",
-        "name": "string"
+        // ... Project details
       }
     }
   ],
@@ -594,11 +605,7 @@ Retrieves all projects the authenticated user has access to, including their org
       "createdAt": "Date",
       "updatedAt": "Date",
       "org": {
-        "id": "string",
-        "name": "string",
-        "slug": "string",
-        "createdAt": "Date",
-        "updatedAt": "Date"
+        // ... Organization details
       },
       "memberships": [
         {
@@ -606,10 +613,7 @@ Retrieves all projects the authenticated user has access to, including their org
           "projectId": "string",
           "role": "OWNER | ADMIN | MEMBER",
           "user": {
-            "id": "string",
-            "name": "string",
-            "email": "string",
-            "image": "string | null"
+            // ... User details
           }
         }
       ],
@@ -638,10 +642,10 @@ Creates a new project in an organization. Only organization owners and admins ca
 
 ```json
 {
-  "name": "string", // 3-50 characters
+  "name": "string", // Required: 3-50 characters
   "slug": "string", // Optional: 3-50 characters, lowercase letters, numbers, and hyphens only
   "description": "string", // Optional: max 255 characters
-  "orgId": "string"
+  "orgId": "string" // Required: organization ID where the project will be created
 }
 ```
 
@@ -658,8 +662,7 @@ Creates a new project in an organization. Only organization owners and admins ca
     "createdAt": "Date",
     "updatedAt": "Date",
     "org": {
-      "id": "string",
-      "name": "string"
+      // ... Organization details
     },
     "memberships": [
       {
@@ -667,10 +670,7 @@ Creates a new project in an organization. Only organization owners and admins ca
         "projectId": "string",
         "role": "OWNER",
         "user": {
-          "id": "string",
-          "email": "string",
-          "name": "string",
-          "image": "string | null"
+          // ... User details
         }
       }
     ],
@@ -714,11 +714,7 @@ Updates project details. Only project owners can perform this action.
     "createdAt": "Date",
     "updatedAt": "Date",
     "org": {
-      "id": "string",
-      "name": "string",
-      "slug": "string",
-      "createdAt": "Date",
-      "updatedAt": "Date"
+      // ... Organization details
     }
   }
 }
@@ -761,7 +757,7 @@ Adds a new member to a project. Only project owners and admins can add members. 
 
 ```json
 {
-  "userId": "string",
+  "userId": "string", // Required: user ID to add as member
   "role": "ADMIN | MEMBER" // Optional: defaults to MEMBER
 }
 ```
@@ -775,14 +771,10 @@ Adds a new member to a project. Only project owners and admins can add members. 
     "projectId": "string",
     "role": "ADMIN | MEMBER",
     "user": {
-      "id": "string",
-      "email": "string",
-      "name": "string",
-      "image": "string | null"
+      // ... User details
     },
     "project": {
-      "id": "string",
-      "name": "string"
+      // ... Project details
     }
   }
 }
@@ -803,7 +795,7 @@ Updates a member's role in the project. Only owners and admins can update member
 
 ```json
 {
-  "role": "ADMIN | MEMBER"
+  "role": "ADMIN | MEMBER" // Required: the new role for the member
 }
 ```
 
@@ -816,17 +808,13 @@ Updates a member's role in the project. Only owners and admins can update member
     "projectId": "string",
     "role": "ADMIN | MEMBER",
     "user": {
-      "id": "string",
-      "email": "string",
-      "name": "string",
-      "image": "string | null"
+      // ... User details
     },
     "project": {
       "id": "string",
       "name": "string",
       "org": {
-        "id": "string",
-        "name": "string"
+        // ... Organization details
       }
     }
   }
@@ -890,13 +878,7 @@ Retrieves all secrets for a project with their decrypted values. All project mem
         }
       ],
       "project": {
-        "id": "string",
-        "name": "string",
-        "slug": "string",
-        "description": "string | null",
-        "orgId": "string",
-        "createdAt": "Date",
-        "updatedAt": "Date"
+        // ... Project details
       }
     }
   ]
@@ -917,12 +899,12 @@ Creates a new secret in a project. Only project owners and admins can create sec
 
 ```json
 {
-  "key": "string", // 1-50 characters, uppercase letters, numbers, and underscores only, cannot start/end with underscore or contain consecutive underscores
+  "key": "string", // Required: 1-50 characters, uppercase letters, numbers, and underscores only, cannot start/end with underscore or contain consecutive underscores
   "description": "string", // Optional: max 255 characters
   "values": [ // Optional: at least 1 value if provided
     {
-      "environment": "DEVELOPMENT | STAGING | PRODUCTION",
-      "value": "string" // 1-1000 characters
+      "environment": "DEVELOPMENT | STAGING | PRODUCTION", // Required: environment type
+      "value": "string" // Required: 1-1000 characters
     }
   ]
 }
@@ -952,8 +934,7 @@ Creates a new secret in a project. Only project owners and admins can create sec
     "id": "string",
     "name": "string",
     "org": {
-      "id": "string",
-      "name": "string"
+      // ... Organization details
     }
   }
 }
@@ -977,8 +958,8 @@ Updates a secret's description or environment values. Only project owners and ad
   "description": "string | null", // Optional: max 255 characters
   "values": [ // Optional: at least 1 value if provided
     {
-      "environment": "DEVELOPMENT | STAGING | PRODUCTION",
-      "value": "string" // 1-1000 characters
+      "environment": "DEVELOPMENT | STAGING | PRODUCTION", // Required: environment type
+      "value": "string" // Required: 1-1000 characters
     }
   ]
 }
@@ -1008,8 +989,7 @@ Updates a secret's description or environment values. Only project owners and ad
     "id": "string",
     "name": "string",
     "org": {
-      "id": "string",
-      "name": "string"
+      // ... Organization details
     }
   }
 }
