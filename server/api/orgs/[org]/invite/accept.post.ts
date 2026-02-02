@@ -44,12 +44,22 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 409, statusText: "You are already a member of this organization" })
   }
 
-  const [newMembership] = await db.$transaction([
-    db.orgMembership.create({
+  // Create new membership with isActive: true
+  const [newMembership] = await db.$transaction(async (tx) => {
+    await tx.orgMembership.updateMany({
+      where: {
+        userId: user.id,
+        isActive: true,
+      },
+      data: { isActive: false },
+    })
+
+    const membership = await tx.orgMembership.create({
       data: {
         userId: user.id,
         orgId: invitation.orgId,
         role: "MEMBER",
+        isActive: true,
       },
       include: {
         org: {
@@ -67,11 +77,15 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    }),
-    db.invitation.delete({
+    })
+
+    // Delete the invitation
+    await tx.invitation.delete({
       where: { id: invitation.id },
-    }),
-  ])
+    })
+
+    return [membership]
+  })
 
   await createAuditLog({
     event,

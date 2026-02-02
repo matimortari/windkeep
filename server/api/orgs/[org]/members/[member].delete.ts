@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   if (memberId !== user.id) {
     await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
     if (targetRole.role === "OWNER") {
-      throw createError({ status: 403, statusText: "Cannot remove organization owners. Use transfer ownership instead." })
+      throw createError({ status: 403, statusText: "Cannot remove organization owners." })
     }
   }
   else if (targetRole.role === "OWNER") {

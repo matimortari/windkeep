@@ -159,7 +159,6 @@ Updates the authenticated user's profile information.
 ```json
 {
   "name": "string", // Optional: 3-50 characters
-  "image": "string | null", // Optional: valid URL or null to remove image
   "regenerateApiToken": "boolean" // Optional: set to true to regenerate API token
 }
 ```
