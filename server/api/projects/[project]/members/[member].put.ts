@@ -19,19 +19,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const targetRole = await db.projectMembership.findUnique({
-    where: { userId_projectId: { userId: memberId, projectId } },
-  })
+  const targetRole = await db.projectMembership.findUnique({ where: { userId_projectId: { userId: memberId, projectId } } })
   if (!targetRole) {
     throw createError({ status: 404, statusText: "Member not found in project" })
   }
-
-  // Prevent changing OWNER roles
   if (targetRole.role === "OWNER") {
     throw createError({ status: 403, statusText: "Cannot change the role of project owners" })
   }
-
-  // Prevent users from changing their own role
   if (memberId === user.id) {
     throw createError({ status: 400, statusText: "You cannot change your own role" })
   }
@@ -40,21 +34,8 @@ export default defineEventHandler(async (event) => {
     where: { userId_projectId: { userId: memberId, projectId } },
     data: { role: result.data.role },
     include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          image: true,
-        },
-      },
-      project: {
-        select: {
-          id: true,
-          name: true,
-          org: { select: { id: true, name: true } },
-        },
-      },
+      user: { select: { id: true, email: true, name: true, image: true } },
+      project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } },
     },
   })
 

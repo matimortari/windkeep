@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "MEMBER", "ADMIN"])
+  await requireRole(user.id, { type: "org", orgId }, ["OWNER", "MEMBER", "ADMIN"])
 
   // Set this org as active and deactivate others
   await db.$transaction([

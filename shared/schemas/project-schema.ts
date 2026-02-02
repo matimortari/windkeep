@@ -7,11 +7,7 @@ export const createProjectSchema = z.object({
     .max(50, "Project name must be at most 50 characters")
     .transform(val => val.trim())
     .refine(val => val.length >= 3, { message: "Project name cannot be empty" }),
-  description: z
-    .string()
-    .max(255, "Description must be at most 255 characters")
-    .transform(val => val.trim())
-    .optional(),
+  description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
   orgId: z.cuid(),
 })
 
@@ -29,11 +25,7 @@ export const updateProjectSchema = z.object({
     .max(50, "Slug must be at most 50 characters")
     .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
     .optional(),
-  description: z
-    .string()
-    .max(255, "Description must be at most 255 characters")
-    .transform(val => val.trim())
-    .optional(),
+  description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
 })
 
 export const addProjectMemberSchema = z.object({

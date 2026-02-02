@@ -46,13 +46,13 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
  * Ensures a user has the required role for an organization or project.
  * Throws 401 if not authenticated, 403 if insufficient permissions.
  */
-export async function requireRole(userId: string, scope: { type: "organization", orgId: string } | { type: "project", projectId: string }, roles: Role[]) {
+export async function requireRole(userId: string, scope: { type: "org", orgId: string } | { type: "project", projectId: string }, roles: Role[]) {
   if (!userId) {
     throw createError({ status: 401, statusText: "Unauthorized" })
   }
 
   let membership
-  if (scope.type === "organization") {
+  if (scope.type === "org") {
     membership = await db.orgMembership.findUnique({
       where: {
         userId_orgId: {
@@ -102,22 +102,10 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
   event?: H3Event<EventHandlerRequest>
 }) {
   const forwarded = event?.node?.req?.headers?.["x-forwarded-for"]
-  const ip = Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(",")[0]?.trim() ?? event?.node?.req?.socket?.remoteAddress
-  const ua = event?.node?.req?.headers?.["user-agent"] ?? undefined
+  const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(",")[0]?.trim()) || event?.node?.req?.socket?.remoteAddress || "unknown"
+  const ua = event?.node?.req?.headers?.["user-agent"] || "unknown"
 
-  await db.auditLog.create({
-    data: {
-      userId,
-      orgId,
-      projectId,
-      action,
-      resource,
-      metadata,
-      ip: ip ?? "",
-      ua: ua ?? "",
-      description: description || `${action} performed on ${resource || "resource"}`,
-    },
-  })
+  await db.auditLog.create({ data: { userId, orgId, projectId, action, resource, metadata, ip, ua, description: description || `${action} performed on ${resource || "resource"}` } })
 }
 
 /**
@@ -141,25 +129,18 @@ export async function getBinaryBlobUrl(binaryKey: string) {
     "windkeep-windows-amd64.exe": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-windows-amd64.exe",
   }
 
-  const blobUrl = BINARIES[binaryKey]
-  if (!blobUrl) {
+  if (!BINARIES[binaryKey]) {
     throw createError({ status: 404, message: "Binary not found" })
   }
 
-  return blobUrl
+  return BINARIES[binaryKey]
 }
 
 /**
  * Uploads a file to Blob storage and removes the previous file if provided.
  * Validates file size and MIME type before upload.
  */
-export async function uploadFile({ path, file, maxSize, allowedMimeTypes, oldFileUrl }: {
-  path: string
-  file: File
-  maxSize: number
-  allowedMimeTypes: string[]
-  oldFileUrl?: string
-}) {
+export async function uploadFile({ path, file, maxSize, allowedMimeTypes, oldFile }: { path: string, file: File, maxSize: number, allowedMimeTypes: string[], oldFile?: string }) {
   if (!file || !(file instanceof File)) {
     throw createError({ status: 400, statusText: "No file uploaded" })
   }
@@ -170,10 +151,9 @@ export async function uploadFile({ path, file, maxSize, allowedMimeTypes, oldFil
     throw createError({ status: 413, statusText: "File too large" })
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase()
-  const blob = await put(`${path}/${Date.now()}.${ext}`, file, { access: "public" })
-  if (oldFileUrl?.includes("blob.vercel-storage.com")) {
-    await del(oldFileUrl).catch(() => {})
+  const blob = await put(`${path}/${Date.now()}.${file.name.split(".").pop()?.toLowerCase()}`, file, { access: "public" })
+  if (oldFile?.includes("blob.vercel-storage.com")) {
+    await del(oldFile).catch(() => {})
   }
 
   return blob.url

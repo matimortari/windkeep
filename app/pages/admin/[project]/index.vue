@@ -145,26 +145,15 @@ function handleSecretChange(secret: Secret) {
   const existingSecret = secrets.value.find(s => s.key === secret.key)
   const existingChange = pendingChanges.value.get(secret.key)
   if (!existingSecret) {
-    pendingChanges.value.set(secret.key, {
-      type: "create",
-      secret,
-    })
+    pendingChanges.value.set(secret.key, { type: "create", secret })
   }
   else if (existingChange?.type === "create") {
-    pendingChanges.value.set(secret.key, {
-      type: "create",
-      secret,
-    })
+    pendingChanges.value.set(secret.key, { type: "create", secret })
   }
   else {
-    pendingChanges.value.set(secret.key, {
-      type: "update",
-      secret,
-      originalSecret: existingSecret,
-    })
+    pendingChanges.value.set(secret.key, { type: "update", secret, originalSecret: existingSecret })
   }
 
-  // Só fecha o dialog se não houver erros
   isSecretsDialogOpen.value = false
   selectedSecret.value = null
 }
@@ -195,17 +184,10 @@ function handleImportSecrets(importedSecrets: any[]) {
 
       const mergedSecret: Secret = { ...baseSecret, values: mergedValues }
       if (!existingSecret) {
-        pendingChanges.value.set(importedSecret.key, {
-          type: "create",
-          secret: mergedSecret,
-        })
+        pendingChanges.value.set(importedSecret.key, { type: "create", secret: mergedSecret })
       }
       else {
-        pendingChanges.value.set(importedSecret.key, {
-          type: "update",
-          secret: mergedSecret,
-          originalSecret: existingSecret,
-        })
+        pendingChanges.value.set(importedSecret.key, { type: "update", secret: mergedSecret, originalSecret: existingSecret })
       }
     }
   }

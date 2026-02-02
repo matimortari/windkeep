@@ -18,15 +18,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const existingProject = await db.project.findUnique({
-    where: { id: projectId },
-    select: {
-      name: true,
-      slug: true,
-      description: true,
-      orgId: true,
-    },
-  })
+  const existingProject = await db.project.findUnique({ where: { id: projectId }, select: { name: true, slug: true, description: true, orgId: true } })
   if (!existingProject) {
     throw createError({ status: 404, statusText: "Project not found" })
   }
@@ -34,14 +26,10 @@ export default defineEventHandler(async (event) => {
   // Check if project with same name or slug already exists in this organization
   if (result.data.name || result.data.slug) {
     const projectWithConflict = await db.project.findFirst({
-      where: {
-        orgId: existingProject.orgId,
-        OR: [
-          result.data.name ? { name: result.data.name } : {},
-          result.data.slug ? { slug: result.data.slug } : {},
-        ].filter(Boolean),
-        NOT: { id: projectId },
-      },
+      where: { orgId: existingProject.orgId, OR: [
+        result.data.name ? { name: result.data.name } : {},
+        result.data.slug ? { slug: result.data.slug } : {},
+      ].filter(Boolean), NOT: { id: projectId } },
     })
 
     if (projectWithConflict) {
@@ -52,11 +40,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const updatedProject = await db.project.update({
-    where: { id: projectId },
-    data: result.data,
-    include: { org: true },
-  })
+  const updatedProject = await db.project.update({ where: { id: projectId }, data: result.data, include: { org: true } })
 
   const changes = []
   if (result.data.name && result.data.name !== existingProject.name) {

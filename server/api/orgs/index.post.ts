@@ -14,31 +14,16 @@ export default defineEventHandler(async (event) => {
 
   const organization = await db.$transaction(async (tx) => {
     const org = await tx.organization.create({
-      data: {
-        name: result.data.name,
-        memberships: {
-          create: {
-            userId: user.id,
-            role: "OWNER",
-            isActive: true,
-          },
-        },
-      },
+      data: { name: result.data.name, memberships: { create: { userId: user.id, role: "OWNER", isActive: true } } },
     })
 
     // Deactivate all other orgs for the user
     await tx.orgMembership.updateMany({
-      where: {
-        userId: user.id,
-        orgId: { not: org.id },
-        isActive: true,
-      },
+      where: { userId: user.id, orgId: { not: org.id }, isActive: true },
       data: { isActive: false },
     })
 
-    return tx.organization.findUniqueOrThrow({
-      where: { id: org.id },
-    })
+    return tx.organization.findUniqueOrThrow({ where: { id: org.id } })
   })
 
   await createAuditLog({

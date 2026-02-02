@@ -19,50 +19,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const existingSecret = await db.secret.findUnique({
-    where: {
-      key_projectId: {
-        key: result.data.key,
-        projectId,
-      },
-    },
-  })
+  const existingSecret = await db.secret.findUnique({ where: { key_projectId: { key: result.data.key, projectId } } })
   if (existingSecret) {
     throw createError({ status: 409, statusText: "A secret with this key already exists in the project" })
   }
 
-  const secretData: any = {
-    key: result.data.key,
-    description: result.data.description,
-    projectId,
-  }
-
+  const secretData: any = { key: result.data.key, description: result.data.description, projectId }
   if (result.data.values && Array.isArray(result.data.values)) {
-    secretData.values = {
-      create: result.data.values.map((val: any) => ({
-        environment: val.environment,
-        value: encrypt(val.value),
-      })),
-    }
+    secretData.values = { create: result.data.values.map((val: any) => ({ environment: val.environment, value: encrypt(val.value) })) }
   }
 
   const secret = await db.secret.create({
     data: secretData,
-    include: {
-      values: true,
-      project: {
-        select: {
-          id: true,
-          name: true,
-          org: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
-    },
+    include: { values: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
   })
 
   await createAuditLog({
@@ -88,11 +57,5 @@ export default defineEventHandler(async (event) => {
   await deleteCached(CacheKeys.projectSecrets(projectId))
   await deleteCached(CacheKeys.userProjects(user.id))
 
-  return {
-    ...secret,
-    values: secret.values.map(val => ({
-      ...val,
-      value: decrypt(val.value),
-    })),
-  }
+  return { ...secret, values: secret.values.map(val => ({ ...val, value: decrypt(val.value) })) }
 })

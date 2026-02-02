@@ -36,9 +36,7 @@ export default defineEventHandler(async (event) => {
     await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
   }
 
-  await db.projectMembership.delete({
-    where: { userId_projectId: { userId: memberId, projectId } },
-  })
+  await db.projectMembership.delete({ where: { userId_projectId: { userId: memberId, projectId } } })
 
   await createAuditLog({
     event,

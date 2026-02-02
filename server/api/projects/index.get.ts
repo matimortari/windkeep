@@ -5,7 +5,6 @@ import { CACHE_TTL, CacheKeys, getCached, setCached } from "#server/utils/redis"
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
-  // Try to get from cache first
   const cacheKey = CacheKeys.userProjects(user.id)
   const cached = await getCached<any>(cacheKey)
   if (cached) {
@@ -13,31 +12,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const projects = await db.project.findMany({
-    where: {
-      AND: [
-        { org: { memberships: { some: { userId: user.id } } } },
-        { memberships: { some: { userId: user.id } } },
-      ],
-    },
+    where: { AND: [{ org: { memberships: { some: { userId: user.id } } } }, { memberships: { some: { userId: user.id } } }] },
     include: {
       org: true,
-      memberships: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
-        },
-      },
       secrets: true,
+      memberships: { include: { user: { select: { id: true, name: true, email: true, image: true } } } },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
   })
 
   await setCached(cacheKey, projects, CACHE_TTL.SHORT)

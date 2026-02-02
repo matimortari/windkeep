@@ -106,6 +106,7 @@ async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {
     isDialogOpen.value = false
   }
   catch {
+    // Silently fail
   }
 }
 </script>
