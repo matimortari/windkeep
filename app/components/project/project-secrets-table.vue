@@ -40,10 +40,10 @@
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
                 <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed' : 'ph:eye'" size="20" class="hover:text-primary" />
               </button>
-              <button aria-label="Edit Secret" @click="emit('edit', secret)">
+              <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Edit Secret" @click="emit('edit', secret)">
                 <icon name="ph:note-pencil" size="20" class="hover:text-primary" />
               </button>
-              <button aria-label="Delete Secret" @click="emit('delete', secret.key)">
+              <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Delete Secret" @click="emit('delete', secret.key)">
                 <icon name="ph:x" size="20" class="hover:text-danger" />
               </button>
             </div>
@@ -69,6 +69,7 @@ const emit = defineEmits<{
 
 const visibleKeys = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
+const { isOwner, isAdmin } = storeToRefs(useProjectStore())
 const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
 
@@ -88,6 +89,10 @@ const columns = computed<Record<string, any>[]>(() => {
 })
 
 function getPendingChangeType(key: string): "create" | "update" | "delete" | null {
+  if (!isOwner.value(props.projectId) && !isAdmin.value(props.projectId)) {
+    return null
+  }
+
   const change = props.pendingChanges.get(key)
   return change ? change.type : null
 }

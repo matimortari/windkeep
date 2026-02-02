@@ -25,18 +25,16 @@ export default defineEventHandler(async (event) => {
 
   // Check if project with same name or slug already exists in this organization
   if (result.data.name || result.data.slug) {
-    const projectWithConflict = await db.project.findFirst({
-      where: { orgId: existingProject.orgId, OR: [
-        result.data.name ? { name: result.data.name } : {},
-        result.data.slug ? { slug: result.data.slug } : {},
-      ].filter(Boolean), NOT: { id: projectId } },
+    const conflictingProject = await db.project.findFirst({
+      where: {
+        orgId: existingProject.orgId,
+        OR: [...(result.data.name ? [{ name: result.data.name }] : []), ...(result.data.slug ? [{ slug: result.data.slug }] : [])],
+        NOT: { id: projectId },
+      },
     })
-
-    if (projectWithConflict) {
-      if (projectWithConflict.slug === result.data.slug) {
-        throw createError({ status: 409, statusText: "A project with this slug already exists in the organization" })
-      }
-      throw createError({ status: 409, statusText: "A project with this name already exists in the organization" })
+    if (conflictingProject) {
+      const conflictField = conflictingProject.slug === result.data.slug ? "slug" : "name"
+      throw createError({ status: 409, statusText: `A project with this ${conflictField} already exists in the organization` })
     }
   }
 
@@ -64,8 +62,8 @@ export default defineEventHandler(async (event) => {
     metadata: {
       projectId,
       projectName: updatedProject.name,
-      oldName: existingProject.name !== updatedProject.name ? existingProject.name : undefined,
-      oldSlug: existingProject.slug !== updatedProject.slug ? existingProject.slug : undefined,
+      oldName: existingProject.name === updatedProject.name ? undefined : existingProject.name,
+      oldSlug: existingProject.slug === updatedProject.slug ? undefined : existingProject.slug,
       descriptionChanged: result.data.description !== undefined && result.data.description !== existingProject.description,
       orgId: updatedProject.org.id,
       orgName: updatedProject.org.name,
