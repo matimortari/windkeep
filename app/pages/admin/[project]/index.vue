@@ -142,9 +142,6 @@ function handleDeleteSecret(key: string) {
 }
 
 function handleSecretChange(secret: Secret) {
-  isSecretsDialogOpen.value = false
-  selectedSecret.value = null
-
   const existingSecret = secrets.value.find(s => s.key === secret.key)
   const existingChange = pendingChanges.value.get(secret.key)
   if (!existingSecret) {
@@ -166,6 +163,10 @@ function handleSecretChange(secret: Secret) {
       originalSecret: existingSecret,
     })
   }
+
+  // Só fecha o dialog se não houver erros
+  isSecretsDialogOpen.value = false
+  selectedSecret.value = null
 }
 
 function handleImportSecrets(importedSecrets: any[]) {

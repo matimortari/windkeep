@@ -5,10 +5,12 @@
         Audit Logs
       </h2>
 
-      <AuditFilter />
+      <AuditFilter v-if="hasPermission" />
     </header>
 
-    <div class="flex max-h-screen flex-col gap-2">
+    <Empty v-if="!hasPermission" message="You don't have permission to view audit logs. Only organization owners and administrators can access this section." icon-name="ph:lock" />
+
+    <div v-else class="flex max-h-screen flex-col gap-2">
       <AuditTable />
       <AuditPagination />
     </div>
@@ -16,11 +18,13 @@
 </template>
 
 <script setup lang="ts">
-const { activeOrg } = storeToRefs(useOrgStore())
+const orgStore = useOrgStore()
+const { activeOrg, isOwner, isAdmin } = storeToRefs(orgStore)
 const auditStore = useAuditStore()
+const hasPermission = computed(() => isOwner.value || isAdmin.value)
 
 watch(activeOrg, async (org) => {
-  if (org?.id) {
+  if (org?.id && hasPermission.value) {
     await auditStore.getAuditLogs(org.id)
   }
 }, { immediate: true })
