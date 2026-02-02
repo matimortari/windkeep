@@ -64,6 +64,20 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Remove user from all projects in this organization
+  const projectsInOrg = await db.project.findMany({
+    where: { orgId },
+    select: { id: true },
+  })
+  if (projectsInOrg.length > 0) {
+    await db.projectMembership.deleteMany({
+      where: {
+        userId: memberId,
+        projectId: { in: projectsInOrg.map(p => p.id) },
+      },
+    })
+  }
+
   await db.orgMembership.delete({
     where: { userId_orgId: { userId: memberId, orgId } },
   })
