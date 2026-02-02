@@ -93,16 +93,10 @@
           </p>
         </header>
 
-        <div class="navigation-group self-end">
-          <p v-if="errors.deleteUser" class="text-danger">
-            {{ errors.deleteUser }}
-          </p>
-
-          <button class="btn-danger" aria-label="Delete Account" @click="handleDeleteUser">
-            <icon name="ph:user-minus" size="20" />
-            <span>Confirm</span>
-          </button>
-        </div>
+        <button class="btn-danger self-end" aria-label="Delete Account" @click="handleDeleteUser">
+          <icon name="ph:user-minus" size="20" />
+          <span>Confirm</span>
+        </button>
       </nav>
     </section>
   </div>
@@ -121,11 +115,7 @@ const userFields = [
     description: "This name will be displayed in your account and projects.",
     type: "input",
     model: computed(() => user.value?.name),
-    update: (value: string) => {
-      if (user.value) {
-        user.value.name = value
-      }
-    },
+    update: (value: string) => { user.value!.name = value },
     onSave: handleSubmit,
   },
   {

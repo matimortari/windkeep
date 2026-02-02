@@ -25,17 +25,19 @@
       </button>
     </form>
 
-    <p class="text-caption flex min-h-4 flex-col items-center gap-2">
-      <span v-if="errors.createOrg" class="text-danger">{{ errors.createOrg }}</span>
-      <span> Already have an invite? <nuxt-link to="/onboarding/join-org" class="text-primary hover:underline">Join an Organization.</nuxt-link>
-      </span>
+    <p class="text-caption">
+      Already have an invite? <nuxt-link to="/onboarding/join-org" class="text-primary hover:underline">
+        Join an Organization.
+      </nuxt-link>
+    </p>
+
+    <p v-if="errors.createOrg" class="text-danger">
+      {{ errors.createOrg }}
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { createOrgSchema } from "#shared/schemas/org-schema"
-
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
@@ -43,13 +45,7 @@ const { errors } = storeToRefs(orgStore)
 const localOrg = ref({ name: `${user.value?.name}'s Team` })
 
 async function handleCreateOrg() {
-  const result = createOrgSchema.safeParse(localOrg.value)
-  if (!result.success) {
-    errors.value.createOrg = "Organization name must be at least 3 characters long."
-    return
-  }
-
-  const org = await orgStore.createOrg(result.data)
+  const org = await orgStore.createOrg(localOrg.value)
   if (!org) {
     return
   }

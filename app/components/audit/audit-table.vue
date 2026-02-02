@@ -33,10 +33,10 @@
             <td>
               <icon name="ph:caret-right" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
-            <td :title="actionLabel(log.action)">
+            <td :title="auditActions.find(a => a.value === log.action)?.label || log.action">
               <div class="navigation-group max-w-xs truncate">
-                <icon :name="resourceIcon(log.resource) || ''" size="15" />
-                <span>{{ actionLabel(log.action) }}</span>
+                <icon :name="resourceMap[log.resource || ''] || ''" size="15" />
+                <span>{{ auditActions.find(a => a.value === log.action)?.label || log.action }}</span>
               </div>
             </td>
             <td class="max-w-md truncate" :title="log.description || 'No description'">
@@ -110,15 +110,6 @@ const resourceMap: Record<string, string> = {
 
 function toggleRow(id: string) {
   expandedRows.value.has(id) ? expandedRows.value.delete(id) : expandedRows.value.add(id)
-}
-
-function resourceIcon(resource: string | null | undefined): string {
-  return (resource && resourceMap[resource]) || ""
-}
-
-function actionLabel(action: string) {
-  const item = auditActions.value.find(a => a.value === action)
-  return item?.label || action
 }
 
 function formatAuditDate(date: string | Date) {

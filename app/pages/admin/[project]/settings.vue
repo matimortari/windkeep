@@ -136,11 +136,8 @@
         </p>
 
         <div v-if="availableOrgMembers.length" class="navigation-group self-end">
-          <p v-if="errors.addProjectMember" class="text-danger">
-            {{ errors.addProjectMember }}
-          </p>
-          <p v-if="addMemberSuccess" class="text-success">
-            {{ addMemberSuccess }}
+          <p v-if="errors.addProjectMember || addMemberSuccess" :class="errors.addProjectMember ? 'text-danger' : 'text-success'">
+            {{ errors.addProjectMember || addMemberSuccess }}
           </p>
           <button class="btn-primary" aria-label="Add Member" @click.prevent="handleAddMember">
             <icon name="ph:plus-circle" size="20" />
@@ -171,16 +168,10 @@
           </p>
         </header>
 
-        <div class="navigation-group self-end">
-          <p v-if="errors.removeProjectMember" class="text-danger">
-            {{ errors.removeProjectMember }}
-          </p>
-
-          <button class="btn-danger" aria-label="Leave Project" @click="handleLeaveProject">
-            <icon name="ph:sign-out" size="20" />
-            <span>Confirm</span>
-          </button>
-        </div>
+        <button class="btn-danger self-end" aria-label="Leave Project" @click="handleLeaveProject">
+          <icon name="ph:sign-out" size="20" />
+          <span>Confirm</span>
+        </button>
       </nav>
 
       <nav v-if="isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Project">
@@ -193,16 +184,10 @@
           </p>
         </header>
 
-        <div class="navigation-group self-end">
-          <p v-if="errors.deleteProject" class="text-danger">
-            {{ errors.deleteProject }}
-          </p>
-
-          <button class="btn-danger" aria-label="Delete Project" @click="handleDeleteProject">
-            <icon name="ph:trash" size="20" />
-            <span>Confirm</span>
-          </button>
-        </div>
+        <button class="btn-danger self-end" aria-label="Delete Project" @click="handleDeleteProject">
+          <icon name="ph:trash" size="20" />
+          <span>Confirm</span>
+        </button>
       </nav>
     </section>
   </div>
