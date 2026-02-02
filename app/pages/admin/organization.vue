@@ -96,7 +96,7 @@
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
           <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 last:border-b-0">
             <div class="navigation-group items-start!">
-              <img :src="orgUser.user.image ?? undefined" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
+              <img :src="orgUser.user.image || DEFAULT_AVATAR" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
 
               <div class="flex flex-col truncate">
                 <span class="font-semibold">{{ orgUser.user.name }}</span>
