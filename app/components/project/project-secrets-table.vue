@@ -31,7 +31,7 @@
 
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
               <span class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, col.env) ? getSecretValueClass(secret.key) : '']">{{ renderValue(secret.key, col.env) }}</span>
-              <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="copySecret(secret.key, col.env, getSecretValue(secret.key, col.env))">
+              <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="handleCopy(secret.key, col.env, getSecretValue(secret.key, col.env))">
                 <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
               </button>
             </div>
@@ -122,16 +122,14 @@ function getCopyIcon(secretKey: string, env: string) {
   return copyStates.value[`${secretKey}-${env}`] ? "ph:check" : "ph:copy"
 }
 
-async function copySecret(secretKey: string, env: string, value: string) {
+async function handleCopy(secretKey: string, env: string, value: string) {
   if (!value) {
     return
   }
 
   await navigator.clipboard.writeText(value)
-  const key = `${secretKey}-${env}`
-  copyStates.value[key] = true
-
-  setTimeout(() => copyStates.value[key] = false, 1500)
+  copyStates.value[`${secretKey}-${env}`] = true
+  setTimeout(() => copyStates.value[`${secretKey}-${env}`] = false, 1500)
 }
 
 function getSecretValue(key: string, env: string) {
