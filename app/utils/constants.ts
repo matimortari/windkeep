@@ -1,5 +1,7 @@
 export const BASE_URL = "https://windkeep.vercel.app"
 
+export const DEFAULT_AVATAR = "/assets/default-avatar.svg"
+
 export const HIGHLIGHTS = [
   {
     title: "Rapid Onboarding",
