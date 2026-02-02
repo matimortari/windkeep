@@ -23,7 +23,12 @@ export default defineEventHandler(async (event) => {
 
   // Prevent removing OWNER users
   if (targetRole.role === "OWNER") {
-    throw createError({ status: 403, statusText: "Cannot remove project owners" })
+    if (memberId === user.id) {
+      throw createError({ status: 400, statusText: "Cannot leave project as owner. Please transfer ownership to another member first, or delete the project." })
+    }
+    else {
+      throw createError({ status: 403, statusText: "Cannot remove project owners." })
+    }
   }
 
   // Check permissions for non-self removal
