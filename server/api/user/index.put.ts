@@ -6,7 +6,6 @@ import { updateUserSchema } from "#shared/schemas/user-schema"
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const body = await readBody(event)
-
   const result = updateUserSchema.safeParse(body)
   if (!result.success) {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
@@ -22,7 +21,6 @@ export default defineEventHandler(async (event) => {
     where: { id: user.id },
     data: {
       name: result.data.name,
-      image: result.data.image,
       apiToken: apiTokenToUpdate,
     },
     select: {
