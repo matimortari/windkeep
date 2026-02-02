@@ -131,6 +131,10 @@ watch(() => props.isOpen, (open) => {
   if (open) {
     resetForm()
   }
+  else {
+    errors.value.createProjectSecret = null
+    errors.value.updateProjectSecret = null
+  }
 }, { immediate: true })
 
 watch(() => props.selectedSecret, () => {
