@@ -14,10 +14,7 @@ export function useEnvFile(projectRef: Ref<Project | undefined>) {
       map.set(v.environment, v.value)
     }
 
-    return Array.from(map.entries()).map(([environment, value]) => ({
-      environment,
-      value,
-    }))
+    return Array.from(map.entries()).map(([environment, value]) => ({ environment, value }))
   }
 
   const importSingleSecret = async (secret: CreateSecretInput) => {
@@ -83,14 +80,10 @@ export function useEnvFile(projectRef: Ref<Project | undefined>) {
       return { success: false, error: "Environment or project not specified" }
     }
 
-    const filteredSecrets = projectSecrets.value
-      .filter(s => s.projectId === currentProjectId)
-      .map((s) => {
-        const value = s.values?.find((v: SecretValue) => v.environment.toLowerCase() === env.toLowerCase())?.value
-        return value ? `${s.key}="${value}"` : null
-      })
-      .filter(Boolean)
-      .join("\n")
+    const filteredSecrets = projectSecrets.value.filter(s => s.projectId === currentProjectId).map((s) => {
+      const value = s.values?.find((v: SecretValue) => v.environment.toLowerCase() === env.toLowerCase())?.value
+      return value ? `${s.key}="${value}"` : null
+    }).filter(Boolean).join("\n")
     if (!filteredSecrets) {
       return { success: false, error: "No secrets found for this environment" }
     }

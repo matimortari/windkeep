@@ -18,17 +18,8 @@ export default defineEventHandler(async (event) => {
       name: true,
       slug: true,
       orgId: true,
-      org: {
-        select: {
-          name: true,
-        },
-      },
-      _count: {
-        select: {
-          secrets: true,
-          memberships: true,
-        },
-      },
+      org: { select: { name: true } },
+      _count: { select: { secrets: true, memberships: true } },
     },
   })
   if (!projectData) {
@@ -54,9 +45,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await db.project.delete({
-    where: { id: projectId },
-  })
+  await db.project.delete({ where: { id: projectId } })
 
   // Invalidate cache for user projects, org data, and project secrets
   await deleteCached(CacheKeys.userProjects(user.id), CacheKeys.orgData(user.id, projectData.orgId), CacheKeys.projectSecrets(projectId))

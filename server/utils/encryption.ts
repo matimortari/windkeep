@@ -34,7 +34,6 @@ export function decrypt(encryptedData: string): string {
     const iv = Buffer.from(ivHex, "hex")
     const authTag = Buffer.from(authTagHex, "hex")
     const encrypted = Buffer.from(encryptedHex, "hex")
-
     const decipher = crypto.createDecipheriv(algorithm, key, iv)
     decipher.setAuthTag(authTag)
     const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()])

@@ -13,39 +13,20 @@ export const createSecretSchema = z.object({
       message: "Secret key cannot contain consecutive underscores",
     })
     .transform(val => val.trim()),
-  description: z
-    .string()
-    .max(255, "Description must be at most 255 characters")
-    .transform(val => val.trim())
-    .optional(),
+  description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
   projectId: z.cuid(),
-  values: z
-    .array(
-      z.object({
-        environment: z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"]),
-        value: z.string().min(1, "Secret value is required").max(1000, "Secret value is too long"),
-      }),
-    )
-    .min(1, "At least one environment value is required")
-    .optional(),
+  values: z.array(z.object({
+    environment: z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"]),
+    value: z.string().min(1, "Secret value is required").max(1000, "Secret value is too long"),
+  })).min(1, "At least one environment value is required").optional(),
 })
 
 export const updateSecretSchema = z.object({
-  description: z
-    .string()
-    .max(255, "Description must be at most 255 characters")
-    .transform(val => val.trim())
-    .optional()
-    .nullable(),
-  values: z
-    .array(
-      z.object({
-        environment: z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"]),
-        value: z.string().min(1, "Secret value is required").max(1000, "Secret value is too long"),
-      }),
-    )
-    .min(1, "At least one environment value is required")
-    .optional(),
+  description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional().nullable(),
+  values: z.array(z.object({
+    environment: z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"]),
+    value: z.string().min(1, "Secret value is required").max(1000, "Secret value is too long"),
+  })).min(1, "At least one environment value is required").optional(),
 })
 
 export const createSecretValueSchema = z.object({

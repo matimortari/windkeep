@@ -8,22 +8,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId }, ["OWNER"])
+  await requireRole(user.id, { type: "org", orgId }, ["OWNER"])
 
-  // Clear active memberships for users who had this org active
-  await db.orgMembership.updateMany({
-    where: { orgId, isActive: true },
-    data: { isActive: false },
-  })
-
-  // Delete invitations
-  await db.invitation.deleteMany({
-    where: { orgId },
-  })
-
-  await db.organization.delete({
-    where: { id: orgId },
-  })
+  await db.orgMembership.updateMany({ where: { orgId, isActive: true }, data: { isActive: false } })
+  await db.invitation.deleteMany({ where: { orgId } })
+  await db.organization.delete({ where: { id: orgId } })
 
   return { success: true, message: "Organization deleted successfully" }
 })

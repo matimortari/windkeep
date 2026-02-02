@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = createInviteSchema.safeParse({ ...body, orgId })
@@ -18,48 +18,21 @@ export default defineEventHandler(async (event) => {
   }
 
   // Generate unique invitation token with retry on collision
-  let token = ""
-  let attempts = 0
-  while (attempts < 5) {
-    token = generateToken()
-    const existing = await db.invitation.findUnique({ where: { token } })
-    if (!existing) {
+  let token = generateToken()
+  for (let attempts = 0; attempts < 5; attempts++) {
+    const existingInvite = await db.invitation.findUnique({ where: { token } })
+    if (!existingInvite) {
       break
     }
-    attempts++
-  }
-  if (attempts === 5) {
-    throw createError({ status: 500, statusText: "Failed to generate unique invitation token" })
+
+    token = generateToken()
   }
 
-  const expiresAt = new Date()
-  expiresAt.setHours(expiresAt.getHours() + 12) // 12 hours
-
+  const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000) // 12 hours
   const invitation = await db.invitation.create({
-    data: {
-      orgId,
-      token,
-      expiresAt,
-      invitedById: user.id,
-    },
-    include: {
-      org: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      invitedBy: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        },
-      },
-    },
+    data: { orgId, token, expiresAt, invitedById: user.id },
+    include: { org: { select: { id: true, name: true } }, invitedBy: { select: { id: true, email: true, name: true } } },
   })
-
-  const inviteUrl = `${getInviteBaseUrl(event)}/onboarding/join-org?token=${token}`
 
   await createAuditLog({
     event,
@@ -76,5 +49,5 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return { invitation, inviteUrl }
+  return { invitation, inviteUrl: `${getInviteBaseUrl(event)}/onboarding/join-org?token=${token}` }
 })

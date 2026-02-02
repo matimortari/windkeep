@@ -20,14 +20,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const existingSecret = await db.secret.findUnique({
-    where: { id: secretId },
-    select: {
-      projectId: true,
-      key: true,
-      description: true,
-    },
-  })
+  const existingSecret = await db.secret.findUnique({ where: { id: secretId }, select: { projectId: true, key: true, description: true } })
   if (!existingSecret) {
     throw createError({ status: 404, statusText: "Secret not found" })
   }
@@ -47,20 +40,9 @@ export default defineEventHandler(async (event) => {
       }
 
       await db.secretValue.upsert({
-        where: {
-          secretId_environment: {
-            secretId,
-            environment: val.environment,
-          },
-        },
-        update: {
-          value: encrypt(val.value),
-        },
-        create: {
-          secretId,
-          environment: val.environment,
-          value: encrypt(val.value),
-        },
+        where: { secretId_environment: { secretId, environment: val.environment } },
+        update: { value: encrypt(val.value) },
+        create: { secretId, environment: val.environment, value: encrypt(val.value) },
       })
     }
   }
@@ -68,21 +50,7 @@ export default defineEventHandler(async (event) => {
   const updatedSecret = await db.secret.update({
     where: { id: secretId },
     data: updateData,
-    include: {
-      values: true,
-      project: {
-        select: {
-          id: true,
-          name: true,
-          org: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
-    },
+    include: { values: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
   })
 
   const updatedEnvironments = result.data.values?.map(v => v.environment) || []
@@ -115,11 +83,5 @@ export default defineEventHandler(async (event) => {
   await deleteCached(CacheKeys.projectSecrets(projectId))
   await deleteCached(CacheKeys.userProjects(user.id))
 
-  return {
-    ...updatedSecret,
-    values: updatedSecret.values.map(val => ({
-      ...val,
-      value: decrypt(val.value),
-    })),
-  }
+  return { ...updatedSecret, values: updatedSecret.values.map(val => ({ ...val, value: decrypt(val.value) })) }
 })
