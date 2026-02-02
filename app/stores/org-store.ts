@@ -41,7 +41,7 @@ export const useOrgStore = defineStore("org", () => {
       return res.organization
     }
     catch (err: any) {
-      errors.value.getOrg = err.data?.message || "Failed to get organization"
+      errors.value.getOrg = getErrorMessage(err, "Failed to get organization")
       console.error("getOrg error:", err)
       throw err
     }
@@ -65,7 +65,7 @@ export const useOrgStore = defineStore("org", () => {
       return res.organization
     }
     catch (err: any) {
-      errors.value.createOrg = err.data?.message || "Failed to create organization"
+      errors.value.createOrg = getErrorMessage(err, "Failed to create organization")
       console.error("createOrg error:", err)
       throw err
     }
@@ -90,7 +90,7 @@ export const useOrgStore = defineStore("org", () => {
       return res.updatedOrg
     }
     catch (err: any) {
-      errors.value.updateOrg = err.data?.message || "Failed to update organization"
+      errors.value.updateOrg = getErrorMessage(err, "Failed to update organization")
       console.error("updateOrg error:", err)
       throw err
     }
@@ -109,7 +109,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.transferOrgOwnership = err.data?.message || "Failed to transfer organization ownership"
+      errors.value.transferOrgOwnership = getErrorMessage(err, "Failed to transfer organization ownership")
       console.error("transferOrgOwnership error:", err)
       throw err
     }
@@ -130,7 +130,7 @@ export const useOrgStore = defineStore("org", () => {
       }
     }
     catch (err: any) {
-      errors.value.deleteOrg = err.data?.message || "Failed to delete organization"
+      errors.value.deleteOrg = getErrorMessage(err, "Failed to delete organization")
       console.error("deleteOrg error:", err)
       throw err
     }
@@ -148,7 +148,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.updateOrgMember = err.data?.message || "Failed to update organization member"
+      errors.value.updateOrgMember = getErrorMessage(err, "Failed to update organization member")
       console.error("updateOrgMember error:", err)
       throw err
     }
@@ -165,7 +165,7 @@ export const useOrgStore = defineStore("org", () => {
       await $fetch(`/api/orgs/${orgId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
     }
     catch (err: any) {
-      errors.value.removeOrgMember = err.data?.message || "Failed to remove organization member"
+      errors.value.removeOrgMember = getErrorMessage(err, "Failed to remove organization member")
       console.error("removeOrgMember error:", err)
       throw err
     }
@@ -183,7 +183,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.createInvite = err.data?.message || "Failed to create organization invite"
+      errors.value.createInvite = getErrorMessage(err, "Failed to create organization invite")
       console.error("createInvite error:", err)
       throw err
     }
@@ -204,7 +204,7 @@ export const useOrgStore = defineStore("org", () => {
       return res
     }
     catch (err: any) {
-      errors.value.acceptInvite = err.data?.message || "Failed to accept organization invite"
+      errors.value.acceptInvite = getErrorMessage(err, "Failed to accept organization invite")
       console.error("acceptInvite error:", err)
       throw err
     }

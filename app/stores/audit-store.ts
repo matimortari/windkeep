@@ -54,7 +54,7 @@ export const useAuditStore = defineStore("audit", () => {
       return res
     }
     catch (err: any) {
-      errors.value.getAuditLogs = err.data?.message || "Failed to fetch audit logs"
+      errors.value.getAuditLogs = getErrorMessage(err, "Failed to fetch audit logs")
       console.error("getAuditLogs error:", err)
       throw err
     }
@@ -71,7 +71,7 @@ export const useAuditStore = defineStore("audit", () => {
       await $fetch(`/api/orgs/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
     }
     catch (err: any) {
-      errors.value.deleteAuditLogs = err.data?.message || "Failed to delete audit logs"
+      errors.value.deleteAuditLogs = getErrorMessage(err, "Failed to delete audit logs")
       console.error("deleteAuditLogs error:", err)
       throw err
     }
