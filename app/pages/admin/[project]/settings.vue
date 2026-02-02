@@ -81,7 +81,7 @@
               </select>
 
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(member.userId, member.role)">
-                <icon name="ph:floppy-disk" size="15" />
+                <icon :name="memberRoleIcon.get(member.userId)?.icon || 'ph:floppy-disk'" size="15" />
               </button>
               <button v-if="isOwner && String(member.role) !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(member.userId)">
                 <icon name="ph:x" size="15" />
@@ -104,8 +104,26 @@
       </header>
 
       <div class="flex flex-col gap-1 md:navigation-group">
-        <div class="navigation-group">
-          <input v-model="newMemberId" type="text" placeholder="User ID">
+        <div v-if="availableOrgMembers.length" ref="addMemberDropdownRef" class="relative navigation-group">
+          <button class="btn w-full justify-between md:w-auto" @click="isAddMemberDropdownOpen = !isAddMemberDropdownOpen">
+            <span class="truncate">{{ selectedMemberToAdd ? availableOrgMembers.find(m => m.user.id === selectedMemberToAdd)?.user.name : 'Select a member...' }}</span>
+            <icon name="ph:caret-down" size="20" :class="[isAddMemberDropdownOpen ? 'rotate-180' : 'rotate-0']" />
+          </button>
+
+          <transition name="dropdown" mode="out-in">
+            <ul v-if="isAddMemberDropdownOpen" class="dropdown-menu left-0 max-h-60 w-full overflow-y-auto text-sm md:w-80" role="menu">
+              <li v-for="member in availableOrgMembers" :key="member.user.id" class="truncate whitespace-nowrap">
+                <button class="navigation-group w-full cursor-pointer truncate rounded-sm p-2 text-left hover:bg-muted" :class="selectedMemberToAdd === member.user.id ? 'bg-muted' : ''" @click="selectedMemberToAdd = member.user.id; isAddMemberDropdownOpen = false">
+                  <img :src="member.user.image || DEFAULT_AVATAR" alt="Avatar" class="size-6 rounded-full border">
+                  <div class="flex flex-col truncate">
+                    <span class="truncate font-semibold">{{ member.user.name }}</span>
+                    <span class="text-xs text-muted-foreground">{{ member.user.email }}</span>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </transition>
+
           <select v-model="newMemberRole" class="md:min-w-30">
             <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
               {{ capitalizeFirst(role.label) }}
@@ -113,7 +131,11 @@
           </select>
         </div>
 
-        <div class="navigation-group self-end">
+        <p v-else class="text-muted-foreground">
+          No available members to add.
+        </p>
+
+        <div v-if="availableOrgMembers.length" class="navigation-group self-end">
           <p v-if="errors.addProjectMember" class="text-danger">
             {{ errors.addProjectMember }}
           </p>
@@ -139,7 +161,7 @@
         </p>
       </header>
 
-      <nav v-if="!isOwner" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Leave Project">
+      <nav v-if="!isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Leave Project">
         <header class="flex flex-col gap-1">
           <h5>
             Leave Project
@@ -191,13 +213,25 @@ const route = useRoute()
 const slug = route.params.project
 const { createActionHandler } = useActionIcon()
 const { user } = storeToRefs(useUserStore())
+const orgStore = useOrgStore()
+const { orgMembers } = storeToRefs(orgStore)
 const projectStore = useProjectStore()
 const { projects, isOwner, isAdmin, errors } = storeToRefs(projectStore)
 const project = computed(() => projects.value.find(p => p.slug === slug))
 const addMemberSuccess = ref<string | null>(null)
-const newMemberId = ref("")
+const selectedMemberToAdd = ref<string>("")
 const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
 const localProject = ref<Project | null>(null)
+const isAddMemberDropdownOpen = ref(false)
+const addMemberDropdownRef = ref<HTMLElement | null>(null)
+const availableOrgMembers = computed(() => {
+  if (!project.value || !orgMembers.value) {
+    return []
+  }
+
+  const projectMemberIds = new Set(project.value.memberships?.map(m => m.userId) || [])
+  return orgMembers.value.filter(member => !projectMemberIds.has(member.user.id))
+})
 
 const projectFields = [
   {
@@ -259,21 +293,38 @@ const projectFields = [
 
 const copyIcon = projectFields.map(() => createActionHandler("ph:copy"))
 const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk"))
+const memberRoleIcon = ref(new Map())
+
+// Initialize action handlers for members
+watch(() => project.value?.memberships, (memberships) => {
+  if (!memberships) {
+    return
+  }
+  memberships.forEach((member) => {
+    if (!memberRoleIcon.value.has(member.userId)) {
+      memberRoleIcon.value.set(member.userId, createActionHandler("ph:floppy-disk"))
+    }
+  })
+}, { immediate: true, deep: true })
+
+useClickOutside(addMemberDropdownRef, () => {
+  isAddMemberDropdownOpen.value = false
+}, { escapeKey: true })
 
 async function handleAddMember() {
   addMemberSuccess.value = null
-  if (!project.value?.id || !newMemberId.value.trim()) {
+  if (!project.value?.id || !selectedMemberToAdd.value) {
     return
   }
 
   await projectStore.addProjectMember(project.value.id, {
-    userId: newMemberId.value.trim(),
+    userId: selectedMemberToAdd.value,
     role: newMemberRole.value as "ADMIN" | "MEMBER",
   })
 
   await projectStore.getProjects()
   addMemberSuccess.value = "Member added successfully."
-  newMemberId.value = ""
+  selectedMemberToAdd.value = ""
   newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
 }
 
@@ -284,6 +335,7 @@ async function handleUpdateMemberRole(memberId: string, newRole: "ADMIN" | "MEMB
 
   await projectStore.updateProjectMember(project.value.id, memberId, { role: newRole })
   await projectStore.getProjects()
+  memberRoleIcon.value.get(memberId)?.triggerSuccess()
 }
 
 async function handleRemoveMember(memberId: string) {
