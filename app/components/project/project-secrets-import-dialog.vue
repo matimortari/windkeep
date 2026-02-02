@@ -106,5 +106,8 @@ watch(() => props.isOpen, (open) => {
     envContent.value = ""
     selectedEnv.value = "DEVELOPMENT"
   }
+  else {
+    errors.value.createProjectSecret = null
+  }
 })
 </script>

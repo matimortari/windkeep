@@ -95,14 +95,17 @@ async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {
     return
   }
 
-  await projectStore.createProject({
-    name: project.name,
-    slug: project.slug,
-    description: project.description || undefined,
-    orgId: props.org.id,
-  })
+  try {
+    await projectStore.createProject({
+      name: project.name,
+      description: project.description || undefined,
+      orgId: props.org.id,
+    })
 
-  await projectStore.getProjects()
-  isDialogOpen.value = false
+    await projectStore.getProjects()
+    isDialogOpen.value = false
+  }
+  catch {
+  }
 }
 </script>
