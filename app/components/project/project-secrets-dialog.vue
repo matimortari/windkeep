@@ -3,7 +3,7 @@
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="key" class="text-sm font-semibold">Key</label>
-        <input id="key" v-model="form.key" type="text">
+        <input id="key" v-model="form.key" type="text" required>
         <span class="text-xs text-muted-foreground">The name for the secret.</span>
       </div>
 
@@ -47,13 +47,9 @@ const props = defineProps<{
   projectId: string
 }>()
 
-const emit = defineEmits<{
-  (e: "close"): void
-  (e: "save", payload: Secret): void
-}>()
+const emit = defineEmits<{ (e: "close"): void, (e: "save", payload: Secret): void }>()
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
-
 const projectStore = useProjectStore()
 const { errors, loading } = storeToRefs(projectStore)
 const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({
@@ -61,59 +57,29 @@ const form = ref<{ key: string, description: string, values: Record<Environment,
   description: "",
   values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
 })
-
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
 function resetForm() {
   if (props.selectedSecret) {
-    const mappedValues: Record<Environment, string> = {
-      DEVELOPMENT: "",
-      STAGING: "",
-      PRODUCTION: "",
-    }
+    const mappedValues: Record<Environment, string> = { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" }
     if (props.selectedSecret.values) {
       for (const sv of props.selectedSecret.values) {
         mappedValues[sv.environment] = sv.value
       }
     }
 
-    form.value = {
-      key: props.selectedSecret.key,
-      description: props.selectedSecret.description || "",
-      values: mappedValues,
-    }
+    form.value = { key: props.selectedSecret.key, description: props.selectedSecret.description || "", values: mappedValues }
   }
   else {
-    form.value = {
-      key: "",
-      description: "",
-      values: {
-        DEVELOPMENT: "",
-        STAGING: "",
-        PRODUCTION: "",
-      },
-    }
+    form.value = { key: "", description: "", values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } }
   }
 }
 
 async function handleSubmit() {
-  if (!form.value.key.trim()) {
-    errors.value.createProjectSecret = "Secret key is required"
-    errors.value.updateProjectSecret = "Secret key is required"
-    return
-  }
-  if (!normalizeKey(form.value.key)) {
-    errors.value.createProjectSecret = "Secret key must contain at least one valid character"
-    errors.value.updateProjectSecret = "Secret key must contain at least one valid character"
-    return
-  }
-
-  const values = Object.entries(form.value.values)
-    .filter(([_, value]) => value.trim() !== "")
-    .map(([environment, value]) => ({
-      environment: environment as Environment,
-      value: value.trim(),
-    }))
+  const values = Object.entries(form.value.values).filter(([_, value]) => value.trim() !== "").map(([environment, value]) => ({
+    environment: environment as Environment,
+    value: value.trim(),
+  }))
 
   const secret: Secret = {
     id: props.selectedSecret?.id || "",
@@ -130,10 +96,6 @@ async function handleSubmit() {
 watch(() => props.isOpen, (open) => {
   if (open) {
     resetForm()
-  }
-  else {
-    errors.value.createProjectSecret = null
-    errors.value.updateProjectSecret = null
   }
 }, { immediate: true })
 

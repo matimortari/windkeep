@@ -35,22 +35,13 @@ const props = defineProps<{
   isOpen: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: "close"): void
-  (e: "save", payload: { name: string, description: string }): void
-}>()
+const emit = defineEmits<{ (e: "close"): void, (e: "save", payload: { name: string, description: string }): void }>()
 
 const { errors } = storeToRefs(useProjectStore())
-const form = ref<{ name: string, description: string }>({
-  name: "",
-  description: "",
-})
+const form = ref<{ name: string, description: string }>({ name: "", description: "" })
 
 async function handleSubmit() {
-  const payload = {
-    name: form.value.name.trim(),
-    description: form.value.description.trim(),
-  }
+  const payload = { name: form.value.name.trim(), description: form.value.description.trim() }
 
   emit("save", payload)
 }
@@ -59,9 +50,6 @@ watch(() => props.isOpen, (open) => {
   if (open) {
     form.value.name = ""
     form.value.description = ""
-  }
-  else {
-    errors.value.createProject = null
   }
 }, { immediate: true })
 </script>

@@ -63,8 +63,6 @@
 </template>
 
 <script setup lang="ts">
-import type { CreateProjectInput } from "~~/shared/schemas/project-schema"
-
 const userStore = useUserStore()
 const projectStore = useProjectStore()
 const { activeOrg } = storeToRefs(useOrgStore())
@@ -75,11 +73,7 @@ const showAllProjects = ref(false)
 const layout = ref<"list" | "grid">((import.meta.client && localStorage.getItem("layoutMode") as "list" | "grid") || "grid")
 
 // All projects the user has access to, across all orgs
-const allProjects = computed(() => {
-  return projects.value.filter(project =>
-    project.memberships?.some(m => m.userId === userStore.user?.id),
-  )
-})
+const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))
 
 // Projects in the active organization that the user has access to
 const activeOrgProjects = computed(() => {
@@ -87,9 +81,7 @@ const activeOrgProjects = computed(() => {
     return []
   }
 
-  return projects.value.filter(
-    project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id),
-  )
+  return projects.value.filter(project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id))
 })
 
 const { sortedData: sortedProjects, sortDirection, sortKey, setSort } = useTableSort<Project>(computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)))
@@ -104,18 +96,13 @@ function toggleSort() {
   setSort("name", sortDirection.value === "asc" ? "desc" : "asc")
 }
 
-async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {
+async function handleCreateProject(project: { name: string, description?: string }) {
   if (!activeOrg.value) {
     return
   }
 
   try {
-    await projectStore.createProject({
-      name: project.name,
-      description: project.description || undefined,
-      orgId: activeOrg.value.id,
-    })
-
+    await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
     await projectStore.getProjects()
     isDialogOpen.value = false
   }

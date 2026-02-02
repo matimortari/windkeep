@@ -40,10 +40,10 @@
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
                 <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed' : 'ph:eye'" size="20" class="hover:text-primary" />
               </button>
-              <button aria-label="Edit Secret" @click="handleUpdateSecret(secret.key)">
+              <button aria-label="Edit Secret" @click="emit('edit', secret)">
                 <icon name="ph:note-pencil" size="20" class="hover:text-primary" />
               </button>
-              <button aria-label="Delete Secret" @click="handleDeleteSecret(secret.key)">
+              <button aria-label="Delete Secret" @click="emit('delete', secret.key)">
                 <icon name="ph:x" size="20" class="hover:text-danger" />
               </button>
             </div>
@@ -93,41 +93,33 @@ function getPendingChangeType(key: string): "create" | "update" | "delete" | nul
 }
 
 function getRowClass(key: string) {
-  const changeType = getPendingChangeType(key)
-  if (changeType === "create") {
+  if (getPendingChangeType(key) === "create") {
     return "bg-success/20"
   }
-  if (changeType === "update") {
+  if (getPendingChangeType(key) === "update") {
     return "bg-secondary/20"
   }
-  if (changeType === "delete") {
+  if (getPendingChangeType(key) === "delete") {
     return "bg-danger/20 line-through decoration-danger"
   }
 }
 
 function getSecretValueClass(key: string) {
-  const changeType = getPendingChangeType(key)
-  const baseClasses = "rounded-sm px-1 transition-colors group-hover:bg-card! hover:text-secondary!"
-
-  if (changeType === "create") {
-    return `${baseClasses} bg-success/40`
+  if (getPendingChangeType(key) === "create") {
+    return "rounded-sm px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-success/40"
   }
-  if (changeType === "update") {
-    return `${baseClasses} bg-secondary/40`
+  if (getPendingChangeType(key) === "update") {
+    return "rounded-sm px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-secondary/40"
   }
-  if (changeType === "delete") {
-    return `${baseClasses} bg-danger/40`
+  if (getPendingChangeType(key) === "delete") {
+    return "rounded-sm px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-danger/40"
   }
 
-  return `${baseClasses} bg-muted`
-}
-
-function getCopyStateKey(secretKey: string, env: string) {
-  return `${secretKey}-${env}`
+  return "rounded-sm px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-muted"
 }
 
 function getCopyIcon(secretKey: string, env: string) {
-  return copyStates.value[getCopyStateKey(secretKey, env)] ? "ph:check" : "ph:copy"
+  return copyStates.value[`${secretKey}-${env}`] ? "ph:check" : "ph:copy"
 }
 
 async function copySecret(secretKey: string, env: string, value: string) {
@@ -136,12 +128,10 @@ async function copySecret(secretKey: string, env: string, value: string) {
   }
 
   await navigator.clipboard.writeText(value)
-  const key = getCopyStateKey(secretKey, env)
+  const key = `${secretKey}-${env}`
   copyStates.value[key] = true
 
-  setTimeout(() => {
-    copyStates.value[key] = false
-  }, 1500)
+  setTimeout(() => copyStates.value[key] = false, 1500)
 }
 
 function getSecretValue(key: string, env: string) {
@@ -151,16 +141,5 @@ function getSecretValue(key: string, env: string) {
 function renderValue(key: string, env: string) {
   const val = getSecretValue(key, env)
   return val ? (visibleKeys.value[key] ? val : "•".repeat(val.length)) : "—"
-}
-
-function handleUpdateSecret(key: string) {
-  const secret = props.secrets.find(s => s.key === key)
-  if (secret) {
-    emit("edit", secret)
-  }
-}
-
-function handleDeleteSecret(key: string) {
-  emit("delete", key)
 }
 </script>

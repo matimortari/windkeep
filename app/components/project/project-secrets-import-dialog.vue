@@ -36,9 +36,6 @@
 </template>
 
 <script setup lang="ts">
-import type { CreateSecretInput } from "#shared/schemas/secret-schema"
-import { createSecretSchema } from "#shared/schemas/secret-schema"
-
 const props = defineProps<{
   isOpen: boolean
   projectId: string
@@ -47,12 +44,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void
-  (e: "save", secrets: CreateSecretInput[]): void
+  (e: "save", secrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[]): void
 }>()
 
 const { errors } = storeToRefs(useProjectStore())
-const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const envContent = ref("")
+const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const selectedEnv = ref<Environment>("DEVELOPMENT")
 
 function parseEnv(text: string): Record<string, string> {
@@ -82,21 +79,13 @@ function parseEnv(text: string): Record<string, string> {
 }
 
 function handleSubmit() {
-  const parsed = parseEnv(envContent.value)
-  if (!Object.keys(parsed).length) {
-    errors.value.createProjectSecret = "No valid key-value pairs found"
-    return
-  }
-
-  const normalized = Object.fromEntries(Object.entries(parsed).map(([key, value]) => [normalizeKey(key), value]).filter(([key]) => Boolean(key)))
-  const payload = Object.entries(normalized).map(([key, value]) =>
-    createSecretSchema.parse({
-      key,
-      description: "",
-      projectId: props.projectId,
-      values: [{ environment: selectedEnv.value, value }],
-    }),
-  )
+  const normalized = Object.fromEntries(Object.entries(parseEnv(envContent.value)).map(([key, value]) => [normalizeKey(key), value]).filter(([key]) => Boolean(key)))
+  const payload = Object.entries(normalized).map(([key, value]) => ({
+    key,
+    description: "",
+    projectId: props.projectId,
+    values: [{ environment: selectedEnv.value, value: value as string }],
+  }))
 
   emit("save", payload)
 }
@@ -105,9 +94,6 @@ watch(() => props.isOpen, (open) => {
   if (open) {
     envContent.value = ""
     selectedEnv.value = "DEVELOPMENT"
-  }
-  else {
-    errors.value.createProjectSecret = null
   }
 })
 </script>

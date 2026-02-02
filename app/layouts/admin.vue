@@ -2,7 +2,7 @@
   <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
   <div class="flex min-h-screen overflow-hidden py-12">
-    <Sidebar :org="activeOrg" :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
+    <Sidebar :is-open="isSidebarOpen" @update:is-open="isSidebarOpen = $event" />
 
     <main class="flex flex-1 flex-col overflow-x-hidden p-4">
       <Loading v-if="isLoading" />
@@ -18,7 +18,6 @@ const userStore = useUserStore()
 const orgStore = useOrgStore()
 const projectStore = useProjectStore()
 const { user } = storeToRefs(userStore)
-const { activeOrg } = storeToRefs(orgStore)
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
