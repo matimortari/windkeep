@@ -63,6 +63,8 @@
 </template>
 
 <script setup lang="ts">
+import type { CreateProjectInput } from "~~/shared/schemas/project-schema"
+
 const userStore = useUserStore()
 const projectStore = useProjectStore()
 const { activeOrg } = storeToRefs(useOrgStore())
@@ -102,19 +104,23 @@ function toggleSort() {
   setSort("name", sortDirection.value === "asc" ? "desc" : "asc")
 }
 
-async function handleCreateProject(payload: { name: string, description: string }) {
+async function handleCreateProject(project: Omit<CreateProjectInput, "orgId">) {
   if (!activeOrg.value) {
     return
   }
 
-  await projectStore.createProject({
-    name: payload.name,
-    description: payload.description || undefined,
-    orgId: activeOrg.value.id,
-  })
+  try {
+    await projectStore.createProject({
+      name: project.name,
+      description: project.description || undefined,
+      orgId: activeOrg.value.id,
+    })
 
-  await projectStore.getProjects()
-  isDialogOpen.value = false
+    await projectStore.getProjects()
+    isDialogOpen.value = false
+  }
+  catch {
+  }
 }
 
 watch(() => activeOrg.value?.id, async (orgId) => {

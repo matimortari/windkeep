@@ -112,10 +112,10 @@
               </select>
 
               <button class="btn" aria-label="Update Member Role" @click="orgUser.role !== 'OWNER' && handleUpdateMemberRole(orgUser.user.id || '', orgUser.role)">
-                <icon name="ph:floppy-disk" size="15" />
+                <icon :name="memberRoleIcon.get(orgUser.user.id)?.icon || 'ph:floppy-disk'" size="15" />
               </button>
               <button class="btn" aria-label="Transfer Ownership" title="Transfer Ownership" @click="handleTransferOwnership(orgUser.user.id || '')">
-                <icon name="ph:arrow-u-up-right" size="15" />
+                <icon :name="transferOwnershipIcon.get(orgUser.user.id)?.icon || 'ph:arrow-u-up-right'" size="15" />
               </button>
               <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.user.id || '')">
                 <icon name="ph:x" size="15" />
@@ -252,6 +252,24 @@ const orgFields = [
 
 const copyIcon = orgFields.map(() => createActionHandler("ph:copy"))
 const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk"))
+const memberRoleIcon = ref(new Map())
+const transferOwnershipIcon = ref(new Map())
+const removeMemberIcon = ref(new Map())
+
+// Initialize action handlers for members
+watch(orgMembers, (members) => {
+  members.forEach((member) => {
+    if (!memberRoleIcon.value.has(member.user.id)) {
+      memberRoleIcon.value.set(member.user.id, createActionHandler("ph:floppy-disk"))
+    }
+    if (!transferOwnershipIcon.value.has(member.user.id)) {
+      transferOwnershipIcon.value.set(member.user.id, createActionHandler("ph:arrow-u-up-right"))
+    }
+    if (!removeMemberIcon.value.has(member.user.id)) {
+      removeMemberIcon.value.set(member.user.id, createActionHandler("ph:x"))
+    }
+  })
+}, { immediate: true, deep: true })
 
 async function handleCreateInvite() {
   inviteSuccess.value = null
@@ -276,6 +294,7 @@ async function handleUpdateMemberRole(memberId: string, newRole: "ADMIN" | "MEMB
 
   await orgStore.updateOrgMember(activeOrg.value.id, memberId, { role: newRole })
   await userStore.getUser()
+  memberRoleIcon.value.get(memberId)?.triggerSuccess()
 }
 
 async function handleRemoveMember(memberId: string) {
@@ -288,6 +307,7 @@ async function handleRemoveMember(memberId: string) {
 
   await orgStore.removeOrgMember(activeOrg.value.id, memberId)
   await userStore.getUser()
+  await orgStore.getOrg(activeOrg.value.id)
 }
 
 async function handleTransferOwnership(newOwnerId: string) {
@@ -301,6 +321,7 @@ async function handleTransferOwnership(newOwnerId: string) {
   await orgStore.transferOrgOwnership(activeOrg.value.id, { newOwnerId })
   await userStore.getUser()
   await orgStore.getOrg(activeOrg.value.id)
+  transferOwnershipIcon.value.get(newOwnerId)?.triggerSuccess()
 }
 
 async function handleSubmit(index: number) {
