@@ -11,12 +11,12 @@
       </div>
 
       <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
-        <button class="btn-primary" aria-label="Add New Secret" @click="() => { isSecretsDialogOpen = true; selectedSecret = null }">
+        <button v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="btn-primary" aria-label="Add New Secret" @click="() => { isSecretsDialogOpen = true; selectedSecret = null }">
           <span class="hidden md:block">Add New Secret</span>
           <icon name="ph:plus" size="20" />
         </button>
 
-        <button class="btn-secondary" aria-label="Import Secrets from .env File" @click="() => { isEnvDialogOpen = true; selectedSecret = null }">
+        <button v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="btn-secondary" aria-label="Import Secrets from .env File" @click="() => { isEnvDialogOpen = true; selectedSecret = null }">
           <span>Import</span>
           <icon name="ph:upload" size="20" />
         </button>
@@ -80,7 +80,7 @@
 const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()
-const { secrets } = storeToRefs(projectStore)
+const { secrets, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
 const { exportToEnv } = useEnvFile(project)
 const selectedSecret = ref<Secret | null>(null)
@@ -93,11 +93,9 @@ const hasPendingChanges = computed(() => pendingChanges.value.size > 0)
 
 const displayedSecrets = computed(() => {
   const secretsMap = new Map<string, Secret>()
-
   for (const secret of secrets.value) {
     secretsMap.set(secret.key, secret)
   }
-
   for (const [key, change] of pendingChanges.value.entries()) {
     if (change.type === "delete") {
       secretsMap.set(key, change.secret)

@@ -25,7 +25,7 @@
           <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" />
         </button>
 
-        <button class="btn-primary" @click="isDialogOpen = true">
+        <button v-if="isOwner || isAdmin" class="btn-primary" @click="isDialogOpen = true">
           <span class="hidden md:inline">Add New Project</span>
           <icon name="ph:plus" size="20" />
         </button>
@@ -49,6 +49,7 @@
       </li>
 
       <button
+        v-if="isOwner || isAdmin"
         v-motion :initial="{ opacity: 0 }"
         :enter="{ opacity: 1 }" :duration="600"
         class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! hover:border-primary!" @click="isDialogOpen = true"
@@ -65,7 +66,7 @@
 <script setup lang="ts">
 const userStore = useUserStore()
 const projectStore = useProjectStore()
-const { activeOrg } = storeToRefs(useOrgStore())
+const { activeOrg, isOwner, isAdmin } = storeToRefs(useOrgStore())
 const { projects } = storeToRefs(projectStore)
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
