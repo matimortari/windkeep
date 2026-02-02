@@ -20,16 +20,7 @@ export default defineEventHandler(async (event) => {
 
   const project = await db.project.findUnique({
     where: { id: projectId },
-    select: {
-      id: true,
-      name: true,
-      org: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
+    select: { id: true, name: true, org: { select: { id: true, name: true } } },
   })
   if (!project) {
     throw createError({ status: 404, statusText: "Project not found" })
@@ -37,63 +28,25 @@ export default defineEventHandler(async (event) => {
 
   const targetUser = await db.user.findUnique({
     where: { id: result.data.userId },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      image: true,
-    },
+    select: { id: true, email: true, name: true, image: true },
   })
   if (!targetUser) {
     throw createError({ status: 404, statusText: "User not found" })
   }
 
-  const orgMembership = await db.orgMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId: result.data.userId,
-        orgId: project.org.id,
-      },
-    },
-  })
+  const orgMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: result.data.userId, orgId: project.org.id } } })
   if (!orgMembership) {
     throw createError({ status: 403, statusText: "User must be a member of the organization first" })
   }
 
-  const existingRole = await db.projectMembership.findUnique({
-    where: {
-      userId_projectId: {
-        userId: result.data.userId,
-        projectId,
-      },
-    },
-  })
+  const existingRole = await db.projectMembership.findUnique({ where: { userId_projectId: { userId: result.data.userId, projectId } } })
   if (existingRole) {
     throw createError({ status: 409, statusText: "User is already a member of this project" })
   }
 
   const projectRole = await db.projectMembership.create({
-    data: {
-      userId: result.data.userId,
-      projectId,
-      role: result.data.role || "MEMBER",
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          image: true,
-        },
-      },
-      project: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
+    data: { userId: result.data.userId, projectId, role: result.data.role || "MEMBER" },
+    include: { user: { select: { id: true, email: true, name: true, image: true } }, project: { select: { id: true, name: true } } },
   })
 
   await createAuditLog({

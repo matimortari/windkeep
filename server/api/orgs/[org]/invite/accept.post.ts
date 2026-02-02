@@ -13,14 +13,7 @@ export default defineEventHandler(async (event) => {
 
   const invitation = await db.invitation.findUnique({
     where: { token: result.data.token },
-    include: {
-      org: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
+    include: { org: { select: { id: true, name: true } } },
   })
   if (!invitation) {
     throw createError({ status: 404, statusText: "Invitation not found or already used" })
@@ -29,60 +22,21 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 410, statusText: "Invitation has expired" })
   }
 
-  const existingMembership = await db.orgMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId: user.id,
-        orgId: invitation.orgId,
-      },
-    },
-  })
+  const existingMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: user.id, orgId: invitation.orgId } } })
   if (existingMembership) {
-    await db.invitation.delete({
-      where: { id: invitation.id },
-    })
+    await db.invitation.delete({ where: { id: invitation.id } })
     throw createError({ status: 409, statusText: "You are already a member of this organization" })
   }
 
-  // Create new membership with isActive: true
   const [newMembership] = await db.$transaction(async (tx) => {
-    await tx.orgMembership.updateMany({
-      where: {
-        userId: user.id,
-        isActive: true,
-      },
-      data: { isActive: false },
-    })
+    await tx.orgMembership.updateMany({ where: { userId: user.id, isActive: true }, data: { isActive: false } })
 
     const membership = await tx.orgMembership.create({
-      data: {
-        userId: user.id,
-        orgId: invitation.orgId,
-        role: "MEMBER",
-        isActive: true,
-      },
-      include: {
-        org: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
+      data: { userId: user.id, orgId: invitation.orgId, role: "MEMBER", isActive: true },
+      include: { org: { select: { id: true, name: true } }, user: { select: { id: true, email: true, name: true, image: true } } },
     })
 
-    // Delete the invitation
-    await tx.invitation.delete({
-      where: { id: invitation.id },
-    })
+    await tx.invitation.delete({ where: { id: invitation.id } })
 
     return [membership]
   })

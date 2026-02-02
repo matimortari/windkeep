@@ -6,21 +6,12 @@ import { createProjectSchema } from "#shared/schemas/project-schema"
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const body = await readBody(event)
-
   const result = createProjectSchema.safeParse(body)
   if (!result.success) {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
-
-  const slug = result.data.name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/(^-+)|(-+$)/g, "")
-    .substring(0, 50)
+  await requireRole(user.id, { type: "org", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
 
   const conflictingProject = await db.project.findFirst({ where: { orgId: result.data.orgId, name: result.data.name } })
   if (conflictingProject) {
@@ -30,41 +21,14 @@ export default defineEventHandler(async (event) => {
   const newProject = await db.project.create({
     data: {
       name: result.data.name,
-      slug,
+      slug: result.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").substring(0, 50),
       description: result.data.description ?? null,
       orgId: result.data.orgId,
-      memberships: {
-        create: {
-          userId: user.id,
-          role: "OWNER",
-        },
-      },
+      memberships: { create: { userId: user.id, role: "OWNER" } },
     },
-    include: {
-      org: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      memberships: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              image: true,
-            },
-          },
-        },
-      },
-      _count: {
-        select: {
-          secrets: true,
-        },
-      },
-    },
+    include: { org: { select: { id: true, name: true } }, memberships: {
+      include: { user: { select: { id: true, email: true, name: true, image: true } } },
+    }, _count: { select: { secrets: true } } },
   })
 
   await createAuditLog({

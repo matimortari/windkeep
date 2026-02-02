@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
+  await requireRole(user.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
 
   const query = getQuery(event)
   const parsedQuery = {
@@ -72,82 +72,40 @@ export default defineEventHandler(async (event) => {
   const auditLogs = await db.auditLog.findMany({
     where,
     include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          image: true,
-        },
-      },
-      project: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
+      project: { select: { id: true, name: true } },
+      user: { select: { id: true, email: true, name: true, image: true } },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
     take: limit,
     skip: offset,
   })
 
   // Get unique users who have audit logs in this organization
   const users = await db.user.findMany({
-    where: {
-      auditLogs: {
-        some: { orgId },
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-    orderBy: {
-      name: "asc",
-    },
+    where: { auditLogs: { some: { orgId } } },
+    select: { id: true, name: true, email: true },
+    orderBy: { name: "asc" },
   })
 
   // Get projects in this organization
   const projects = await db.project.findMany({
     where: { orgId },
-    select: {
-      id: true,
-      name: true,
-    },
-    orderBy: {
-      name: "asc",
-    },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
   })
 
   // Get unique actions
   const actionsResult = await db.auditLog.findMany({
     where: { orgId },
-    select: {
-      action: true,
-    },
+    select: { action: true },
     distinct: ["action"],
-    orderBy: {
-      action: "asc",
-    },
+    orderBy: { action: "asc" },
   })
-
-  const actions = actionsResult.map(log => log.action)
 
   const response = {
     auditLogs,
-    pagination: {
-      page,
-      limit,
-      totalPages,
-      totalItems,
-      hasNext: page < totalPages,
-      hasPrev: page > 1,
-    },
-    filters: { users, projects, actions },
+    filters: { users, projects, actions: actionsResult.map(log => log.action) },
+    pagination: { page, limit, totalPages, totalItems, hasNext: page < totalPages, hasPrev: page > 1 },
   }
 
   await setCached(cacheKey, response, CACHE_TTL.SHORT)

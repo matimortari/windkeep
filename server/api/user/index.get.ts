@@ -5,7 +5,6 @@ import { CACHE_TTL, CacheKeys, getCached, setCached } from "#server/utils/redis"
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
-  // Try to get from cache first
   const cacheKey = CacheKeys.userData(user.id)
   const cached = await getCached<any>(cacheKey)
   if (cached) {
@@ -15,9 +14,7 @@ export default defineEventHandler(async (event) => {
   const userData = await db.user.findUnique({
     where: { id: user.id },
     include: {
-      orgMemberships: {
-        include: { org: true },
-      },
+      orgMemberships: { include: { org: true } },
       projectMemberships: {
         select: {
           role: true,

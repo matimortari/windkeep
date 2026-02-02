@@ -1,20 +1,11 @@
 import { z } from "zod"
 
 export const createOrgSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(3, "Organization name must be at least 3 characters")
-    .max(50, "Organization name must be at most 50 characters"),
+  name: z.string().trim().min(3, "Organization name must be at least 3 characters").max(50, "Organization name must be at most 50 characters"),
 })
 
 export const updateOrgSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(3, "Organization name must be at least 3 characters")
-    .max(50, "Organization name must be at most 50 characters")
-    .optional(),
+  name: z.string().trim().min(3, "Organization name must be at least 3 characters").max(50, "Organization name must be at most 50 characters").optional(),
 })
 
 export const updateMemberRoleSchema = z.object({
@@ -26,10 +17,7 @@ export const createInviteSchema = z.object({
 })
 
 export const acceptInviteSchema = z.object({
-  token: z
-    .string()
-    .min(1, "Invitation token is required")
-    .transform(val => val.trim()),
+  token: z.string().min(1, "Invitation token is required").transform(val => val.trim()),
 })
 
 export const transferOwnershipSchema = z.object({

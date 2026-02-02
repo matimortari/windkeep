@@ -18,23 +18,8 @@ export default defineEventHandler(async (event) => {
       id: true,
       key: true,
       projectId: true,
-      project: {
-        select: {
-          id: true,
-          name: true,
-          org: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
-      _count: {
-        select: {
-          values: true,
-        },
-      },
+      project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } },
+      _count: { select: { values: true } },
     },
   })
   if (!secretData) {
@@ -64,10 +49,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Delete the secret (cascade will handle secret values)
-  await db.secret.delete({
-    where: { id: secretId },
-  })
+  await db.secret.delete({ where: { id: secretId } })
 
   // Invalidate cache for project secrets and user projects list
   await deleteCached(CacheKeys.projectSecrets(projectId))

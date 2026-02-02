@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
 
-  // Try to get from cache first
   const cacheKey = CacheKeys.projectSecrets(projectId)
   const cached = await getCached<any>(cacheKey)
   if (cached) {
@@ -21,27 +20,11 @@ export default defineEventHandler(async (event) => {
 
   const secrets = await db.secret.findMany({
     where: { projectId },
-    include: {
-      values: {
-        orderBy: {
-          environment: "asc",
-        },
-      },
-      project: true,
-    },
-    orderBy: {
-      key: "asc",
-    },
+    include: { project: true, values: { orderBy: { environment: "asc" } } },
+    orderBy: { key: "asc" },
   })
 
-  const decryptedSecrets = secrets.map(secret => ({
-    ...secret,
-    values: secret.values.map(val => ({
-      ...val,
-      value: decrypt(val.value),
-    })),
-  }))
-
+  const decryptedSecrets = secrets.map(secret => ({ ...secret, values: secret.values.map(val => ({ ...val, value: decrypt(val.value) })) }))
   await setCached(cacheKey, decryptedSecrets, CACHE_TTL.SHORT)
 
   return { decryptedSecrets }

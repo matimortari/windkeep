@@ -12,10 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const targetRole = await db.orgMembership.findUnique({
     where: { userId_orgId: { userId: memberId, orgId } },
-    include: {
-      user: { select: { id: true, email: true, name: true } },
-      org: { select: { id: true, name: true } },
-    },
+    include: { user: { select: { id: true, email: true, name: true } }, org: { select: { id: true, name: true } } },
   })
   if (!targetRole) {
     throw createError({ status: 404, statusText: "Member not found in organization" })
@@ -23,15 +20,13 @@ export default defineEventHandler(async (event) => {
 
   // Check permissions for non-self removal
   if (memberId !== user.id) {
-    await requireRole(user.id, { type: "organization", orgId }, ["OWNER", "ADMIN"])
+    await requireRole(user.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
     if (targetRole.role === "OWNER") {
       throw createError({ status: 403, statusText: "Cannot remove organization owners." })
     }
   }
   else if (targetRole.role === "OWNER") {
-    const allMembers = await db.orgMembership.findMany({
-      where: { orgId },
-    })
+    const allMembers = await db.orgMembership.findMany({ where: { orgId } })
 
     const otherMembers = allMembers.filter(m => m.userId !== memberId)
     if (otherMembers.length === 0) {
@@ -45,42 +40,22 @@ export default defineEventHandler(async (event) => {
 
   // Ensure no dangling active org
   if (targetRole.isActive) {
-    await db.orgMembership.update({
-      where: { userId_orgId: { userId: memberId, orgId } },
-      data: { isActive: false },
-    })
+    await db.orgMembership.update({ where: { userId_orgId: { userId: memberId, orgId } }, data: { isActive: false } })
 
     // Switch to another org if possible
-    const next = await db.orgMembership.findFirst({
-      where: { userId: memberId, orgId: { not: orgId } },
-      orderBy: { createdAt: "asc" },
-    })
-
+    const next = await db.orgMembership.findFirst({ where: { userId: memberId, orgId: { not: orgId } }, orderBy: { createdAt: "asc" } })
     if (next) {
-      await db.orgMembership.update({
-        where: { userId_orgId: { userId: memberId, orgId: next.orgId } },
-        data: { isActive: true },
-      })
+      await db.orgMembership.update({ where: { userId_orgId: { userId: memberId, orgId: next.orgId } }, data: { isActive: true } })
     }
   }
 
   // Remove user from all projects in this organization
-  const projectsInOrg = await db.project.findMany({
-    where: { orgId },
-    select: { id: true },
-  })
+  const projectsInOrg = await db.project.findMany({ where: { orgId }, select: { id: true } })
   if (projectsInOrg.length > 0) {
-    await db.projectMembership.deleteMany({
-      where: {
-        userId: memberId,
-        projectId: { in: projectsInOrg.map(p => p.id) },
-      },
-    })
+    await db.projectMembership.deleteMany({ where: { userId: memberId, projectId: { in: projectsInOrg.map(p => p.id) } } })
   }
 
-  await db.orgMembership.delete({
-    where: { userId_orgId: { userId: memberId, orgId } },
-  })
+  await db.orgMembership.delete({ where: { userId_orgId: { userId: memberId, orgId } } })
 
   await createAuditLog({
     event,
@@ -99,7 +74,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for affected user's data
+  // Invalidate cache for removed user's data
   await deleteCached(CacheKeys.userData(memberId))
 
   return { success: true, message: "Member removed successfully" }
