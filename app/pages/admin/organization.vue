@@ -138,11 +138,8 @@
       </header>
 
       <div class="navigation-group self-end">
-        <p v-if="errors.createInvite" class="text-danger">
-          {{ errors.createInvite }}
-        </p>
-        <p v-if="inviteSuccess" class="text-success">
-          {{ inviteSuccess }}
+        <p v-if="errors.createInvite || inviteSuccess" :class="errors.createInvite ? 'text-danger' : 'text-success'">
+          {{ errors.createInvite || inviteSuccess }}
         </p>
 
         <button class="btn-primary" aria-label="Create Invite Link" @click="handleCreateInvite">
@@ -173,16 +170,10 @@
           </p>
         </header>
 
-        <div class="navigation-group self-end">
-          <p v-if="errors.removeOrgMember" class="text-danger">
-            {{ errors.removeOrgMember }}
-          </p>
-
-          <button class="btn-danger" aria-label="Leave Organization" @click="handleLeaveOrg">
-            <icon name="ph:sign-out" size="20" />
-            <span>Confirm</span>
-          </button>
-        </div>
+        <button class="btn-danger self-end" aria-label="Leave Organization" @click="handleLeaveOrg">
+          <icon name="ph:sign-out" size="20" />
+          <span>Confirm</span>
+        </button>
       </nav>
 
       <nav v-if="isOwner" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Organization">
@@ -195,16 +186,10 @@
           </p>
         </header>
 
-        <div class="navigation-group self-end">
-          <p v-if="errors.deleteOrg" class="text-danger">
-            {{ errors.deleteOrg }}
-          </p>
-
-          <button class="btn-danger" aria-label="Delete Organization" @click="handleDeleteOrg">
-            <icon name="ph:network-x" size="20" />
-            <span>Confirm</span>
-          </button>
-        </div>
+        <button class="btn-danger self-end" aria-label="Delete Organization" @click="handleDeleteOrg">
+          <icon name="ph:network-x" size="20" />
+          <span>Confirm</span>
+        </button>
       </nav>
     </section>
   </div>
@@ -224,11 +209,7 @@ const orgFields = [
     description: "The name of your organization.",
     type: "input",
     model: computed(() => activeOrg.value?.name || ""),
-    update: (value: string) => {
-      if (activeOrg.value) {
-        activeOrg.value.name = value
-      }
-    },
+    update: (value: string) => { activeOrg.value!.name = value },
     onSave: handleSubmit,
     editable: isOwner,
   },

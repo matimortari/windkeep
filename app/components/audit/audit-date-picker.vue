@@ -54,9 +54,7 @@ const props = defineProps<{
   modelValue?: { start?: string, end?: string }
 }>()
 
-const emit = defineEmits<{
-  "update:modelValue": [{ start?: string, end?: string }]
-}>()
+const emit = defineEmits<{ "update:modelValue": [{ start?: string, end?: string }] }>()
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
@@ -67,10 +65,7 @@ const currentYear = ref(new Date().getFullYear())
 const hoverDate = ref<Date | null>(null)
 const startDate = computed(() => parseDate(props.modelValue?.start))
 const endDate = computed(() => parseDate(props.modelValue?.end))
-const years = computed(() => {
-  const currentY = new Date().getFullYear()
-  return Array.from({ length: 10 }, (_, i) => currentY - 5 + i)
-})
+const years = computed(() => Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i))
 
 useClickOutside(datePickerRef, () => {
   isOpen.value = false

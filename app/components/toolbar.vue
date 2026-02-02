@@ -50,7 +50,7 @@
         <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
           <icon :name="themeIcon" size="20" />
         </button>
-        <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="$emit('toggleSidebar')">
+        <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="emit('toggleSidebar')">
           <icon name="ph:list" size="20" />
         </button>
         <button class="btn" aria-label="Sign Out" @click="signOut">
@@ -66,7 +66,7 @@ defineProps<{
   orgs: Array<Organization> | null
 }>()
 
-defineEmits<(e: "toggleSidebar") => void>()
+const emit = defineEmits<(e: "toggleSidebar") => void>()
 
 const { toggleTheme, themeIcon } = useTheme()
 const { user } = storeToRefs(useUserStore())
@@ -94,15 +94,10 @@ async function handleSetActiveOrg(orgId: string) {
   }
 
   isDropdownOpen.value = false
-  const org = organizations.value.find((o: Organization) => o.id === orgId)
-  if (!org) {
-    const res = await orgStore.getOrg(orgId)
-    if (res) {
-      orgStore.setActiveOrg(res.id)
-    }
-    return
+  if (!organizations.value.find(o => o.id === orgId)) {
+    await orgStore.getOrg(orgId)
   }
 
-  orgStore.setActiveOrg(org.id)
+  orgStore.setActiveOrg(orgId)
 }
 </script>

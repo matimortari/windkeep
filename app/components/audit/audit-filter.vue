@@ -72,8 +72,7 @@ function getUserDisplayName(userId?: string) {
     return "All Users"
   }
 
-  const user = availableUsers.value.find((u: { id: string, name: string | null }) => u.id === userId)
-  return user?.name
+  return availableUsers.value.find((u: { id: string, name: string | null }) => u.id === userId)?.name
 }
 
 function updateFilter(type: "date" | "user" | "action", value: any) {
@@ -109,8 +108,7 @@ async function handleDeleteLogs() {
     userId: currentFilters.value.userId || undefined,
   })
 
-  const resetFilters = { ...currentFilters.value, page: 1 }
-  auditStore.updateFilters(resetFilters)
-  await auditStore.getAuditLogs(activeOrg.value!.id, resetFilters)
+  auditStore.updateFilters({ ...currentFilters.value, page: 1 })
+  await auditStore.getAuditLogs(activeOrg.value!.id, { ...currentFilters.value, page: 1 })
 }
 </script>
