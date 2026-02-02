@@ -22,7 +22,7 @@ const PAGE_DESCRIPTIONS: Record<string, string> = {
 }
 
 useHead({
-  title: `CLI - ${PAGE_TITLES[slug]}`,
+  title: `CLI – ${PAGE_TITLES[slug]}`,
   link: [{ rel: "canonical", href: `https://windkeep.vercel.app/cli/${slug}` }],
   meta: [{ name: "description", content: PAGE_DESCRIPTIONS[slug] }],
 })

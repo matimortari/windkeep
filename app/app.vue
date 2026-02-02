@@ -13,7 +13,7 @@ useSessionMonitor()
 useHead({
   htmlAttrs: { lang: "en" },
   link: [{ rel: "icon", href: "/favicon.svg" }],
-  titleTemplate: "%s - WindKeep",
+  titleTemplate: "%s – WindKeep",
   meta: [
     { name: "description", content: "Centralize, encrypt, and share your secrets with confidence. Fast, safe, and easy to use." },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
