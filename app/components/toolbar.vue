@@ -72,6 +72,7 @@ const { toggleTheme, themeIcon } = useTheme()
 const { user } = storeToRefs(useUserStore())
 const { activeOrg, organizations } = storeToRefs(useOrgStore())
 const route = useRoute()
+const router = useRouter()
 const orgStore = useOrgStore()
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
@@ -94,10 +95,11 @@ async function handleSetActiveOrg(orgId: string) {
   }
 
   isDropdownOpen.value = false
-  if (!organizations.value.find(o => o.id === orgId)) {
+  if (!organizations.value.some(o => o.id === orgId)) {
     await orgStore.getOrg(orgId)
   }
 
   orgStore.setActiveOrg(orgId)
+  await router.push("/admin/projects")
 }
 </script>
