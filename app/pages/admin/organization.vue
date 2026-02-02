@@ -258,10 +258,7 @@ async function handleCreateInvite() {
     return
   }
 
-  const result = await orgStore.createInvite(activeOrg.value.id, {
-    orgId: activeOrg.value.id,
-  })
-
+  const result = await orgStore.createInvite(activeOrg.value.id, { orgId: activeOrg.value.id })
   if (result?.inviteUrl) {
     await navigator.clipboard.writeText(result.inviteUrl)
     inviteSuccess.value = "Invite link copied to clipboard!"

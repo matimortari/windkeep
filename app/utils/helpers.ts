@@ -17,15 +17,6 @@ export function formatDate(date?: string | Date | null): string {
 }
 
 /**
- * Copies the provided string value to the clipboard.
- */
-export function copyToClipboard(val: string) {
-  if (val) {
-    navigator.clipboard.writeText(val)
-  }
-}
-
-/**
  * Capitalizes the first letter of the given string.
  */
 export function capitalizeFirst(str: string) {
@@ -36,12 +27,14 @@ export function capitalizeFirst(str: string) {
  * Normalizes a string to be used as an environment variable key.
  */
 export function normalizeKey(key: string): string {
-  return key
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9_]/g, "_") // Replace invalid chars with underscore
-    .replace(/_+/g, "_") // Collapse multiple underscores
-    .replace(/^_+|_+$/g, "") // Remove leading/trailing underscores
+  return key.trim().toUpperCase().replace(/[^A-Z0-9_]/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "")
+}
+
+/**
+ * Extracts the error message from various error formats (Nuxt/H3/Zod).
+ */
+export function getErrorMessage(err: any, fallback: string): string {
+  return err?.data?.statusMessage || err?.data?.message || err?.statusMessage || err?.message || fallback
 }
 
 /**
