@@ -16,7 +16,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:     "windkeep",
 	Aliases: []string{"wk"},
-	Short:   "WindKeep CLI - Manage your secrets from the terminal",
+	Short:   "WindKeep CLI – Manage your secrets from the terminal",
 	Long: `WindKeep CLI is a command-line interface for managing secrets,
 organizations, and projects in your WindKeep instance.
 
