@@ -53,13 +53,15 @@ async function handleSubmit() {
   }
 
   emit("save", payload)
-  emit("close")
 }
 
 watch(() => props.isOpen, (open) => {
   if (open) {
     form.value.name = ""
     form.value.description = ""
+  }
+  else {
+    errors.value.createProject = null
   }
 }, { immediate: true })
 </script>
