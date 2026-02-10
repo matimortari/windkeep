@@ -123,10 +123,10 @@ export function getInviteBaseUrl(event: any) {
  */
 export async function getBinaryBlobUrl(binaryKey: string) {
   const BINARIES: Record<string, string | undefined> = {
-    "windkeep-darwin-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-darwin-amd64",
-    "windkeep-darwin-arm64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-darwin-arm64",
-    "windkeep-linux-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-linux-amd64",
-    "windkeep-windows-amd64.exe": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep-binaries/windkeep-windows-amd64.exe",
+    "windkeep-darwin-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-darwin-amd64",
+    "windkeep-darwin-arm64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-darwin-arm64",
+    "windkeep-linux-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-linux-amd64",
+    "windkeep-windows-amd64.exe": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-windows-amd64.exe",
   }
 
   if (!BINARIES[binaryKey]) {
