@@ -109,7 +109,7 @@ export const REST_METHOD_LABELS = {
 }
 
 export const OAUTH_PROVIDERS = [
-  { name: "github", label: "Sign In With Github", icon: "simple-icons:github" },
+  { name: "github", label: "Sign In With GitHub", icon: "simple-icons:github" },
   { name: "google", label: "Sign In With Google", icon: "simple-icons:google" },
   { name: "gitlab", label: "Sign In With GitLab", icon: "simple-icons:gitlab" },
 ]
