@@ -59,22 +59,6 @@ const form = ref<{ key: string, description: string, values: Record<Environment,
 })
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
-function resetForm() {
-  if (props.selectedSecret) {
-    const mappedValues: Record<Environment, string> = { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" }
-    if (props.selectedSecret.values) {
-      for (const sv of props.selectedSecret.values) {
-        mappedValues[sv.environment] = sv.value
-      }
-    }
-
-    form.value = { key: props.selectedSecret.key, description: props.selectedSecret.description || "", values: mappedValues }
-  }
-  else {
-    form.value = { key: "", description: "", values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } }
-  }
-}
-
 async function handleSubmit() {
   const values = Object.entries(form.value.values).filter(([_, value]) => value.trim() !== "").map(([environment, value]) => ({
     environment: environment as Environment,
@@ -93,15 +77,32 @@ async function handleSubmit() {
   emit("save", secret)
 }
 
-watch(() => props.isOpen, (open) => {
+function resetForm() {
+  if (props.selectedSecret) {
+    const mappedValues: Record<Environment, string> = { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" }
+    if (props.selectedSecret.values) {
+      for (const sv of props.selectedSecret.values) {
+        mappedValues[sv.environment] = sv.value
+      }
+    }
+
+    form.value = { key: props.selectedSecret.key, description: props.selectedSecret.description || "", values: mappedValues }
+  }
+  else {
+    form.value = { key: "", description: "", values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } }
+  }
+}
+
+// Reset form and clear errors when dialog is opened or selected secret changes
+watch([() => props.isOpen, () => props.selectedSecret], ([open]) => {
   if (open) {
     resetForm()
+    if (isUpdateMode.value && errors.value.updateProjectSecret) {
+      errors.value.updateProjectSecret = null
+    }
+    else if (!isUpdateMode.value && errors.value.createProjectSecret) {
+      errors.value.createProjectSecret = null
+    }
   }
-}, { immediate: true })
-
-watch(() => props.selectedSecret, () => {
-  if (props.isOpen) {
-    resetForm()
-  }
-}, { deep: true })
+}, { immediate: true, deep: true })
 </script>

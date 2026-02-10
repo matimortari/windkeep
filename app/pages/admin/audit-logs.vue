@@ -23,6 +23,7 @@ const { activeOrg, isOwner, isAdmin } = storeToRefs(orgStore)
 const auditStore = useAuditStore()
 const hasPermission = computed(() => isOwner.value || isAdmin.value)
 
+// Get audit logs when organization changes and user has permission
 watch(activeOrg, async (org) => {
   if (org?.id && hasPermission.value) {
     await auditStore.getAuditLogs(org.id)

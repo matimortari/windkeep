@@ -90,10 +90,14 @@ function handleSubmit() {
   emit("save", payload)
 }
 
+// Reset form and clear errors when dialog is opened
 watch(() => props.isOpen, (open) => {
   if (open) {
     envContent.value = ""
     selectedEnv.value = "DEVELOPMENT"
+    if (errors.value.createProjectSecret) {
+      errors.value.createProjectSecret = null
+    }
   }
 })
 </script>
