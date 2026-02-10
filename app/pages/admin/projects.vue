@@ -53,6 +53,7 @@ const layout = ref<"list" | "grid">((import.meta.client && localStorage.getItem(
 // All projects the user has access to, across all orgs
 const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))
 
+// Projects within the active org that the user has access to
 const activeOrgProjects = computed(() => {
   if (!activeOrg.value?.id) {
     return []
@@ -88,12 +89,7 @@ async function handleCreateProject(project: { name: string, description?: string
   }
 }
 
-watch(() => activeOrg.value?.id, async (id) => {
-  if (id) {
-    await projectStore.getProjects()
-  }
-}, { immediate: true })
-
+// Persist layout mode in localStorage
 watch(layout, (value) => {
   if (import.meta.client) {
     localStorage.setItem("layoutMode", value)

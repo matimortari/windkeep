@@ -237,21 +237,6 @@ const memberRoleIcon = ref(new Map())
 const transferOwnershipIcon = ref(new Map())
 const removeMemberIcon = ref(new Map())
 
-// Initialize action handlers for members
-watch(orgMembers, (members) => {
-  members.forEach((member) => {
-    if (!memberRoleIcon.value.has(member.user.id)) {
-      memberRoleIcon.value.set(member.user.id, createActionHandler("ph:floppy-disk"))
-    }
-    if (!transferOwnershipIcon.value.has(member.user.id)) {
-      transferOwnershipIcon.value.set(member.user.id, createActionHandler("ph:arrow-u-up-right"))
-    }
-    if (!removeMemberIcon.value.has(member.user.id)) {
-      removeMemberIcon.value.set(member.user.id, createActionHandler("ph:x"))
-    }
-  })
-}, { immediate: true, deep: true })
-
 async function handleCreateInvite() {
   inviteSuccess.value = null
   if (!activeOrg.value?.id) {
@@ -337,6 +322,21 @@ async function handleDeleteOrg() {
 
   await orgStore.deleteOrg(activeOrg.value.id)
 }
+
+// Initialize action handlers for members
+watch(orgMembers, (members) => {
+  members.forEach((member) => {
+    if (!memberRoleIcon.value.has(member.user.id)) {
+      memberRoleIcon.value.set(member.user.id, createActionHandler("ph:floppy-disk"))
+    }
+    if (!transferOwnershipIcon.value.has(member.user.id)) {
+      transferOwnershipIcon.value.set(member.user.id, createActionHandler("ph:arrow-u-up-right"))
+    }
+    if (!removeMemberIcon.value.has(member.user.id)) {
+      removeMemberIcon.value.set(member.user.id, createActionHandler("ph:x"))
+    }
+  })
+}, { immediate: true, deep: true })
 
 useHead({
   title: "Organization",
