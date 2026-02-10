@@ -280,18 +280,6 @@ const copyIcon = projectFields.map(() => createActionHandler("ph:copy"))
 const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk"))
 const memberRoleIcon = ref(new Map())
 
-// Initialize action handlers for members
-watch(() => project.value?.memberships, (memberships) => {
-  if (!memberships) {
-    return
-  }
-  memberships.forEach((member) => {
-    if (!memberRoleIcon.value.has(member.userId)) {
-      memberRoleIcon.value.set(member.userId, createActionHandler("ph:floppy-disk"))
-    }
-  })
-}, { immediate: true, deep: true })
-
 useClickOutside(addMemberDropdownRef, () => {
   isAddMemberDropdownOpen.value = false
 }, { escapeKey: true })
@@ -379,6 +367,19 @@ async function handleLeaveProject() {
   await navigateTo("/admin/projects")
 }
 
+// Initialize action handlers for members
+watch(() => project.value?.memberships, (memberships) => {
+  if (!memberships) {
+    return
+  }
+  memberships.forEach((member) => {
+    if (!memberRoleIcon.value.has(member.userId)) {
+      memberRoleIcon.value.set(member.userId, createActionHandler("ph:floppy-disk"))
+    }
+  })
+}, { immediate: true, deep: true })
+
+// Keep local project state in sync with store
 watch(() => project.value, (proj) => {
   if (!proj) {
     return
@@ -394,6 +395,7 @@ watch(() => project.value, (proj) => {
   }
 }, { immediate: true })
 
+// Set page metadata when project changes
 watch(() => project.value?.id, async (id: string | undefined) => {
   const projectTitle = projects.value.find(p => p.id === id)?.name
 

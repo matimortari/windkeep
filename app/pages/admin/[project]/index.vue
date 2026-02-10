@@ -179,6 +179,7 @@ onBeforeRouteLeave((_to, _from, next) => {
   }
 })
 
+// Get secrets and set page metadata when project changes
 watch(() => project.value?.id, async (id) => {
   if (!id) {
     return
