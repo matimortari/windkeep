@@ -63,7 +63,7 @@
         </h5>
 
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
-          <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 last:border-b-0">
+          <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 first:pt-0 last:border-b-0 last:pb-0">
             <div class="navigation-group items-start!">
               <img :src="member.user.image || DEFAULT_AVATAR" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
 
@@ -209,13 +209,13 @@ const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
 const localProject = ref<Project | null>(null)
 const isAddMemberDropdownOpen = ref(false)
 const addMemberDropdownRef = ref<HTMLElement | null>(null)
+
 const availableOrgMembers = computed(() => {
   if (!project.value || !orgMembers.value) {
     return []
   }
 
-  const projectMemberIds = new Set(project.value.memberships?.map(m => m.userId) || [])
-  return orgMembers.value.filter(member => !projectMemberIds.has(member.user.id))
+  return orgMembers.value.filter(member => !new Set(project.value?.memberships?.map(m => m.userId) || []).has(member.user.id))
 })
 
 const projectFields = [

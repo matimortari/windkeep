@@ -1,41 +1,18 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="navigation-group border-b py-2">
-      <h2>
-        Projects
-      </h2>
-
-      <nav class="navigation-group w-full flex-1 justify-end">
-        <div class="relative hidden md:block">
-          <input id="search" v-model="searchQuery" type="text" placeholder="Search projects...">
-          <span class="absolute inset-y-0 right-0 flex flex-row items-center pr-4 text-muted-foreground">
-            <icon name="ph:magnifying-glass" size="20" />
-          </span>
-        </div>
-
-        <button class="btn" :title="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="toggleSort">
-          <icon name="ph:arrow-down" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
-        </button>
-
-        <button title="Toggle Layout" class="btn" @click="layout = layout === 'grid' ? 'list' : 'grid'">
-          <icon :name="layout === 'grid' ? 'ph:list-bullets' : 'ph:squares-four'" size="20" />
-        </button>
-
-        <button class="btn" :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
-          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" />
-        </button>
-
-        <button v-if="isOwner || isAdmin" class="btn-primary" @click="isDialogOpen = true">
-          <span class="hidden md:inline">Add New Project</span>
-          <icon name="ph:plus" size="20" />
-        </button>
-      </nav>
-    </header>
+    <ProjectsActions
+      :search="searchQuery" :layout="layout"
+      :show-all="showAllProjects" :sort-direction="sortDirection || 'asc'"
+      :is-owner="isOwner" :is-admin="isAdmin"
+      @update:search="searchQuery = $event" @update:layout="layout = $event"
+      @update:show-all="showAllProjects = $event" @toggle-sort="toggleSort"
+      @open-dialog="isDialogOpen = true"
+    />
 
     <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" />
 
     <div v-else-if="layout === 'list'" class="flex max-h-screen">
-      <ProjectTable :projects="filteredProjects" />
+      <ProjectsTable :projects="filteredProjects" />
     </div>
 
     <ul v-else class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3">
@@ -45,21 +22,21 @@
         :enter="{ opacity: 1 }" :duration="600"
         :delay="200 * index"
       >
-        <ProjectCard :project="project" />
+        <ProjectsCard :project="project" />
       </li>
 
       <button
-        v-if="isOwner || isAdmin"
-        v-motion :initial="{ opacity: 0 }"
-        :enter="{ opacity: 1 }" :duration="600"
-        class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! hover:border-primary!" @click="isDialogOpen = true"
+        v-if="isOwner || isAdmin" v-motion
+        :initial="{ opacity: 0 }" :enter="{ opacity: 1 }"
+        :duration="600" class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! hover:border-primary!"
+        @click="isDialogOpen = true"
       >
         <icon name="ph:plus" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-primary" />
         <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
       </button>
     </ul>
 
-    <ProjectDialog :is-open="isDialogOpen" @close="isDialogOpen = false" @save="handleCreateProject" />
+    <ProjectsDialog :is-open="isDialogOpen" @close="isDialogOpen = false" @save="handleCreateProject" />
   </div>
 </template>
 
@@ -76,7 +53,6 @@ const layout = ref<"list" | "grid">((import.meta.client && localStorage.getItem(
 // All projects the user has access to, across all orgs
 const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))
 
-// Projects in the active organization that the user has access to
 const activeOrgProjects = computed(() => {
   if (!activeOrg.value?.id) {
     return []
@@ -85,8 +61,8 @@ const activeOrgProjects = computed(() => {
   return projects.value.filter(project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id))
 })
 
-const { sortedData: sortedProjects, sortDirection, sortKey, setSort } = useTableSort<Project>(computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)))
-const filteredProjects = computed(() => sortedProjects.value.filter(project => project.name.toLowerCase().includes(searchQuery.value.toLowerCase())))
+const { sortedData, sortDirection, sortKey, setSort } = useTableSort<Project>(computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)))
+const filteredProjects = computed(() => sortedData.value.filter(p => p.name.toLowerCase().includes(searchQuery.value.toLowerCase())))
 
 function toggleSort() {
   if (sortKey.value !== "name") {
@@ -112,15 +88,15 @@ async function handleCreateProject(project: { name: string, description?: string
   }
 }
 
-watch(() => activeOrg.value?.id, async (orgId) => {
-  if (orgId) {
+watch(() => activeOrg.value?.id, async (id) => {
+  if (id) {
     await projectStore.getProjects()
   }
 }, { immediate: true })
 
-watch(layout, (newLayout) => {
+watch(layout, (value) => {
   if (import.meta.client) {
-    localStorage.setItem("layoutMode", newLayout)
+    localStorage.setItem("layoutMode", value)
   }
 })
 

@@ -51,7 +51,7 @@ async function handleCreateOrg() {
   }
 
   orgStore.setActiveOrg(org.id)
-  navigateTo("/admin/projects")
+  setTimeout(() => navigateTo("/admin/projects"), 2000)
 }
 
 onMounted(async () => {
