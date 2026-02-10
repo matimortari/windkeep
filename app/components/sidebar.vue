@@ -48,7 +48,7 @@
     </div>
   </aside>
 
-  <ProjectDialog :is-open="isDialogOpen" @close="isDialogOpen = false" @save="handleCreateProject" />
+  <ProjectsDialog :is-open="isDialogOpen" @close="isDialogOpen = false" @save="handleCreateProject" />
 </template>
 
 <script setup lang="ts">

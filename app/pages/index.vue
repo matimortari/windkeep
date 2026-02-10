@@ -140,7 +140,7 @@
 
     <div class="flex w-full flex-col items-center justify-center divide-y">
       <div v-for="(item, index) in FAQS" :key="index" class="w-full max-w-xs space-y-2 p-4 md:max-w-xl">
-        <button class="group flex w-full items-start justify-between gap-2 font-semibold hover:text-primary" @click="toggleAccordion(index)">
+        <button class="group flex w-full items-start justify-between gap-2 font-semibold hover:text-primary" @click="openIndex = openIndex === index ? null : index">
           <p class="text-sm/4 md:text-base">
             {{ item.question }}
           </p>
@@ -160,10 +160,6 @@
 <script setup lang="ts">
 const openIndex = ref<number | null>(null)
 const activeTab = ref<"install" | "commands">("install")
-
-function toggleAccordion(index: number) {
-  openIndex.value = openIndex.value === index ? null : index
-}
 
 useHead({
   title: "Securely Manage Your Environment Variables",

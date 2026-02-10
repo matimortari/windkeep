@@ -5,7 +5,7 @@
         Audit Logs
       </h2>
 
-      <AuditFilter v-if="hasPermission" />
+      <AuditActions v-if="hasPermission" />
     </header>
 
     <Empty v-if="!hasPermission" message="You don't have permission to view audit logs. Only organization owners and administrators can access this section." icon-name="ph:lock" />
