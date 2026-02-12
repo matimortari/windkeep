@@ -1,6 +1,11 @@
+import { Buffer } from "node:buffer"
+import { promises as fs } from "node:fs"
+import os from "node:os"
+import path from "node:path"
 import db from "#server/utils/db"
-import { getUserFromSession, requireRole } from "#server/utils/helpers"
+import { getUserFromSession, requireRole, uploadFile } from "#server/utils/helpers"
 import { deleteAuditLogsSchema } from "#shared/schemas/audit-schema"
+import parquet from "parquetjs"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -31,7 +36,59 @@ export default defineEventHandler(async (event) => {
     where.action = { contains: result.data.action, mode: "insensitive" }
   }
 
-  const deleteResult = await db.auditLog.deleteMany({ where })
+  // Limit for memory safety
+  const logs = await db.auditLog.findMany({ where, take: 20000, orderBy: { createdAt: "asc" } })
+  if (logs.length === 0) {
+    return { success: true, message: "No logs found to delete" }
+  }
 
-  return { success: true, message: `Deleted ${deleteResult.count} audit log(s)` }
+  // Define Parquet schema
+  const schema = new parquet.ParquetSchema({
+    id: { type: "UTF8" },
+    userId: { type: "UTF8", optional: true },
+    action: { type: "UTF8" },
+    resource: { type: "UTF8", optional: true },
+    description: { type: "UTF8", optional: true },
+    ip: { type: "UTF8", optional: true },
+    ua: { type: "UTF8", optional: true },
+    metadata: { type: "UTF8", optional: true },
+    createdAt: { type: "TIMESTAMP_MILLIS" },
+  })
+
+  // Write logs to a temporary Parquet file before uploading to cold storage
+  const tempPath = path.join(os.tmpdir(), `audit_archive_${Date.now()}.parquet`)
+  const writer = await parquet.ParquetWriter.openFile(schema, tempPath)
+  for (const log of logs) {
+    await writer.appendRow({
+      id: log.id,
+      userId: log.userId ?? null,
+      action: log.action,
+      resource: log.resource ?? null,
+      description: log.description ?? null,
+      ip: log.ip ?? null,
+      ua: log.ua ?? null,
+      metadata: log.metadata ? JSON.stringify(log.metadata) : null,
+      createdAt: log.createdAt,
+    } as any)
+  }
+
+  // Read generated parquet file and upload to cold storage
+  await writer.close()
+  const buffer = await fs.readFile(tempPath)
+  const file = new File([Buffer.from(buffer)], `audit_archive_${Date.now()}.parquet`, { type: "application/vnd.apache.parquet" })
+  await uploadFile({
+    path: `windkeep/archive/org_${org}`,
+    file,
+    maxSize: 50 * 1024 * 1024,
+    allowedMimeTypes: ["application/vnd.apache.parquet", "application/octet-stream"],
+  })
+
+  // Clean up temporary file and delete logs from database
+  await fs.unlink(tempPath)
+  const deleteResult = await db.auditLog.deleteMany({ where: { id: { in: logs.map(l => l.id) } } })
+
+  // Invalidate cache
+  await deleteCached(CacheKeys.orgAuditLogs(org, 1, ""))
+
+  return { success: true, message: `Successfully deleted ${deleteResult.count} audit ${deleteResult.count === 1 ? "log" : "logs"}` }
 })
