@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -19,6 +20,20 @@ type ErrorResponse struct {
 	Error   string `json:"error"`
 	Message string `json:"message"`
 	Status  int    `json:"status"`
+}
+
+// ParseEnvironment converts a string to an Environment enum value
+func ParseEnvironment(environment string) Environment {
+	switch strings.ToUpper(environment) {
+	case "DEV", "DEVELOPMENT":
+		return EnvDevelopment
+	case "STAGING":
+		return EnvStaging
+	case "PROD", "PRODUCTION":
+		return EnvProduction
+	default:
+		return EnvDevelopment
+	}
 }
 
 // NewClient creates a new API client

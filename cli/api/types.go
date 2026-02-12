@@ -2,7 +2,6 @@ package api
 
 import "time"
 
-// Environment types
 type Environment string
 
 const (
@@ -11,7 +10,6 @@ const (
 	EnvProduction  Environment = "PRODUCTION"
 )
 
-// Role types
 type Role string
 
 const (
@@ -20,7 +18,6 @@ const (
 	RoleMember Role = "MEMBER"
 )
 
-// User represents a user
 type User struct {
 	ID             string          `json:"id"`
 	Email          string          `json:"email"`
@@ -32,7 +29,6 @@ type User struct {
 	UpdatedAt      time.Time       `json:"updatedAt"`
 }
 
-// OrgMembership represents a user's membership in an organization
 type OrgMembership struct {
 	UserID   string       `json:"userId"`
 	OrgID    string       `json:"orgId"`
@@ -41,7 +37,6 @@ type OrgMembership struct {
 	Org      Organization `json:"org"`
 }
 
-// Organization represents an organization
 type Organization struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
@@ -52,7 +47,6 @@ type Organization struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// Project represents a project within an organization
 type Project struct {
 	ID          string        `json:"id"`
 	Name        string        `json:"name"`
@@ -65,7 +59,6 @@ type Project struct {
 	UpdatedAt   time.Time     `json:"updatedAt"`
 }
 
-// Secret represents a secret key
 type Secret struct {
 	ID          string        `json:"id"`
 	Key         string        `json:"key"`
@@ -77,7 +70,6 @@ type Secret struct {
 	UpdatedAt   time.Time     `json:"updatedAt"`
 }
 
-// SecretValue represents a secret value for a specific environment
 type SecretValue struct {
 	ID          string      `json:"id"`
 	SecretID    string      `json:"secretId"`
@@ -87,7 +79,6 @@ type SecretValue struct {
 	UpdatedAt   time.Time   `json:"updatedAt"`
 }
 
-// Request types
 type CreateProjectRequest struct {
 	Name        string  `json:"name"`
 	Slug        string  `json:"slug"`

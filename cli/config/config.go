@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/matimortari/windkeep/cli/api"
 	"gopkg.in/yaml.v3"
 )
 
@@ -111,18 +109,4 @@ func Delete(customPath string) error {
 	}
 
 	return nil
-}
-
-// ParseEnvironment converts a string to an api.Environment type
-func ParseEnvironment(environment string) api.Environment {
-	switch strings.ToUpper(environment) {
-	case "DEV", "DEVELOPMENT":
-		return api.EnvDevelopment
-	case "STAGING":
-		return api.EnvStaging
-	case "PROD", "PRODUCTION":
-		return api.EnvProduction
-	default:
-		return api.EnvDevelopment
-	}
 }

@@ -39,7 +39,7 @@ var pushCmd = &cobra.Command{
 		}
 
 		var secrets []api.Secret
-		env := config.ParseEnvironment(pushEnv)
+		env := api.ParseEnvironment(pushEnv)
 		scanner := bufio.NewScanner(strings.NewReader(string(data)))
 		for scanner.Scan() {
 			line := strings.TrimSpace(scanner.Text())
