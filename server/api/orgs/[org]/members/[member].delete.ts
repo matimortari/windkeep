@@ -26,13 +26,11 @@ export default defineEventHandler(async (event) => {
     }
   }
   else if (targetRole.role === "OWNER") {
-    const allMembers = await db.orgMembership.findMany({ where: { orgId } })
-
-    const otherMembers = allMembers.filter(m => m.userId !== memberId)
+    const otherMembers = await db.orgMembership.findMany({ where: { orgId, userId: { not: memberId } } })
     if (otherMembers.length === 0) {
       await db.organization.delete({ where: { id: orgId } })
       await deleteCached(CacheKeys.userData(memberId))
-      return { success: true, message: "Left organization. Organization was deleted as you were the last member." }
+      return { success: true, message: "Left organization. Organization was deleted as you were the last member" }
     }
 
     throw createError({ status: 400, statusText: "Cannot leave organization as owner. Please transfer ownership to another member first, or delete the organization." })
