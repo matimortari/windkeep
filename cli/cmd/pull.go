@@ -38,7 +38,7 @@ var pullCmd = &cobra.Command{
 		}
 
 		var data []byte
-		env := config.ParseEnvironment(pullEnv)
+		env := api.ParseEnvironment(pullEnv)
 		var lines []string
 		for _, secret := range secrets {
 			for _, val := range secret.Values {
