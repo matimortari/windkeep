@@ -11,8 +11,8 @@
     </div>
 
     <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
-      <button v-if="canManage" class="btn-primary" aria-label="Add New Secret" @click="$emit('openSecretsDialog')">
-        <span class="hidden md:block">Add New Secret</span>
+      <button v-if="canManage" class="btn-primary" @click="$emit('openSecretsDialog')">
+        <span>New Secret</span>
         <icon name="ph:plus" size="20" />
       </button>
 

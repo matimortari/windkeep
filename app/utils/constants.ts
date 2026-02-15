@@ -66,7 +66,7 @@ export const FAQS = [
   },
   {
     question: "What is audit logging and why is it important?",
-    answer: "Audit logs record actions performed within the workspace — such as updating secrets, changing roles, or modifying projects. Each log entry captures who performed the action, timestamps, and additional metadata. Audit logs help teams stay transparent, investigate issues, and maintain accountability. All members in the organization can view the logs, and the Owner can clear them if desired.",
+    answer: "Audit logs record actions performed within the workspace – such as updating secrets, changing roles, or modifying projects. Each log entry captures who performed the action, timestamps, and additional metadata. Audit logs help teams stay transparent, investigate issues, and maintain accountability. All members in the organization can view the logs, and the Owner can clear them if desired.",
   },
   {
     question: "What is the WindKeep CLI and how can i use it?",
@@ -74,7 +74,13 @@ export const FAQS = [
   },
 ]
 
-export const INSTALL_COMMAND = "go install github.com/matimortari/windkeep/cli@latest"
+export const INSTALL_COMMAND = [
+  " # Windows (PowerShell)",
+  "irm https://windkeep.vercel.app/install/install.ps1 | iex",
+  "",
+  " # macOS/Linux (Bash)",
+  "curl -sSL https://windkeep.vercel.app/install/install.sh | bash",
+]
 
 export const CLI_COMMANDS = [
   "windkeep login",

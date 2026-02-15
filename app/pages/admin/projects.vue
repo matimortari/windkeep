@@ -32,7 +32,7 @@
         @click="isDialogOpen = true"
       >
         <icon name="ph:plus" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-primary" />
-        <span class="text-caption transition-transform group-hover:scale-110">Add New Project...</span>
+        <span class="font-semibold text-muted-foreground transition-transform group-hover:scale-110">New Project</span>
       </button>
     </ul>
 

@@ -4,6 +4,7 @@
       <div class="flex flex-col items-start gap-1">
         <label for="name" class="text-sm font-semibold">Project Name</label>
         <input id="name" v-model="form.name" type="text">
+        <span class="text-xs text-muted-foreground">The name for the project.</span>
       </div>
 
       <div class="flex flex-col items-start gap-1">
