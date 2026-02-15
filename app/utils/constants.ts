@@ -74,7 +74,13 @@ export const FAQS = [
   },
 ]
 
-export const INSTALL_COMMAND = "go install github.com/matimortari/windkeep/cli@latest"
+export const INSTALL_COMMAND = [
+  " # Windows (PowerShell)",
+  "irm https://windkeep.vercel.app/install/install.ps1 | iex",
+  "",
+  " # macOS/Linux (Bash)",
+  "curl -sSL https://windkeep.vercel.app/install/install.sh | bash",
+]
 
 export const CLI_COMMANDS = [
   "windkeep login",

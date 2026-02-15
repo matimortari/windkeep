@@ -81,7 +81,7 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
       return "ph:caret-down-bold"
     }
 
-    return "ph:caret-up-down"
+    return "ph:caret-up-down-bold"
   }
 
   return {

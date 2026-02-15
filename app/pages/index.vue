@@ -83,14 +83,14 @@
           </button>
         </div>
 
-        <article v-if="activeTab === 'install'" class="card space-y-1 p-2.5!">
+        <article v-if="activeTab === 'install'" class="card space-y-1 p-2!">
           <p class="text-caption">
-            > Install the Go module:
+            > Run the following command from your terminal:
           </p>
-          <Shiki lang="bash" :code="INSTALL_COMMAND" class="code-block" />
+          <Shiki lang="bash" :code="Array.isArray(INSTALL_COMMAND) ? INSTALL_COMMAND.join('\n') : INSTALL_COMMAND" class="code-block" />
         </article>
 
-        <article v-if="activeTab === 'commands'" class="card space-y-1 p-2.5!">
+        <article v-if="activeTab === 'commands'" class="card space-y-1 p-2!">
           <p class="text-caption">
             > After installing, run the following commands to get started:
           </p>
