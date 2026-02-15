@@ -2,7 +2,7 @@
   <Navbar />
 
   <main class="relative flex min-h-screen flex-col items-center">
-    <div class="grid-backdrop" />
+    <div class="backdrop" />
     <slot />
   </main>
 
@@ -10,20 +10,16 @@
 </template>
 
 <style scoped>
-.grid-backdrop {
-  position: absolute;
+.backdrop {
+  position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.3;
-  background-image:
-    linear-gradient(to right, var(--muted) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--muted) 1px, transparent 1px);
-  background-size: 250px 250px;
-}
-
-main > *:not(.grid-backdrop) {
-  position: relative;
-  z-index: 1;
+  background-image: repeating-linear-gradient(
+    to top,
+    transparent 0,
+    color-mix(in srgb, var(--muted-foreground) 5%, transparent) 4px,
+    color-mix(in srgb, var(--muted-foreground) 5%, transparent) 8px
+  );
 }
 </style>

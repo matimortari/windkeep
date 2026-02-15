@@ -29,7 +29,7 @@
       </button>
 
       <button v-if="isOwner || isAdmin" class="btn-primary" @click="$emit('openDialog')">
-        <span class="hidden md:inline">Add New Project</span>
+        <span class="hidden md:inline">New Project</span>
         <icon name="ph:plus" size="20" />
       </button>
     </nav>

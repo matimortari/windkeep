@@ -99,13 +99,13 @@ h1 {
   font-weight: 700;
 }
 h2 {
-  font-size: 2.25rem;
-  line-height: 2.25rem;
+  font-size: 2rem;
+  line-height: 2rem;
   font-weight: 700;
 }
 h3 {
-  font-size: 1.75rem;
-  line-height: 1.75rem;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
   font-weight: 700;
 }
 h4 {
@@ -145,6 +145,9 @@ h6 {
   padding: 1.25rem;
   transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.card:hover {
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--muted));
+}
 
 .overlay {
   background-color: var(--card);
@@ -153,6 +156,10 @@ h6 {
   padding: 1.5rem;
   z-index: 40;
   box-shadow: 4px 4px 8px 2px rgba(0, 0, 0, 0.4);
+  transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.overlay:hover {
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--muted));
 }
 
 .dropdown-menu {
@@ -163,7 +170,7 @@ h6 {
   margin: 0.5rem;
   z-index: 30;
   cursor: pointer;
-  max-height: 8rem;
+  max-height: 12rem;
   box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.4);
   scrollbar-width: thin;
   scrollbar-color: var(--muted-foreground) transparent;

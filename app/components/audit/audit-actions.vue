@@ -9,7 +9,7 @@
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-28! overflow-y-auto text-sm whitespace-nowrap">
+        <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-24! overflow-y-auto text-sm whitespace-nowrap">
           <li class="rounded-sm p-2 hover:bg-muted" @click="updateFilter('action', '')">
             All Actions
           </li>

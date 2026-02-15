@@ -2,18 +2,23 @@
   <div
     v-motion :initial="{ opacity: 0 }"
     :visible="{ opacity: 1 }" :duration="800"
-    class="relative flex min-h-screen w-full flex-col items-center justify-center gap-12 py-24 text-center"
+    class="relative flex min-h-screen w-full flex-col items-center justify-center gap-8 py-20 text-center"
   >
     <header id="hero" class="z-20 flex w-full flex-col items-center gap-8 px-4 py-20 md:px-20">
-      <h1 class="font-display md:text-5xl! 2xl:text-6xl!">
+      <div aria-hidden="true" class="pointer-events-none absolute inset-0 z-[-1] overflow-hidden">
+        <div class="blob blob-1" />
+        <div class="blob blob-2" />
+      </div>
+
+      <h1>
         Your Secrets, Secured.
       </h1>
       <p class="max-w-2xl leading-6 font-semibold text-muted-foreground md:text-lg">
-        No more .env headaches — WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
+        No more .env headaches – WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
       </p>
 
-      <div class="flex flex-col items-center gap-4 backdrop-blur-xs">
-        <nuxt-link to="/sign-in" class="btn rounded-full! shadow-lg shadow-primary/20 hover:shadow-primary/30">
+      <div class="flex flex-col items-center gap-4">
+        <nuxt-link to="/sign-in" class="btn rounded-full! shadow-lg shadow-primary/10 transition-all duration-300 hover:shadow-primary/30">
           <span>Create Account</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
@@ -49,13 +54,14 @@
   <section
     id="cli" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="w-full border-y-2 bg-card py-24"
+    :duration="800" class="w-full border-y-2 bg-card py-20"
   >
     <div class="container mx-auto flex flex-col items-center justify-center gap-8 p-4 md:flex-row md:gap-20 2xl:gap-32">
       <header class="flex flex-col items-center gap-4 text-center md:items-start md:text-start">
-        <h2 class="font-display">
+        <h2>
           Command Line Interface
         </h2>
+
         <p class="max-w-lg font-semibold text-muted-foreground">
           Manage secrets and projects directly from your terminal. Fast, secure, and open-source.
           Read the
@@ -65,7 +71,7 @@
           for more details.
         </p>
 
-        <ul class="text-caption flex flex-col items-start gap-2">
+        <ul class="flex flex-col items-start gap-1 font-medium text-muted-foreground">
           <li v-for="bullet in CLI_BULLETS" :key="bullet.description" class="navigation-group">
             <span>• {{ bullet.description }} </span>
           </li>
@@ -76,21 +82,21 @@
         <div class="my-2 flex flex-row gap-1">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
-            class="text-caption flex-1 rounded-t-sm border-2 border-b-4 p-2" :class="activeTab === tab.key ? 'border-b-primary' : 'border-transparent'"
+            class="text-caption flex-1 rounded-t-sm border-2 p-2 pb-1! hover:bg-muted/50" :class="activeTab === tab.key ? 'border-b-primary' : ''"
             @click="activeTab = (tab.key as 'install' | 'commands')"
           >
             {{ tab.label }}
           </button>
         </div>
 
-        <article v-if="activeTab === 'install'" class="card space-y-1 p-2.5!">
+        <article v-if="activeTab === 'install'" class="card space-y-2">
           <p class="text-caption">
-            > Install the Go module:
+            > Run the following command from your terminal:
           </p>
-          <Shiki lang="bash" :code="INSTALL_COMMAND" class="code-block" />
+          <Shiki lang="bash" :code="Array.isArray(INSTALL_COMMAND) ? INSTALL_COMMAND.join('\n') : INSTALL_COMMAND" class="code-block" />
         </article>
 
-        <article v-if="activeTab === 'commands'" class="card space-y-1 p-2.5!">
+        <article v-if="activeTab === 'commands'" class="card space-y-2">
           <p class="text-caption">
             > After installing, run the following commands to get started:
           </p>
@@ -103,13 +109,13 @@
   <section
     id="features" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-12 px-4 py-12 md:px-20 md:py-20"
+    :duration="800" class="flex w-full flex-col items-center gap-12 px-4 md:p-20"
   >
-    <h2 class="font-display">
+    <h2>
       Features
     </h2>
 
-    <div class="grid grid-cols-1 place-items-center gap-12 md:grid-cols-2 md:gap-24">
+    <div class="grid grid-cols-1 place-items-center gap-12 md:grid-cols-2 md:gap-32">
       <div
         v-for="(feature, index) in FEATURES" :key="index"
         v-motion :initial="{ opacity: 0, y: -20 }"
@@ -117,7 +123,7 @@
         :delay="200 * index" class="flex max-w-sm flex-col items-center gap-4 text-center"
       >
         <div class="card flex items-center justify-center rounded-2xl!">
-          <icon :name="feature.icon" class="text-primary" size="60" />
+          <icon :name="feature.icon" class="text-primary" size="50" />
         </div>
         <h3 class="whitespace-nowrap">
           {{ feature.title }}
@@ -132,9 +138,9 @@
   <section
     id="faq" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 py-12 text-center md:p-20 2xl:p-32"
+    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 text-center md:p-20"
   >
-    <h2 class="font-display">
+    <h2>
       Frequently Asked Questions
     </h2>
 
@@ -173,6 +179,16 @@ definePageMeta({
 </script>
 
 <style scoped>
+h1,
+h2 {
+  font-family: var(--font-display);
+}
+@media (min-width: 768px) {
+  h1 {
+    font-size: 3.5rem;
+  }
+}
+
 .accordion-enter-active,
 .accordion-leave-active {
   transition:
@@ -191,5 +207,47 @@ definePageMeta({
 .accordion-leave-from {
   max-height: 500px;
   opacity: 1;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+  animation: blob-drift 14s ease-in-out infinite alternate;
+}
+
+.blob-1 {
+  width: 520px;
+  height: 520px;
+  background: color-mix(in srgb, var(--primary) 70%, var(--accent, white));
+  opacity: 0.2;
+  top: -100px;
+  left: 60%;
+  transform: translateX(-50%);
+  animation-duration: 15s;
+}
+
+.blob-2 {
+  width: 300px;
+  height: 300px;
+  background: color-mix(in srgb, var(--primary) 70%, var(--accent, white));
+  opacity: 0.1;
+  bottom: 20px;
+  right: 8%;
+  animation-duration: 10s;
+  animation-delay: -5s;
+}
+
+@keyframes blob-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -15px) scale(1.03);
+  }
+  100% {
+    transform: translate(-15px, 10px) scale(0.98);
+  }
 }
 </style>
