@@ -47,9 +47,7 @@ const { toggleTheme, themeIcon } = useTheme()
 const { loggedIn } = useUserSession()
 const scrolled = ref(false)
 
-onMounted(() => {
-  const handleScroll = () => scrolled.value = window.scrollY > 50
-  window.addEventListener("scroll", handleScroll, { passive: true })
-  onBeforeUnmount(() => window.removeEventListener("scroll", handleScroll))
-})
+const handleScroll = () => scrolled.value = window.scrollY > 50
+onMounted(() => window.addEventListener("scroll", handleScroll, { passive: true }))
+onBeforeUnmount(() => window.removeEventListener("scroll", handleScroll))
 </script>

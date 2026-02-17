@@ -43,7 +43,7 @@
           <button
             v-if="field.onRegenerate" class="btn"
             title="Regenerate Token" aria-label="Regenerate API Token"
-            @click="() => { regenerateIcon[index]?.triggerSuccess(); field.onRegenerate() }"
+            @click="field.onRegenerate()"
           >
             <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise'" size="20" />
           </button>
@@ -186,6 +186,7 @@ async function handleRegenerateToken() {
   const res = await userStore.updateUser({ regenerateApiToken: true })
   if (res?.updatedUser?.apiToken && user.value) {
     user.value.apiToken = res.updatedUser.apiToken
+    regenerateIcon[userFields.findIndex(f => f.onRegenerate)]?.triggerSuccess()
   }
 }
 

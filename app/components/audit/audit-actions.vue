@@ -45,10 +45,6 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  modelValue?: boolean
-}>()
-
 const auditStore = useAuditStore()
 const { auditLogs, auditActions, filters, currentFilters } = storeToRefs(auditStore)
 const { activeOrg } = storeToRefs(useOrgStore())

@@ -56,10 +56,6 @@ const errorMessage = computed(() => {
   return messages[error] || "Authentication failed. Please try again."
 })
 
-function signIn(provider: string) {
-  navigateTo(`/api/auth/${provider}`, { external: true })
-}
-
 useHead({
   title: "Sign In",
   meta: [{ name: "description", content: "WindKeep Sign In page" }],

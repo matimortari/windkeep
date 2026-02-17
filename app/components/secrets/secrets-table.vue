@@ -61,11 +61,7 @@ const props = defineProps<{
   pendingChanges: Map<string, PendingChange>
 }>()
 
-const emit = defineEmits<{
-  (e: "edit", secret: Secret): void
-  (e: "delete", key: string): void
-  (e: "update"): void
-}>()
+const emit = defineEmits<{ edit: [secret: Secret], delete: [key: string], update: [] }>()
 
 const visibleKeys = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})

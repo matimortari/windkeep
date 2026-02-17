@@ -73,7 +73,7 @@
               </div>
             </div>
 
-            <nav v-if="(isOwner || isAdmin) && member.userId !== user?.id && member.role !== 'OWNER'" class="navigation-group" aria-label="Project Member Actions">
+            <nav v-if="(isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')) && member.userId !== user?.id && member.role !== 'OWNER'" class="navigation-group" aria-label="Project Member Actions">
               <select v-model="member.role">
                 <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
                   {{ capitalizeFirst(role.label) }}
@@ -83,7 +83,7 @@
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(member.userId, member.role)">
                 <icon :name="memberRoleIcon.get(member.userId)?.icon || 'ph:floppy-disk'" size="15" />
               </button>
-              <button v-if="isOwner && String(member.role) !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(member.userId)">
+              <button v-if="isOwner(project?.id ?? '') && String(member.role) !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(member.userId)">
                 <icon name="ph:x" size="15" />
               </button>
             </nav>
