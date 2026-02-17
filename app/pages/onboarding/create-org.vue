@@ -56,7 +56,7 @@ async function handleCreateOrg() {
 
 onMounted(async () => {
   await userStore.getUser()
-  localOrg.value.name = `${user.value?.name || user.value?.email}'s Team` || "My Team"
+  localOrg.value.name = `${user.value?.name || user.value?.email || "My"}'s Team`
 })
 
 useHead({

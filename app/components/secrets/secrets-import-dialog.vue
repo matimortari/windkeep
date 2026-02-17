@@ -43,8 +43,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "close"): void
-  (e: "save", secrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[]): void
+  close: []
+  save: [secrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[]]
 }>()
 
 const { errors } = storeToRefs(useProjectStore())

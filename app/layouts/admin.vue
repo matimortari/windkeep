@@ -24,14 +24,13 @@ const isLoading = ref(true)
 onMounted(async () => {
   try {
     await userStore.getUser()
-    const activeMembership = userStore.user?.orgMemberships?.find(m => m.isActive)
-    if (!activeMembership) {
+    const activeOrg = user.value?.orgMemberships?.find(m => m.isActive)
+    if (!activeOrg) {
       return navigateTo("/onboarding/create-org")
     }
 
-    await orgStore.getOrg(activeMembership.orgId)
-    orgStore.setActiveOrg(activeMembership.orgId)
-
+    await orgStore.getOrg(activeOrg.orgId)
+    orgStore.setActiveOrg(activeOrg.orgId)
     await projectStore.getProjects()
   }
   catch {

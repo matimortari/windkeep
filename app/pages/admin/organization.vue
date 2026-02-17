@@ -235,7 +235,6 @@ const copyIcon = orgFields.map(() => createActionHandler("ph:copy"))
 const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk"))
 const memberRoleIcon = ref(new Map())
 const transferOwnershipIcon = ref(new Map())
-const removeMemberIcon = ref(new Map())
 
 async function handleCreateInvite() {
   inviteSuccess.value = null
@@ -331,9 +330,6 @@ watch(orgMembers, (members) => {
     }
     if (!transferOwnershipIcon.value.has(member.user.id)) {
       transferOwnershipIcon.value.set(member.user.id, createActionHandler("ph:arrow-u-up-right"))
-    }
-    if (!removeMemberIcon.value.has(member.user.id)) {
-      removeMemberIcon.value.set(member.user.id, createActionHandler("ph:x"))
     }
   })
 }, { immediate: true, deep: true })

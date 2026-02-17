@@ -36,10 +36,10 @@
           </td>
           <td>
             <div class="navigation-group">
-              <nuxt-link :to="`/admin/${project.slug}/settings`" title="Settings">
+              <nuxt-link :to="`/admin/${project.slug}/settings`" title="Settings" @click.stop>
                 <icon name="ph:gear" size="20" class="hover:text-primary" />
               </nuxt-link>
-              <nuxt-link :to="`/admin/${project.slug}`" title="Open">
+              <nuxt-link :to="`/admin/${project.slug}`" title="Open" @click.stop>
                 <icon name="ph:arrow-right" size="20" class="hover:text-primary" />
               </nuxt-link>
             </div>

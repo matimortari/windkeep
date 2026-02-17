@@ -66,14 +66,14 @@ defineProps<{
   orgs: Array<Organization> | null
 }>()
 
-const emit = defineEmits<(e: "toggleSidebar") => void>()
+const emit = defineEmits<{ toggleSidebar: [] }>()
 
 const { toggleTheme, themeIcon } = useTheme()
-const { user } = storeToRefs(useUserStore())
-const { activeOrg, organizations } = storeToRefs(useOrgStore())
 const route = useRoute()
 const router = useRouter()
 const orgStore = useOrgStore()
+const { activeOrg, organizations } = storeToRefs(orgStore)
+const { user } = storeToRefs(useUserStore())
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 
