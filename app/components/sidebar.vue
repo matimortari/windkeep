@@ -56,7 +56,7 @@ defineProps<{
   isOpen: boolean
 }>()
 
-const emit = defineEmits<(e: "update:isOpen", value: boolean) => void>()
+const emit = defineEmits<{ "update:isOpen": [value: boolean] }>()
 
 const route = useRoute()
 const userStore = useUserStore()

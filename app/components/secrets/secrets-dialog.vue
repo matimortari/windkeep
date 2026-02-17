@@ -47,7 +47,7 @@ const props = defineProps<{
   projectId: string
 }>()
 
-const emit = defineEmits<{ (e: "close"): void, (e: "save", payload: Secret): void }>()
+const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const projectStore = useProjectStore()

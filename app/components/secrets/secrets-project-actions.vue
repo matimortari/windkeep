@@ -11,12 +11,12 @@
     </div>
 
     <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
-      <button v-if="canManage" class="btn-primary" @click="$emit('openSecretsDialog')">
+      <button v-if="canManage" class="btn-primary" @click="emit('openSecretsDialog')">
         <span>New Secret</span>
         <icon name="ph:plus" size="20" />
       </button>
 
-      <button v-if="canManage" class="btn-secondary" aria-label="Import Secrets from .env File" @click="$emit('openImportDialog')">
+      <button v-if="canManage" class="btn-secondary" aria-label="Import Secrets from .env File" @click="emit('openImportDialog')">
         <span>Import</span>
         <icon name="ph:upload" size="20" />
       </button>
@@ -30,7 +30,7 @@
         <transition name="dropdown" mode="out-in">
           <ul v-if="isDropdownOpen" class="dropdown-menu -left-8 overflow-y-auto text-sm" role="menu" aria-label="Export environments">
             <li v-for="env in ENVIRONMENTS" :key="env.value" class="rounded-sm capitalize">
-              <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="$emit('export', env.value); isDropdownOpen = false">
+              <button role="menuitem" class="w-full p-2 text-left hover:bg-muted" @click="handleExport(env.value)">
                 {{ capitalizeFirst(env.label) }}
               </button>
             </li>
@@ -42,11 +42,11 @@
         <icon name="ph:gear" size="20" />
       </nuxt-link>
 
-      <button v-if="hasPendingChanges" class="btn-success" aria-label="Save All Changes" @click="$emit('save')">
+      <button v-if="hasPendingChanges" class="btn-success" aria-label="Save All Changes" @click="emit('save')">
         <icon name="ph:floppy-disk" size="20" />
       </button>
 
-      <button v-if="hasPendingChanges" class="btn-danger" aria-label="Discard Changes" @click="$emit('discard')">
+      <button v-if="hasPendingChanges" class="btn-danger" aria-label="Discard Changes" @click="emit('discard')">
         <icon name="ph:x" size="20" />
       </button>
     </nav>
@@ -61,12 +61,12 @@ const props = defineProps<{
   hasPendingChanges: boolean
 }>()
 
-defineEmits<{
-  (e: "openSecretsDialog"): void
-  (e: "openImportDialog"): void
-  (e: "export", env: string): void
-  (e: "save"): void
-  (e: "discard"): void
+const emit = defineEmits<{
+  openSecretsDialog: []
+  openImportDialog: []
+  export: [env: string]
+  save: []
+  discard: []
 }>()
 
 const dropdownRef = ref<HTMLElement | null>(null)
@@ -75,4 +75,9 @@ const isDropdownOpen = ref(false)
 useClickOutside(dropdownRef, () => {
   isDropdownOpen.value = false
 }, { escapeKey: true })
+
+function handleExport(env: string) {
+  emit("export", env)
+  isDropdownOpen.value = false
+}
 </script>

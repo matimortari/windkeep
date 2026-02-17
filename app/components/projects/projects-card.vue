@@ -24,7 +24,7 @@
         </div>
 
         <div class="navigation-group">
-          <nuxt-link :to="`/admin/${project.slug}/settings`" title="Project Settings" class="group navigation-group rounded-full p-2 text-muted-foreground transition-colors">
+          <nuxt-link :to="`/admin/${project.slug}/settings`" title="Project Settings" class="group navigation-group rounded-full p-2 text-muted-foreground transition-colors" @click.stop>
             <icon name="ph:gear" size="25" class="transition-transform group-hover:text-primary" />
             <span class="text-caption hidden whitespace-nowrap 2xl:block">Settings</span>
           </nuxt-link>
