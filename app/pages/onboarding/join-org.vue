@@ -53,7 +53,7 @@ onMounted(async () => await userStore.getUser())
 
 useHead({
   title: "Join Organization",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/onboarding/join-org" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/onboarding/join-org` }],
   meta: [{ name: "description", content: "Join an organization on WindKeep." }],
 })
 

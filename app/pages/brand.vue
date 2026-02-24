@@ -147,7 +147,7 @@ watch(colorMode, () => updateColors(), { flush: "post" })
 
 useHead({
   title: "Brand Assets",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/brand" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/brand` }],
   meta: [{ name: "description", content: "WindKeep Brand Assets." }],
 })
 </script>

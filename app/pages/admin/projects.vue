@@ -98,7 +98,7 @@ watch(layout, (value) => {
 
 useHead({
   title: "Projects",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/projects" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/admin/projects` }],
   meta: [{ name: "description", content: "WindKeep projects page." }],
 })
 

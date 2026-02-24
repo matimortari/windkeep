@@ -61,7 +61,7 @@ onMounted(async () => {
 
 useHead({
   title: "Create Organization",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/onboarding/create-org" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/onboarding/create-org` }],
   meta: [{ name: "description", content: "Create your organization on WindKeep." }],
 })
 

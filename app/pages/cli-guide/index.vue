@@ -7,7 +7,7 @@ const pageContent = await queryCollection("content").path("/cli").first()
 
 useHead({
   title: "Command Line Interface",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/cli" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/cli` }],
   meta: [{ name: "description", content: "WindKeep Command Line Interface." }],
 })
 

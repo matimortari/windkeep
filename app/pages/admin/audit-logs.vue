@@ -32,7 +32,7 @@ watch(activeOrg, async (org) => {
 
 useHead({
   title: "Audit Logs",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/audit-logs" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/admin/audit-logs` }],
   meta: [{ name: "description", content: "WindKeep audit logs page." }],
 })
 
