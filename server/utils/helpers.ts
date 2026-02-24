@@ -1,7 +1,6 @@
 import type { EventHandlerRequest, H3Event } from "h3"
 import { randomBytes } from "node:crypto"
 import db from "#server/utils/db"
-import { del, put } from "@vercel/blob"
 
 /**
  * Retrieves the authenticated user from the current session or API token.
@@ -91,7 +90,7 @@ export function generateToken(byteLength: number = 12): string {
  * Creates an audit log entry for a user action, capturing relevant metadata.
  * This helps maintain a record of significant events for security and compliance.
  */
-export async function createAuditLog({ userId, orgId, projectId, action, resource, metadata, description, event}: {
+export async function createAuditLog({ userId, orgId, projectId, action, resource, metadata, description, event }: {
   userId: string
   orgId?: string
   projectId?: string
@@ -118,15 +117,12 @@ export function getInviteBaseUrl(event: any) {
   return `${protocol}://${host}`
 }
 
-/**
- * Retrieves the download URL for a specified Windkeep binary.
- */
 export async function getBinaryBlobUrl(binaryKey: string) {
   const BINARIES: Record<string, string | undefined> = {
-    "windkeep-darwin-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-darwin-amd64",
-    "windkeep-darwin-arm64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-darwin-arm64",
-    "windkeep-linux-amd64": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-linux-amd64",
-    "windkeep-windows-amd64.exe": "https://kdenka4dfbuxnv79.public.blob.vercel-storage.com/windkeep/binaries/windkeep-windows-amd64.exe",
+    "windkeep-darwin-amd64": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-darwin-amd64`,
+    "windkeep-darwin-arm64": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-darwin-arm64`,
+    "windkeep-linux-amd64": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-linux-amd64`,
+    "windkeep-windows-amd64.exe": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-windows-amd64.exe`,
   }
 
   if (!BINARIES[binaryKey]) {
@@ -134,27 +130,4 @@ export async function getBinaryBlobUrl(binaryKey: string) {
   }
 
   return BINARIES[binaryKey]
-}
-
-/**
- * Uploads a file to Blob storage and removes the previous file if provided.
- * Validates file size and MIME type before upload.
- */
-export async function uploadFile({ path, file, maxSize, allowedMimeTypes, oldFile }: { path: string, file: File, maxSize: number, allowedMimeTypes: string[], oldFile?: string }) {
-  if (!file || !(file instanceof File)) {
-    throw createError({ status: 400, statusText: "No file uploaded" })
-  }
-  if (allowedMimeTypes.length && !allowedMimeTypes.includes(file.type)) {
-    throw createError({ status: 415, statusText: `Unsupported file type: ${file.type}` })
-  }
-  if (file.size > maxSize) {
-    throw createError({ status: 413, statusText: "File too large" })
-  }
-
-  const blob = await put(`${path}/${Date.now()}.${file.name.split(".").pop()?.toLowerCase()}`, file, { access: "public" })
-  if (oldFile?.includes("blob.vercel-storage.com")) {
-    await del(oldFile).catch(() => {})
-  }
-
-  return blob.url
 }

@@ -1,6 +1,6 @@
 import db from "#server/utils/db"
 import { getUserFromSession } from "#server/utils/helpers"
-import { del } from "@vercel/blob"
+import { deleteFile } from "#server/utils/storage"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
@@ -32,8 +32,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // Delete user's avatar from blob storage if it exists
-  if (user.image && user.image.includes("blob.vercel-storage.com")) {
-    await del(user.image)
+  if (user.image) {
+    await deleteFile(user.image).catch(() => {})
   }
 
   // Delete the user (cascade will handle related records)

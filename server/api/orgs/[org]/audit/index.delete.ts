@@ -3,7 +3,8 @@ import { promises as fs } from "node:fs"
 import os from "node:os"
 import path from "node:path"
 import db from "#server/utils/db"
-import { getUserFromSession, requireRole, uploadFile } from "#server/utils/helpers"
+import { getUserFromSession, requireRole } from "#server/utils/helpers"
+import { uploadFile } from "#server/utils/storage"
 import { deleteAuditLogsSchema } from "#shared/schemas/audit-schema"
 import parquet from "parquetjs"
 
@@ -77,9 +78,9 @@ export default defineEventHandler(async (event) => {
   const buffer = await fs.readFile(tempPath)
   const file = new File([Buffer.from(buffer)], `audit_archive_${Date.now()}.parquet`, { type: "application/vnd.apache.parquet" })
   await uploadFile({
-    path: `windkeep/archive/org_${org}`,
+    path: `archive/org_${org}`,
     file,
-    maxSize: 50 * 1024 * 1024,
+    maxSize: 50 * 1024 * 1024, // 50 MB
     allowedMimeTypes: ["application/vnd.apache.parquet", "application/octet-stream"],
   })
 
