@@ -8,7 +8,7 @@ This document provides comprehensive documentation for the WindKeep REST API, wh
 
 The API uses OAuth 2.0 for user authentication via third-party providers (Google, GitHub and GitLab). Sessions are managed using secure HTTP-only cookies.
 
-For CLI and programmatic access, an API token is used for authentication. The token can be obtained from the [preferences page](https://windkeep.vercel.app/admin/preferences). Include the token in the `Authorization` header:
+For CLI and programmatic access, an API token is used for authentication. The token can be obtained from the [preferences page](https://windkeep.up.railway.app/admin/preferences). Include the token in the `Authorization` header:
 
 ```
 Authorization: Bearer YOUR_API_TOKEN

@@ -46,7 +46,7 @@ Move-Item windkeep.exe C:\Windows\System32\windkeep.exe
 
 ## Getting Started
 
-1. Sign in to WindKeep at https://windkeep.vercel.app
+1. Sign in to WindKeep at https://windkeep.up.railway.app
 2. Navigate to Admin → Preferences
 3. Copy your API token from the dashboard
 4. Authenticate using the CLI:
