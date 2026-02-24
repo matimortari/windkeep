@@ -11,7 +11,7 @@ import (
 const (
 	DefaultConfigDir  = ".windkeep"
 	DefaultConfigFile = "config.yaml"
-	APIURL            = "https://windkeep.vercel.app"
+	APIURL            = "https://windkeep.up.railway.app"
 )
 
 type Config struct {

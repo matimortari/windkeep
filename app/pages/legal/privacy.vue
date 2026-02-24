@@ -7,7 +7,7 @@ const pageContent = await queryCollection("content").path("/privacy-policy").fir
 
 useHead({
   title: "Privacy Policy",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/legal/privacy" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/legal/privacy` }],
   meta: [{ name: "description", content: "WindKeep Privacy Policy." }],
 })
 

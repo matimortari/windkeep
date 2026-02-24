@@ -336,7 +336,7 @@ watch(orgMembers, (members) => {
 
 useHead({
   title: "Organization",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/organization" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/admin/organization` }],
   meta: [{ name: "description", content: "WindKeep organization page." }],
 })
 
