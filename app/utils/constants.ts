@@ -1,4 +1,4 @@
-export const BASE_URL = "https://windkeep.vercel.app"
+export const BASE_URL = "https://windkeep.up.railway.app"
 
 export const DEFAULT_AVATAR = "/assets/default-avatar.svg"
 
@@ -76,10 +76,10 @@ export const FAQS = [
 
 export const INSTALL_COMMAND = [
   " # Windows (PowerShell)",
-  "irm https://windkeep.vercel.app/install/install.ps1 | iex",
+  "irm https://windkeep.up.railway.app/install/install.ps1 | iex",
   "",
   " # macOS/Linux (Bash)",
-  "curl -sSL https://windkeep.vercel.app/install/install.sh | bash",
+  "curl -sSL https://windkeep.up.railway.app/install/install.sh | bash",
 ]
 
 export const CLI_COMMANDS = [

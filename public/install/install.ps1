@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $binary = "windkeep-windows-amd64.exe"
-$url = "https://windkeep.vercel.app/api/downloads/$binary"
+$url = "https://windkeep.up.railway.app/api/downloads/$binary"
 
 $installDir = "$HOME\.windkeep\bin"
 $target = "$installDir\windkeep.exe"

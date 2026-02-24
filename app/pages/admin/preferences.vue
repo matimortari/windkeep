@@ -214,7 +214,7 @@ async function handleDeleteUser() {
 
 useHead({
   title: "Preferences",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app/admin/preferences" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}/admin/preferences` }],
   meta: [{ name: "description", content: "WindKeep preferences page." }],
 })
 

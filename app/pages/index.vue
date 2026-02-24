@@ -36,7 +36,7 @@
         :visible="{ opacity: 1, y: 0 }" :duration="800"
         :delay="200 * index" class="card flex max-w-sm flex-col items-start gap-2"
       >
-        <div class="flex flex-row items-center gap-2">
+        <div class="navigation-group">
           <span class="card rounded-full! p-2!">
             <icon :name="highlight.icon" class="text-primary" size="25" />
           </span>
@@ -169,7 +169,7 @@ const activeTab = ref<"install" | "commands">("install")
 
 useHead({
   title: "Securely Manage Your Environment Variables",
-  link: [{ rel: "canonical", href: "https://windkeep.vercel.app" }],
+  link: [{ rel: "canonical", href: `${BASE_URL}` }],
   meta: [{ name: "description", content: "Centralize, encrypt, and share your secrets with confidence. Fast, safe, and easy to use." }],
 })
 
