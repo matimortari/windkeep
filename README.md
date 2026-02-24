@@ -8,7 +8,7 @@
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=matimortari_windkeep&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=matimortari_windkeep)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat&colorA=0d1117)](https://opensource.org/licenses/MIT)
 
-[**WindKeep**](https://windkeep.vercel.app) is a platform for secrets management that helps organizations securely store, manage, and share sensitive information. It features role-based access control and audit logging mechanisms, encrypted storage for secrets, and an integrated command line interface. Check out the [**CLI documentation**](./cli/README.md) for instructions.
+[**WindKeep**](https://windkeep.up.railway.app) is a platform for secrets management that helps organizations securely store, manage, and share sensitive information. It features role-based access control and audit logging mechanisms, encrypted storage for secrets, and an integrated command line interface. Check out the [**CLI documentation**](./cli/README.md) for instructions.
 
 </div>
 
@@ -35,7 +35,6 @@
 - **Tailwind CSS**.
 - **Framer Motion**.
 - **Go** for CLI development using **Cobra**.
-- **Vercel** for deployment, blob storage and website analytics.
 
 ## Contact
 

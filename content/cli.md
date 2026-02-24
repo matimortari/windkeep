@@ -9,24 +9,24 @@
 ### Shell Script (Linux / macOS)
 
 ```bash
-curl -sSL https://windkeep.vercel.app/install/install.sh | bash
+curl -sSL https://windkeep.up.railway.app/install/install.sh | bash
 ```
 
 ### PowerShell Script (Windows)
 
 ```bash
-irm https://windkeep.vercel.app/install/install.ps1 | iex
+irm https://windkeep.up.railway.app/install/install.ps1 | iex
 ```
 
 ### Manual Download
 
-- [**Linux (x64)**](https://windkeep.vercel.app/api/downloads/windkeep-linux-amd64) - For Ubuntu, Debian, Fedora, and other Linux distributions
+- [**Linux (x64)**](https://windkeep.up.railway.app/api/downloads/windkeep-linux-amd64) - For Ubuntu, Debian, Fedora, and other Linux distributions
 
-- [**macOS (Intel)**](https://windkeep.vercel.app/api/downloads/windkeep-darwin-amd64) - For Macs with Intel processors
+- [**macOS (Intel)**](https://windkeep.up.railway.app/api/downloads/windkeep-darwin-amd64) - For Macs with Intel processors
 
-- [**macOS (Apple Silicon)**](https://windkeep.vercel.app/api/downloads/windkeep-darwin-arm64) - For Macs with M1, M2, M3, or M4 chips
+- [**macOS (Apple Silicon)**](https://windkeep.up.railway.app/api/downloads/windkeep-darwin-arm64) - For Macs with M1, M2, M3, or M4 chips
 
-- [**Windows (x64)**](https://windkeep.vercel.app/api/downloads/windkeep-windows-amd64.exe) - For Windows 10/11
+- [**Windows (x64)**](https://windkeep.up.railway.app/api/downloads/windkeep-windows-amd64.exe) - For Windows 10/11
 
 ### Installation Steps
 

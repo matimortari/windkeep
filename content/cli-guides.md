@@ -459,7 +459,7 @@ windkeep logout
 windkeep login YOUR_NEW_API_TOKEN
 ```
 
-To regenerate your API token, sign in to WindKeep and generate a new API token in the [preferences](https://windkeep.vercel.app/admin/preferences) page.
+To regenerate your API token, sign in to WindKeep and generate a new API token in the [preferences](https://windkeep.up.railway.app/admin/preferences) page.
 
 ---
 
