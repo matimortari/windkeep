@@ -2,7 +2,7 @@
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <header class="navigation-group border-b py-2">
       <nuxt-link :to="`/admin/${project?.slug}`" aria-label="Go back" class="flex items-center">
-        <icon name="ph:arrow-left" size="30" class="text-muted-foreground hover:text-primary" />
+        <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-primary" />
       </nuxt-link>
       <h2 class="max-w-lg truncate">
         {{ project?.name }}
@@ -20,7 +20,7 @@
           </p>
         </header>
 
-        <p v-if="Object.values(errors).some(Boolean)" class="text-danger">
+        <p v-if="Object.values(errors).some(Boolean)" class="text-caption-danger">
           {{ Object.values(errors).find(Boolean) }}
         </p>
       </div>
@@ -42,14 +42,14 @@
             class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
-            <icon :name="copyIcon[index]?.icon.value || 'ph:copy'" size="20" />
+            <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
-            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk'" size="20" />
+            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
 
@@ -81,10 +81,10 @@
               </select>
 
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(member.userId, member.role)">
-                <icon :name="memberRoleIcon.get(member.userId)?.icon || 'ph:floppy-disk'" size="15" />
+                <icon :name="memberRoleIcon.get(member.userId)?.icon || 'ph:floppy-disk-bold'" size="15" />
               </button>
               <button v-if="isOwner(project?.id ?? '') && String(member.role) !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(member.userId)">
-                <icon name="ph:x" size="15" />
+                <icon name="ph:x-bold" size="15" />
               </button>
             </nav>
           </li>
@@ -107,13 +107,13 @@
         <div v-if="availableOrgMembers.length" ref="addMemberDropdownRef" class="relative navigation-group">
           <button class="btn w-full justify-between md:w-auto" @click="isAddMemberDropdownOpen = !isAddMemberDropdownOpen">
             <span class="truncate">{{ selectedMemberToAdd ? availableOrgMembers.find(m => m.user.id === selectedMemberToAdd)?.user.name : 'Select a member...' }}</span>
-            <icon name="ph:caret-down" size="20" :class="[isAddMemberDropdownOpen ? 'rotate-180' : 'rotate-0']" />
+            <icon name="ph:caret-down-bold" size="20" :class="[isAddMemberDropdownOpen ? 'rotate-180' : 'rotate-0']" />
           </button>
 
-          <transition name="dropdown" mode="out-in">
-            <ul v-if="isAddMemberDropdownOpen" class="dropdown-menu left-0 max-h-60 w-full overflow-y-auto text-sm md:w-80" role="menu">
+          <transition name="dropdown">
+            <ul v-if="isAddMemberDropdownOpen" class="dropdown-menu left-0 max-h-60 w-full md:w-80" role="menu">
               <li v-for="member in availableOrgMembers" :key="member.user.id" class="truncate whitespace-nowrap">
-                <button class="navigation-group w-full cursor-pointer truncate rounded-sm p-2 text-left hover:bg-muted" :class="selectedMemberToAdd === member.user.id ? 'bg-muted' : ''" @click="selectedMemberToAdd = member.user.id; isAddMemberDropdownOpen = false">
+                <button class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="selectedMemberToAdd === member.user.id ? 'bg-muted' : ''" @click="selectedMemberToAdd = member.user.id; isAddMemberDropdownOpen = false">
                   <img :src="member.user.image || DEFAULT_AVATAR" alt="Avatar" class="size-6 rounded-full border">
                   <div class="flex flex-col truncate">
                     <span class="truncate font-semibold">{{ member.user.name }}</span>
@@ -136,11 +136,11 @@
         </p>
 
         <div v-if="availableOrgMembers.length" class="navigation-group self-end">
-          <p v-if="errors.addProjectMember || addMemberSuccess" :class="errors.addProjectMember ? 'text-danger' : 'text-success'">
+          <p v-if="errors.addProjectMember || addMemberSuccess" :class="errors.addProjectMember ? 'text-caption-danger' : 'text-caption-success'">
             {{ errors.addProjectMember || addMemberSuccess }}
           </p>
           <button class="btn-primary" aria-label="Add Member" @click.prevent="handleAddMember">
-            <icon name="ph:plus-circle" size="20" />
+            <icon name="ph:plus-circle-bold" size="20" />
             <span>Add Member</span>
           </button>
         </div>
@@ -163,13 +163,13 @@
           <h5>
             Leave Project
           </h5>
-          <p class="text-danger">
+          <p class="text-caption-danger">
             This action is irreversible. You will no longer have access to this project.
           </p>
         </header>
 
         <button class="btn-danger self-end" aria-label="Leave Project" @click="handleLeaveProject">
-          <icon name="ph:sign-out" size="20" />
+          <icon name="ph:sign-out-bold" size="20" />
           <span>Confirm</span>
         </button>
       </nav>
@@ -179,13 +179,13 @@
           <h5>
             Delete Project
           </h5>
-          <p class="text-danger">
+          <p class="text-caption-danger">
             This action is irreversible. All data associated with this project will be permanently deleted.
           </p>
         </header>
 
         <button class="btn-danger self-end" aria-label="Delete Project" @click="handleDeleteProject">
-          <icon name="ph:trash" size="20" />
+          <icon name="ph:trash-bold" size="20" />
           <span>Confirm</span>
         </button>
       </nav>
@@ -276,8 +276,8 @@ const projectFields = [
   },
 ]
 
-const copyIcon = projectFields.map(() => createActionHandler("ph:copy"))
-const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk"))
+const copyIcon = projectFields.map(() => createActionHandler("ph:copy-bold"))
+const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 const memberRoleIcon = ref(new Map())
 
 useClickOutside(addMemberDropdownRef, () => {
@@ -374,7 +374,7 @@ watch(() => project.value?.memberships, (memberships) => {
   }
   memberships.forEach((member) => {
     if (!memberRoleIcon.value.has(member.userId)) {
-      memberRoleIcon.value.set(member.userId, createActionHandler("ph:floppy-disk"))
+      memberRoleIcon.value.set(member.userId, createActionHandler("ph:floppy-disk-bold"))
     }
   })
 }, { immediate: true, deep: true })

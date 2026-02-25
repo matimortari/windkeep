@@ -25,7 +25,7 @@
       </button>
     </form>
 
-    <p :class="errors.acceptInvite ? 'text-danger' : 'text-success'">
+    <p :class="errors.acceptInvite ? 'text-caption-danger' : 'text-caption-success'">
       {{ errors.acceptInvite || joinOrgSuccess }}
     </p>
   </div>

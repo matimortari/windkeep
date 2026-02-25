@@ -17,13 +17,13 @@
       <tbody>
         <tr v-for="(secret, index) in sortedSecrets" :key="`${secret.key}-${index}`" class="group hover:bg-muted/20" :class="getRowClass(secret.key)">
           <td v-for="col in columns" :key="col.key" :class="col.class">
-            <div v-if="col.key === 'key'" class="flex flex-row items-center gap-2 font-mono text-sm font-semibold">
-              <icon v-if="getPendingChangeType(secret.key) === 'create'" name="ph:plus-circle" size="20" class="shrink-0 text-success" />
-              <icon v-else-if="getPendingChangeType(secret.key) === 'update'" name="ph:pencil-circle" size="20" class="shrink-0 text-secondary" />
-              <icon v-else-if="getPendingChangeType(secret.key) === 'delete'" name="ph:minus-circle" size="20" class="shrink-0 text-danger" />
+            <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold">
+              <icon v-if="getPendingChangeType(secret.key) === 'create'" name="ph:plus-circle-bold" size="20" class="text-caption-success shrink-0" />
+              <icon v-else-if="getPendingChangeType(secret.key) === 'update'" name="ph:pencil-circle-bold" size="20" class="shrink-0 text-secondary" />
+              <icon v-else-if="getPendingChangeType(secret.key) === 'delete'" name="ph:minus-circle-bold" size="20" class="text-caption-danger shrink-0" />
               <span class="truncate"><span class="text-muted">{{ index + 1 }}.</span> {{ secret.key }}</span>
               <icon
-                v-if="secret.description" name="ph:info"
+                v-if="secret.description" name="ph:info-bold"
                 :title="secret.description" size="15"
                 class="hidden shrink-0 cursor-pointer md:inline"
               />
@@ -38,13 +38,13 @@
 
             <div v-else-if="col.key === 'actions'" class="navigation-group">
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
-                <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed' : 'ph:eye'" size="20" class="hover:text-primary" />
+                <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
               </button>
               <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Edit Secret" @click="emit('edit', secret)">
-                <icon name="ph:note-pencil" size="20" class="hover:text-primary" />
+                <icon name="ph:note-pencil-bold" size="20" class="hover:text-primary" />
               </button>
               <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Delete Secret" @click="emit('delete', secret.key)">
-                <icon name="ph:x" size="20" class="hover:text-danger" />
+                <icon name="ph:x-bold" size="20" class="hover:text-danger" />
               </button>
             </div>
           </td>
@@ -107,20 +107,20 @@ function getRowClass(key: string) {
 
 function getSecretValueClass(key: string) {
   if (getPendingChangeType(key) === "create") {
-    return "rounded-sm px-1 transition-colors hover:text-secondary! bg-success/40 group-hover:bg-success/50!"
+    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-success/40 group-hover:bg-success/50!"
   }
   if (getPendingChangeType(key) === "update") {
-    return "rounded-sm px-1 transition-colors hover:text-secondary! bg-secondary/40 group-hover:bg-secondary/50!"
+    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-secondary/40 group-hover:bg-secondary/50!"
   }
   if (getPendingChangeType(key) === "delete") {
-    return "rounded-sm px-1 transition-colors hover:text-secondary! bg-danger/40 group-hover:bg-danger/50!"
+    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-danger/40 group-hover:bg-danger/50!"
   }
 
-  return "rounded-sm px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-muted"
+  return "rounded-lg px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-muted"
 }
 
 function getCopyIcon(secretKey: string, env: string) {
-  return copyStates.value[`${secretKey}-${env}`] ? "ph:check" : "ph:copy"
+  return copyStates.value[`${secretKey}-${env}`] ? "ph:check-bold" : "ph:copy-bold"
 }
 
 async function handleCopy(secretKey: string, env: string, value: string) {

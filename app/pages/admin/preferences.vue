@@ -15,7 +15,7 @@
           </p>
         </header>
 
-        <p v-if="Object.values(errors).some(Boolean)" class="text-danger">
+        <p v-if="Object.values(errors).some(Boolean)" class="text-caption-danger">
           {{ Object.values(errors).find(Boolean) }}
         </p>
       </div>
@@ -37,7 +37,7 @@
             class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
-            <icon :name="copyIcon[index]?.icon.value || 'ph:copy'" size="20" />
+            <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
 
           <button
@@ -45,26 +45,26 @@
             title="Regenerate Token" aria-label="Regenerate API Token"
             @click="field.onRegenerate()"
           >
-            <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise'" size="20" />
+            <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
-            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk'" size="20" />
+            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'image'" class="navigation-group justify-end">
-          <img v-if="field.src" :src="field.src.value ?? undefined" alt="Profile preview" class="size-10 rounded-full border-2">
+          <img v-if="field.src" :src="field.src.value ?? undefined" alt="Profile preview" class="size-16 rounded-full border-2">
           <input
             id="image" type="file"
             accept="image/*" class="hidden"
             @change="field.onUpload"
           >
-          <label for="image" class="btn">
-            <icon name="ph:image" size="20" />
+          <label for="image" class="btn cursor-pointer">
+            <icon name="ph:image-bold" size="20" />
           </label>
         </div>
 
@@ -88,13 +88,13 @@
           <h5>
             Delete Account
           </h5>
-          <p class="text-danger">
+          <p class="text-caption-danger">
             This action is irreversible. All your data will be permanently deleted.
           </p>
         </header>
 
         <button class="btn-danger self-end" aria-label="Delete Account" @click="handleDeleteUser">
-          <icon name="ph:user-minus" size="20" />
+          <icon name="ph:user-minus-bold" size="20" />
           <span>Confirm</span>
         </button>
       </nav>
@@ -161,9 +161,9 @@ const userFields = [
   },
 ]
 
-const copyIcon = userFields.map(() => createActionHandler("ph:copy"))
-const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk"))
-const regenerateIcon = userFields.map(() => createActionHandler("ph:arrows-clockwise"))
+const copyIcon = userFields.map(() => createActionHandler("ph:copy-bold"))
+const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk-bold"))
+const regenerateIcon = userFields.map(() => createActionHandler("ph:arrows-clockwise-bold"))
 
 async function handleUpdateImage(event: Event) {
   const input = event.target as HTMLInputElement

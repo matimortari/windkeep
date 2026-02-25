@@ -106,9 +106,9 @@ const COLORS = [
   { name: "Secondary", var: "--secondary" },
 ]
 
-const symbolActions = SYMBOLS.map(() => createActionHandler("ph:download"))
-const wordmarkActions = WORDMARKS.map(() => createActionHandler("ph:download"))
-const colorActions = COLORS.map(() => createActionHandler("ph:copy"))
+const symbolActions = SYMBOLS.map(() => createActionHandler("ph:download-bold"))
+const wordmarkActions = WORDMARKS.map(() => createActionHandler("ph:download-bold"))
+const colorActions = COLORS.map(() => createActionHandler("ph:copy-bold"))
 
 function handleDownloadImage(logo: { name: string, image: string }, index: number, actions: ReturnType<typeof createActionHandler>[]) {
   if (!actions[index]) {

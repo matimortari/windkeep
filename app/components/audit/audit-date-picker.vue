@@ -2,11 +2,11 @@
   <div ref="datePickerRef" class="relative">
     <button class="btn flex items-center gap-2" :title="displayLabel" @click="isOpen = !isOpen">
       <span>{{ displayLabel }}</span>
-      <icon name="ph:caret-down" size="15" />
+      <icon name="ph:caret-down-bold" size="15" />
     </button>
 
     <transition name="dropdown">
-      <div v-if="isOpen" class="dropdown-menu max-h-none! min-w-72 space-y-2">
+      <div v-if="isOpen" class="dropdown-menu max-h-none! min-w-72 space-y-2" role="dialog" aria-label="Select date range">
         <div class="navigation-group justify-between">
           <select v-model="currentMonth">
             <option v-for="(month, idx) in months" :key="idx" :value="idx">
@@ -37,7 +37,7 @@
         <div class="grid grid-cols-7 gap-1">
           <button
             v-for="day in calendarDays" :key="`${day.date}-${day.isCurrentMonth}`"
-            class="aspect-square rounded-sm text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-primary': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
+            class="aspect-square rounded-lg text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-primary': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
             :disabled="!day.isCurrentMonth" @mouseenter="hoverDate = day.date"
             @mouseleave="hoverDate = null" @click="selectDate(day)"
           >

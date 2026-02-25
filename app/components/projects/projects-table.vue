@@ -24,23 +24,23 @@
           </td>
           <td>
             <div class="navigation-group">
-              <icon name="ph:key" size="20" />
+              <icon name="ph:key-bold" size="20" />
               <span>{{ project.secrets?.length }}</span>
             </div>
           </td>
           <td>
             <div class="navigation-group">
-              <icon name="ph:users" size="20" />
+              <icon name="ph:users-bold" size="20" />
               <span>{{ project.memberships?.length }}</span>
             </div>
           </td>
           <td>
             <div class="navigation-group">
               <nuxt-link :to="`/admin/${project.slug}/settings`" title="Settings" @click.stop>
-                <icon name="ph:gear" size="20" class="hover:text-primary" />
+                <icon name="ph:gear-bold" size="20" class="transition-colors hover:text-primary" />
               </nuxt-link>
               <nuxt-link :to="`/admin/${project.slug}`" title="Open" @click.stop>
-                <icon name="ph:arrow-right" size="20" class="hover:text-primary" />
+                <icon name="ph:arrow-right-bold" size="20" class="transition-colors hover:text-primary" />
               </nuxt-link>
             </div>
           </td>

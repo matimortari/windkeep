@@ -12,25 +12,25 @@
           @input="emit('update:search', ($event.target as HTMLInputElement).value)"
         >
         <span class="absolute inset-y-0 right-0 flex flex-row items-center pr-4 text-muted-foreground">
-          <icon name="ph:magnifying-glass" size="20" />
+          <icon name="ph:magnifying-glass-bold" size="20" />
         </span>
       </div>
 
       <button class="btn" :title="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="emit('toggleSort')">
-        <icon name="ph:arrow-down" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
+        <icon name="ph:arrow-down-bold" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
       </button>
 
       <button title="Toggle Layout" class="btn" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
-        <icon :name="layout === 'grid' ? 'ph:list-bullets' : 'ph:squares-four'" size="20" />
+        <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
       </button>
 
       <button class="btn" :title="showAll ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="emit('update:show-all', !showAll)">
-        <icon :name="showAll ? 'ph:users-four' : 'ph:user'" size="20" />
+        <icon :name="showAll ? 'ph:users-four-bold' : 'ph:user-bold'" size="20" />
       </button>
 
       <button v-if="isOwner || isAdmin" class="btn-primary" @click="emit('openDialog')">
         <span class="hidden md:inline">New Project</span>
-        <icon name="ph:plus" size="20" />
+        <icon name="ph:plus-bold" size="20" />
       </button>
     </nav>
   </header>

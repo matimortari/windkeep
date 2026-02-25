@@ -18,12 +18,12 @@
       </div>
 
       <footer class="flex flex-row items-center justify-between">
-        <p class="text-danger">
+        <p class="text-caption-danger">
           {{ errors.createProjectSecret || " " }}
         </p>
 
         <div class="navigation-group">
-          <button class="text-sm font-semibold hover:underline" aria-label="Cancel" @click="emit('close')">
+          <button class="btn-ghost" aria-label="Cancel" @click="emit('close')">
             Cancel
           </button>
           <button class="btn-success" type="submit" aria-label="Import Secrets from .env File">
