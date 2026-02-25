@@ -8,7 +8,7 @@
       @discard="discardAllChanges"
     />
 
-    <Empty v-if="!displayedSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus" />
+    <Empty v-if="!displayedSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus-bold" />
 
     <div v-else class="max-h-screen overflow-y-auto">
       <SecretsTable

@@ -1,6 +1,6 @@
 <template>
   <nuxt-link :to="`/admin/${project.slug}`">
-    <div class="card relative flex h-50 w-full flex-col justify-between overflow-hidden hover:border-primary!">
+    <div class="card relative flex h-50 w-full flex-col justify-between overflow-hidden">
       <div class="flex flex-col gap-2">
         <h3 class="truncate">
           {{ project.name }}
@@ -13,25 +13,24 @@
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-4">
           <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">
-            <icon name="ph:key" size="20" />
+            <icon name="ph:key-bold" size="20" />
             <span>{{ project.secrets?.length }}</span>
           </div>
 
           <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">
-            <icon name="ph:users" size="20" />
+            <icon name="ph:users-bold" size="20" />
             <span>{{ project.memberships?.length }}</span>
           </div>
         </div>
 
         <div class="navigation-group">
-          <nuxt-link :to="`/admin/${project.slug}/settings`" title="Project Settings" class="group navigation-group rounded-full p-2 text-muted-foreground transition-colors" @click.stop>
-            <icon name="ph:gear" size="25" class="transition-transform group-hover:text-primary" />
-            <span class="text-caption hidden whitespace-nowrap 2xl:block">Settings</span>
+          <nuxt-link :to="`/admin/${project.slug}/settings`" title="Project Settings" class="group btn-ghost rounded-full!" @click.stop>
+            <icon name="ph:gear-bold" size="25" class="text-muted-foreground group-hover:text-primary" />
+            <span class="text-caption hidden whitespace-nowrap xl:block">Settings</span>
           </nuxt-link>
 
-          <div class="group navigation-group rounded-full p-2 text-muted-foreground transition-colors">
-            <span class="text-caption hidden whitespace-nowrap 2xl:block">View Project</span>
-            <icon name="ph:arrow-right" size="25" class="transition-transform group-hover:text-primary" />
+          <div class="group btn-ghost rounded-full!">
+            <icon name="ph:arrow-right-bold" size="25" class="text-muted-foreground group-hover:text-primary" />
           </div>
         </div>
       </div>

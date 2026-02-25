@@ -9,13 +9,13 @@
       @open-dialog="isDialogOpen = true"
     />
 
-    <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus" />
+    <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus-bold" />
 
     <div v-else-if="layout === 'list'" class="flex max-h-screen">
       <ProjectsTable :projects="filteredProjects" />
     </div>
 
-    <ul v-else class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3">
+    <ul v-else class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3 2xl:grid-cols-4">
       <li
         v-for="(project, index) in filteredProjects" :key="project.id"
         v-motion :initial="{ opacity: 0 }"
@@ -28,11 +28,11 @@
       <button
         v-if="isOwner || isAdmin" v-motion
         :initial="{ opacity: 0 }" :enter="{ opacity: 1 }"
-        :duration="600" class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! hover:border-primary!"
+        :duration="600" class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! text-muted-foreground"
         @click="isDialogOpen = true"
       >
-        <icon name="ph:plus" size="50" class="text-muted-foreground transition-transform group-hover:scale-110 group-hover:text-primary" />
-        <span class="font-semibold text-muted-foreground transition-transform group-hover:scale-110">New Project</span>
+        <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105 group-hover:text-primary" />
+        <span class="font-semibold transition-transform group-hover:scale-105">New Project</span>
       </button>
     </ul>
 

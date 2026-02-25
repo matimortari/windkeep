@@ -36,22 +36,22 @@ export const FEATURES = [
   {
     title: "Controlled Access",
     description: "Role-based permissions allow you to control who can manage secrets at both the organization and project levels.",
-    icon: "ph:user-check",
+    icon: "ph:user-check-bold",
   },
   {
     title: "Audit Logs",
     description: "Every sensitive operation, from secret changes to role updates, is logged for full traceability and accountability.",
-    icon: "ph:list-magnifying-glass",
+    icon: "ph:list-magnifying-glass-bold",
   },
   {
     title: "Secure Encryption",
     description: "Secrets are encrypted from end to end using AES-256-CBC, keeping your data safe and private.",
-    icon: "ph:shield-star",
+    icon: "ph:shield-star-bold",
   },
   {
     title: "Command-Line Tool",
     description: "Securely access and manage secrets programmatically, integrating seamlessly into scripts or pipelines.",
-    icon: "ph:terminal",
+    icon: "ph:terminal-bold",
   },
 ]
 
@@ -89,10 +89,10 @@ export const CLI_COMMANDS = [
 ]
 
 export const SIDEBAR_NAV_LINKS = [
-  { url: "/admin/projects", icon: "ph:folder-open", label: "Projects" },
-  { url: "/admin/organization", icon: "ph:building-office", label: "Organization" },
-  { url: "/admin/audit-logs", icon: "ph:clipboard-text", label: "Audit Logs" },
-  { url: "/admin/preferences", icon: "ph:user-gear", label: "Preferences" },
+  { url: "/admin/projects", icon: "ph:folder-open-bold", label: "Projects" },
+  { url: "/admin/organization", icon: "ph:building-office-bold", label: "Organization" },
+  { url: "/admin/audit-logs", icon: "ph:clipboard-text-bold", label: "Audit Logs" },
+  { url: "/admin/preferences", icon: "ph:user-gear-bold", label: "Preferences" },
 ]
 
 export const ROLES = [

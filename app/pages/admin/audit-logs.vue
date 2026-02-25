@@ -8,7 +8,7 @@
       <AuditActions v-if="hasPermission" />
     </header>
 
-    <Empty v-if="!hasPermission" message="You don't have permission to view audit logs. Only organization owners and administrators can access this section." icon-name="ph:lock" />
+    <Empty v-if="!hasPermission" message="You don't have permission to view audit logs for this organization." icon-name="ph:lock-bold" />
 
     <div v-else class="flex max-h-screen flex-col gap-2">
       <AuditTable />

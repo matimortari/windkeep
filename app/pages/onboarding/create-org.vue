@@ -31,7 +31,7 @@
       </nuxt-link>
     </p>
 
-    <p v-if="errors.createOrg" class="text-danger">
+    <p v-if="errors.createOrg" class="text-caption-danger">
       {{ errors.createOrg }}
     </p>
   </div>

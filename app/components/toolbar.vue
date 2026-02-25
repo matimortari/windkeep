@@ -11,25 +11,22 @@
         </div>
 
         <div ref="dropdownRef" class="relative">
-          <button class="navigation-group truncate hover:underline" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
+          <button class="navigation-group truncate" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span class="text-caption">{{ activeOrg?.name }}</span>
-            <icon name="ph:caret-down" size="20" class="hover:text-primary" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
+            <icon name="ph:caret-down-bold" size="20" class="transition-all hover:text-primary" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
           </button>
 
-          <transition name="dropdown" mode="out-in">
-            <ul v-if="isDropdownOpen" class="dropdown-menu space-y-1 overflow-y-auto text-sm" role="menu" aria-label="User Organizations">
-              <li v-for="org in orgs" :key="org.id" class="truncate whitespace-nowrap">
-                <button
-                  type="button" class="w-full cursor-pointer truncate rounded-sm p-2 text-left hover:bg-muted"
-                  :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)"
-                >
+          <transition name="dropdown">
+            <ul v-if="isDropdownOpen" class="dropdown-menu" role="menu">
+              <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
+                <button class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)">
                   {{ org.name }}
                 </button>
               </li>
 
-              <li class="truncate whitespace-nowrap">
-                <nuxt-link to="/onboarding/create-org" class="group navigation-group block rounded-sm p-2 hover:bg-muted" role="menuitem">
-                  <icon name="ph:plus" size="20" class="text-primary transition-transform group-hover:scale-125" />
+              <li>
+                <nuxt-link to="/onboarding/create-org" class="group navigation-group rounded-lg p-2 whitespace-nowrap hover:bg-muted/60" role="menuitem">
+                  <icon name="ph:plus-bold" size="20" class="text-primary transition-transform group-hover:scale-125" />
                   <span>Create Organization</span>
                 </nuxt-link>
               </li>
@@ -45,16 +42,16 @@
 
       <nav class="navigation-group" aria-label="User Actions">
         <nuxt-link to="/admin/preferences" title="User Preferences" aria-label="User Preferences" class="btn hidden! md:block!">
-          <icon name="ph:user-circle-gear" size="20" />
+          <icon name="ph:user-circle-gear-bold" size="20" />
         </nuxt-link>
         <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
           <icon :name="themeIcon" size="20" />
         </button>
         <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="emit('toggleSidebar')">
-          <icon name="ph:list" size="20" />
+          <icon name="ph:list-bold" size="20" />
         </button>
         <button class="btn" aria-label="Sign Out" @click="signOut">
-          <icon name="ph:sign-out" size="20" />
+          <icon name="ph:sign-out-bold" size="20" />
         </button>
       </nav>
     </div>

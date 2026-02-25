@@ -24,14 +24,14 @@
 
         <tr v-else-if="!auditLogs.length">
           <td :colspan="columns.length" class="p-8 text-center">
-            <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus" />
+            <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus-bold" />
           </td>
         </tr>
 
         <template v-for="log in sortedLogs" v-else :key="log.id">
           <tr class="cursor-pointer hover:bg-muted/20" @click="toggleRow(log.id)">
             <td>
-              <icon name="ph:caret-right" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
+              <icon name="ph:caret-right-bold" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
             <td :title="auditActions.find(a => a.value === log.action)?.label || log.action">
               <div class="navigation-group max-w-xs truncate">
@@ -65,7 +65,7 @@
 
               <div v-if="(log.metadata || {})" class="relative">
                 <button class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="copyMetadataActions.get(log.id)?.triggerCopy(formatMetadata(log.metadata))">
-                  <icon :name="copyMetadataActions.get(log.id)?.icon.value || 'ph:copy'" size="15" />
+                  <icon :name="copyMetadataActions.get(log.id)?.icon.value || 'ph:copy-bold'" size="15" />
                 </button>
                 <Shiki lang="json" :code="formatMetadata(log.metadata)" class="code-block" />
               </div>
@@ -92,20 +92,20 @@ const copyMetadataActions = computed(() => {
 })
 
 const columns = [
-  { key: "expand", label: "", icon: "ph:eye", class: "w-10", sortable: false },
-  { key: "action", label: "Action", icon: "ph:lightning", class: "w-28", sortable: true },
-  { key: "description", label: "Description", icon: "ph:text-align-left", sortable: false },
-  { key: "user", label: "User", icon: "ph:user", class: "w-28", sortable: true },
-  { key: "createdAt", label: "Date", icon: "ph:calendar", class: "w-44", sortable: true },
+  { key: "expand", label: "", icon: "ph:eye-bold", class: "w-10", sortable: false },
+  { key: "action", label: "Action", icon: "ph:lightning-bold", class: "w-28", sortable: true },
+  { key: "description", label: "Description", icon: "ph:text-align-left-bold", sortable: false },
+  { key: "user", label: "User", icon: "ph:user-bold", class: "w-28", sortable: true },
+  { key: "createdAt", label: "Date", icon: "ph:calendar-bold", class: "w-44", sortable: true },
 ]
 
 const resourceMap: Record<string, string> = {
-  organization: "ph:buildings",
-  organization_invite: "ph:envelope",
-  organization_member: "ph:users-three",
-  project: "ph:folder",
-  project_member: "ph:user-plus",
-  secret: "ph:key",
+  organization: "ph:buildings-bold",
+  organization_invite: "ph:envelope-bold",
+  organization_member: "ph:users-three-bold",
+  project: "ph:folder-bold",
+  project_member: "ph:user-plus-bold",
+  secret: "ph:key-bold",
 }
 
 function toggleRow(id: string) {

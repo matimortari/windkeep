@@ -17,12 +17,12 @@
         No more .env headaches – WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
       </p>
 
-      <div class="flex flex-col items-center gap-4">
-        <nuxt-link to="/sign-in" class="btn rounded-full! shadow-lg shadow-primary/10 transition-all duration-300 hover:shadow-primary/30">
+      <div class="flex flex-col items-center gap-2">
+        <nuxt-link to="/sign-in" class="btn rounded-full! text-base! shadow-lg shadow-primary/30 transition-all hover:shadow-primary/50">
           <span>Create Account</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
-        <nuxt-link to="/cli-guide" class="text-caption group flex flex-row items-center gap-1">
+        <nuxt-link to="/cli-guide" class="btn-ghost group rounded-full! text-base!">
           <span>Or explore the <span class="font-semibold text-primary group-hover:underline"> WindKeep CLI</span></span>
           <icon name="ph:code-block-bold" size="20" class="text-primary transition-transform group-hover:scale-125" />
         </nuxt-link>
@@ -82,7 +82,7 @@
         <div class="my-2 flex flex-row gap-1">
           <button
             v-for="tab in [{ key: 'install', label: 'Installation' }, { key: 'commands', label: 'Usage' }]" :key="tab.key"
-            class="text-caption flex-1 rounded-t-sm border-2 p-2 pb-1! hover:bg-muted/50" :class="activeTab === tab.key ? 'border-b-primary' : ''"
+            class="text-caption flex-1 rounded-t-lg border-2 p-2 pb-1! hover:bg-muted/50" :class="activeTab === tab.key ? 'border-b-primary' : ''"
             @click="activeTab = (tab.key as 'install' | 'commands')"
           >
             {{ tab.label }}
@@ -146,7 +146,7 @@
 
     <div class="flex w-full flex-col items-center justify-center divide-y">
       <div v-for="(item, index) in FAQS" :key="index" class="w-full max-w-xs space-y-2 p-4 md:max-w-xl">
-        <button class="group flex w-full items-start justify-between gap-2 font-semibold hover:text-primary" @click="openIndex = openIndex === index ? null : index">
+        <button class="group flex w-full items-start justify-between gap-2 font-semibold transition-all hover:text-primary" @click="openIndex = openIndex === index ? null : index">
           <p class="text-sm/4 md:text-base">
             {{ item.question }}
           </p>

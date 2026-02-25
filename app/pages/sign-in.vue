@@ -3,7 +3,7 @@
     <div
       v-motion :initial="{ opacity: 0 }"
       :visible="{ opacity: 1 }" :duration="800"
-      class="card w-full max-w-sm md:max-w-md 2xl:max-w-lg"
+      class="card w-full max-w-sm md:max-w-md xl:max-w-lg"
     >
       <header class="flex flex-col items-center gap-2 py-4 text-center">
         <h1 class="font-display">
@@ -12,10 +12,10 @@
         <p class="text-caption">
           Choose a provider to continue.
         </p>
-        <span v-if="errorMessage" class="text-danger">{{ errorMessage }}</span>
+        <span v-if="errorMessage" class="text-caption-danger">{{ errorMessage }}</span>
       </header>
 
-      <div class="flex flex-col justify-center gap-4 border-y p-4 2xl:p-8">
+      <div class="flex flex-col justify-center gap-4 border-y p-4 xl:p-8">
         <button v-for="provider in OAUTH_PROVIDERS" :key="provider.name" class="btn" @click="signIn(provider.name)">
           <icon :name="provider.icon" size="25" />
           <span>{{ provider.label }}</span>
