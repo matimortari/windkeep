@@ -15,7 +15,7 @@
           </p>
         </header>
 
-        <p v-if="Object.values(errors).some(Boolean)" class="text-danger">
+        <p v-if="Object.values(errors).some(Boolean)" class="text-caption-danger">
           {{ Object.values(errors).find(Boolean) }}
         </p>
       </div>
@@ -37,14 +37,14 @@
             class="btn transition-transform" title="Copy to Clipboard"
             aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
-            <icon :name="copyIcon[index]?.icon.value || 'ph:copy'" size="20" />
+            <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
-            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk'" size="20" />
+            <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
 
@@ -68,10 +68,10 @@
 
             <nav class="navigation-group" aria-label="Organization Project Actions">
               <nuxt-link :to="`/admin/${project?.slug}`" class="btn">
-                <icon name="ph:eye" size="15" />
+                <icon name="ph:eye-bold" size="15" />
               </nuxt-link>
               <nuxt-link v-if="isOwner || isAdmin" :to="`/admin/${project?.slug}/settings`" class="btn">
-                <icon name="ph:gear" size="15" />
+                <icon name="ph:gear-bold" size="15" />
               </nuxt-link>
             </nav>
           </li>
@@ -88,7 +88,7 @@
           <h5>
             Organization Members
           </h5>
-          <p v-if="errors.transferOrgOwnership" class="text-danger">
+          <p v-if="errors.transferOrgOwnership" class="text-caption-danger">
             {{ errors.transferOrgOwnership }}
           </p>
         </div>
@@ -112,13 +112,13 @@
               </select>
 
               <button class="btn" aria-label="Update Member Role" @click="orgUser.role !== 'OWNER' && handleUpdateMemberRole(orgUser.user.id || '', orgUser.role)">
-                <icon :name="memberRoleIcon.get(orgUser.user.id)?.icon || 'ph:floppy-disk'" size="15" />
+                <icon :name="memberRoleIcon.get(orgUser.user.id)?.icon || 'ph:floppy-disk-bold'" size="15" />
               </button>
               <button class="btn" aria-label="Transfer Ownership" title="Transfer Ownership" @click="handleTransferOwnership(orgUser.user.id || '')">
-                <icon :name="transferOwnershipIcon.get(orgUser.user.id)?.icon || 'ph:arrow-u-up-right'" size="15" />
+                <icon :name="transferOwnershipIcon.get(orgUser.user.id)?.icon || 'ph:arrow-u-up-right-bold'" size="15" />
               </button>
               <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.user.id || '')">
-                <icon name="ph:x" size="15" />
+                <icon name="ph:x-bold" size="15" />
               </button>
             </nav>
           </li>
@@ -138,12 +138,12 @@
       </header>
 
       <div class="navigation-group self-end">
-        <p v-if="errors.createInvite || inviteSuccess" :class="errors.createInvite ? 'text-danger' : 'text-success'">
+        <p v-if="errors.createInvite || inviteSuccess" :class="errors.createInvite ? 'text-caption-danger' : 'text-caption-success'">
           {{ errors.createInvite || inviteSuccess }}
         </p>
 
         <button class="btn-primary" aria-label="Create Invite Link" @click="handleCreateInvite">
-          <icon name="ph:link" size="20" />
+          <icon name="ph:link-bold" size="20" />
           <span>Copy Invite Link</span>
         </button>
       </div>
@@ -165,13 +165,13 @@
           <h5>
             Leave Organization
           </h5>
-          <p class="text-danger">
+          <p class="text-caption-danger">
             This action is irreversible. You will no longer have access to this organization. If you are the last owner, the organization will be deleted.
           </p>
         </header>
 
         <button class="btn-danger self-end" aria-label="Leave Organization" @click="handleLeaveOrg">
-          <icon name="ph:sign-out" size="20" />
+          <icon name="ph:sign-out-bold" size="20" />
           <span>Confirm</span>
         </button>
       </nav>
@@ -181,13 +181,13 @@
           <h5>
             Delete Organization
           </h5>
-          <p class="text-danger">
+          <p class="text-caption-danger">
             This action is irreversible. All data associated with this organization will be permanently deleted.
           </p>
         </header>
 
         <button class="btn-danger self-end" aria-label="Delete Organization" @click="handleDeleteOrg">
-          <icon name="ph:network-x" size="20" />
+          <icon name="ph:network-x-bold" size="20" />
           <span>Confirm</span>
         </button>
       </nav>
@@ -231,8 +231,8 @@ const orgFields = [
   },
 ]
 
-const copyIcon = orgFields.map(() => createActionHandler("ph:copy"))
-const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk"))
+const copyIcon = orgFields.map(() => createActionHandler("ph:copy-bold"))
+const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 const memberRoleIcon = ref(new Map())
 const transferOwnershipIcon = ref(new Map())
 
@@ -326,10 +326,10 @@ async function handleDeleteOrg() {
 watch(orgMembers, (members) => {
   members.forEach((member) => {
     if (!memberRoleIcon.value.has(member.user.id)) {
-      memberRoleIcon.value.set(member.user.id, createActionHandler("ph:floppy-disk"))
+      memberRoleIcon.value.set(member.user.id, createActionHandler("ph:floppy-disk-bold"))
     }
     if (!transferOwnershipIcon.value.has(member.user.id)) {
-      transferOwnershipIcon.value.set(member.user.id, createActionHandler("ph:arrow-u-up-right"))
+      transferOwnershipIcon.value.set(member.user.id, createActionHandler("ph:arrow-u-up-right-bold"))
     }
   })
 }, { immediate: true, deep: true })

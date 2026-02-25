@@ -7,15 +7,15 @@
     <div class="flex flex-1 flex-col xl:flex-row">
       <div class="btn fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 gap-4! rounded-full! md:hidden!">
         <button @click="isSidebarOpen = !isSidebarOpen">
-          <icon :name="isSidebarOpen ? 'ph:x' : 'ph:list'" size="25" />
+          <icon :name="isSidebarOpen ? 'ph:x-bold' : 'ph:list-bold'" size="25" />
         </button>
         <button @click="scrollToTop">
-          <icon name="ph:arrow-up" size="25" />
+          <icon name="ph:arrow-up-bold" size="25" />
         </button>
       </div>
 
       <button class="btn fixed bottom-4 left-4 z-50 hidden! md:block!" @click="scrollToTop">
-        <icon name="ph:arrow-up" size="25" />
+        <icon name="ph:arrow-up-bold" size="25" />
       </button>
 
       <article
@@ -28,11 +28,11 @@
 
       <aside
         id="table-of-contents" :class="isSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
-        class="fixed inset-y-0 right-0 z-40 h-screen w-3/4 bg-card p-4 pt-20 transition-transform duration-300 md:w-1/4 xl:translate-x-0"
+        class="fixed inset-y-0 right-0 z-40 h-screen w-3/4 bg-card p-4 pt-20 transition-transform md:w-1/4 xl:translate-x-0"
       >
         <div class="flex h-full flex-col">
           <p class="flex items-center gap-1 border-b py-2 font-semibold text-muted-foreground uppercase">
-            <icon name="ph:list-bullets" size="25" />
+            <icon name="ph:list-bullets-bold" size="25" />
             <span>On this page</span>
           </p>
 

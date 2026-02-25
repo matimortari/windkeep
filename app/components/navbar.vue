@@ -1,25 +1,25 @@
 <template>
-  <div class="fixed top-2 left-1/2 z-50 w-[95%] -translate-x-1/2 transition-all duration-500" :class="[scrolled ? 'max-w-4xl' : 'max-w-5xl']">
+  <div class="fixed top-2 left-1/2 z-50 w-[95%] -translate-x-1/2 transition-all" :class="[scrolled ? 'max-w-4xl' : 'max-w-5xl']">
     <div
-      class="flex flex-row items-center justify-between rounded-full border-2 py-2 backdrop-blur-xl transition-all duration-500"
+      class="flex flex-row items-center justify-between rounded-full border-2 py-2 backdrop-blur-xl transition-all"
       :class="[scrolled ? 'bg-card/80 px-2 shadow-lg' : 'bg-card/50 px-4 shadow-none']"
     >
       <nav class="navigation-group gap-8!" aria-label="Main Navigation">
         <Logo />
 
         <div class="hidden gap-4! md:navigation-group">
-          <nuxt-link to="/#features" class="text-caption flex flex-row items-center gap-1 hover:text-primary! hover:underline">
-            <icon name="ph:star" size="20" />
+          <nuxt-link to="/#features" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
+            <icon name="ph:star-bold" size="20" />
             <span>Features</span>
           </nuxt-link>
 
-          <nuxt-link to="/#faq" class="text-caption flex flex-row items-center gap-1 hover:text-primary! hover:underline">
-            <icon name="ph:question" size="20" />
+          <nuxt-link to="/#faq" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
+            <icon name="ph:question-bold" size="20" />
             <span>FAQ</span>
           </nuxt-link>
 
-          <nuxt-link to="/cli-guide" class="text-caption flex flex-row items-center gap-1 hover:text-primary! hover:underline">
-            <icon name="ph:terminal" size="20" />
+          <nuxt-link to="/cli-guide" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
+            <icon name="ph:terminal-bold" size="20" />
             <span>CLI Guide</span>
           </nuxt-link>
         </div>
@@ -31,11 +31,11 @@
         </button>
 
         <nuxt-link v-if="!loggedIn" to="/sign-in" class="btn rounded-full!" aria-label="Sign In">
-          <icon name="ph:sign-in" size="20" />
+          <icon name="ph:sign-in-bold" size="20" />
         </nuxt-link>
 
         <button v-if="loggedIn" class="btn rounded-full!" aria-label="Sign Out" @click="signOut">
-          <icon name="ph:sign-out" size="20" />
+          <icon name="ph:sign-out-bold" size="20" />
         </button>
       </nav>
     </div>

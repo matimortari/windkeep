@@ -1,7 +1,7 @@
 <template>
   <nav v-if="pagination && pagination.totalPages > 0" class="navigation-group w-full flex-1 justify-between" aria-label="Pagination">
     <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="auditStore.prevPage(activeOrg!.id)">
-      <icon name="ph:arrow-left" size="20" />
+      <icon name="ph:arrow-left-bold" size="20" />
     </button>
 
     <div class="text-caption flex flex-col items-center justify-center gap-1 whitespace-nowrap md:mx-4">
@@ -10,7 +10,7 @@
     </div>
 
     <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="auditStore.nextPage(activeOrg!.id)">
-      <icon name="ph:arrow-right" size="20" />
+      <icon name="ph:arrow-right-bold" size="20" />
     </button>
   </nav>
 </template>

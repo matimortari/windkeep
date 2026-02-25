@@ -5,16 +5,20 @@
     <div ref="actionDropdownRef" class="relative">
       <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
         <span>{{ auditActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
-        <icon name="ph:caret-down" size="15" />
+        <icon name="ph:caret-down-bold" size="15" />
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-24! overflow-y-auto text-sm whitespace-nowrap">
-          <li class="rounded-sm p-2 hover:bg-muted" @click="updateFilter('action', '')">
-            All Actions
+        <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-24! whitespace-nowrap" role="menu">
+          <li>
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', '')">
+              All Actions
+            </button>
           </li>
-          <li v-for="action in auditActions" :key="action.value" class="rounded-sm p-2 hover:bg-muted" @click="updateFilter('action', action.value)">
-            {{ action.label }}
+          <li v-for="action in auditActions" :key="action.value">
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="action.value === currentFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', action.value)">
+              {{ action.label }}
+            </button>
           </li>
         </ul>
       </transition>
@@ -23,23 +27,27 @@
     <div ref="userDropdownRef" class="relative">
       <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
         <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
-        <icon name="ph:caret-down" size="15" />
+        <icon name="ph:caret-down-bold" size="15" />
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isUserDropdownOpen" class="dropdown-menu overflow-y-auto text-sm whitespace-nowrap">
-          <li class="rounded-sm p-2 hover:bg-muted" @click="updateFilter('user', '')">
-            All Users
+        <ul v-if="isUserDropdownOpen" class="dropdown-menu whitespace-nowrap" role="menu">
+          <li>
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', '')">
+              All Users
+            </button>
           </li>
-          <li v-for="user in availableUsers" :key="user.id" class="flex items-center gap-1 rounded-sm p-2 hover:bg-muted" @click="updateFilter('user', user.id)">
-            <span>{{ user.name }}</span>
+          <li v-for="user in availableUsers" :key="user.id">
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="user.id === currentFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', user.id)">
+              {{ user.name }}
+            </button>
           </li>
         </ul>
       </transition>
     </div>
 
     <button class="btn-danger" :disabled="!auditLogs.length" title="Delete Logs" @click="handleDeleteLogs">
-      <icon name="ph:trash" size="20" />
+      <icon name="ph:trash-bold" size="20" />
     </button>
   </nav>
 </template>

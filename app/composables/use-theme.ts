@@ -30,7 +30,7 @@ export function useTheme() {
     updateHtmlClass()
   })
 
-  const themeIcon = computed(() => colorMode.value === "light" ? "ph:moon-stars" : "ph:sun-horizon")
+  const themeIcon = computed(() => colorMode.value === "light" ? "ph:moon-stars-bold" : "ph:sun-horizon-bold")
   const themeTitle = computed(() => colorMode.value === "light" ? logoDark : logoLight)
 
   return {

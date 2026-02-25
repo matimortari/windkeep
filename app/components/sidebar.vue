@@ -3,15 +3,18 @@
   <div v-if="isOpen" class="fixed inset-0 z-40 bg-black/50 md:hidden" @click="emit('update:isOpen', false)" />
 
   <aside
-    class="fixed top-0 left-0 z-50 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-sm md:border-b-2 2xl:w-72"
+    class="fixed top-0 left-0 z-50 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b-2 2xl:w-72"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
-    <span class="font-semibold">Overview</span>
-    <nav class="text-caption flex flex-col gap-1" aria-label="Main Navigation">
+    <h5>
+      Overview
+    </h5>
+
+    <nav class="flex flex-col gap-2 font-semibold text-muted-foreground" aria-label="Main Navigation">
       <nuxt-link
         v-for="link in SIDEBAR_NAV_LINKS" :key="link.url"
-        :to="link.url" class="group navigation-group rounded-sm p-2 transition-colors hover:bg-muted"
-        :class="{ 'bg-muted/50': route.path === link.url }" @click="emit('update:isOpen', false)"
+        :to="link.url" class="group navigation-group rounded-lg p-2 transition-colors hover:bg-muted/50"
+        :class="{ 'bg-muted': route.path === link.url }" @click="emit('update:isOpen', false)"
       >
         <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />
         <span>{{ link.label }}</span>
@@ -19,14 +22,16 @@
     </nav>
 
     <div class="flex items-center justify-between">
-      <span class="font-semibold">Projects</span>
+      <h5>
+        Projects
+      </h5>
 
       <div class="navigation-group">
-        <button :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="showAllProjects = !showAllProjects">
-          <Icon :name="showAllProjects ? 'ph:users-four' : 'ph:user'" size="20" class="hover:text-primary" />
+        <button :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" class="btn-ghost p-0!" @click="showAllProjects = !showAllProjects">
+          <Icon :name="showAllProjects ? 'ph:users-four-bold' : 'ph:user-bold'" size="25" />
         </button>
-        <button aria-label="Create New Project" @click="isDialogOpen = true">
-          <icon name="ph:plus" size="25" class="hover:text-primary" />
+        <button aria-label="Create New Project" class="btn-ghost p-0!" @click="isDialogOpen = true">
+          <icon name="ph:plus-bold" size="25" />
         </button>
       </div>
     </div>
@@ -39,7 +44,7 @@
       <nav v-else aria-label="Projects Navigation" class="text-caption flex flex-col gap-2">
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
-          :to="`/admin/${project.slug}`" class="truncate hover:text-primary hover:underline"
+          :to="`/admin/${project.slug}`" class="truncate hover:underline"
           :class="{ 'font-semibold text-primary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="emit('update:isOpen', false)"
         >
           > {{ project.name }}
