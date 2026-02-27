@@ -27,7 +27,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      script: [{ "src": "https://static.cloudflareinsights.com/beacon.min.js", "defer": true, "data-cf-beacon": "{\"token\": \"59e0cb447ba54c72bf6a994997bea0e9\"}" }],
+      script: process.env.NODE_ENV === "production" ? [{ "src": "https://static.cloudflareinsights.com/beacon.min.js", "defer": true, "data-cf-beacon": "{\"token\": \"59e0cb447ba54c72bf6a994997bea0e9\"}" }] : [],
     },
   },
   css: ["~/assets/styles.css"],
