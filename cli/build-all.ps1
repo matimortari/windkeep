@@ -5,7 +5,7 @@ $Version = "1.0.0"
 $LdFlags = "-s -w -X github.com/matimortari/windkeep/cli/cmd.Version=$Version"
 Write-Host "Version: $Version" -ForegroundColor Yellow
 
-$OutputDir = "dist/bin"
+$OutputDir = "../.data/bin"
 if (Test-Path $OutputDir) {
     Remove-Item -Recurse -Force $OutputDir
 }
