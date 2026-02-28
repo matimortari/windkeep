@@ -30,7 +30,7 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
       data: {
         email,
         name: name?.trim() ?? email.split("@")[0],
-        image: image || undefined,
+        image: image || `${process.env.R2_PUBLIC_URL}/defaults/avatar.png`,
         apiToken: generateToken(),
       },
     })
@@ -57,20 +57,14 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
     id: user.id,
     email: user.email,
     name: user.name,
-    image: user.image ?? undefined,
+    image: user.image,
     apiToken: user.apiToken ?? undefined,
     activeOrgId: activeMembership?.org?.id ?? null,
   }
 
   const now = new Date()
   const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days
-
-  await setUserSession(event, {
-    user: sessionUser,
-    loggedInAt: now,
-    expiresAt,
-    lastActivityAt: now,
-  })
+  await setUserSession(event, { user: sessionUser, loggedInAt: now, expiresAt, lastActivityAt: now })
 
   return sendRedirect(event, activeMembership?.org ? "/admin/projects" : "/onboarding/create-org")
 }

@@ -41,6 +41,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const userStore = useUserStore()
 const projectStore = useProjectStore()
 const { activeOrg, isOwner, isAdmin } = storeToRefs(useOrgStore())
@@ -98,7 +99,7 @@ watch(layout, (value) => {
 
 useHead({
   title: "Projects",
-  link: [{ rel: "canonical", href: `${BASE_URL}/admin/projects` }],
+  link: [{ rel: "canonical", href: `${baseURL}/admin/projects` }],
   meta: [{ name: "description", content: "WindKeep projects page." }],
 })
 

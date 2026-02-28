@@ -32,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const userStore = useUserStore()
 const orgStore = useOrgStore()
@@ -53,7 +54,7 @@ onMounted(async () => await userStore.getUser())
 
 useHead({
   title: "Join Organization",
-  link: [{ rel: "canonical", href: `${BASE_URL}/onboarding/join-org` }],
+  link: [{ rel: "canonical", href: `${baseURL}/onboarding/join-org` }],
   meta: [{ name: "description", content: "Join an organization on WindKeep." }],
 })
 

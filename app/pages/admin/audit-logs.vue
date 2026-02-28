@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const orgStore = useOrgStore()
 const { activeOrg, isOwner, isAdmin } = storeToRefs(orgStore)
 const auditStore = useAuditStore()
@@ -32,7 +33,7 @@ watch(activeOrg, async (org) => {
 
 useHead({
   title: "Audit Logs",
-  link: [{ rel: "canonical", href: `${BASE_URL}/admin/audit-logs` }],
+  link: [{ rel: "canonical", href: `${baseURL}/admin/audit-logs` }],
   meta: [{ name: "description", content: "WindKeep audit logs page." }],
 })
 

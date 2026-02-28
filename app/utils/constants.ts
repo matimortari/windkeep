@@ -1,7 +1,3 @@
-export const BASE_URL = "https://windkeep.up.railway.app"
-
-export const DEFAULT_AVATAR = "/assets/default-avatar.svg"
-
 export const HIGHLIGHTS = [
   {
     title: "Rapid Onboarding",

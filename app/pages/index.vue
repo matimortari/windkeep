@@ -164,12 +164,13 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const openIndex = ref<number | null>(null)
 const activeTab = ref<"install" | "commands">("install")
 
 useHead({
   title: "Securely Manage Your Environment Variables",
-  link: [{ rel: "canonical", href: `${BASE_URL}` }],
+  link: [{ rel: "canonical", href: `${baseURL}` }],
   meta: [{ name: "description", content: "Centralize, encrypt, and share your secrets with confidence. Fast, safe, and easy to use." }],
 })
 
