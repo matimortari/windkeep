@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()
@@ -190,7 +191,7 @@ watch(() => project.value?.id, async (id) => {
 
   useHead({
     title: `${projectTitle}`,
-    link: [{ rel: "canonical", href: `${BASE_URL}/${id}` }],
+    link: [{ rel: "canonical", href: `${baseURL}/${id}` }],
     meta: [{ name: "description", content: `${projectTitle} project page.` }],
   })
 }, { immediate: true })

@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const slug = route.params.slug as string
 const pageContent = await queryCollection("content").path(`/cli-${slug}`).first()
@@ -23,7 +24,7 @@ const PAGE_DESCRIPTIONS: Record<string, string> = {
 
 useHead({
   title: `CLI – ${PAGE_TITLES[slug]}`,
-  link: [{ rel: "canonical", href: `${BASE_URL}/cli/${slug}` }],
+  link: [{ rel: "canonical", href: `${baseURL}/cli/${slug}` }],
   meta: [{ name: "description", content: PAGE_DESCRIPTIONS[slug] }],
 })
 

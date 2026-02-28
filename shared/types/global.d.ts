@@ -5,7 +5,7 @@ interface User {
   id: string
   email: string
   name: string
-  image: string | null
+  image: string
   apiToken: string | null
   orgMemberships?: OrgMembership[]
   projectMemberships?: ProjectMembership[]
