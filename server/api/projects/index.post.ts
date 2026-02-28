@@ -1,6 +1,3 @@
-import db from "#server/utils/db"
-import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
-import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { createProjectSchema } from "#shared/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
