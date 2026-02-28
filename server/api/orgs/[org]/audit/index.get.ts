@@ -1,6 +1,3 @@
-import db from "#server/utils/db"
-import { getUserFromSession, requireRole } from "#server/utils/helpers"
-import { CACHE_TTL, CacheKeys, getCached, setCached } from "#server/utils/redis"
 import { getAuditLogsSchema } from "#shared/schemas/audit-schema"
 
 export default defineEventHandler(async (event) => {

@@ -1,6 +1,3 @@
-import db from "#server/utils/db"
-import { getUserFromSession, requireRole } from "#server/utils/helpers"
-
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
