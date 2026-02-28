@@ -1,7 +1,3 @@
-import db from "#server/utils/db"
-import { decrypt, encrypt } from "#server/utils/encryption"
-import { createAuditLog, getUserFromSession, requireRole } from "#server/utils/helpers"
-import { CacheKeys, deleteCached } from "#server/utils/redis"
 import { updateSecretSchema } from "#shared/schemas/secret-schema"
 
 export default defineEventHandler(async (event) => {

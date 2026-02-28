@@ -1,5 +1,3 @@
-import db from "#server/utils/db"
-import { createAuditLog, getUserFromSession } from "#server/utils/helpers"
 import { acceptInviteSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {

@@ -1,6 +1,5 @@
 import type { EventHandlerRequest, H3Event } from "h3"
 import { randomBytes } from "node:crypto"
-import db from "#server/utils/db"
 
 /**
  * Retrieves the authenticated user from the current session or API token.
