@@ -38,6 +38,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
@@ -61,7 +62,7 @@ onMounted(async () => {
 
 useHead({
   title: "Create Organization",
-  link: [{ rel: "canonical", href: `${BASE_URL}/onboarding/create-org` }],
+  link: [{ rel: "canonical", href: `${baseURL}/onboarding/create-org` }],
   meta: [{ name: "description", content: "Create your organization on WindKeep." }],
 })
 

@@ -103,6 +103,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const { clear } = useUserSession()
 const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
@@ -214,7 +215,7 @@ async function handleDeleteUser() {
 
 useHead({
   title: "Preferences",
-  link: [{ rel: "canonical", href: `${BASE_URL}/admin/preferences` }],
+  link: [{ rel: "canonical", href: `${baseURL}/admin/preferences` }],
   meta: [{ name: "description", content: "WindKeep preferences page." }],
 })
 

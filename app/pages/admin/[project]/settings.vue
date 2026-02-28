@@ -65,7 +65,7 @@
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
           <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 first:pt-0 last:border-b-0 last:pb-0">
             <div class="navigation-group items-start!">
-              <img :src="member.user.image || DEFAULT_AVATAR" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
+              <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
 
               <div class="flex flex-col truncate">
                 <span class="font-semibold">{{ member.user?.name }}</span>
@@ -114,7 +114,7 @@
             <ul v-if="isAddMemberDropdownOpen" class="dropdown-menu left-0 max-h-60 w-full md:w-80" role="menu">
               <li v-for="member in availableOrgMembers" :key="member.user.id" class="truncate whitespace-nowrap">
                 <button class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="selectedMemberToAdd === member.user.id ? 'bg-muted' : ''" @click="selectedMemberToAdd = member.user.id; isAddMemberDropdownOpen = false">
-                  <img :src="member.user.image || DEFAULT_AVATAR" alt="Avatar" class="size-6 rounded-full border">
+                  <img :src="member.user.image" alt="Avatar" class="size-6 rounded-full border">
                   <div class="flex flex-col truncate">
                     <span class="truncate font-semibold">{{ member.user.name }}</span>
                     <span class="text-xs text-muted-foreground">{{ member.user.email }}</span>
@@ -194,6 +194,7 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const slug = route.params.project
 const { createActionHandler } = useActionIcon()
@@ -401,7 +402,7 @@ watch(() => project.value?.id, async (id: string | undefined) => {
 
   useHead({
     title: `${projectTitle} settings`,
-    link: [{ rel: "canonical", href: `${BASE_URL}/${id}/settings` }],
+    link: [{ rel: "canonical", href: `${baseURL}/${id}/settings` }],
     meta: [{ name: "description", content: `${projectTitle} project settings page.` }],
   })
 }, { immediate: true })

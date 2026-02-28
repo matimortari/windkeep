@@ -3,11 +3,12 @@
 </template>
 
 <script setup lang="ts">
+const { public: { baseURL } } = useRuntimeConfig()
 const pageContent = await queryCollection("content").path("/cli").first()
 
 useHead({
   title: "Command Line Interface",
-  link: [{ rel: "canonical", href: `${BASE_URL}/cli` }],
+  link: [{ rel: "canonical", href: `${baseURL}/cli` }],
   meta: [{ name: "description", content: "WindKeep Command Line Interface." }],
 })
 
