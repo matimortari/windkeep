@@ -10,7 +10,7 @@
 
     <Empty v-if="!displayedSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus-bold" />
 
-    <div v-else class="max-h-screen overflow-y-auto">
+    <div v-else class="flex max-h-screen flex-col gap-2">
       <SecretsTable
         :secrets="displayedSecrets" :project-id="project?.id ?? ''"
         :pending-changes="pendingChanges" @edit="handleEditSecret"
