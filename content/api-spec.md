@@ -1054,4 +1054,41 @@ Permanently deletes a secret and all its environment values. Only project owners
 }
 ```
 
+#### Get Secret History
+
+> **GET** `/api/projects/{project}/secrets/{secret}/history`
+
+Retrieves the complete change history for a secret, including all previous decrypted values for each environment and information about who made each change. All project members can view secret history.
+
+**Route Parameters**:
+
+- `project`: Project ID (required).
+- `secret`: Secret ID (required).
+
+**Response:**
+
+```json
+{
+  "history": [
+    {
+      "environment": "DEVELOPMENT | STAGING | PRODUCTION",
+      "currentValue": "string",
+      "history": [
+        {
+          "id": "string",
+          "value": "string",
+          "changedBy": {
+            "id": "string",
+            "name": "string",
+            "email": "string",
+            "image": "string | null"
+          },
+          "changedAt": "Date"
+        }
+      ]
+    }
+  ]
+}
+```
+
 ---
