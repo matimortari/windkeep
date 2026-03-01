@@ -1,61 +1,50 @@
 <template>
-  <div
-    v-motion :initial="{ opacity: 0 }"
-    :visible="{ opacity: 1 }" :duration="800"
-    class="relative flex min-h-screen w-full flex-col items-center justify-center gap-8 py-20 text-center"
+  <section
+    id="hero" v-motion
+    :initial="{ opacity: 0 }" :visible-once="{ opacity: 1 }"
+    :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center gap-8 px-4 py-24 text-center"
   >
-    <header id="hero" class="z-20 flex w-full flex-col items-center gap-8 px-4 py-20 md:px-20">
+    <header class="z-20 flex w-full max-w-2xl flex-col items-center gap-8">
+      <h1>
+        Your Secrets, Secured.
+      </h1>
+      <p class="leading-6 font-semibold text-muted-foreground md:text-lg">
+        No more .env headaches – WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
+      </p>
+
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 z-[-1] overflow-hidden">
         <div class="blob blob-1" />
         <div class="blob blob-2" />
       </div>
 
-      <h1>
-        Your Secrets, Secured.
-      </h1>
-      <p class="max-w-2xl leading-6 font-semibold text-muted-foreground md:text-lg">
-        No more .env headaches – WindKeep is a secrets management platform that helps organizations securely store, manage, and share sensitive information.
-      </p>
+      <div class="flex flex-col items-center gap-4 md:flex-row">
+        <nuxt-link to="/sign-in" class="group btn rounded-full! bg-linear-to-r from-primary to-secondary px-8 shadow-lg shadow-primary/30 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/40">
+          <span class="font-semibold">Get Started</span>
+          <icon name="ph:arrow-right-bold" size="20" class="transition-transform group-hover:translate-x-1" />
+        </nuxt-link>
+        <nuxt-link to="/cli-guide" class="btn-ghost group rounded-full! border-2 border-muted px-8 backdrop-blur-sm hover:border-primary/50">
+          <icon name="ph:code-block-bold" size="20" class="text-primary" />
+          <span class="font-semibold">WindKeep CLI</span>
+        </nuxt-link>
+      </div>
 
-      <div class="flex flex-col items-center gap-2">
-        <nuxt-link to="/sign-in" class="btn rounded-full! text-base! shadow-lg shadow-primary/30 transition-all hover:shadow-primary/50">
-          <span>Create Account</span>
-          <icon name="ph:arrow-right-bold" size="20" />
-        </nuxt-link>
-        <nuxt-link to="/cli-guide" class="btn-ghost group rounded-full! text-base!">
-          <span>Or explore the <span class="font-semibold text-primary group-hover:underline"> WindKeep CLI</span></span>
-          <icon name="ph:code-block-bold" size="20" class="text-primary transition-transform group-hover:scale-125" />
-        </nuxt-link>
+      <div class="flex w-full flex-wrap items-center justify-center gap-4 border-t py-8 md:gap-8">
+        <div
+          v-for="(highlight, index) in HIGHLIGHTS" :key="index"
+          v-motion :initial="{ opacity: 0, y: 20 }"
+          :visible-once="{ opacity: 1, y: 0 }" :duration="800"
+          :delay="200 * index" class="navigation-group"
+        >
+          <span class="card rounded-full! p-2!">
+            <icon :name="highlight.icon" class="text-primary" size="20" />
+          </span>
+          <span class="font-semibold text-muted-foreground">{{ highlight.title }}</span>
+        </div>
       </div>
     </header>
+  </section>
 
-    <section id="highlights" class="flex w-full flex-col items-center justify-center gap-4 md:flex-row">
-      <div
-        v-for="(highlight, index) in HIGHLIGHTS" :key="index"
-        v-motion :initial="{ opacity: 0, y: 20 }"
-        :visible="{ opacity: 1, y: 0 }" :duration="800"
-        :delay="200 * index" class="card flex max-w-sm flex-col items-start gap-2"
-      >
-        <div class="navigation-group">
-          <span class="card rounded-full! p-2!">
-            <icon :name="highlight.icon" class="text-primary" size="25" />
-          </span>
-          <h4>
-            {{ highlight.title }}
-          </h4>
-        </div>
-        <p class="text-caption text-start">
-          {{ highlight.description }}
-        </p>
-      </div>
-    </section>
-  </div>
-
-  <section
-    id="cli" v-motion
-    :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="w-full border-y-2 bg-card py-20"
-  >
+  <section id="cli" class="w-full border-y-2 bg-card py-20">
     <div class="container mx-auto flex flex-col items-center justify-center gap-8 p-4 md:flex-row md:gap-20 2xl:gap-32">
       <header class="flex flex-col items-center gap-4 text-center md:items-start md:text-start">
         <h2>
@@ -108,18 +97,18 @@
 
   <section
     id="features" v-motion
-    :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-12 px-4 md:p-20"
+    :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
+    :duration="800" class="flex w-full flex-col items-center gap-12 px-4 py-24"
   >
     <h2>
       Features
     </h2>
 
-    <div class="grid grid-cols-1 place-items-center gap-12 md:grid-cols-2 md:gap-32">
+    <div class="grid grid-cols-1 place-items-center gap-12 md:grid-cols-2 md:gap-20 2xl:gap-32">
       <div
         v-for="(feature, index) in FEATURES" :key="index"
         v-motion :initial="{ opacity: 0, y: -20 }"
-        :visible="{ opacity: 1, y: 0 }" :duration="800"
+        :visible-once="{ opacity: 1, y: 0 }" :duration="800"
         :delay="200 * index" class="flex max-w-sm flex-col items-center gap-4 text-center"
       >
         <div class="card flex items-center justify-center rounded-2xl!">
@@ -137,8 +126,8 @@
 
   <section
     id="faq" v-motion
-    :initial="{ opacity: 0, y: 20 }" :visible="{ opacity: 1, y: 0 }"
-    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 text-center md:p-20"
+    :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
+    :duration="800" class="flex w-full flex-col items-center gap-8 px-4 py-24 text-center"
   >
     <h2>
       Frequently Asked Questions
@@ -219,8 +208,8 @@ h2 {
 }
 
 .blob-1 {
-  width: 520px;
-  height: 520px;
+  width: 500px;
+  height: 500px;
   background: color-mix(in srgb, var(--primary) 70%, var(--accent, white));
   opacity: 0.2;
   top: -100px;

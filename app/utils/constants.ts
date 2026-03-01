@@ -1,17 +1,14 @@
 export const HIGHLIGHTS = [
   {
     title: "Rapid Onboarding",
-    description: "Connect with your team or get your workspace up and running in seconds, so you don't miss a beat.",
     icon: "ph:users-three-bold",
   },
   {
     title: "Free & Open Source",
-    description: "WindKeep is completely free to use and open source, giving you full transparency and control.",
     icon: "ph:code-bold",
   },
   {
     title: "Encrypted & Safe",
-    description: "Your secrets are protected with industry-standard encryption protocols, ensuring they remain secure.",
     icon: "ph:lock-key-bold",
   },
 ]

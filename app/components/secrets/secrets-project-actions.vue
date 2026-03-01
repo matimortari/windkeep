@@ -12,7 +12,7 @@
 
     <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
       <button v-if="canManage" class="btn-primary" @click="emit('openSecretsDialog')">
-        <span>New Secret</span>
+        <span class="hidden md:inline">New Secret</span>
         <icon name="ph:plus-bold" size="20" />
       </button>
 
