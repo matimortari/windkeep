@@ -24,10 +24,6 @@
         Accept Invite
       </button>
     </form>
-
-    <p :class="errors.acceptInvite ? 'text-caption-danger' : 'text-caption-success'">
-      {{ errors.acceptInvite || joinOrgSuccess }}
-    </p>
   </div>
 </template>
 
@@ -36,16 +32,11 @@ const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const userStore = useUserStore()
 const orgStore = useOrgStore()
-const { errors } = storeToRefs(orgStore)
 const token = ref(route.query.token as string || "")
-const joinOrgSuccess = ref<string | null>(null)
 
 async function handleAcceptInvite() {
-  joinOrgSuccess.value = null
-
   const res = await orgStore.acceptInvite(token.value, { token: token.value })
   if (res) {
-    joinOrgSuccess.value = "Invitation accepted! Redirecting."
     setTimeout(() => navigateTo("/admin/projects"), 2000)
   }
 }

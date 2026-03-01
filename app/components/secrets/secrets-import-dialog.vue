@@ -17,11 +17,7 @@
         <span class="text-xs text-muted-foreground">Select the environment for the imported secrets.</span>
       </div>
 
-      <footer class="flex flex-row items-center justify-between">
-        <p class="text-caption-danger">
-          {{ errors.createProjectSecret || " " }}
-        </p>
-
+      <footer class="flex flex-row items-center justify-end">
         <div class="navigation-group">
           <button class="btn-ghost" aria-label="Cancel" @click="emit('close')">
             Cancel
@@ -47,7 +43,6 @@ const emit = defineEmits<{
   save: [secrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[]]
 }>()
 
-const { errors } = storeToRefs(useProjectStore())
 const envContent = ref("")
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const selectedEnv = ref<Environment>("DEVELOPMENT")
@@ -90,14 +85,11 @@ function handleSubmit() {
   emit("save", payload)
 }
 
-// Reset form and clear errors when dialog is opened
+// Reset form when dialog is opened
 watch(() => props.isOpen, (open) => {
   if (open) {
     envContent.value = ""
     selectedEnv.value = "DEVELOPMENT"
-    if (errors.value.createProjectSecret) {
-      errors.value.createProjectSecret = null
-    }
   }
 })
 </script>

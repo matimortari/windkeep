@@ -14,10 +14,6 @@
             Manage organization details and settings.
           </p>
         </header>
-
-        <p v-if="Object.values(errors).some(Boolean)" class="text-caption-danger">
-          {{ Object.values(errors).find(Boolean) }}
-        </p>
       </div>
 
       <!-- Organization Details -->
@@ -84,14 +80,9 @@
 
       <!-- Organization Members List -->
       <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
-        <div class="flex items-center justify-between">
-          <h5>
-            Organization Members
-          </h5>
-          <p v-if="errors.transferOrgOwnership" class="text-caption-danger">
-            {{ errors.transferOrgOwnership }}
-          </p>
-        </div>
+        <h5>
+          Organization Members
+        </h5>
 
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
           <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 first:pt-0 last:border-b-0 last:pb-0">
@@ -138,10 +129,6 @@
       </header>
 
       <div class="navigation-group self-end">
-        <p v-if="errors.createInvite || inviteSuccess" :class="errors.createInvite ? 'text-caption-danger' : 'text-caption-success'">
-          {{ errors.createInvite || inviteSuccess }}
-        </p>
-
         <button class="btn-primary" aria-label="Create Invite Link" @click="handleCreateInvite">
           <icon name="ph:link-bold" size="20" />
           <span>Copy Invite Link</span>
@@ -198,11 +185,11 @@
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
 const { createActionHandler } = useActionIcon()
+const toast = useToast()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
-const { activeOrg, orgMembers, orgProjects, isOwner, isAdmin, errors } = storeToRefs(orgStore)
-const inviteSuccess = ref<string | null>(null)
+const { activeOrg, orgMembers, orgProjects, isOwner, isAdmin } = storeToRefs(orgStore)
 
 const orgFields = [
   {
@@ -238,7 +225,6 @@ const memberRoleIcon = ref(new Map())
 const transferOwnershipIcon = ref(new Map())
 
 async function handleCreateInvite() {
-  inviteSuccess.value = null
   if (!activeOrg.value?.id) {
     return
   }
@@ -246,7 +232,7 @@ async function handleCreateInvite() {
   const result = await orgStore.createInvite(activeOrg.value.id, { orgId: activeOrg.value.id })
   if (result?.inviteUrl) {
     await navigator.clipboard.writeText(result.inviteUrl)
-    inviteSuccess.value = "Invite link copied to clipboard!"
+    toast.success("Invite link copied to clipboard!")
   }
 }
 
