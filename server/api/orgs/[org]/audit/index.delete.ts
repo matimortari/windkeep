@@ -7,6 +7,10 @@ import parquet from "parquetjs"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 5 requests per hour per user
+  await enforceRateLimit(event, `audit:delete:${user.id}`, 5, 60 * 60 * 1000)
+
   const org = getRouterParam(event, "org")
   if (!org) {
     throw createError({ status: 400, statusText: "Organization ID is required" })

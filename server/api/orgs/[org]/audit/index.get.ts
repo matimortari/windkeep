@@ -2,6 +2,10 @@ import { getAuditLogsSchema } from "#shared/schemas/audit-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 100 requests per hour per user
+  await enforceRateLimit(event, `audit:list:${user.id}`, 100, 60 * 60 * 1000)
+
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
     throw createError({ status: 400, statusText: "Organization ID is required" })

@@ -1,5 +1,9 @@
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 10 requests per hour per user
+  await enforceRateLimit(event, `project:delete:${user.id}`, 10, 60 * 60 * 1000)
+
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
     throw createError({ status: 400, statusText: "Project ID is required" })
