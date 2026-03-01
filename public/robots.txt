@@ -1,5 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /onboarding/
-Sitemap: https://windkeep.up.railway.app/sitemap.xml
