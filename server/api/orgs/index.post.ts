@@ -2,6 +2,10 @@ import { createOrgSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 10 requests per hour per user
+  await enforceRateLimit(event, `org:create:${user.id}`, 10, 60 * 60 * 1000)
+
   const body = await readBody(event)
 
   const result = createOrgSchema.safeParse(body)

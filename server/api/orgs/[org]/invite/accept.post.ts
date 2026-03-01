@@ -2,6 +2,10 @@ import { acceptInviteSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 20 requests per hour per user
+  await enforceRateLimit(event, `org:invite:accept:${user.id}`, 20, 60 * 60 * 1000)
+
   const body = await readBody(event)
 
   const result = acceptInviteSchema.safeParse(body)
