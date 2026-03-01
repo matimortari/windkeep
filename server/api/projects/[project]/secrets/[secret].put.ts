@@ -35,6 +35,11 @@ export default defineEventHandler(async (event) => {
         continue
       }
 
+      const existingValue = await db.secretValue.findUnique({ where: { secretId_environment: { secretId, environment: val.environment } } })
+      if (existingValue) {
+        await db.secretValueHistory.create({ data: { secretValueId: existingValue.id, value: existingValue.value, changedBy: user.id } })
+      }
+
       await db.secretValue.upsert({
         where: { secretId_environment: { secretId, environment: val.environment } },
         update: { value: encrypt(val.value) },

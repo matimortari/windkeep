@@ -82,6 +82,15 @@ interface SecretValue {
   updatedAt?: Date | string
 }
 
+interface SecretValueHistory {
+  id: string
+  secretValueId: string
+  value: string
+  changedBy: string
+  changedByUser?: User
+  createdAt?: Date | string
+}
+
 interface Invitation {
   id: string
   orgId: string
@@ -129,6 +138,24 @@ interface PendingChange {
   type: "create" | "update" | "delete"
   secret: Secret
   originalSecret?: Secret
+}
+
+interface HistoryItem {
+  id: string
+  value: string
+  changedBy: {
+    id: string
+    name: string
+    email: string
+    image: string | null
+  }
+  changedAt: Date | string
+}
+
+interface EnvironmentHistory {
+  environment: Environment
+  currentValue: string
+  history: HistoryItem[]
 }
 
 interface CalendarDay {
