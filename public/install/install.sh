@@ -10,7 +10,7 @@ case "$ARCH" in
 esac
 
 BINARY="windkeep-$OS-$ARCH"
-URL="https://windkeep.app/api/downloads/$BINARY"
+URL="https://windkeep.up.railway.app/api/downloads/$BINARY"
 
 INSTALL_DIR="$HOME/.windkeep/bin"
 

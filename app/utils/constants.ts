@@ -38,7 +38,7 @@ export const FEATURES = [
   },
   {
     title: "Secure Encryption",
-    description: "Secrets are encrypted from end to end using AES-256-CBC, keeping your data safe and private.",
+    description: "Secrets are encrypted from end to end using AES-256-GCM, keeping your data safe and private.",
     icon: "ph:shield-star-bold",
   },
   {
