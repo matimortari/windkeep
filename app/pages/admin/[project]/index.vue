@@ -45,7 +45,6 @@ const slug = route.params.project
 const projectStore = useProjectStore()
 const { secrets, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
-const { exportToEnv } = useEnvFile(project)
 const selectedSecret = ref<Secret | null>(null)
 const isSecretsDialogOpen = ref(false)
 const isEnvDialogOpen = ref(false)
@@ -183,6 +182,37 @@ function discardAllChanges() {
   }
 
   pendingChanges.value.clear()
+}
+
+function exportToEnv(env: string | null | undefined) {
+  const currentProjectId = project.value?.id
+  if (!env || !currentProjectId) {
+    return { success: false, error: "Environment or project not specified" }
+  }
+
+  const filteredSecrets = secrets.value.filter((s: Secret) => s.projectId === currentProjectId).map((s: Secret) => {
+    const value = s.values?.find((v: SecretValue) => v.environment.toLowerCase() === env.toLowerCase())?.value
+    return value ? `${s.key}="${value}"` : null
+  }).filter(Boolean).join("\n")
+  if (!filteredSecrets) {
+    return { success: false, error: "No secrets found for this environment" }
+  }
+
+  try {
+    const blob = new Blob([filteredSecrets], { type: "text/plain" })
+    const projectName = project.value?.name?.toLowerCase().replaceAll(/\s+/g, "-").replaceAll(/[^\w.-]/g, "")
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(blob)
+    a.download = `.env.${projectName}.${env.toLowerCase()}`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+
+    return { success: true }
+  }
+  catch (err: any) {
+    return { success: false, error: err.data?.message || "Failed to export secrets" }
+  }
 }
 
 onBeforeRouteLeave((_to, _from, next) => {
