@@ -1,15 +1,12 @@
 import type { DeleteAuditLogsInput, GetAuditLogsInput } from "#shared/schemas/audit-schema"
 
 export const useAuditStore = defineStore("audit", () => {
+  const toast = useToast()
   const auditLogs = ref<AuditLog[]>([])
   const pagination = ref<AuditLogsPagination | null>(null)
   const filters = ref<AuditFilters | null>(null)
   const currentFilters = ref<GetAuditLogsInput>({ page: 1, limit: 25 })
   const loading = ref(false)
-  const errors = ref<Record<string, string | null>>({
-    getAuditLogs: null,
-    deleteAuditLogs: null,
-  })
 
   const auditActions = computed(() => [
     { label: "Organization Created", value: "CREATE.ORG" },
@@ -32,7 +29,6 @@ export const useAuditStore = defineStore("audit", () => {
 
   async function getAuditLogs(orgId: string, params?: GetAuditLogsInput) {
     loading.value = true
-    errors.value.getAuditLogs = null
 
     try {
       const queryParams = new URLSearchParams()
@@ -54,7 +50,8 @@ export const useAuditStore = defineStore("audit", () => {
       return res
     }
     catch (err: any) {
-      errors.value.getAuditLogs = getErrorMessage(err, "Failed to fetch audit logs")
+      const message = getErrorMessage(err, "Failed to fetch audit logs")
+      toast.error(message)
       console.error("getAuditLogs error:", err)
       throw err
     }
@@ -65,13 +62,14 @@ export const useAuditStore = defineStore("audit", () => {
 
   async function deleteAuditLogs(orgId: string, data: DeleteAuditLogsInput) {
     loading.value = true
-    errors.value.deleteAuditLogs = null
 
     try {
       await $fetch(`/api/orgs/${orgId}/audit`, { method: "DELETE", body: data, credentials: "include" })
+      toast.success("Audit logs deleted successfully")
     }
     catch (err: any) {
-      errors.value.deleteAuditLogs = getErrorMessage(err, "Failed to delete audit logs")
+      const message = getErrorMessage(err, "Failed to delete audit logs")
+      toast.error(message)
       console.error("deleteAuditLogs error:", err)
       throw err
     }
@@ -98,7 +96,6 @@ export const useAuditStore = defineStore("audit", () => {
 
   return {
     loading,
-    errors,
     auditLogs,
     pagination,
     filters,

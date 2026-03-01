@@ -30,10 +30,6 @@
         Join an Organization.
       </nuxt-link>
     </p>
-
-    <p v-if="errors.createOrg" class="text-caption-danger">
-      {{ errors.createOrg }}
-    </p>
   </div>
 </template>
 
@@ -42,7 +38,6 @@ const { public: { baseURL } } = useRuntimeConfig()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
-const { errors } = storeToRefs(orgStore)
 const localOrg = ref({ name: `${user.value?.name}'s Team` })
 
 async function handleCreateOrg() {

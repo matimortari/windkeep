@@ -22,11 +22,7 @@
         <input :id="env" v-model="form.values[env]" type="text">
       </div>
 
-      <footer class="flex flex-row items-center justify-between">
-        <p class="text-caption-danger">
-          {{ (isUpdateMode ? errors.updateProjectSecret : errors.createProjectSecret) || '' }}
-        </p>
-
+      <footer class="flex flex-row items-center justify-end">
         <div class="navigation-group">
           <button class="btn-ghost" aria-label="Cancel" @click="emit('close')">
             Cancel
@@ -51,7 +47,7 @@ const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const projectStore = useProjectStore()
-const { errors, loading } = storeToRefs(projectStore)
+const { loading } = storeToRefs(projectStore)
 const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({
   key: "",
   description: "",
@@ -93,16 +89,10 @@ function resetForm() {
   }
 }
 
-// Reset form and clear errors when dialog is opened or selected secret changes
+// Reset form when dialog is opened or selected secret changes
 watch([() => props.isOpen, () => props.selectedSecret], ([open]) => {
   if (open) {
     resetForm()
-    if (isUpdateMode.value && errors.value.updateProjectSecret) {
-      errors.value.updateProjectSecret = null
-    }
-    else if (!isUpdateMode.value && errors.value.createProjectSecret) {
-      errors.value.createProjectSecret = null
-    }
   }
 }, { immediate: true, deep: true })
 </script>
