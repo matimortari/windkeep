@@ -165,3 +165,10 @@ interface CalendarDay {
   isSelected: boolean
   isToday: boolean
 }
+
+interface Toast {
+  id: string
+  message: string
+  type: "success" | "error"
+  duration?: number
+}
