@@ -14,10 +14,6 @@
             Manage your account information.
           </p>
         </header>
-
-        <p v-if="Object.values(errors).some(Boolean)" class="text-caption-danger">
-          {{ Object.values(errors).find(Boolean) }}
-        </p>
       </div>
 
       <!-- User Details -->
@@ -107,7 +103,7 @@ const { public: { baseURL } } = useRuntimeConfig()
 const { clear } = useUserSession()
 const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
-const { user, errors } = storeToRefs(userStore)
+const { user } = storeToRefs(userStore)
 const { activeOrg } = storeToRefs(useOrgStore())
 
 const userFields = [

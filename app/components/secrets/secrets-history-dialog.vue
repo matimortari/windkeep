@@ -7,10 +7,6 @@
     <Empty v-else-if="!projectStore.loading && (!history || history.length === 0)" message="No history available for this secret." icon-name="ph:clock-counter-clockwise-bold" />
 
     <div v-else class="scroll-area max-h-[70vh] space-y-4 overflow-y-auto pr-2">
-      <p v-if="projectStore.errors.getSecretHistory" class="text-caption-danger text-sm">
-        {{ projectStore.errors.getSecretHistory }}
-      </p>
-
       <div v-for="env in history" :key="env.environment" class="space-y-2 rounded-lg bg-muted/30 p-2">
         <h4>
           {{ env.environment.charAt(0) + env.environment.slice(1).toLowerCase() }}

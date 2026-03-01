@@ -13,11 +13,7 @@
         <span class="text-xs text-muted-foreground">An optional description for your project.</span>
       </div>
 
-      <footer class="flex flex-row items-center justify-between">
-        <p class="text-caption-danger">
-          {{ errors.createProject || " " }}
-        </p>
-
+      <footer class="flex flex-row items-center justify-end">
         <nav class="navigation-group">
           <button class="btn-ghost" aria-label="Cancel" @click="emit('close')">
             Cancel
@@ -38,7 +34,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{ close: [], save: [payload: { name: string, description: string }] }>()
 
-const { errors } = storeToRefs(useProjectStore())
 const form = ref<{ name: string, description: string }>({ name: "", description: "" })
 
 async function handleSubmit() {
@@ -47,15 +42,11 @@ async function handleSubmit() {
   emit("save", payload)
 }
 
-// Reset form and clear errors when dialog is opened
+// Reset form when dialog is opened
 watch(() => props.isOpen, (open) => {
   if (open) {
     form.value.name = ""
     form.value.description = ""
-
-    if (errors.value.createProject) {
-      errors.value.createProject = null
-    }
   }
 }, { immediate: true })
 </script>

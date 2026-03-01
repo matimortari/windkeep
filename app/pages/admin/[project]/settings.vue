@@ -19,10 +19,6 @@
             Manage project details and settings.
           </p>
         </header>
-
-        <p v-if="Object.values(errors).some(Boolean)" class="text-caption-danger">
-          {{ Object.values(errors).find(Boolean) }}
-        </p>
       </div>
 
       <!-- Project Details -->
@@ -136,9 +132,6 @@
         </p>
 
         <div v-if="availableOrgMembers.length" class="navigation-group self-end">
-          <p v-if="errors.addProjectMember || addMemberSuccess" :class="errors.addProjectMember ? 'text-caption-danger' : 'text-caption-success'">
-            {{ errors.addProjectMember || addMemberSuccess }}
-          </p>
           <button class="btn-primary" aria-label="Add Member" @click.prevent="handleAddMember">
             <icon name="ph:plus-circle-bold" size="20" />
             <span>Add Member</span>
@@ -202,9 +195,8 @@ const { user } = storeToRefs(useUserStore())
 const orgStore = useOrgStore()
 const { orgMembers } = storeToRefs(orgStore)
 const projectStore = useProjectStore()
-const { projects, isOwner, isAdmin, errors } = storeToRefs(projectStore)
+const { projects, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projects.value.find(p => p.slug === slug))
-const addMemberSuccess = ref<string | null>(null)
 const selectedMemberToAdd = ref<string>("")
 const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
 const localProject = ref<Project | null>(null)
@@ -286,7 +278,6 @@ useClickOutside(addMemberDropdownRef, () => {
 }, { escapeKey: true })
 
 async function handleAddMember() {
-  addMemberSuccess.value = null
   if (!project.value?.id || !selectedMemberToAdd.value) {
     return
   }
@@ -297,7 +288,6 @@ async function handleAddMember() {
   })
 
   await projectStore.getProjects()
-  addMemberSuccess.value = "Member added successfully."
   selectedMemberToAdd.value = ""
   newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
 }
