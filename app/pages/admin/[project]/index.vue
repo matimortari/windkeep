@@ -14,7 +14,7 @@
       <SecretsTable
         :secrets="displayedSecrets" :project-id="project?.id ?? ''"
         :pending-changes="pendingChanges" @edit="handleEditSecret"
-        @delete="handleDeleteSecret"
+        @delete="handleDeleteSecret" @history="handleViewHistory"
       />
     </div>
 
@@ -28,6 +28,12 @@
       :is-open="isEnvDialogOpen" :project-id="project?.id ?? ''"
       :secrets="displayedSecrets" @close="() => { isEnvDialogOpen = false; selectedSecret = null }"
       @save="handleImportSecrets"
+    />
+
+    <SecretsHistoryDialog
+      :is-open="isHistoryDialogOpen" :secret-id="historySecretId"
+      :secret-key="historySecretKey" :project-id="project?.id ?? ''"
+      @close="() => { isHistoryDialogOpen = false; historySecretId = ''; historySecretKey = '' }"
     />
   </div>
 </template>
@@ -43,6 +49,9 @@ const { exportToEnv } = useEnvFile(project)
 const selectedSecret = ref<Secret | null>(null)
 const isSecretsDialogOpen = ref(false)
 const isEnvDialogOpen = ref(false)
+const isHistoryDialogOpen = ref(false)
+const historySecretId = ref("")
+const historySecretKey = ref("")
 const pendingChanges = ref<Map<string, PendingChange>>(new Map())
 const hasPendingChanges = computed(() => pendingChanges.value.size > 0)
 
@@ -61,6 +70,12 @@ const displayedSecrets = computed(() => {
 function handleEditSecret(secret: Secret) {
   isSecretsDialogOpen.value = true
   selectedSecret.value = secret
+}
+
+function handleViewHistory(secret: Secret) {
+  historySecretId.value = secret.id
+  historySecretKey.value = secret.key
+  isHistoryDialogOpen.value = true
 }
 
 function handleDeleteSecret(key: string) {
