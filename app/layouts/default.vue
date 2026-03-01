@@ -18,20 +18,16 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-color: var(--background);
-  background-image: radial-gradient(color-mix(in srgb, var(--muted-foreground) 40%, transparent) 1px, transparent 1px);
-  background-size: 24px 24px;
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
-  animation: pulse-opacity 8s ease-in-out infinite;
+  background-image: url("@/assets/backdrop.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  mask-image: radial-gradient(ellipse at center, black 80%, transparent 100%);
+  filter: brightness(0.3);
 }
 
-@keyframes pulse-opacity {
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 0.3;
-  }
+html.light .backdrop {
+  opacity: 0;
+  animation: none;
 }
 </style>

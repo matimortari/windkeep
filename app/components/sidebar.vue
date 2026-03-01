@@ -13,7 +13,7 @@
     <nav class="flex flex-col gap-2 font-semibold text-muted-foreground" aria-label="Main Navigation">
       <nuxt-link
         v-for="link in SIDEBAR_NAV_LINKS" :key="link.url"
-        :to="link.url" class="group navigation-group rounded-lg p-2 transition-colors hover:bg-muted/50"
+        :to="link.url" class="group navigation-group rounded-lg p-2 text-sm transition-colors hover:bg-muted/50 2xl:text-base"
         :class="{ 'bg-muted': route.path === link.url }" @click="emit('update:isOpen', false)"
       >
         <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />
