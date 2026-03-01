@@ -3,7 +3,7 @@
     <div
       v-motion :initial="{ opacity: 0 }"
       :visible-once="{ opacity: 1 }" :duration="800"
-      class="w-full max-w-sm border-none bg-transparent py-32 backdrop-blur-lg 2xl:max-w-lg"
+      class="w-full max-w-sm border-none bg-transparent py-32 2xl:max-w-lg"
     >
       <header class="flex flex-col items-center gap-2 text-center">
         <h1 class="font-display">
