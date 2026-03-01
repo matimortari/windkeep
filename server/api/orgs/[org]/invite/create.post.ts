@@ -2,6 +2,10 @@ import { createInviteSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 20 requests per hour per user
+  await enforceRateLimit(event, `org:invite:create:${user.id}`, 20, 60 * 60 * 1000)
+
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
     throw createError({ status: 400, statusText: "Organization ID is required" })

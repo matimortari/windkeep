@@ -2,6 +2,10 @@ import { updateProjectSchema } from "#shared/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 30 requests per hour per user
+  await enforceRateLimit(event, `project:update:${user.id}`, 30, 60 * 60 * 1000)
+
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
     throw createError({ status: 400, statusText: "Project ID is required" })

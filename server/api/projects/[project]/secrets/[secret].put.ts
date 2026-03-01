@@ -2,6 +2,10 @@ import { updateSecretSchema } from "#shared/schemas/secret-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
+
+  // Rate limit: 100 requests per hour per user
+  await enforceRateLimit(event, `secret:update:${user.id}`, 100, 60 * 60 * 1000)
+
   const projectId = getRouterParam(event, "project")
   const secretId = getRouterParam(event, "secret")
   if (!projectId || !secretId) {
