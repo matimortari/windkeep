@@ -37,6 +37,9 @@
             </div>
 
             <div v-else-if="col.key === 'actions'" class="navigation-group">
+              <button aria-label="View history" @click="emit('history', secret)">
+                <icon name="ph:clock-counter-clockwise-bold" size="20" class="hover:text-primary" />
+              </button>
               <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
                 <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
               </button>
@@ -61,7 +64,7 @@ const props = defineProps<{
   pendingChanges: Map<string, PendingChange>
 }>()
 
-const emit = defineEmits<{ edit: [secret: Secret], delete: [key: string], update: [] }>()
+const emit = defineEmits<{ edit: [secret: Secret], delete: [key: string], history: [secret: Secret], update: [] }>()
 
 const visibleKeys = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})

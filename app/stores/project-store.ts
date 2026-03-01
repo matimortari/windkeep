@@ -19,6 +19,7 @@ export const useProjectStore = defineStore("project", () => {
     createProjectSecret: null,
     updateProjectSecret: null,
     deleteProjectSecret: null,
+    getSecretHistory: null,
   })
 
   const isOwner = computed(() => (projectId: string) => projects.value.find(p => p.id === projectId)?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "OWNER") ?? false)
@@ -233,6 +234,24 @@ export const useProjectStore = defineStore("project", () => {
     }
   }
 
+  async function getSecretHistory(projectId: string, secretId: string) {
+    loading.value = true
+    errors.value.getSecretHistory = null
+
+    try {
+      const res = await $fetch<{ history: EnvironmentHistory[] }>(`/api/projects/${projectId}/secrets/${secretId}/history`, { method: "GET", credentials: "include" })
+      return res.history
+    }
+    catch (err: any) {
+      errors.value.getSecretHistory = getErrorMessage(err, "Failed to get secret history")
+      console.error("getSecretHistory error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     errors,
@@ -251,5 +270,6 @@ export const useProjectStore = defineStore("project", () => {
     createProjectSecret,
     updateProjectSecret,
     deleteProjectSecret,
+    getSecretHistory,
   }
 })
