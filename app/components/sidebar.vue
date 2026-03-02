@@ -1,9 +1,9 @@
 <template>
   <!-- Mobile overlay -->
-  <div v-if="isOpen" class="fixed inset-0 z-40 bg-black/50 md:hidden" @click="emit('update:isOpen', false)" />
+  <div v-if="isOpen" class="fixed inset-0 z-20 bg-black/80 md:hidden" @click="emit('update:isOpen', false)" />
 
   <aside
-    class="fixed top-0 left-0 z-50 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b-2 2xl:w-72"
+    class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b-2 2xl:w-72"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <h5>
