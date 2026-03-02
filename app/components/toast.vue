@@ -29,7 +29,7 @@ const { toasts, dismiss } = useToast()
   position: fixed;
   bottom: 1rem;
   right: 1rem;
-  z-index: 60;
+  z-index: 50;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

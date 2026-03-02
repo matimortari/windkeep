@@ -163,7 +163,7 @@ h6 {
   border: var(--border-style);
   border-radius: var(--border-radius);
   padding: 1.5rem;
-  z-index: 40;
+  z-index: 50;
   box-shadow: 0 2px 4px 0px rgba(0, 0, 0, 0.2);
   transition: box-shadow var(--transition);
 }
@@ -181,7 +181,7 @@ h6 {
   border-radius: var(--border-radius);
   padding: 0.5rem;
   margin: 0.5rem;
-  z-index: 30;
+  z-index: 40;
   cursor: pointer;
   font-size: 0.875rem;
   max-height: 12rem;
