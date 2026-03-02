@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-2 left-1/2 z-50 w-[95%] -translate-x-1/2 transition-all" :class="[scrolled ? 'max-w-4xl' : 'max-w-5xl']">
+  <div class="fixed top-2 left-1/2 z-40 w-[95%] -translate-x-1/2 transition-all" :class="[scrolled ? 'max-w-4xl' : 'max-w-5xl']">
     <div
       class="flex flex-row items-center justify-between rounded-full border-2 py-2 backdrop-blur-xl transition-all"
       :class="[scrolled ? 'bg-card/80 px-2 shadow-lg' : 'bg-card/50 px-4 shadow-none']"

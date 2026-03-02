@@ -21,7 +21,7 @@
 
     <!-- Foreground cogwheels -->
     <icon name="ph:gear-fine-bold" size="200" class="absolute top-4 left-1/2 hidden animate-spin opacity-20 xl:block" />
-    <icon name="ph:gear-fine-bold" size="220" class="relative z-10 hidden animate-spin opacity-30 xl:block" />
+    <icon name="ph:gear-fine-bold" size="220" class="relative hidden animate-spin opacity-30 xl:block" />
   </div>
 </template>
 
