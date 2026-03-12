@@ -7,7 +7,7 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
       return data.value
     }
 
-    return [...data.value].sort((a, b) => {
+    return data.value.toSorted((a, b) => {
       const A = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], a as any)
       const B = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], b as any)
 
