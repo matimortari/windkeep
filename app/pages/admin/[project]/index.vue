@@ -63,7 +63,7 @@ const displayedSecrets = computed(() => {
     secretsMap.set(change.secret.key, change.secret)
   }
 
-  return Array.from(secretsMap.values())
+  return [...secretsMap.values()]
 })
 
 function handleEditSecret(secret: Secret) {

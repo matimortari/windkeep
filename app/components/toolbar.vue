@@ -82,7 +82,7 @@ useClickOutside(dropdownRef, () => {
 
 const currentPage = computed(() => {
   const segments = route.path.split("/").filter(Boolean)
-  let page = segments.length ? segments[segments.length - 1] : "home"
+  let page = segments.length ? segments.at(-1) : "home"
   page = (page ?? "home").replaceAll("-", " ")
 
   return page.replace(/\b\w/g, l => l.toUpperCase())

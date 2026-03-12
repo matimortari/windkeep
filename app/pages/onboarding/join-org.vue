@@ -37,7 +37,7 @@ const token = ref(route.query.token as string || "")
 async function handleAcceptInvite() {
   const res = await orgStore.acceptInvite(token.value, { token: token.value })
   if (res) {
-    setTimeout(() => navigateTo("/admin/projects"), 2000)
+    setTimeout(navigateTo, 2000, "/admin/projects")
   }
 }
 
