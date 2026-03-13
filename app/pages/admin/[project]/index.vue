@@ -150,29 +150,36 @@ async function saveAllChanges() {
   }
 
   const projectId = project.value.id
-  for (const [_key, change] of pendingChanges.value) {
-    if (change.type === "create") {
-      const { values, ...data } = change.secret
-      await projectStore.createProjectSecret(projectId, {
-        key: data.key,
-        description: data.description || "",
-        projectId,
-        values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
-      })
+  const failed: string[] = []
+  for (const [key, change] of pendingChanges.value) {
+    try {
+      if (change.type === "create") {
+        const { values, ...data } = change.secret
+        await projectStore.createProjectSecret(projectId, {
+          key: data.key,
+          description: data.description || "",
+          projectId,
+          values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
+        })
+      }
+      else if (change.type === "update" && change.secret.id) {
+        const { values, ...data } = change.secret
+        await projectStore.updateProjectSecret(projectId, change.secret.id, {
+          description: data.description || "",
+          values: values || [],
+        })
+      }
+      else if (change.type === "delete" && change.secret.id) {
+        await projectStore.deleteProjectSecret(projectId, change.secret.id)
+      }
+      pendingChanges.value.delete(key)
     }
-    else if (change.type === "update" && change.secret.id) {
-      const { values, ...data } = change.secret
-      await projectStore.updateProjectSecret(projectId, change.secret.id, {
-        description: data.description || "",
-        values: values || [],
-      })
-    }
-    else if (change.type === "delete" && change.secret.id) {
-      await projectStore.deleteProjectSecret(projectId, change.secret.id)
+    catch (err: any) {
+      console.error(`Failed to save secret "${key}":`, err)
+      failed.push(key)
     }
   }
 
-  pendingChanges.value.clear()
   await projectStore.getProjectSecrets(projectId)
 }
 
