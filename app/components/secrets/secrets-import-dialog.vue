@@ -75,11 +75,11 @@ function parseEnv(text: string): Record<string, string> {
 
 function handleSubmit() {
   const normalized = Object.fromEntries(Object.entries(parseEnv(envContent.value)).map(([key, value]) => [normalizeKey(key), value]).filter(([key]) => Boolean(key)))
-  const payload = Object.entries(normalized).map(([key, value]) => ({
+const payload = Object.entries(normalized).filter(([_, value]) => Boolean((value as string).trim())).map(([key, value]) => ({
     key,
     description: "",
     projectId: props.projectId,
-    values: [{ environment: selectedEnv.value, value: value as string }],
+    values: [{ environment: selectedEnv.value, value: (value as string).trim() }],
   }))
 
   emit("save", payload)
