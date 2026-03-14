@@ -7,6 +7,7 @@ interface User {
   name: string
   image: string
   apiToken: string | null
+  apiTokenExpiresAt: Date | null
   orgMemberships?: OrgMembership[]
   projectMemberships?: ProjectMembership[]
   invitations?: Invitation[]

@@ -5,6 +5,7 @@ declare module "#auth-utils" {
     name: string
     image: string
     apiToken?: string | null
+    apiTokenExpiresAt?: Date | string | null
   }
 
   interface UserSession {

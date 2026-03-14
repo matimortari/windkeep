@@ -14,15 +14,21 @@ export default defineEventHandler(async (event) => {
 
   // Only regenerate when the boolean is explicitly sent and true
   let apiTokenToUpdate: string | undefined
+  let apiTokenExpiresAt: Date | undefined
+
   if (result.data.regenerateApiToken) {
     apiTokenToUpdate = generateToken()
+    apiTokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
   }
 
   const updatedUser = await db.user.update({
     where: { id: user.id },
     data: {
       name: result.data.name,
-      apiToken: apiTokenToUpdate,
+      ...(apiTokenToUpdate !== undefined && {
+        apiToken: apiTokenToUpdate,
+        apiTokenExpiresAt,
+      }),
     },
     select: {
       id: true,
@@ -30,6 +36,7 @@ export default defineEventHandler(async (event) => {
       name: true,
       image: true,
       apiToken: true,
+      apiTokenExpiresAt: true,
       createdAt: true,
       updatedAt: true,
     },
