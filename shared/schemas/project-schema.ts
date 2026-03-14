@@ -8,6 +8,7 @@ export const createProjectSchema = z.object({
     .transform(val => val.trim())
     .refine(val => val.length >= 3, { message: "Project name cannot be empty" }),
   description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
+  website: z.string().trim().url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional(),
   orgId: z.cuid(),
 })
 
@@ -26,6 +27,7 @@ export const updateProjectSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
     .optional(),
   description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
+  website: z.string().trim().url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional(),
 })
 
 export const addProjectMemberSchema = z.object({

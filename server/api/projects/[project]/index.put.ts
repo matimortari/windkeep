@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const existingProject = await db.project.findUnique({ where: { id: projectId }, select: { name: true, slug: true, description: true, orgId: true } })
+  const existingProject = await db.project.findUnique({ where: { id: projectId }, select: { name: true, slug: true, description: true, website: true, orgId: true } })
   if (!existingProject) {
     throw createError({ status: 404, statusText: "Project not found" })
   }
@@ -51,6 +51,9 @@ export default defineEventHandler(async (event) => {
   if (result.data.description !== undefined && result.data.description !== existingProject.description) {
     changes.push(`description`)
   }
+  if (result.data.website !== undefined && result.data.website !== existingProject.website) {
+    changes.push(`website`)
+  }
 
   await createAuditLog({
     event,
@@ -65,6 +68,8 @@ export default defineEventHandler(async (event) => {
       projectName: updatedProject.name,
       oldName: existingProject.name === updatedProject.name ? undefined : existingProject.name,
       oldSlug: existingProject.slug === updatedProject.slug ? undefined : existingProject.slug,
+      oldWebsite: existingProject.website === updatedProject.website ? undefined : existingProject.website,
+      newWebsite: updatedProject.website,
       descriptionChanged: result.data.description !== undefined && result.data.description !== existingProject.description,
       orgId: updatedProject.org.id,
       orgName: updatedProject.org.name,
