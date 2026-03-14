@@ -16,15 +16,15 @@
         </span>
       </div>
 
-      <button class="btn" :title="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="emit('toggleSort')">
+      <button class="btn" :aria-label="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="emit('toggleSort')">
         <icon name="ph:arrow-down-bold" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
       </button>
 
-      <button title="Toggle Layout" class="btn" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
+      <button aria-label="Toggle Layout" class="btn" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
         <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
       </button>
 
-      <button class="btn" :title="showAll ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="emit('update:show-all', !showAll)">
+      <button class="btn" :aria-label="showAll ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="emit('update:show-all', !showAll)">
         <icon :name="showAll ? 'ph:users-four-bold' : 'ph:user-bold'" size="20" />
       </button>
 

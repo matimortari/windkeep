@@ -29,10 +29,7 @@
 
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
-          <button
-            class="btn transition-transform" title="Copy to Clipboard"
-            aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
-          >
+          <button class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
         </div>
@@ -63,10 +60,10 @@
             </div>
 
             <nav class="navigation-group" aria-label="Organization Project Actions">
-              <nuxt-link :to="`/admin/${project?.slug}`" class="btn">
+              <nuxt-link :to="`/admin/${project?.slug}`" class="btn" aria-label="View Project Details">
                 <icon name="ph:eye-bold" size="15" />
               </nuxt-link>
-              <nuxt-link v-if="isOwner || isAdmin" :to="`/admin/${project?.slug}/settings`" class="btn">
+              <nuxt-link v-if="isOwner || isAdmin" :to="`/admin/${project?.slug}/settings`" class="btn" aria-label="Edit Project Settings">
                 <icon name="ph:gear-bold" size="15" />
               </nuxt-link>
             </nav>
@@ -105,7 +102,7 @@
               <button class="btn" aria-label="Update Member Role" @click="orgUser.role !== 'OWNER' && handleUpdateMemberRole(orgUser.user.id || '', orgUser.role)">
                 <icon :name="memberRoleIcon.get(orgUser.user.id)?.icon || 'ph:floppy-disk-bold'" size="15" />
               </button>
-              <button class="btn" aria-label="Transfer Ownership" title="Transfer Ownership" @click="handleTransferOwnership(orgUser.user.id || '')">
+              <button class="btn" aria-label="Transfer Organization Ownership" @click="handleTransferOwnership(orgUser.user.id || '')">
                 <icon :name="transferOwnershipIcon.get(orgUser.user.id)?.icon || 'ph:arrow-u-up-right-bold'" size="15" />
               </button>
               <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.user.id || '')">

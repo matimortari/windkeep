@@ -29,24 +29,39 @@
         </tr>
 
         <template v-for="log in sortedLogs" v-else :key="log.id">
-          <tr class="cursor-pointer hover:bg-muted/20" @click="toggleRow(log.id)">
+          <tr class="cursor-pointer hover:bg-muted/20" :aria-expanded="expandedRows.has(log.id)" @click="toggleRow(log.id)">
             <td>
               <icon name="ph:caret-right-bold" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
-            <td :title="auditActions.find(a => a.value === log.action)?.label || log.action">
+            <td>
               <div class="navigation-group max-w-xs truncate">
                 <icon :name="resourceMap[log.resource || ''] || ''" size="15" />
                 <span>{{ auditActions.find(a => a.value === log.action)?.label || log.action }}</span>
               </div>
             </td>
-            <td class="max-w-md truncate" :title="log.description || 'No description'">
-              {{ log.description || 'No description' }}
+            <td class="max-w-md overflow-visible!">
+              <span class="group/tooltip relative inline-flex max-w-full">
+                <span class="truncate">{{ log.description || 'No description' }}</span>
+                <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
+                  {{ log.description || 'No description' }}
+                </span>
+              </span>
             </td>
-            <td class="max-w-sm truncate md:max-w-32" :title="log.user?.name || log.user?.email">
-              {{ log.user?.name || log.user?.email }}
+            <td class="max-w-sm overflow-visible! md:max-w-32">
+              <span class="group/tooltip relative inline-flex max-w-full">
+                <span class="truncate">{{ log.user?.name || log.user?.email }}</span>
+                <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
+                  {{ log.user?.name || log.user?.email }}
+                </span>
+              </span>
             </td>
-            <td class="max-w-sm truncate md:max-w-40" :title="log.createdAt ? formatAuditDate(log.createdAt) : 'N/A'">
-              {{ log.createdAt ? formatAuditDate(log.createdAt) : 'N/A' }}
+            <td class="max-w-sm overflow-visible! md:max-w-40">
+              <span class="group/tooltip relative inline-flex max-w-full">
+                <span class="truncate">{{ log.createdAt ? formatAuditDate(log.createdAt) : 'N/A' }}</span>
+                <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
+                  {{ log.createdAt ? formatAuditDate(log.createdAt) : 'N/A' }}
+                </span>
+              </span>
             </td>
           </tr>
 

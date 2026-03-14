@@ -29,18 +29,11 @@
 
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
-          <button
-            class="btn transition-transform" title="Copy to Clipboard"
-            aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
-          >
+          <button class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
 
-          <button
-            v-if="field.onRegenerate" class="btn"
-            title="Regenerate Token" aria-label="Regenerate API Token"
-            @click="field.onRegenerate()"
-          >
+          <button v-if="field.onRegenerate" class="btn" aria-label="Regenerate API Token" @click="field.onRegenerate()">
             <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
           </button>
         </div>
@@ -59,7 +52,7 @@
             accept="image/*" class="hidden"
             @change="field.onUpload"
           >
-          <label for="image" class="btn cursor-pointer">
+          <label class="btn cursor-pointer" for="image" aria-label="Upload Profile Image">
             <icon name="ph:image-bold" size="20" />
           </label>
         </div>

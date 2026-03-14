@@ -3,20 +3,20 @@
 
   <div class="flex min-h-screen overflow-x-hidden border-b">
     <!-- Mobile overlay -->
-    <div v-if="isOpen" class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm xl:hidden" @click="isOpen = false" />
+    <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm xl:hidden" @click="isOpen = false" />
 
     <div class="flex flex-1 flex-col xl:flex-row">
       <div class="btn fixed bottom-6 left-1/2 z-30 flex -translate-x-1/2 gap-2 shadow-lg md:hidden!">
-        <button class="transition-transform hover:scale-110" @click="isOpen = !isOpen">
+        <button class="transition-transform hover:scale-110" :aria-label="isOpen ? 'Close menu' : 'Open menu'" @click="isOpen = !isOpen">
           <icon :name="isOpen ? 'ph:x-bold' : 'ph:list-bold'" size="25" />
         </button>
         <div class="bg-border h-6 w-px" />
-        <button class="transition-transform hover:scale-110" @click="scrollToTop">
+        <button class="transition-transform hover:scale-110" aria-label="Scroll to top" @click="scrollToTop">
           <icon name="ph:arrow-up-bold" size="25" />
         </button>
       </div>
 
-      <button class="btn fixed bottom-6 left-6 z-40 hidden! transition-transform md:flex!" @click="scrollToTop">
+      <button class="btn fixed bottom-6 left-6 z-30 hidden! transition-transform md:flex!" aria-label="Scroll to top" @click="scrollToTop">
         <icon name="ph:arrow-up-bold" size="25" />
       </button>
 
@@ -41,7 +41,7 @@
               </p>
             </div>
 
-            <button class="btn md:hidden!" @click="isOpen = false">
+            <button class="btn md:hidden!" aria-label="Close table of contents" @click="isOpen = false">
               <icon name="ph:x-bold" size="25" />
             </button>
           </div>

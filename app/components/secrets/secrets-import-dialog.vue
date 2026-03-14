@@ -1,15 +1,16 @@
 <template>
   <Dialog :is-open="isOpen" title="Import from .env" @update:is-open="emit('close')">
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
+      <label for="env-content" class="text-sm font-semibold">.env File</label>
       <textarea
-        v-model="envContent" name="env-content"
-        placeholder="Paste your .env content here..."
+        id="env-content" v-model="envContent"
+        name="env-content" placeholder="Paste your .env content here..."
         rows="8" class="scroll-area resize-none"
       />
 
       <div class="flex flex-col items-start gap-1">
-        <span class="text-sm font-semibold">Environment</span>
-        <select v-model="selectedEnv" class="w-full capitalize">
+        <label for="environment" class="text-sm font-semibold">Environment</label>
+        <select id="environment" v-model="selectedEnv" class="w-full capitalize">
           <option v-for="env in environments" :key="env" :value="env" class="capitalize">
             {{ capitalizeFirst(env) }}
           </option>
@@ -19,10 +20,10 @@
 
       <footer class="flex flex-row items-center justify-end">
         <div class="navigation-group">
-          <button class="btn-ghost" aria-label="Cancel" @click="emit('close')">
+          <button class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
-          <button class="btn-success" type="submit" aria-label="Import Secrets from .env File">
+          <button class="btn-success" type="submit" :disabled="!envContent.trim()">
             Import
           </button>
         </div>

@@ -1,6 +1,6 @@
 <template>
   <nav v-if="pagination && pagination.totalPages > 0" class="navigation-group w-full flex-1 justify-between" aria-label="Pagination">
-    <button class="btn-secondary" :disabled="!pagination.hasPrev" title="Previous Page" @click="auditStore.prevPage(activeOrg!.id)">
+    <button class="btn-secondary" :disabled="!pagination.hasPrev" aria-label="Previous Page" @click="auditStore.prevPage(activeOrg!.id)">
       <icon name="ph:arrow-left-bold" size="20" />
     </button>
 
@@ -9,7 +9,7 @@
       <span v-if="auditLogs.length" class="text-xs italic">{{ `Showing ${auditLogs.length} ${auditLogs.length === 1 ? "log" : "logs"}` }}</span>
     </div>
 
-    <button class="btn-secondary" :disabled="!pagination.hasNext" title="Next Page" @click="auditStore.nextPage(activeOrg!.id)">
+    <button class="btn-secondary" :disabled="!pagination.hasNext" aria-label="Next Page" @click="auditStore.nextPage(activeOrg!.id)">
       <icon name="ph:arrow-right-bold" size="20" />
     </button>
   </nav>

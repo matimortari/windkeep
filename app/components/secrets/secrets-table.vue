@@ -16,22 +16,21 @@
 
       <tbody>
         <tr v-for="(secret, index) in sortedSecrets" :key="`${secret.key}-${index}`" class="group hover:bg-muted/20" :class="getRowClass(secret.key)">
-          <td v-for="col in columns" :key="col.key" :class="col.class">
+          <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
             <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold">
               <icon v-if="getPendingChangeType(secret.key) === 'create'" name="ph:plus-circle-bold" size="20" class="text-caption-success shrink-0" />
               <icon v-else-if="getPendingChangeType(secret.key) === 'update'" name="ph:pencil-circle-bold" size="20" class="shrink-0 text-secondary" />
               <icon v-else-if="getPendingChangeType(secret.key) === 'delete'" name="ph:minus-circle-bold" size="20" class="text-caption-danger shrink-0" />
               <span class="truncate"><span class="text-muted">{{ index + 1 }}.</span> {{ secret.key }}</span>
-              <icon
-                v-if="secret.description" name="ph:info-bold"
-                :title="secret.description" size="15"
-                class="hidden shrink-0 cursor-pointer md:inline"
-              />
+              <span v-if="secret.description" class="group/tooltip relative hidden shrink-0 cursor-pointer md:inline-flex">
+                <icon name="ph:info-bold" size="15" />
+                <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 rounded-lg p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
+              </span>
             </div>
 
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
-              <span class="max-w-[80%] truncate select-none" :class="[getSecretValue(secret.key, col.env) ? getSecretValueClass(secret.key) : '']">{{ renderValue(secret.key, col.env) }}</span>
-              <button v-if="getSecretValue(secret.key, col.env)" aria-label="Copy Secret Value" @click="handleCopy(secret.key, col.env, getSecretValue(secret.key, col.env))">
+              <span class="max-w-[80%] truncate select-none" aria-label="Hidden value" :class="[getSecretValue(secret.key, col.env) ? getSecretValueClass(secret.key) : '']">{{ renderValue(secret.key, col.env) }}</span>
+              <button v-if="getSecretValue(secret.key, col.env)" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, getSecretValue(secret.key, col.env))">
                 <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
               </button>
             </div>
@@ -40,7 +39,7 @@
               <button aria-label="View history" @click="emit('history', secret)">
                 <icon name="ph:clock-counter-clockwise-bold" size="20" class="hover:text-primary" />
               </button>
-              <button aria-label="Toggle visibility" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
+              <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
                 <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
               </button>
               <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Edit Secret" @click="emit('edit', secret)">
