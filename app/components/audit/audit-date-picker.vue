@@ -1,6 +1,6 @@
 <template>
   <div ref="datePickerRef" class="relative">
-    <button class="btn flex items-center gap-2" :title="displayLabel" @click="isOpen = !isOpen">
+    <button class="btn" @click="isOpen = !isOpen">
       <span>{{ displayLabel }}</span>
       <icon name="ph:caret-down-bold" size="15" />
     </button>
@@ -8,12 +8,12 @@
     <transition name="dropdown">
       <div v-if="isOpen" class="dropdown-menu max-h-none! min-w-72 space-y-2" role="dialog" aria-label="Select date range">
         <div class="navigation-group justify-between">
-          <select v-model="currentMonth">
+          <select v-model="currentMonth" aria-label="Month">
             <option v-for="(month, idx) in months" :key="idx" :value="idx">
               {{ month }}
             </option>
           </select>
-          <select v-model="currentYear">
+          <select v-model="currentYear" aria-label="Year">
             <option v-for="year in years" :key="year" :value="year">
               {{ year }}
             </option>
@@ -37,6 +37,7 @@
         <div class="grid grid-cols-7 gap-1">
           <button
             v-for="day in calendarDays" :key="`${day.date}-${day.isCurrentMonth}`"
+            :aria-label="`${day.isStart ? 'Start: ' : day.isEnd ? 'End: ' : ''}${day.date.toLocaleDateString('en-GB')}`"
             class="aspect-square rounded-lg text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-primary': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
             :disabled="!day.isCurrentMonth" @mouseenter="hoverDate = day.date"
             @mouseleave="hoverDate = null" @click="selectDate(day)"

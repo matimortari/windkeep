@@ -3,7 +3,7 @@
     <AuditDatePicker v-model="dateFilter" @update:model-value="updateFilter('date', $event)" />
 
     <div ref="actionDropdownRef" class="relative">
-      <button class="btn" title="Filter by action" @click="isActionDropdownOpen = !isActionDropdownOpen">
+      <button class="btn" @click="isActionDropdownOpen = !isActionDropdownOpen">
         <span>{{ auditActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
         <icon name="ph:caret-down-bold" size="15" />
       </button>
@@ -25,7 +25,7 @@
     </div>
 
     <div ref="userDropdownRef" class="relative">
-      <button class="btn" title="Filter by user" @click="isUserDropdownOpen = !isUserDropdownOpen">
+      <button class="btn" @click="isUserDropdownOpen = !isUserDropdownOpen">
         <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
         <icon name="ph:caret-down-bold" size="15" />
       </button>
@@ -46,7 +46,7 @@
       </transition>
     </div>
 
-    <button class="btn-danger" :disabled="!auditLogs.length" title="Delete Logs" @click="handleDeleteLogs">
+    <button class="btn-danger" :disabled="!auditLogs.length" aria-label="Delete Audit Logs" @click="handleDeleteLogs">
       <icon name="ph:trash-bold" size="20" />
     </button>
   </nav>

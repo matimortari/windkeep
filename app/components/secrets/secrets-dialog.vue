@@ -24,10 +24,10 @@
 
       <footer class="flex flex-row items-center justify-end">
         <div class="navigation-group">
-          <button class="btn-ghost" aria-label="Cancel" @click="emit('close')">
+          <button class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
-          <button class="btn-success" type="submit" aria-label="Save Secret" :disabled="loading">
+          <button class="btn-success" type="submit" :disabled="loading">
             Save
           </button>
         </div>

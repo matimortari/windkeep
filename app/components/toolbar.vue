@@ -23,7 +23,7 @@
 
           <transition name="dropdown">
             <ul v-if="isDropdownOpen" class="dropdown-menu" role="menu">
-              <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
+              <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap" role="menuitem">
                 <button class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)">
                   {{ org.name }}
                 </button>
@@ -45,7 +45,7 @@
       </nav>
 
       <nav class="navigation-group" aria-label="User Actions">
-        <nuxt-link to="/admin/preferences" title="User Preferences" aria-label="User Preferences" class="btn hidden! md:block!">
+        <nuxt-link to="/admin/preferences" aria-label="User Preferences" class="btn hidden! md:block!">
           <icon name="ph:user-circle-gear-bold" size="20" />
         </nuxt-link>
         <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">

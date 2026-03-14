@@ -15,10 +15,10 @@
 
       <footer class="flex flex-row items-center justify-end">
         <nav class="navigation-group">
-          <button class="btn-ghost" aria-label="Cancel" @click="emit('close')">
+          <button class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
-          <button class="btn-success" type="submit" aria-label="Save Project">
+          <button class="btn-success" type="submit">
             Save
           </button>
         </nav>

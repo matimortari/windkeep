@@ -11,11 +11,7 @@
     </div>
 
     <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
-      <button
-        v-if="canManage" class="btn-primary"
-        :disabled="hasPendingChanges" :title="hasPendingChanges ? 'Save or discard pending changes before creating a new secret' : undefined"
-        @click="emit('openSecretsDialog')"
-      >
+      <button v-if="canManage" class="btn-primary" :disabled="hasPendingChanges" @click="emit('openSecretsDialog')">
         <span class="hidden md:inline">New Secret</span>
         <icon name="ph:plus-bold" size="20" />
       </button>
@@ -23,18 +19,14 @@
       <button
         v-if="canManage" class="btn-secondary"
         aria-label="Import Secrets from .env File" :disabled="hasPendingChanges"
-        :title="hasPendingChanges ? 'Save or discard pending changes before importing' : undefined" @click="emit('openImportDialog')"
+        @click="emit('openImportDialog')"
       >
         <span>Import</span>
         <icon name="ph:upload-bold" size="20" />
       </button>
 
       <div ref="dropdownRef" class="relative">
-        <button
-          class="btn-secondary" aria-label="Export Secrets to .env File"
-          :disabled="hasPendingChanges" :title="hasPendingChanges ? 'Save or discard pending changes before exporting' : undefined"
-          @click="isDropdownOpen = !isDropdownOpen"
-        >
+        <button class="btn-secondary" aria-label="Export Secrets to .env File" :disabled="hasPendingChanges" @click="isDropdownOpen = !isDropdownOpen">
           <span>Export</span>
           <icon name="ph:download-bold" size="20" />
         </button>
@@ -50,7 +42,7 @@
         </transition>
       </div>
 
-      <nuxt-link :to="`/admin/${props.projectSlug}/settings`" class="btn">
+      <nuxt-link :to="`/admin/${props.projectSlug}/settings`" class="btn" aria-label="Project Settings">
         <icon name="ph:gear-bold" size="20" />
       </nuxt-link>
 

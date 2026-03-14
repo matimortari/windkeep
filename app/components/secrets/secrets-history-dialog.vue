@@ -21,10 +21,10 @@
             </p>
 
             <div class="navigation-group">
-              <button aria-label="Toggle visibility" @click="visibleValues[env.environment] = !visibleValues[env.environment]">
+              <button :aria-label="`Toggle visibility for ${env.environment}`" @click="visibleValues[env.environment] = !visibleValues[env.environment]">
                 <icon :name="visibleValues[env.environment] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
               </button>
-              <button aria-label="Copy value" @click="handleCopy(env.environment, env.currentValue)">
+              <button :aria-label="`Copy value for ${env.environment}`" @click="handleCopy(env.environment, env.currentValue)">
                 <icon :name="copyStates[env.environment] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" class="hover:text-primary" />
               </button>
             </div>
@@ -53,10 +53,10 @@
               </p>
 
               <div class="navigation-group">
-                <button aria-label="Toggle visibility" @click="visibleHistory[item.id] = !visibleHistory[item.id]">
+                <button :aria-label="`Toggle visibility for ${item.id}`" @click="visibleHistory[item.id] = !visibleHistory[item.id]">
                   <icon :name="visibleHistory[item.id] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
                 </button>
-                <button aria-label="Copy value" @click="handleCopy(`history-${item.id}`, item.value)">
+                <button :aria-label="`Copy value for ${item.id}`" @click="handleCopy(`history-${item.id}`, item.value)">
                   <icon :name="copyStates[`history-${item.id}`] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" class="hover:text-primary" />
                 </button>
               </div>
