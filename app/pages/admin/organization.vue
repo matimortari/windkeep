@@ -292,7 +292,7 @@ async function handleLeaveOrg() {
   }
 
   await orgStore.removeOrgMember(activeOrg.value.id, user.value.id)
-  await navigateTo("/onboarding/create-org")
+  await navigateTo("/onboarding")
 }
 
 async function handleDeleteOrg() {
