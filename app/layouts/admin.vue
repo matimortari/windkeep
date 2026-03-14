@@ -26,7 +26,7 @@ onMounted(async () => {
     await userStore.getUser()
     const activeOrg = user.value?.orgMemberships?.find(m => m.isActive)
     if (!activeOrg) {
-      return navigateTo("/onboarding/create-org")
+      return navigateTo("/onboarding")
     }
 
     await orgStore.getOrg(activeOrg.orgId)

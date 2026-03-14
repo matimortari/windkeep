@@ -4,6 +4,8 @@
     :initial="{ opacity: 0 }" :visible-once="{ opacity: 1 }"
     :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center gap-8 px-4 py-24 text-center"
   >
+    <div class="backdrop" />
+
     <header class="z-20 flex w-full max-w-2xl flex-col items-center gap-8">
       <h1>
         Your Secrets, Secured.
@@ -177,6 +179,24 @@ h2 {
   h1 {
     font-size: 3.5rem;
   }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("@/assets/backdrop.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  mask-image: radial-gradient(ellipse at center, black 80%, transparent 100%);
+  filter: brightness(0.3);
+}
+
+html.light .backdrop {
+  opacity: 0;
+  animation: none;
 }
 
 .accordion-enter-active,
