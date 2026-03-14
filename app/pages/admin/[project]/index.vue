@@ -1,8 +1,7 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <SecretsProjectActions
-      :project-name="project?.name" :project-slug="project?.slug"
-      :can-manage="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
+      :project="project" :can-manage="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
       :has-pending-changes="hasPendingChanges" :all-visible="allVisible"
       @open-secrets-dialog="() => { isSecretsDialogOpen = true; selectedSecret = null }"
       @open-import-dialog="() => { isEnvDialogOpen = true; selectedSecret = null }"

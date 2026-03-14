@@ -199,6 +199,24 @@ const orgFields = [
     editable: isOwner,
   },
   {
+    label: "Organization Description",
+    description: "A brief description of your organization.",
+    type: "input",
+    model: computed(() => activeOrg.value?.description || ""),
+    update: (value: string) => { activeOrg.value!.description = value },
+    onSave: handleSubmit,
+    editable: isOwner,
+  },
+  {
+    label: "Organization Website",
+    description: "The website URL for your organization.",
+    type: "input",
+    model: computed(() => activeOrg.value?.website || ""),
+    update: (value: string) => { activeOrg.value!.website = value },
+    onSave: handleSubmit,
+    editable: isOwner,
+  },
+  {
     label: "Organization ID",
     description: "This ID uniquely identifies your organization.",
     value: computed(() => activeOrg.value?.id),
@@ -277,6 +295,8 @@ async function handleSubmit(index: number) {
 
   await orgStore.updateOrg(activeOrg.value.id, {
     name: activeOrg.value.name || "",
+    description: activeOrg.value.description || "",
+    website: activeOrg.value.website || "",
   })
 
   await userStore.getUser()

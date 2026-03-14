@@ -29,8 +29,7 @@
 
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span v-if="field.expiresAt !== undefined">
-            <span v-if="!field.expiresAt?.value" class="text-caption">Never expires</span>
-            <span v-else-if="isTokenExpired(field.expiresAt.value)" class="text-caption-danger">Expired</span>
+            <span v-if="isTokenExpired(field.expiresAt.value)" class="text-caption-danger">Expired</span>
             <span v-else class="text-caption">Expires {{ formatDate(field.expiresAt.value) }}</span>
           </span>
 
