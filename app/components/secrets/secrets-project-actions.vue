@@ -6,8 +6,11 @@
       </nuxt-link>
 
       <h2 class="max-w-lg truncate">
-        {{ projectName }}
+        {{ project?.name }}
       </h2>
+      <nuxt-link v-if="project?.website" :href="project?.website" target="_blank" aria-label="Visit project website">
+        <icon name="ph:arrow-up-right-bold" size="20" class="text-muted-foreground hover:text-primary" />
+      </nuxt-link>
     </div>
 
     <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
@@ -46,7 +49,7 @@
         <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
       </button>
 
-      <nuxt-link :to="`/admin/${props.projectSlug}/settings`" class="btn" aria-label="Project Settings">
+      <nuxt-link :to="`/admin/${props.project?.slug}/settings`" class="btn" aria-label="Project Settings">
         <icon name="ph:gear-bold" size="20" />
       </nuxt-link>
 
@@ -63,8 +66,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  projectName?: string
-  projectSlug?: string
+  project?: Project
   canManage: boolean
   hasPendingChanges: boolean
   allVisible: boolean

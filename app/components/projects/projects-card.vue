@@ -5,6 +5,9 @@
         <h3 class="truncate">
           {{ project.name }}
         </h3>
+        <p v-if="project.website" class="text-caption text-xs!">
+          {{ project.website }}
+        </p>
         <p class="text-caption line-clamp-3">
           {{ project.description || 'No description provided.' }}
         </p>
