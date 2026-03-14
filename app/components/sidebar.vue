@@ -37,7 +37,11 @@
     </div>
 
     <div class="scroll-area flex-1 overflow-y-auto">
-      <p v-if="!filteredProjects.length" class="text-caption">
+      <div v-if="loading" class="flex flex-col gap-2" aria-hidden="true">
+        <div v-for="i in 8" :key="i" class="h-3 animate-pulse rounded-sm bg-muted" :style="{ width: skeletonWidths[i - 1] }" />
+      </div>
+
+      <p v-else-if="!filteredProjects.length" class="text-caption">
         No projects yet.
       </p>
 
@@ -45,7 +49,8 @@
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
           :to="`/admin/${project.slug}`" class="truncate hover:underline"
-          :class="{ 'font-semibold text-primary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="emit('update:isOpen', false)"
+          :class="{ 'font-semibold text-primary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }"
+          @click="emit('update:isOpen', false)"
         >
           > {{ project.name }}
         </nuxt-link>
@@ -59,6 +64,7 @@
 <script setup lang="ts">
 defineProps<{
   isOpen: boolean
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{ "update:isOpen": [value: boolean] }>()
@@ -70,6 +76,7 @@ const projectStore = useProjectStore()
 const { projects } = storeToRefs(projectStore)
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
+const skeletonWidths = ["72%", "55%", "85%", "60%", "78%", "50%", "68%", "40%"]
 
 // All projects the user has access to, across all orgs
 const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))
@@ -83,7 +90,7 @@ const activeOrgProjects = computed(() => {
   return projects.value.filter(project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id))
 })
 
-const filteredProjects = computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value))
+const filteredProjects = computed(() => showAllProjects.value ? allProjects.value : activeOrgProjects.value)
 
 async function handleCreateProject(project: { name: string, description?: string }) {
   if (!activeOrg.value?.id) {
