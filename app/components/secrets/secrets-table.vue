@@ -39,8 +39,8 @@
               <button aria-label="View history" @click="emit('history', secret)">
                 <icon name="ph:clock-counter-clockwise-bold" size="20" class="hover:text-primary" />
               </button>
-              <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !visibleKeys[secret.key]">
-                <icon :name="visibleKeys[secret.key] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
+              <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !isKeyVisible(secret.key)">
+                <icon :name="isKeyVisible(secret.key) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
               </button>
               <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Edit Secret" @click="emit('edit', secret)">
                 <icon name="ph:note-pencil-bold" size="20" class="hover:text-primary" />
@@ -61,6 +61,7 @@ const props = defineProps<{
   secrets: Secret[]
   projectId: string
   pendingChanges: Map<string, PendingChange>
+  allVisible: boolean
 }>()
 
 const emit = defineEmits<{ edit: [secret: Secret], delete: [key: string], history: [secret: Secret], update: [] }>()
@@ -129,10 +130,13 @@ async function handleCopy(secretKey: string, env: string, value: string) {
   if (!value) {
     return
   }
-
   await navigator.clipboard.writeText(value)
   copyStates.value[`${secretKey}-${env}`] = true
   setTimeout(() => copyStates.value[`${secretKey}-${env}`] = false, 1500)
+}
+
+function isKeyVisible(key: string): boolean {
+  return visibleKeys.value[key] ?? props.allVisible
 }
 
 function getSecretValue(key: string, env: string) {
@@ -141,6 +145,6 @@ function getSecretValue(key: string, env: string) {
 
 function renderValue(key: string, env: string) {
   const val = getSecretValue(key, env)
-  return val ? (visibleKeys.value[key] ? val : "•".repeat(val.length)) : "—"
+  return val ? (isKeyVisible(key) ? val : "•".repeat(val.length)) : "—"
 }
 </script>

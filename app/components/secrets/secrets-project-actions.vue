@@ -42,6 +42,10 @@
         </transition>
       </div>
 
+      <button :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" class="btn" @click="emit('toggleAllVisible')">
+        <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
+      </button>
+
       <nuxt-link :to="`/admin/${props.projectSlug}/settings`" class="btn" aria-label="Project Settings">
         <icon name="ph:gear-bold" size="20" />
       </nuxt-link>
@@ -63,6 +67,7 @@ const props = defineProps<{
   projectSlug?: string
   canManage: boolean
   hasPendingChanges: boolean
+  allVisible: boolean
 }>()
 
 const emit = defineEmits<{
@@ -71,6 +76,7 @@ const emit = defineEmits<{
   export: [env: string]
   save: []
   discard: []
+  toggleAllVisible: []
 }>()
 
 const dropdownRef = ref<HTMLElement | null>(null)
