@@ -32,6 +32,8 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
+          description: true,
+          website: true,
           createdAt: true,
           updatedAt: true,
           memberships: {
