@@ -15,7 +15,12 @@ export default defineEventHandler(async (event) => {
 
   const organization = await db.$transaction(async (tx) => {
     const org = await tx.organization.create({
-      data: { name: result.data.name, memberships: { create: { userId: user.id, role: "OWNER", isActive: true } } },
+      data: {
+        name: result.data.name,
+        description: result.data.description || null,
+        website: result.data.website || null,
+        memberships: { create: { userId: user.id, role: "OWNER", isActive: true } },
+      },
     })
 
     // Deactivate all other orgs for the user
@@ -37,6 +42,8 @@ export default defineEventHandler(async (event) => {
     metadata: {
       orgId: organization.id,
       orgName: organization.name,
+      orgDescription: organization.description,
+      orgWebsite: organization.website,
     },
   })
 

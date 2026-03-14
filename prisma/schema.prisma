@@ -51,6 +51,8 @@ model User {
 model Organization {
   id          String          @id @default(cuid())
   name        String
+  description String?
+  website     String?
   memberships OrgMembership[]
   projects    Project[]
   invitations Invitation[]
