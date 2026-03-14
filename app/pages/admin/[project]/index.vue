@@ -2,10 +2,12 @@
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <SecretsProjectActions
       :project-name="project?.name" :project-slug="project?.slug"
-      :can-manage="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" :has-pending-changes="hasPendingChanges"
-      @open-secrets-dialog="() => { isSecretsDialogOpen = true; selectedSecret = null }" @open-import-dialog="() => { isEnvDialogOpen = true; selectedSecret = null }"
+      :can-manage="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
+      :has-pending-changes="hasPendingChanges" :all-visible="allVisible"
+      @open-secrets-dialog="() => { isSecretsDialogOpen = true; selectedSecret = null }"
+      @open-import-dialog="() => { isEnvDialogOpen = true; selectedSecret = null }"
       @export="exportToEnv" @save="saveAllChanges"
-      @discard="discardAllChanges"
+      @toggle-all-visible="allVisible = !allVisible" @discard="discardAllChanges"
     />
 
     <Empty v-if="!displayedSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus-bold" />
@@ -13,8 +15,9 @@
     <div v-else class="flex max-h-screen flex-col gap-2">
       <SecretsTable
         :secrets="displayedSecrets" :project-id="project?.id ?? ''"
-        :pending-changes="pendingChanges" @edit="handleEditSecret"
-        @delete="handleDeleteSecret" @history="handleViewHistory"
+        :pending-changes="pendingChanges" :all-visible="allVisible"
+        @edit="handleEditSecret" @delete="handleDeleteSecret"
+        @history="handleViewHistory"
       />
     </div>
 
@@ -53,6 +56,7 @@ const historySecretId = ref("")
 const historySecretKey = ref("")
 const pendingChanges = ref<Map<string, PendingChange>>(new Map())
 const hasPendingChanges = computed(() => pendingChanges.value.size > 0)
+const allVisible = ref(false)
 
 const displayedSecrets = computed(() => {
   const secretsMap = new Map<string, Secret>()
@@ -115,10 +119,7 @@ function handleImportSecrets(importedSecrets: any[]) {
     const existingSecret = secrets.value.find(s => s.key === importedSecret.key)
     const pendingChange = pendingChanges.value.get(importedSecret.key)
     if (!existingSecret && !pendingChange) {
-      pendingChanges.value.set(importedSecret.key, {
-        type: "create",
-        secret: importedSecret,
-      })
+      pendingChanges.value.set(importedSecret.key, { type: "create", secret: importedSecret })
     }
     else {
       const baseSecret = pendingChange?.secret || existingSecret!
@@ -238,6 +239,7 @@ watch(() => project.value?.id, async (id) => {
     return
   }
 
+  allVisible.value = false
   await projectStore.getProjectSecrets(id)
   const projectTitle = projectStore.projects.find(p => p.id === id)?.name
 

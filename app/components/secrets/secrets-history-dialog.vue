@@ -6,6 +6,13 @@
 
     <Empty v-else-if="!projectStore.loading && (!history || history.length === 0)" message="No history available for this secret." icon-name="ph:clock-counter-clockwise-bold" />
 
+    <div v-if="history && history.length > 0" class="flex justify-end">
+      <button class="btn" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" @click="allVisible = !allVisible">
+        <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
+        <span>{{ allVisible ? 'Hide all' : 'Reveal all' }}</span>
+      </button>
+    </div>
+
     <div v-else class="scroll-area max-h-[70vh] space-y-4 overflow-y-auto pr-2">
       <div v-for="env in history" :key="env.environment" class="space-y-2 rounded-lg bg-muted/30 p-2">
         <h4>
@@ -17,7 +24,7 @@
 
           <div class="navigation-group justify-between font-mono text-sm text-muted-foreground">
             <p class="truncate select-none">
-              {{ visibleValues[env.environment] ? env.currentValue : "•".repeat(env.currentValue?.length || 0) }}
+              {{ visibleValues[env.environment] || allVisible ? env.currentValue : "•".repeat(env.currentValue?.length || 0) }}
             </p>
 
             <div class="navigation-group">
@@ -49,7 +56,7 @@
 
             <div class="text-caption navigation-group justify-between font-mono">
               <p class="truncate select-none">
-                {{ visibleHistory[item.id] ? item.value : "•".repeat(item.value?.length || 0) }}
+                {{ visibleHistory[item.id] || allVisible ? item.value : "•".repeat(item.value?.length || 0) }}
               </p>
 
               <div class="navigation-group">
@@ -87,6 +94,7 @@ const history = ref<EnvironmentHistory[]>([])
 const visibleValues = ref<Record<string, boolean>>({})
 const visibleHistory = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
+const allVisible = ref(false)
 
 async function fetchHistory() {
   if (!props.isOpen || !props.secretId) {
@@ -152,6 +160,7 @@ watch(() => props.isOpen, (newVal) => {
     visibleValues.value = {}
     visibleHistory.value = {}
     copyStates.value = {}
+    allVisible.value = false
   }
 })
 </script>
