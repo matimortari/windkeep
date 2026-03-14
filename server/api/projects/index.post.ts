@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
       name: result.data.name,
       slug: result.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").substring(0, 50),
       description: result.data.description ?? null,
+      website: result.data.website ?? null,
       orgId: result.data.orgId,
       memberships: { create: { userId: user.id, role: "OWNER" } },
     },
@@ -45,6 +46,7 @@ export default defineEventHandler(async (event) => {
       projectName: newProject.name,
       orgId: newProject.org.id,
       orgName: newProject.org.name,
+      website: newProject.website,
     },
   })
 

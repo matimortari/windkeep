@@ -45,6 +45,7 @@ interface Project {
   name: string
   slug: string
   description: string | null
+  website: string | null
   orgId: string
   org: Organization
   secrets?: Secret[]
