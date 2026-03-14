@@ -242,6 +242,19 @@ const projectFields = [
     editable: isOwner,
   },
   {
+    label: "Project Website",
+    description: "The official website for your project (optional).",
+    type: "input",
+    model: computed(() => localProject.value?.website ?? ""),
+    update: (value: string) => {
+      if (localProject.value) {
+        localProject.value.website = value
+      }
+    },
+    onSave: handleSubmit,
+    editable: isOwner,
+  },
+  {
     label: "Project Description",
     description: "Briefly describe the purpose or content of this project.",
     type: "input",
@@ -322,6 +335,7 @@ async function handleSubmit(index: number) {
     name: localProject.value?.name ?? "",
     slug: localProject.value?.slug ?? "",
     description: localProject.value?.description ?? "",
+    website: localProject.value?.website ?? "",
   })
 
   await projectStore.getProjects()
@@ -377,6 +391,7 @@ watch(() => project.value, (proj) => {
     localProject.value.name = proj.name
     localProject.value.slug = proj.slug
     localProject.value.description = proj.description || ""
+    localProject.value.website = proj.website || ""
   }
   else {
     localProject.value = { ...proj }
