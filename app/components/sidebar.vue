@@ -1,6 +1,6 @@
 <template>
   <!-- Mobile overlay -->
-  <div v-if="isOpen" class="fixed inset-0 z-20 bg-black/80 md:hidden" @click="emit('update:isOpen', false)" />
+  <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-20 bg-black/80 md:hidden" @click="emit('update:isOpen', false)" />
 
   <aside
     class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b-2 2xl:w-72"
@@ -27,7 +27,7 @@
       </h5>
 
       <div class="navigation-group">
-        <button :title="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" class="btn-ghost p-0!" @click="showAllProjects = !showAllProjects">
+        <button :aria-label="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" class="btn-ghost p-0!" @click="showAllProjects = !showAllProjects">
           <Icon :name="showAllProjects ? 'ph:users-four-bold' : 'ph:user-bold'" size="25" />
         </button>
         <button aria-label="Create New Project" class="btn-ghost p-0!" @click="isDialogOpen = true">

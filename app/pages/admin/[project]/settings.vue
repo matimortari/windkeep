@@ -34,10 +34,7 @@
 
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
-          <button
-            class="btn transition-transform" title="Copy to Clipboard"
-            aria-label="Copy to Clipboard" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
-          >
+          <button class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
         </div>

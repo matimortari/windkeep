@@ -19,8 +19,13 @@
           <td>
             {{ project.name }}
           </td>
-          <td class="max-w-md" :title="project.description || 'No description provided.'">
-            {{ project.description || 'No description provided.' }}
+          <td class="max-w-md overflow-visible!">
+            <span class="group/tooltip relative inline-flex max-w-full">
+              <span class="truncate">{{ project.description || 'No description provided.' }}</span>
+              <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
+                {{ project.description || 'No description provided.' }}
+              </span>
+            </span>
           </td>
           <td>
             <div class="navigation-group">
@@ -36,10 +41,10 @@
           </td>
           <td>
             <div class="navigation-group">
-              <nuxt-link :to="`/admin/${project.slug}/settings`" title="Settings" @click.stop>
+              <nuxt-link :to="`/admin/${project.slug}/settings`" aria-label="Project Settings" @click.stop>
                 <icon name="ph:gear-bold" size="20" class="transition-colors hover:text-primary" />
               </nuxt-link>
-              <nuxt-link :to="`/admin/${project.slug}`" title="Open" @click.stop>
+              <nuxt-link :to="`/admin/${project.slug}`" aria-label="Open Project" @click.stop>
                 <icon name="ph:arrow-right-bold" size="20" class="transition-colors hover:text-primary" />
               </nuxt-link>
             </div>

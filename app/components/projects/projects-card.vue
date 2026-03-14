@@ -24,7 +24,7 @@
         </div>
 
         <div class="navigation-group">
-          <nuxt-link :to="`/admin/${project.slug}/settings`" title="Project Settings" class="group btn-ghost rounded-full!" @click.stop>
+          <nuxt-link :to="`/admin/${project.slug}/settings`" class="group btn-ghost rounded-full!" @click.stop>
             <icon name="ph:gear-bold" size="25" class="text-muted-foreground group-hover:text-primary" />
             <span class="text-caption hidden whitespace-nowrap xl:block">Settings</span>
           </nuxt-link>
