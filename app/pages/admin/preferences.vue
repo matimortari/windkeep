@@ -28,8 +28,15 @@
         </header>
 
         <div v-if="field.copyable" class="navigation-group justify-end">
-          <span>{{ field.value }}</span>
-          <button class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
+          <span v-if="field.expiresAt !== undefined">
+            <span v-if="!field.expiresAt?.value" class="text-caption">Never expires</span>
+            <span v-else-if="isTokenExpired(field.expiresAt.value)" class="text-caption-danger">Expired</span>
+            <span v-else class="text-caption">Expires {{ formatDate(field.expiresAt.value) }}</span>
+          </span>
+
+          <span>{{ field.value?.value }}</span>
+
+          <button class="btn" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
 
@@ -40,7 +47,7 @@
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
-          <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
+          <button class="btn" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
@@ -129,7 +136,6 @@ const userFields = [
     description: "Your role within the current organization.",
     value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find((m: OrgMembership) => m.userId === user.value?.id)?.role || "N/A")),
   },
-
   {
     label: "Joined On",
     description: "The date you joined WindKeep.",
@@ -139,6 +145,7 @@ const userFields = [
     label: "CLI Token",
     description: "Use this token to authenticate with the WindKeep CLI. Keep it secure and do not share it with others.",
     value: computed(() => user.value?.apiToken),
+    expiresAt: computed(() => user.value?.apiTokenExpiresAt),
     onRegenerate: handleRegenerateToken,
     copyable: true,
   },
@@ -154,6 +161,14 @@ const userFields = [
 const copyIcon = userFields.map(() => createActionHandler("ph:copy-bold"))
 const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 const regenerateIcon = userFields.map(() => createActionHandler("ph:arrows-clockwise-bold"))
+
+function isTokenExpired(expiresAt: string | Date | null | undefined): boolean {
+  if (!expiresAt) {
+    return false
+  }
+
+  return new Date(expiresAt) < new Date()
+}
 
 async function handleUpdateImage(event: Event) {
   const input = event.target as HTMLInputElement
@@ -176,6 +191,7 @@ async function handleRegenerateToken() {
   const res = await userStore.updateUser({ regenerateApiToken: true })
   if (res?.updatedUser?.apiToken && user.value) {
     user.value.apiToken = res.updatedUser.apiToken
+    user.value.apiTokenExpiresAt = res.updatedUser.apiTokenExpiresAt
     regenerateIcon[userFields.findIndex(f => f.onRegenerate)]?.triggerSuccess()
   }
 }
@@ -185,10 +201,7 @@ async function handleSubmit(index: number) {
     return
   }
 
-  await userStore.updateUser({
-    name: user.value.name,
-  })
-
+  await userStore.updateUser({ name: user.value.name })
   saveIcon[index]?.triggerSuccess()
 }
 
