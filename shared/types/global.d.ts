@@ -19,6 +19,8 @@ interface User {
 interface Organization {
   id: string
   name: string
+  description: string | null
+  website: string | null
   memberships?: OrgMembership[]
   projects?: Project[]
   invitations?: Invitation[]
