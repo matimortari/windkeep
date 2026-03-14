@@ -6,15 +6,18 @@
           <img src="/assets/symbol.png" alt="Logo" width="30">
         </nuxt-link>
 
-        <div class="text-caption hidden md:navigation-group">
+        <div v-if="user?.name" class="text-caption hidden md:navigation-group">
           <span>/</span>
-          <span>{{ user?.name }}</span>
+          <span>{{ user.name }}</span>
           <span>/</span>
         </div>
 
+        <div v-else class="hidden h-4 w-24 animate-pulse rounded-sm bg-muted md:block" />
+
         <div ref="dropdownRef" class="relative">
           <button class="navigation-group truncate" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
-            <span class="text-caption">{{ activeOrg?.name }}</span>
+            <span v-if="activeOrg?.name" class="text-caption">{{ activeOrg.name }}</span>
+            <span v-else class="inline-block h-4 w-20 animate-pulse rounded-sm bg-muted" />
             <icon name="ph:caret-down-bold" size="20" class="transition-all hover:text-primary" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
           </button>
 
@@ -36,10 +39,9 @@
           </transition>
         </div>
 
-        <div class="text-caption hidden md:navigation-group">
-          <span>/</span>
-          <span class="capitalize">{{ currentPage }}</span>
-        </div>
+        <p v-if="currentPage" class="text-caption hidden md:navigation-group">
+          <span>/</span><span class="capitalize">{{ currentPage }}</span>
+        </p>
       </nav>
 
       <nav class="navigation-group" aria-label="User Actions">

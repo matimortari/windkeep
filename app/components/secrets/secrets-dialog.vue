@@ -3,7 +3,7 @@
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="key" class="text-sm font-semibold">Key</label>
-        <input id="key" v-model="form.key" type="text" required>
+        <input id="key" v-model="form.key" type="text">
         <span class="text-xs text-muted-foreground">The name for the secret.</span>
       </div>
 
