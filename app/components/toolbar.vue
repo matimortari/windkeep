@@ -101,6 +101,6 @@ async function handleSetActiveOrg(orgId: string) {
   }
 
   orgStore.setActiveOrg(orgId)
-  await router.push("/admin/projects")
+  router.go(0)
 }
 </script>
