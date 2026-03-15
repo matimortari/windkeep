@@ -239,6 +239,7 @@ watch(() => project.value?.id, async (id) => {
   }
 
   allVisible.value = false
+  secrets.value = []
   await projectStore.getProjectSecrets(id)
   const projectTitle = projectStore.projects.find(p => p.id === id)?.name
 

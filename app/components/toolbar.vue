@@ -22,8 +22,11 @@
 
           <transition name="dropdown">
             <ul v-if="isDropdownOpen" class="dropdown-menu" role="menu">
-              <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap" role="menuitem">
-                <button class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)">
+              <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
+                <button
+                  class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem"
+                  :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)"
+                >
                   {{ org.name }}
                 </button>
               </li>
