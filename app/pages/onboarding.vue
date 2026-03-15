@@ -1,44 +1,72 @@
 <template>
-  <div class="flex min-h-screen w-full flex-col items-center justify-center">
-    <header
-      v-motion class="flex flex-col items-center gap-4 border-b-2 p-4 text-center"
-      :initial="{ opacity: 0, y: -10, scale: 0.8 }" :visible="{ opacity: 1, y: 0, scale: 1 }"
-      :duration="800"
+  <div class="flex min-h-screen w-full items-center justify-center">
+    <div
+      v-motion :initial="{ opacity: 0 }"
+      :visible-once="{ opacity: 1 }" :duration="800"
+      class="w-full max-w-xl border-none bg-transparent py-32"
     >
-      <h1 class="font-display">
-        Welcome to WindKeep
-      </h1>
-      <p class="text-caption">
-        To get started, please create an organization name with at least 3 characters.
-      </p>
-    </header>
+      <header class="flex flex-col items-center gap-2 py-4 text-center">
+        <h1 class="font-display">
+          Welcome to WindKeep
+        </h1>
+        <p class="text-caption">
+          Create an organization to get started, or accept an existing invitation.
+        </p>
+      </header>
 
-    <form
-      v-motion class="flex min-w-lg flex-col items-center gap-2 p-4"
-      :initial="{ opacity: 0 }" :visible="{ opacity: 1 }"
-      :duration="800" @submit.prevent="handleCreateOrg"
-    >
-      <input v-model="localOrg.name" placeholder="Organization Name" type="text" autofocus>
+      <div class="border-y">
+        <button
+          class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary"
+          @click="activeSection = activeSection === 'create' ? null : 'create'"
+        >
+          <h5>
+            New Organization
+          </h5>
+          <icon
+            name="ph:caret-down-bold" size="20"
+            class="shrink-0 text-muted-foreground transition-transform group-hover:text-primary"
+            :class="activeSection === 'create' ? 'rotate-180' : 'rotate-0'"
+          />
+        </button>
 
-      <button class="btn-primary w-full" type="submit" aria-label="Create Organization">
-        Create Organization
-      </button>
-    </form>
+        <transition name="accordion">
+          <form v-if="activeSection === 'create'" class="flex flex-col gap-2 p-4 pt-0" @submit.prevent="handleCreateOrg">
+            <input v-model="localOrg.name" placeholder="Organization Name" type="text">
+            <div class="flex gap-2">
+              <input v-model="localOrg.description" placeholder="Description (optional)" type="text" class="flex-1">
+              <input v-model="localOrg.website" placeholder="Website (optional)" type="url" class="flex-1">
+            </div>
+            <button class="btn-primary w-full" type="submit" :disabled="!localOrg.name">
+              Create Organization
+            </button>
+          </form>
+        </transition>
+      </div>
 
-    <p class="text-caption">
-      Already have an invite? Enter the invitation token below:
-    </p>
-    <form
-      v-motion class="flex min-w-lg flex-col items-center gap-2 p-4"
-      :initial="{ opacity: 0 }" :visible="{ opacity: 1 }"
-      :duration="800" @submit.prevent="handleAcceptInvite"
-    >
-      <input v-model="token" placeholder="Invite Token" type="text" autofocus>
+      <div class="border-b">
+        <button
+          class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary"
+          @click="activeSection = activeSection === 'invite' ? null : 'invite'"
+        >
+          <h5>
+            Accept Invitation
+          </h5>
+          <icon
+            name="ph:caret-down-bold" size="20"
+            class="shrink-0 text-muted-foreground transition-transform group-hover:text-primary" :class="activeSection === 'invite' ? 'rotate-180' : 'rotate-0'"
+          />
+        </button>
 
-      <button class="btn-primary w-full" type="submit">
-        Accept Invite
-      </button>
-    </form>
+        <transition name="accordion">
+          <form v-if="activeSection === 'invite'" class="flex flex-col gap-2 p-4 pt-0" @submit.prevent="handleAcceptInvite">
+            <input v-model="token" placeholder="Invite Token" type="text">
+            <button class="btn-secondary w-full" type="submit" :disabled="!token">
+              Accept Invite
+            </button>
+          </form>
+        </transition>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,8 +75,9 @@ const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const userStore = useUserStore()
 const orgStore = useOrgStore()
-const localOrg = ref({ name: `${userStore.user?.name}'s Team` })
+const localOrg = ref({ name: "", description: "", website: "" })
 const token = ref(route.query.token as string || "")
+const activeSection = ref<"create" | "invite" | null>(route.query.token ? "invite" : "create")
 
 async function handleCreateOrg() {
   const org = await orgStore.createOrg(localOrg.value)
@@ -82,3 +111,23 @@ definePageMeta({
   middleware: "auth",
 })
 </script>
+
+<style scoped>
+.accordion-enter-active,
+.accordion-leave-active {
+  transition:
+    max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease;
+  overflow: hidden;
+}
+.accordion-enter-from,
+.accordion-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+.accordion-enter-to,
+.accordion-leave-from {
+  max-height: 300px;
+  opacity: 1;
+}
+</style>

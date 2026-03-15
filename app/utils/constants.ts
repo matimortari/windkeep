@@ -1,15 +1,15 @@
 export const HIGHLIGHTS = [
   {
+    title: "Encrypted & Safe",
+    icon: "ph:lock-key-bold",
+  },
+  {
     title: "Rapid Onboarding",
     icon: "ph:users-three-bold",
   },
   {
     title: "Free & Open Source",
     icon: "ph:code-bold",
-  },
-  {
-    title: "Encrypted & Safe",
-    icon: "ph:lock-key-bold",
   },
 ]
 
@@ -67,18 +67,54 @@ export const FAQS = [
   },
 ]
 
-export const INSTALL_COMMAND = [
-  " # Windows (PowerShell)",
-  "irm https://windkeep.up.railway.app/install/install.ps1 | iex",
-  "",
-  " # macOS/Linux (Bash)",
-  "curl -sSL https://windkeep.up.railway.app/install/install.sh | bash",
-]
-
-export const CLI_COMMANDS = [
-  "windkeep login",
-  "windkeep whoami",
-  "windkeep projects list",
+export const CLI_TABS = [
+  {
+    key: "install",
+    label: "Installation",
+    description: "Run the following command from your terminal:",
+    code: [
+      " # Windows (PowerShell)",
+      "irm https://windkeep.up.railway.app/install/install.ps1 | iex",
+      "",
+      " # macOS/Linux (Bash)",
+      "curl -sSL https://windkeep.up.railway.app/install/install.sh | bash",
+    ],
+  },
+  {
+    key: "commands",
+    label: "Getting Started",
+    description: "Authenticate and set up your workspace:",
+    code: [
+      "# authenticate with your API token",
+      "windkeep login <your-api-token>",
+      "",
+      "# verify your session and active context",
+      "windkeep whoami",
+      "",
+      "# list and switch to an organization",
+      "windkeep orgs list",
+      "windkeep orgs switch <org-id>",
+      "",
+      "# list and switch to a project",
+      "windkeep projects list",
+      "windkeep projects switch <project-slug>",
+    ],
+  },
+  {
+    key: "run",
+    label: "Run",
+    description: "Inject secrets as env vars and run any command:",
+    code: [
+      "# inject dev secrets and run",
+      "windkeep run npm run dev",
+      "",
+      "# use a specific environment",
+      "windkeep run --env prod node server.js",
+      "",
+      "# show injected keys (not values)",
+      "windkeep run -v npm start",
+    ],
+  },
 ]
 
 export const SIDEBAR_NAV_LINKS = [
