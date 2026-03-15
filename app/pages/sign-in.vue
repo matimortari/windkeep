@@ -3,9 +3,9 @@
     <div
       v-motion :initial="{ opacity: 0 }"
       :visible-once="{ opacity: 1 }" :duration="800"
-      class="w-full max-w-sm border-none bg-transparent py-32 2xl:max-w-lg"
+      class="w-full max-w-md border-none bg-transparent py-32"
     >
-      <header class="flex flex-col items-center gap-2 text-center">
+      <header class="flex flex-col items-center gap-2 py-4 text-center">
         <h1 class="font-display">
           Sign In
         </h1>
@@ -15,20 +15,20 @@
         <span v-if="errorMessage" class="text-caption-danger">{{ errorMessage }}</span>
       </header>
 
-      <div class="flex flex-col justify-center gap-4 p-4 2xl:p-12">
+      <div class="flex flex-col justify-center gap-4 border-y p-4">
         <button v-for="provider in OAUTH_PROVIDERS" :key="provider.name" class="btn" @click="signIn(provider.name)">
           <icon :name="provider.icon" size="25" />
           <span>{{ provider.label }}</span>
         </button>
       </div>
 
-      <p class="text-caption mx-auto max-w-xs text-center">
+      <p class="text-caption mx-auto max-w-xs py-4 text-center">
         By signing in, you agree to our
-        <nuxt-link to="/legal/terms" class="underline hover:text-primary">
+        <nuxt-link to="/legal/terms" class="text-primary hover:underline">
           Terms of Service
         </nuxt-link>
         and
-        <nuxt-link to="/legal/privacy" class="underline hover:text-primary">
+        <nuxt-link to="/legal/privacy" class="text-primary hover:underline">
           Privacy Policy.
         </nuxt-link>
       </p>
