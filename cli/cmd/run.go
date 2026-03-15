@@ -13,25 +13,83 @@ import (
 )
 
 var runCmd = &cobra.Command{
-	Use:   "run [command] [args...]",
+	Use:   "run [flags] [command] [args...]",
 	Short: "Run a command with injected secrets",
 	Long: `Run a command with environment variables injected from your active project's secrets.
 
 Fetches all secrets from the specified environment and injects them as environment
 variables when running your command. No .env file needed.
 
-Examples:
-  windkeep run npm run dev
-  windkeep run -e prod -- ./server
-  windkeep run -e staging -p my-api -- go run main.go`,
-	Args:               cobra.MinimumNArgs(1),
-	DisableFlagParsing: false,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		environment, _ := cmd.Flags().GetString("env")
-		projectSlug, _ := cmd.Flags().GetString("project")
-		verbose, _ := cmd.Flags().GetBool("verbose")
+windkeep flags must come before the command name:
 
-		// Validate and parse environment
+  windkeep run npm run dev
+  windkeep run -e prod npm run build
+  windkeep run -v -e staging go run main.go
+  windkeep run -p api-service -e prod -- node --inspect server.js
+
+Flags:
+  -e, --env      Environment (dev/development, staging, prod/production) [default: development]
+  -p, --project  Project slug (overrides active project)
+  -v, --verbose  Show injected secret keys before running`,
+	// DisableFlagParsing passes ALL args to RunE unmodified, so flags like
+	// --version or --inspect in the child command are never intercepted by Cobra.
+	DisableFlagParsing: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Manually parse windkeep flags from the front of args.
+		// Stop at the first arg that is not a recognised windkeep flag.
+		environment := "development"
+		projectSlug := ""
+		verbose := false
+
+		i := 0
+		for i < len(args) {
+			arg := args[i]
+
+			if arg == "--" {
+				i++ // skip separator, everything after is child args
+				break
+			}
+
+			consumed := true
+			switch arg {
+			case "-e", "--env":
+				i++
+				if i >= len(args) {
+					return fmt.Errorf("flag %s requires a value", arg)
+				}
+				environment = args[i]
+			case "-p", "--project":
+				i++
+				if i >= len(args) {
+					return fmt.Errorf("flag %s requires a value", arg)
+				}
+				projectSlug = args[i]
+			case "-v", "--verbose":
+				verbose = true
+			case "-h", "--help":
+				return cmd.Help()
+			default:
+				if strings.HasPrefix(arg, "--env=") {
+					environment = strings.TrimPrefix(arg, "--env=")
+				} else if strings.HasPrefix(arg, "--project=") {
+					projectSlug = strings.TrimPrefix(arg, "--project=")
+				} else {
+					consumed = false
+				}
+			}
+
+			if !consumed {
+				break // first non-windkeep arg is the start of the child command
+			}
+			i++
+		}
+
+		childArgs := args[i:]
+		if len(childArgs) == 0 {
+			return fmt.Errorf("no command specified\nUsage: windkeep run [flags] [command] [args...]")
+		}
+
+		// Validate environment
 		var env api.Environment
 		switch strings.ToUpper(environment) {
 		case "DEV", "DEVELOPMENT":
@@ -46,7 +104,7 @@ Examples:
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		// Resolve project: flag overrides active project
+		// Resolve project
 		var projectID string
 		var projectName string
 		var err error
@@ -56,7 +114,6 @@ Examples:
 			if err != nil {
 				return fmt.Errorf("failed to get projects: %w", err)
 			}
-
 			found := false
 			for _, proj := range projects {
 				if proj.Slug == projectSlug {
@@ -85,7 +142,7 @@ Examples:
 			return fmt.Errorf("failed to fetch secrets: %w", err)
 		}
 
-		// Build env vars map, filtering by environment
+		// Build env vars map
 		envVars := make(map[string]string)
 		for _, secret := range secrets {
 			for _, val := range secret.Values {
@@ -109,19 +166,12 @@ Examples:
 			fmt.Println()
 		}
 
-		// Build and run the command
-		commandName := args[0]
-		var commandArgs []string
-		if len(args) > 1 {
-			commandArgs = args[1:]
-		}
-
-		execCmd := exec.Command(commandName, commandArgs...)
+		// Run the child command
+		execCmd := exec.Command(childArgs[0], childArgs[1:]...)
 		execCmd.Env = os.Environ()
 		for key, value := range envVars {
 			execCmd.Env = append(execCmd.Env, fmt.Sprintf("%s=%s", key, value))
 		}
-
 		execCmd.Stdin = os.Stdin
 		execCmd.Stdout = os.Stdout
 		execCmd.Stderr = os.Stderr
@@ -138,6 +188,7 @@ Examples:
 }
 
 func init() {
-	runCmd.Flags().StringP("env", "e", "development", "Environment (dev/development, staging, prod/production)")
-	runCmd.Flags().StringP("project", "p", "", "Project slug (overrides active project)")
+	// Flags are parsed manually (DisableFlagParsing: true) so that child command
+	// flags like --version, --inspect, etc. are never intercepted by Cobra.
+	// Supported windkeep flags: -e/--env, -p/--project, -v/--verbose
 }
