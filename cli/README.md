@@ -40,7 +40,7 @@ sudo mv windkeep /usr/local/bin/
 
 **Windows (PowerShell as Administrator):**
 
-```bash
+```powershell
 Move-Item windkeep.exe C:\Windows\System32\windkeep.exe
 ```
 
@@ -133,14 +133,14 @@ Set the active organization for future commands. This will clear your active pro
 windkeep orgs switch cm123abc456
 ```
 
-#### `windkeep orgs update [ORG_ID] [NAME]`
+#### `windkeep orgs update [NAME]`
 
-Update an organization's name.
+Update the active organization's name.
 
 **Example:**
 
 ```bash
-windkeep orgs update cm123abc456 "New Organization Name"
+windkeep orgs update "New Organization Name"
 ```
 
 ---
@@ -271,10 +271,11 @@ windkeep secrets create SMTP_PASSWORD \
 
 #### `windkeep secrets set [KEY]`
 
-Update values for an existing secret. Only specified environments will be updated.
+Update values for an existing secret. Only specified environments will be updated. You can also update the description independently.
 
 **Flags:**
 
+- `-d, --description`: Update the secret's description
 - `--dev`: Value for DEVELOPMENT environment
 - `--staging`: Value for STAGING environment
 - `--prod`: Value for PRODUCTION environment
@@ -285,15 +286,45 @@ Update values for an existing secret. Only specified environments will be update
 # Update only production value
 windkeep secrets set DATABASE_URL --prod "postgres://new-prod-db:5432/app"
 
+# Update description only
+windkeep secrets set JWT_SECRET -d "Rotated signing secret"
+
+# Update description and a value together
+windkeep secrets set DATABASE_URL \
+  -d "Primary database" \
+  --prod "postgres://new-prod-db:5432/app"
+
 # Update multiple environments
 windkeep secrets set API_KEY \
   --staging "sk_test_xyz789" \
   --prod "sk_live_xyz789"
 ```
 
-#### `windkeep secrets delete [KEY] --confirm`
+#### `windkeep secrets history [KEY]`
+
+Show the full change history for a secret across all environments, including who made each change and when.
+
+**Flags:**
+
+- `-e, --env`: Filter by environment (dev/staging/prod)
+
+**Examples:**
+
+```bash
+# Show full history
+windkeep secrets history DATABASE_URL
+
+# Show only production history
+windkeep secrets history API_KEY -e prod
+```
+
+#### `windkeep secrets delete [KEY]`
 
 Delete a secret and all its values. This action cannot be undone.
+
+**Flags:**
+
+- `--confirm`: Skip confirmation prompt
 
 **Example:**
 
@@ -312,6 +343,7 @@ Pull secrets from your active project and save to a local file.
 **Flags:**
 
 - `-e, --env`: Environment to pull (default: development)
+- `-p, --project`: Project slug (overrides active project)
 
 **Examples:**
 
@@ -321,6 +353,9 @@ windkeep pull
 
 # Pull production to custom file
 windkeep pull prod.env -e production
+
+# Pull from a specific project without switching context
+windkeep pull -p api-service -e staging .env.staging
 ```
 
 #### `windkeep push [INPUT_FILE]`
@@ -330,6 +365,7 @@ Push secrets from a local file to your active project.
 **Flags:**
 
 - `-e, --env`: Environment to push to (default: development)
+- `--overwrite`: Update secrets that already exist (default: skip existing)
 
 **Examples:**
 
@@ -339,14 +375,10 @@ windkeep push
 
 # Push to production
 windkeep push prod.env -e production
+
+# Push and overwrite existing secrets
+windkeep push --overwrite
 ```
-
-**Use Cases:**
-
-- Pull secrets to work locally without managing .env files manually
-- Push local secrets to WindKeep for team synchronization
-- Migrate secrets between projects
-- Backup secrets to files
 
 **Security Note:** Pulled files contain plaintext secrets. Store them securely and never commit them to version control.
 
@@ -360,119 +392,22 @@ Run a command with environment variables injected from your active project's sec
 
 **Flags:**
 
-- `-e, --env`: Environment to use (dev/development, staging, prod/production) - default: development
-- `-p, --project`: Project slug to use (overrides active project)
-- `-v, --verbose`: Show which secrets are being injected
+- `-e, --env`: Environment to use (default: development)
+- `-p, --project`: Project slug (overrides active project)
+- `-v, --verbose`: Show injected secret keys before running (inherited from global flag)
 
 **Examples:**
 
 ```bash
-# Run a Node.js app with development secrets
+# Run with development secrets
 windkeep run npm run dev
 
-# Run a Python script with production secrets
-windkeep run --env prod python app.py
+# Run with production secrets
+windkeep run -e prod node server.js
 
-# Run with staging secrets and show which secrets are injected
-windkeep run -e staging -v node server.js
+# Show which secrets are injected
+windkeep run -v npm start
 
-# Run with short environment names
-windkeep run -e dev npm start
-windkeep run -e prod python manage.py runserver
-
-# Override active project - use a different project temporarily
-windkeep run --project my-other-project npm run dev
-
-# Combine flags: use specific project with production environment
-windkeep run -p api-service -e prod npm start
+# Use a different project without switching context
+windkeep run -p api-service -e staging npm test
 ```
-
-**Use Cases:**
-
-- **Local Development:** Run your app without maintaining a `.env` file
-- **CI/CD:** Inject secrets in build pipelines without storing them in files
-- **Testing:** Quickly switch between environments without editing config files
-- **Security:** Avoid committing secrets to version control
-
-**Example Workflow:**
-
-```bash
-# Set up your project
-windkeep projects switch my-api
-
-# Add secrets for different environments
-windkeep secrets create DATABASE_URL \
-  --dev "postgres://localhost:5432/dev" \
-  --prod "postgres://prod-db:5432/app"
-
-# Run your app with development secrets (no .env file needed!)
-windkeep run npm run dev
-
-# Deploy to production with production secrets
-windkeep run --env prod npm start
-```
-
----
-
-## Development
-
-### Building for Multiple Platforms
-
-```bash
-# Linux (64-bit)
-GOOS=linux GOARCH=amd64 go build -o windkeep-linux-amd64
-
-# macOS (Intel)
-GOOS=darwin GOARCH=amd64 go build -o windkeep-darwin-amd64
-
-# macOS (Apple Silicon)
-GOOS=darwin GOARCH=arm64 go build -o windkeep-darwin-arm64
-
-# Windows (64-bit)
-GOOS=windows GOARCH=amd64 go build -o windkeep-windows-amd64.exe
-```
-
-## Troubleshooting
-
-### "Config file not found" error
-
-**Solution:** You need to login first:
-
-```bash
-windkeep login YOUR_API_TOKEN
-```
-
-### "Not authenticated" error
-
-**Solution:** Your API token may have expired or been regenerated. Login again:
-
-```bash
-windkeep logout
-windkeep login YOUR_NEW_API_TOKEN
-```
-
-### "No active organization/project" error
-
-**Solution:** Switch to an organization/project:
-
-```bash
-windkeep orgs list
-windkeep orgs switch <ORG_ID>
-
-windkeep projects list
-windkeep projects switch <PROJECT_ID>
-```
-
----
-
-## Contact
-
-Feel free to reach out to discuss collaboration opportunities or to say hello!
-
-- [**My Email**](mailto:matheus.felipe.19rt@gmail.com)
-- [**My LinkedIn Profile**](https://www.linkedin.com/in/matheus-mortari-19rt)
-- [**My GitHub Profile**](https://github.com/matimortari)
-
-## License
-
-This project is licensed under the [**MIT License**](../LICENSE).
