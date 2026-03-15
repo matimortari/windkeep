@@ -26,11 +26,6 @@ Examples:
   windkeep pull .env.staging -e staging -p my-api`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		outputFile := ".env"
-		if len(args) > 0 {
-			outputFile = args[0]
-		}
-
 		projectSlug, _ := cmd.Flags().GetString("project")
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
@@ -59,10 +54,16 @@ Examples:
 			if err != nil {
 				return err
 			}
+			projectSlug = cfg.ActiveProjectSlug
 			projectName = cfg.ActiveProjectName
 			if projectName == "" {
-				projectName = cfg.ActiveProjectSlug
+				projectName = projectSlug
 			}
+		}
+
+		outputFile := fmt.Sprintf(".env.%s.%s", projectSlug, strings.ToLower(pullEnv))
+		if len(args) > 0 {
+			outputFile = args[0]
 		}
 
 		ui.PrintInfo("Project: %s  •  Env: %s", ui.Highlight(projectName), ui.Info(pullEnv))

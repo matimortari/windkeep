@@ -207,10 +207,9 @@ function exportToEnv(env: string | null | undefined) {
 
   try {
     const blob = new Blob([filteredSecrets], { type: "text/plain" })
-    const projectName = project.value?.name?.toLowerCase().replaceAll(/\s+/g, "-").replaceAll(/[^\w.-]/g, "")
     const a = document.createElement("a")
     a.href = URL.createObjectURL(blob)
-    a.download = `.env.${projectName}.${env.toLowerCase()}`
+    a.download = `.env.${project.value?.slug}.${env.toLowerCase()}`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
