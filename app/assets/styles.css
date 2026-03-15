@@ -144,6 +144,14 @@ h6 {
   color: var(--danger);
 }
 
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
 /*
   UI elements
 */
@@ -263,7 +271,7 @@ table {
 td,
 th {
   color: var(--muted-foreground);
-  padding: 0.5rem;
+  padding: 1rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;

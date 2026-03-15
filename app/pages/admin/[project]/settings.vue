@@ -334,8 +334,8 @@ async function handleSubmit(index: number) {
   await projectStore.updateProject(project.value.id, {
     name: localProject.value?.name ?? "",
     slug: localProject.value?.slug ?? "",
-    description: localProject.value?.description ?? "",
-    website: localProject.value?.website ?? "",
+    description: localProject.value?.description || undefined,
+    website: localProject.value?.website || undefined,
   })
 
   await projectStore.getProjects()

@@ -6,19 +6,18 @@
           <img src="/assets/symbol.png" alt="Logo" width="30">
         </nuxt-link>
 
-        <div v-if="user?.name" class="text-caption hidden md:navigation-group">
-          <span>/</span>
-          <span>{{ user.name }}</span>
-          <span>/</span>
-        </div>
-
+        <span class="hidden text-muted-foreground md:block">/</span>
+        <p v-if="user?.name" class="text-caption hidden md:block">
+          {{ user.name }}
+        </p>
         <div v-else class="hidden h-4 w-24 animate-pulse rounded-sm bg-muted md:block" />
+        <span class="hidden text-muted-foreground md:block">/</span>
 
         <div ref="dropdownRef" class="relative">
-          <button class="navigation-group truncate" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
+          <button class="navigation-group gap-1!" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span v-if="activeOrg?.name" class="text-caption">{{ activeOrg.name }}</span>
             <span v-else class="inline-block h-4 w-20 animate-pulse rounded-sm bg-muted" />
-            <icon name="ph:caret-down-bold" size="20" class="transition-all hover:text-primary" :class="[isDropdownOpen ? 'rotate-180 text-muted-foreground' : 'rotate-0']" />
+            <icon name="ph:caret-down-bold" size="15" class="transition-transform" :class="isDropdownOpen ? 'rotate-180' : 'rotate-0'" />
           </button>
 
           <transition name="dropdown">
@@ -39,8 +38,9 @@
           </transition>
         </div>
 
-        <p v-if="currentPage" class="text-caption hidden md:navigation-group">
-          <span>/</span><span class="capitalize">{{ currentPage }}</span>
+        <p v-if="currentPage" class="hidden md:navigation-group">
+          <span class="text-muted-foreground">/</span>
+          <span class="text-caption capitalize">{{ currentPage }}</span>
         </p>
       </nav>
 

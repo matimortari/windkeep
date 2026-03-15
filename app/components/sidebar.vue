@@ -6,53 +6,55 @@
     class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-8 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b-2 2xl:w-72"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
-    <h5>
+    <p class="section-label">
       Overview
-    </h5>
+    </p>
 
-    <nav class="flex flex-col gap-2 font-semibold text-muted-foreground" aria-label="Main Navigation">
+    <nav class="flex flex-col gap-1 font-semibold text-muted-foreground" aria-label="Main Navigation">
       <nuxt-link
         v-for="link in SIDEBAR_NAV_LINKS" :key="link.url"
-        :to="link.url" class="group navigation-group rounded-lg p-2 text-sm transition-colors hover:bg-muted/50 2xl:text-base"
-        :class="{ 'bg-muted': route.path === link.url }" @click="emit('update:isOpen', false)"
+        :to="link.url" class="group navigation-group border-l-2 border-transparent p-2 text-sm transition-all hover:border-primary hover:text-foreground 2xl:text-base"
+        :class="{ 'border-primary! text-foreground': route.path === link.url }"
+        @click="emit('update:isOpen', false)"
       >
-        <icon :name="link.icon" size="30" class="transition-transform group-hover:scale-110" />
+        <icon :name="link.icon" size="22" />
         <span>{{ link.label }}</span>
       </nuxt-link>
     </nav>
 
-    <div class="flex items-center justify-between">
-      <h5>
+    <div class="flex items-center justify-between border-t pt-4">
+      <p class="section-label">
         Projects
-      </h5>
+      </p>
 
       <div class="navigation-group">
         <button :aria-label="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" class="btn-ghost p-0!" @click="showAllProjects = !showAllProjects">
-          <Icon :name="showAllProjects ? 'ph:users-four-bold' : 'ph:user-bold'" size="25" />
+          <icon :name="showAllProjects ? 'ph:users-four-bold' : 'ph:user-bold'" size="20" />
         </button>
         <button aria-label="Create New Project" class="btn-ghost p-0!" @click="isDialogOpen = true">
-          <icon name="ph:plus-bold" size="25" />
+          <icon name="ph:plus-bold" size="20" />
         </button>
       </div>
     </div>
 
     <div class="scroll-area flex-1 overflow-y-auto">
       <div v-if="loading" class="flex flex-col gap-2" aria-hidden="true">
-        <div v-for="i in 8" :key="i" class="h-3 animate-pulse rounded-sm bg-muted" :style="{ width: skeletonWidths[i - 1] }" />
+        <div v-for="i in 6" :key="i" class="h-3 animate-pulse rounded-sm bg-muted" :style="{ width: skeletonWidths[i - 1] }" />
       </div>
 
       <p v-else-if="!filteredProjects.length" class="text-caption">
         No projects yet.
       </p>
 
-      <nav v-else aria-label="Projects Navigation" class="text-caption flex flex-col gap-2">
+      <nav v-else aria-label="Projects Navigation" class="flex flex-col gap-2">
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
-          :to="`/admin/${project.slug}`" class="truncate hover:underline"
-          :class="{ 'font-semibold text-primary': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }"
+          :to="`/admin/${project.slug}`"
+          class="text-caption truncate border-l-2 border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
+          :class="{ 'border-primary! text-primary!': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }"
           @click="emit('update:isOpen', false)"
         >
-          > {{ project.name }}
+          {{ project.name }}
         </nuxt-link>
       </nav>
     </div>
@@ -76,7 +78,7 @@ const projectStore = useProjectStore()
 const { projects } = storeToRefs(projectStore)
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
-const skeletonWidths = ["72%", "55%", "85%", "60%", "78%", "50%", "68%", "40%"]
+const skeletonWidths = ["65%", "45%", "60%", "50%", "50%", "60%"]
 
 // All projects the user has access to, across all orgs
 const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))

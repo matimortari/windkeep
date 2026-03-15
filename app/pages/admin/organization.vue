@@ -295,14 +295,13 @@ async function handleSubmit(index: number) {
 
   await orgStore.updateOrg(activeOrg.value.id, {
     name: activeOrg.value.name || "",
-    description: activeOrg.value.description || "",
-    website: activeOrg.value.website || "",
+    description: activeOrg.value.description || undefined,
+    website: activeOrg.value.website || undefined,
   })
 
   await userStore.getUser()
   saveIcon[index]?.triggerSuccess()
 }
-
 async function handleLeaveOrg() {
   if (!activeOrg.value?.id || !user.value?.id) {
     return

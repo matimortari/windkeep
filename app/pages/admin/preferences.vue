@@ -28,10 +28,10 @@
         </header>
 
         <div v-if="field.copyable" class="navigation-group justify-end">
-          <span v-if="field.expiresAt !== undefined">
-            <span v-if="isTokenExpired(field.expiresAt.value)" class="text-caption-danger">Expired</span>
-            <span v-else class="text-caption">Expires {{ formatDate(field.expiresAt.value) }}</span>
-          </span>
+          <p v-if="field.label === 'CLI Token'">
+            <span v-if="isTokenExpired(field.expiresAt?.value)" class="text-caption-danger px-4">Expired</span>
+            <span v-else class="text-caption px-4">Expires {{ formatDate(field.expiresAt?.value) }}</span>
+          </p>
 
           <span>{{ field.value?.value }}</span>
 
@@ -142,7 +142,7 @@ const userFields = [
   },
   {
     label: "CLI Token",
-    description: "Use this token to authenticate with the WindKeep CLI. Keep it secure and do not share it with others.",
+    description: "Use this token to login to the WindKeep CLI. Keep it secure and do not share it.",
     value: computed(() => user.value?.apiToken),
     expiresAt: computed(() => user.value?.apiTokenExpiresAt),
     onRegenerate: handleRegenerateToken,
