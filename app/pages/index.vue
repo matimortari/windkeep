@@ -206,14 +206,6 @@ html.light .backdrop {
   opacity: 0;
 }
 
-.section-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-}
-
 .cli-tab {
   flex: 1;
   padding: 0.5rem 0.75rem;
