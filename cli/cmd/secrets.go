@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
@@ -11,7 +12,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Helper functions
 func getActiveProjectID(client *api.Client) (string, error) {
 	if cfg.ActiveProjectSlug == "" {
 		return "", fmt.Errorf("no active project. Use 'windkeep projects switch' first")
@@ -32,9 +32,9 @@ func getActiveProjectID(client *api.Client) (string, error) {
 }
 
 func findSecretByKey(secrets []api.Secret, key string) *api.Secret {
-	for _, s := range secrets {
-		if s.Key == key {
-			return &s
+	for i := range secrets {
+		if secrets[i].Key == key {
+			return &secrets[i]
 		}
 	}
 	return nil
@@ -43,24 +43,39 @@ func findSecretByKey(secrets []api.Secret, key string) *api.Secret {
 func buildSecretValues(dev, staging, prod string) []api.SecretValueInput {
 	var values []api.SecretValueInput
 	if dev != "" {
-		values = append(values, api.SecretValueInput{
-			Environment: api.EnvDevelopment,
-			Value:       dev,
-		})
+		values = append(values, api.SecretValueInput{Environment: api.EnvDevelopment, Value: dev})
 	}
 	if staging != "" {
-		values = append(values, api.SecretValueInput{
-			Environment: api.EnvStaging,
-			Value:       staging,
-		})
+		values = append(values, api.SecretValueInput{Environment: api.EnvStaging, Value: staging})
 	}
 	if prod != "" {
-		values = append(values, api.SecretValueInput{
-			Environment: api.EnvProduction,
-			Value:       prod,
-		})
+		values = append(values, api.SecretValueInput{Environment: api.EnvProduction, Value: prod})
 	}
 	return values
+}
+
+func printProjectContext() {
+	if cfg.ActiveProjectName != "" {
+		ui.PrintInfo("Project: %s", ui.Highlight(cfg.ActiveProjectName))
+	} else if cfg.ActiveProjectSlug != "" {
+		ui.PrintInfo("Project: %s", ui.Highlight(cfg.ActiveProjectSlug))
+	}
+}
+
+func formatRelativeTime(t time.Time) string {
+	d := time.Since(t)
+	switch {
+	case d < time.Minute:
+		return "just now"
+	case d < time.Hour:
+		return fmt.Sprintf("%dm ago", int(d.Minutes()))
+	case d < 24*time.Hour:
+		return fmt.Sprintf("%dh ago", int(d.Hours()))
+	case d < 7*24*time.Hour:
+		return fmt.Sprintf("%dd ago", int(d.Hours()/24))
+	default:
+		return t.Format("Jan 2, 2006")
+	}
 }
 
 var secretsCmd = &cobra.Command{
@@ -72,7 +87,7 @@ var secretsCmd = &cobra.Command{
 
 var secretsListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List secrets in active project",
+	Short: "List secrets in the active project",
 	Long:  `List all secrets in your active project.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := api.NewClient(config.APIURL, cfg.APIToken)
@@ -81,6 +96,8 @@ var secretsListCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		printProjectContext()
 
 		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
@@ -93,7 +110,7 @@ var secretsListCmd = &cobra.Command{
 			return nil
 		}
 
-		table := ui.CreateTable([]string{"Key", "Environments", "Description"})
+		table := ui.CreateTable([]string{"Key", "Environments", "Description", "Updated"})
 		for _, secret := range secrets {
 			var envs []string
 			for _, val := range secret.Values {
@@ -107,9 +124,11 @@ var secretsListCmd = &cobra.Command{
 				secret.Key,
 				strings.Join(envs, ", "),
 				desc,
+				formatRelativeTime(secret.UpdatedAt),
 			})
 		}
 		table.Render()
+		fmt.Printf("\n%d secret(s) total\n", len(secrets))
 		return nil
 	},
 }
@@ -138,17 +157,20 @@ var secretsGetCmd = &cobra.Command{
 			return fmt.Errorf("secret '%s' not found", key)
 		}
 
-		ui.CyanBold.Printf("Key: %s\n", found.Key)
-		if found.Description != nil {
-			fmt.Printf("Description: %s\n", *found.Description)
+		ui.CyanBold.Printf("Key:     %s\n", found.Key)
+		if found.Description != nil && *found.Description != "" {
+			fmt.Printf("Desc:    %s\n", *found.Description)
 		}
-		fmt.Println()
+		fmt.Printf("Updated: %s\n\n", formatRelativeTime(found.UpdatedAt))
+
+		if len(found.Values) == 0 {
+			ui.PrintWarning("No values set for any environment")
+			return nil
+		}
+
 		table := ui.CreateTable([]string{"Environment", "Value"})
 		for _, val := range found.Values {
-			table.Append([]string{
-				string(val.Environment),
-				val.Value,
-			})
+			table.Append([]string{string(val.Environment), val.Value})
 		}
 		table.Render()
 		return nil
@@ -158,8 +180,13 @@ var secretsGetCmd = &cobra.Command{
 var secretsCreateCmd = &cobra.Command{
 	Use:   "create [KEY]",
 	Short: "Create a new secret",
-	Long:  `Create a new secret key in your active project. Use --env flags to set values for specific environments.`,
-	Args:  cobra.ExactArgs(1),
+	Long: `Create a new secret in your active project.
+
+Examples:
+  windkeep secrets create DATABASE_URL --dev "postgres://localhost/dev" --prod "postgres://prod/app"
+  windkeep secrets create API_KEY -d "Third-party API key" --prod "sk_live_xyz"
+  windkeep secrets create PLACEHOLDER -d "To be filled later"`,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
 		description, _ := cmd.Flags().GetString("description")
@@ -178,7 +205,6 @@ var secretsCreateCmd = &cobra.Command{
 			ProjectID: projectID,
 			Values:    buildSecretValues(dev, staging, prod),
 		}
-
 		if description != "" {
 			req.Description = &description
 		}
@@ -188,24 +214,38 @@ var secretsCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to create secret: %w", err)
 		}
 
-		ui.PrintSuccess("Secret '%s' created", ui.Highlight(secret.Key))
+		ui.PrintSuccess("Created '%s'", ui.Highlight(secret.Key))
+		if len(secret.Values) > 0 {
+			for _, val := range secret.Values {
+				ui.PrintInfo("Set value for %s", string(val.Environment))
+			}
+		}
 		return nil
 	},
 }
 
 var secretsSetCmd = &cobra.Command{
 	Use:   "set [KEY]",
-	Short: "Set secret values",
-	Long:  `Update values for a specific secret. Use --env flags to set values for specific environments.`,
-	Args:  cobra.ExactArgs(1),
+	Short: "Update a secret's values",
+	Long: `Update environment values for an existing secret.
+Only specified environments will be updated; others remain unchanged.
+
+Examples:
+  windkeep secrets set API_KEY --prod "sk_live_new"
+  windkeep secrets set DATABASE_URL --staging "postgres://staging/app" --prod "postgres://prod/app"
+  windkeep secrets set JWT_SECRET -d "Updated signing secret" --dev "new_dev_secret"`,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
+		description, _ := cmd.Flags().GetString("description")
 		dev, _ := cmd.Flags().GetString("dev")
 		staging, _ := cmd.Flags().GetString("staging")
 		prod, _ := cmd.Flags().GetString("prod")
 
-		if dev == "" && staging == "" && prod == "" {
-			return fmt.Errorf("at least one environment value must be provided (--dev, --staging, or --prod)")
+		values := buildSecretValues(dev, staging, prod)
+
+		if len(values) == 0 && description == "" {
+			return fmt.Errorf("nothing to update — provide at least one of: --dev, --staging, --prod, or -d/--description")
 		}
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
@@ -214,54 +254,112 @@ var secretsSetCmd = &cobra.Command{
 			return err
 		}
 
-		// Find the secret first
+		// Fetch existing secrets to find the secret ID
 		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
 
-		var secretID string
-		for _, s := range secrets {
-			if s.Key == key {
-				secretID = s.ID
-				break
-			}
-		}
-
-		if secretID == "" {
-			return fmt.Errorf("secret '%s' not found", key)
-		}
-
-		// Build values array
-		values := []api.SecretValueInput{}
-		if dev != "" {
-			values = append(values, api.SecretValueInput{
-				Environment: api.EnvDevelopment,
-				Value:       dev,
-			})
-		}
-		if staging != "" {
-			values = append(values, api.SecretValueInput{
-				Environment: api.EnvStaging,
-				Value:       staging,
-			})
-		}
-		if prod != "" {
-			values = append(values, api.SecretValueInput{
-				Environment: api.EnvProduction,
-				Value:       prod,
-			})
+		found := findSecretByKey(secrets, key)
+		if found == nil {
+			return fmt.Errorf("secret '%s' not found. Use 'windkeep secrets create' to create it", key)
 		}
 
 		req := api.UpdateSecretRequest{
 			Values: values,
 		}
+		if description != "" {
+			req.Description = &description
+		}
 
-		if _, err := client.UpdateSecret(projectID, secretID, req); err != nil {
+		if _, err := client.UpdateSecret(projectID, found.ID, req); err != nil {
 			return fmt.Errorf("failed to update secret: %w", err)
 		}
 
-		ui.PrintSuccess("Secret '%s' updated", ui.Highlight(key))
+		ui.PrintSuccess("Updated '%s'", ui.Highlight(key))
+		if description != "" {
+			ui.PrintInfo("Updated description")
+		}
+		for _, val := range values {
+			ui.PrintInfo("Updated value for %s", string(val.Environment))
+		}
+		return nil
+	},
+}
+
+var secretsHistoryCmd = &cobra.Command{
+	Use:   "history [KEY]",
+	Short: "Show change history for a secret",
+	Long: `Show the full change history for a secret across all environments.
+
+Examples:
+  windkeep secrets history DATABASE_URL
+  windkeep secrets history API_KEY -e prod`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		key := args[0]
+		envFilter, _ := cmd.Flags().GetString("env")
+
+		client := api.NewClient(config.APIURL, cfg.APIToken)
+		projectID, err := getActiveProjectID(client)
+		if err != nil {
+			return err
+		}
+
+		printProjectContext()
+
+		// Find the secret ID
+		secrets, err := client.GetSecrets(projectID)
+		if err != nil {
+			return fmt.Errorf("failed to get secrets: %w", err)
+		}
+
+		found := findSecretByKey(secrets, key)
+		if found == nil {
+			return fmt.Errorf("secret '%s' not found", key)
+		}
+
+		history, err := client.GetSecretHistory(projectID, found.ID)
+		if err != nil {
+			return fmt.Errorf("failed to get history: %w", err)
+		}
+
+		if len(history) == 0 {
+			ui.PrintInfo("No history found for '%s'", key)
+			return nil
+		}
+
+		ui.CyanBold.Printf("History for: %s\n\n", key)
+
+		// Optionally filter by environment
+		var filterEnv api.Environment
+		if envFilter != "" {
+			filterEnv = api.ParseEnvironment(envFilter)
+		}
+
+		for _, envHistory := range history {
+			if envFilter != "" && envHistory.Environment != filterEnv {
+				continue
+			}
+
+			ui.CyanBold.Printf("[%s]  current: %s\n", envHistory.Environment, envHistory.CurrentValue)
+
+			if len(envHistory.History) == 0 {
+				fmt.Println("  No previous changes")
+			} else {
+				table := ui.CreateTable([]string{"Value", "Changed By", "When"})
+				for _, entry := range envHistory.History {
+					table.Append([]string{
+						entry.Value,
+						entry.ChangedBy.Name,
+						formatRelativeTime(entry.ChangedAt),
+					})
+				}
+				table.Render()
+			}
+			fmt.Println()
+		}
+
 		return nil
 	},
 }
@@ -277,7 +375,7 @@ var secretsDeleteCmd = &cobra.Command{
 
 		if !confirm {
 			prompt := promptui.Prompt{
-				Label:     fmt.Sprintf("Delete secret '%s' and all its values", key),
+				Label:     fmt.Sprintf("Delete '%s' and all its values", key),
 				IsConfirm: true,
 			}
 			_, err := prompt.Run()
@@ -308,7 +406,7 @@ var secretsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete secret: %w", err)
 		}
 
-		ui.PrintSuccess("Secret '%s' deleted", ui.Highlight(key))
+		ui.PrintSuccess("Deleted '%s'", ui.Highlight(key))
 		return nil
 	},
 }
@@ -318,6 +416,7 @@ func init() {
 	secretsCmd.AddCommand(secretsGetCmd)
 	secretsCmd.AddCommand(secretsCreateCmd)
 	secretsCmd.AddCommand(secretsSetCmd)
+	secretsCmd.AddCommand(secretsHistoryCmd)
 	secretsCmd.AddCommand(secretsDeleteCmd)
 
 	secretsCreateCmd.Flags().StringP("description", "d", "", "Secret description")
@@ -325,9 +424,12 @@ func init() {
 	secretsCreateCmd.Flags().String("staging", "", "Value for STAGING environment")
 	secretsCreateCmd.Flags().String("prod", "", "Value for PRODUCTION environment")
 
+	secretsSetCmd.Flags().StringP("description", "d", "", "Update the secret's description")
 	secretsSetCmd.Flags().String("dev", "", "Value for DEVELOPMENT environment")
 	secretsSetCmd.Flags().String("staging", "", "Value for STAGING environment")
 	secretsSetCmd.Flags().String("prod", "", "Value for PRODUCTION environment")
 
-	secretsDeleteCmd.Flags().Bool("confirm", false, "Confirm destructive action")
+	secretsHistoryCmd.Flags().StringP("env", "e", "", "Filter by environment (dev/staging/prod)")
+
+	secretsDeleteCmd.Flags().Bool("confirm", false, "Skip confirmation prompt")
 }
