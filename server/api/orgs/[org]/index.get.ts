@@ -23,6 +23,9 @@ export default defineEventHandler(async (event) => {
     }),
   ])
 
+  // Invalidate user data and projects cache
+  await deleteCached(CacheKeys.userData(user.id), CacheKeys.userProjects(user.id))
+
   const membership = await db.orgMembership.findUnique({
     where: { userId_orgId: { userId: user.id, orgId } },
     select: {

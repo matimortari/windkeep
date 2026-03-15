@@ -21,7 +21,6 @@ func generateSlug(name string) string {
 	reg = regexp.MustCompile("-+")
 	slug = reg.ReplaceAllString(slug, "-")
 	slug = strings.Trim(slug, "-")
-
 	return slug
 }
 
@@ -34,7 +33,7 @@ var projectsCmd = &cobra.Command{
 
 var projectsListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List your projects",
+	Short: "List projects in the active organization",
 	Long:  `List all projects in your active organization.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := api.NewClient(config.APIURL, cfg.APIToken)
@@ -52,7 +51,7 @@ var projectsListCmd = &cobra.Command{
 			return fmt.Errorf("failed to get projects: %w", err)
 		}
 
-		// Filter projects by active organization
+		// Filter by active org
 		var orgProjects []api.Project
 		for _, proj := range projects {
 			if proj.Org != nil && proj.Org.ID == activeOrg.OrgID {
@@ -66,20 +65,13 @@ var projectsListCmd = &cobra.Command{
 			return nil
 		}
 
-		table := ui.CreateTable([]string{"ID", "Name", "Slug", "Organization", "Secrets"})
-
+		table := ui.CreateTable([]string{"ID", "Name", "Slug", "Secrets"})
 		for _, proj := range orgProjects {
-			orgName := "N/A"
-			if proj.Org != nil {
-				orgName = proj.Org.Name
-			}
-			secretsCount := fmt.Sprintf("%d", len(proj.Secrets))
 			table.Append([]string{
 				proj.ID,
 				proj.Name,
 				proj.Slug,
-				orgName,
-				secretsCount,
+				fmt.Sprintf("%d", len(proj.Secrets)),
 			})
 		}
 		table.Render()
@@ -138,18 +130,35 @@ var projectsCreateCmd = &cobra.Command{
 var projectsSwitchCmd = &cobra.Command{
 	Use:   "switch [PROJECT_SLUG]",
 	Short: "Switch to a different project",
-	Long:  `Set the active project for future commands. If no slug is provided, shows an interactive selector.`,
+	Long:  `Set the active project for future commands. Only shows projects from the active organization.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		projects, err := client.GetProjects()
+		// Require an active org — projects are org-scoped
+		activeOrg, err := getActiveOrg(client)
+		if err != nil {
+			return err
+		}
+		if activeOrg == nil {
+			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
+		}
+
+		allProjects, err := client.GetProjects()
 		if err != nil {
 			return fmt.Errorf("failed to get projects: %w", err)
 		}
 
+		// Filter to active org only
+		var projects []api.Project
+		for _, proj := range allProjects {
+			if proj.Org != nil && proj.Org.ID == activeOrg.OrgID {
+				projects = append(projects, proj)
+			}
+		}
+
 		if len(projects) == 0 {
-			ui.PrintWarning("No projects found.")
+			ui.PrintWarning("No projects found in '%s'.", activeOrg.Org.Name)
 			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep projects create"))
 			return nil
 		}
@@ -166,7 +175,7 @@ var projectsSwitchCmd = &cobra.Command{
 			}
 
 			prompt := promptui.Select{
-				Label:     "Select Project",
+				Label:     fmt.Sprintf("Select Project (%s)", activeOrg.Org.Name),
 				Items:     projects,
 				Templates: templates,
 			}
@@ -177,16 +186,16 @@ var projectsSwitchCmd = &cobra.Command{
 			}
 			selectedProject = &projects[idx]
 		} else {
-			projectSlug := args[0]
-			for _, proj := range projects {
-				if proj.Slug == projectSlug {
-					selectedProject = &proj
+			slug := args[0]
+			for i := range projects {
+				if projects[i].Slug == slug {
+					selectedProject = &projects[i]
 					break
 				}
 			}
 
 			if selectedProject == nil {
-				return fmt.Errorf("project not found or you don't have access to it")
+				return fmt.Errorf("project '%s' not found in organization '%s'", slug, activeOrg.Org.Name)
 			}
 		}
 
@@ -235,7 +244,7 @@ var projectsUpdateCmd = &cobra.Command{
 		}
 
 		if projectID == "" {
-			return fmt.Errorf("project not found or you don't have access to it")
+			return fmt.Errorf("project '%s' not found", projectSlug)
 		}
 
 		req := api.UpdateProjectRequest{}
@@ -308,7 +317,7 @@ var projectsDeleteCmd = &cobra.Command{
 		}
 
 		if projectID == "" {
-			return fmt.Errorf("project not found or you don't have access to it")
+			return fmt.Errorf("project '%s' not found", projectSlug)
 		}
 
 		if err := client.DeleteProject(projectID); err != nil {
