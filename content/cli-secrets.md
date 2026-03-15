@@ -45,12 +45,10 @@ windkeep secrets list
 **Output:**
 
 ```
-KEY              ENVIRONMENTS                      DESCRIPTION
-DATABASE_URL     DEVELOPMENT, STAGING, PRODUCTION  Database connection string
-API_KEY          PRODUCTION                        Third-party API key
-SMTP_PASSWORD    DEVELOPMENT, PRODUCTION           Email service password
-STRIPE_KEY       DEVELOPMENT, STAGING, PRODUCTION  Stripe API key
-JWT_SECRET       PRODUCTION                        JWT signing secret
+KEY              ENVIRONMENTS                      DESCRIPTION           UPDATED
+DATABASE_URL     DEVELOPMENT, STAGING, PRODUCTION  Database connection    2d ago
+API_KEY          PRODUCTION                        Third-party API key   5m ago
+SMTP_PASSWORD    DEVELOPMENT, PRODUCTION           Email service         Jan 3, 2025
 ```
 
 ---
@@ -72,10 +70,10 @@ windkeep secrets get DATABASE_URL
 **Output:**
 
 ```
-Key: DATABASE_URL
-Description: Database connection string
+Key:     DATABASE_URL
+Desc:    Database connection string
+Updated: 2d ago
 
-Values:
 ENVIRONMENT   VALUE
 DEVELOPMENT   postgres://localhost:5432/dev
 STAGING       postgres://staging-db:5432/app
@@ -132,17 +130,17 @@ windkeep secrets create ANALYTICS_KEY \
 **Output:**
 
 ```
-✓ Created secret 'DATABASE_URL'
-✓ Set value for DEVELOPMENT
-✓ Set value for STAGING
-✓ Set value for PRODUCTION
+✓ Created 'DATABASE_URL'
+• Set value for DEVELOPMENT
+• Set value for STAGING
+• Set value for PRODUCTION
 ```
 
 ---
 
 ### `windkeep secrets set [KEY]`
 
-Update values for an existing secret. Only specified environments will be updated; other environments remain unchanged.
+Update values for an existing secret. Only specified environments will be updated; other environments remain unchanged. You can also update the description independently.
 
 **Arguments:**
 
@@ -150,9 +148,12 @@ Update values for an existing secret. Only specified environments will be update
 
 **Flags:**
 
+- `-d, --description` - Update the secret's description (optional)
 - `--dev` - Value for DEVELOPMENT environment (optional)
 - `--staging` - Value for STAGING environment (optional)
 - `--prod` - Value for PRODUCTION environment (optional)
+
+At least one flag must be provided.
 
 **Examples:**
 
@@ -166,9 +167,13 @@ windkeep secrets set API_KEY \
   --staging "sk_test_xyz789" \
   --prod "sk_live_xyz789"
 
-# Add a development value to an existing secret
-windkeep secrets set ANALYTICS_KEY \
-  --dev "sk_test_local123"
+# Update description only
+windkeep secrets set JWT_SECRET -d "Rotated signing secret"
+
+# Update description and a value together
+windkeep secrets set DATABASE_URL \
+  -d "Primary database connection" \
+  --prod "postgres://new-prod-db:5432/app"
 
 # Update all environments
 windkeep secrets set JWT_SECRET \
@@ -180,8 +185,46 @@ windkeep secrets set JWT_SECRET \
 **Output:**
 
 ```
-✓ Updated secret 'DATABASE_URL'
-✓ Set value for PRODUCTION
+✓ Updated 'DATABASE_URL'
+• Updated value for PRODUCTION
+```
+
+---
+
+### `windkeep secrets history [KEY]`
+
+Show the full change history for a secret across all environments, including who made each change and when.
+
+**Arguments:**
+
+- `KEY` - The secret key name (required)
+
+**Flags:**
+
+- `-e, --env` - Filter history by environment (dev/staging/prod) (optional)
+
+**Examples:**
+
+```bash
+# Show full history across all environments
+windkeep secrets history DATABASE_URL
+
+# Show only production history
+windkeep secrets history API_KEY -e prod
+```
+
+**Output:**
+
+```
+History for: DATABASE_URL
+
+[PRODUCTION]  current: postgres://prod-db:5432/app
+VALUE                              CHANGED BY     WHEN
+postgres://old-prod-db:5432/app    Alice Smith    3d ago
+postgres://legacy-db:5432/app      Bob Jones      Jan 10, 2025
+
+[DEVELOPMENT]  current: postgres://localhost:5432/dev
+No previous changes
 ```
 
 ---
@@ -220,7 +263,7 @@ Run any command with environment variables automatically injected from your acti
 
 - `-e, --env` - Environment to use (dev/development, staging, prod/production) - default: development
 - `-p, --project` - Project slug to use (overrides active project)
-- `-v, --verbose` - Show which secrets are being injected
+- `-v, --verbose` - Show injected secret keys before running (global flag)
 
 **How It Works:**
 
@@ -241,14 +284,10 @@ windkeep run --env prod python app.py
 # Run with staging secrets
 windkeep run -e staging node server.js
 
-# Show which secrets are being injected
+# Show which secret keys are being injected
 windkeep run -v npm start
 
-# Use short environment names
-windkeep run -e dev npm start
-windkeep run -e prod python manage.py runserver
-
-# Override active project - use a different project temporarily
+# Override active project temporarily
 windkeep run --project my-other-project npm run dev
 
 # Combine flags: specific project with production environment
@@ -259,12 +298,9 @@ windkeep run -e staging npm test
 
 # Run database migrations with production credentials
 windkeep run -e prod npm run migrate
-
-# Start a development server with verbose output
-windkeep run -v -e dev npm run dev
 ```
 
-> **Tip:** Use the --verbose flag to see which secrets are being injected, but be cautious as it may expose sensitive information in logs.
+> **Tip:** `--verbose` (`-v`) is a global flag available on all commands. On `run`, it shows the secret keys being injected — but never their values.
 
 ---
 
@@ -289,12 +325,6 @@ windkeep secrets create STRIPE_KEY \
   --dev "sk_test_abc123" \
   --prod "sk_live_xyz789"
 
-# Add authentication secrets
-windkeep secrets create JWT_SECRET \
-  --description "JWT signing secret" \
-  --dev "dev_secret_123" \
-  --prod "prod_secret_456"
-
 # Verify secrets
 windkeep secrets list
 
@@ -307,17 +337,14 @@ windkeep run npm run dev
 ### Updating Secrets
 
 ```bash
-# List current secrets
-windkeep secrets list
-
 # View current values
 windkeep secrets get API_KEY
 
 # Update production value
 windkeep secrets set API_KEY --prod "sk_live_new_key_789"
 
-# Verify the change
-windkeep secrets get API_KEY
+# Check who changed what and when
+windkeep secrets history API_KEY
 ```
 
 ---
@@ -325,8 +352,6 @@ windkeep secrets get API_KEY
 ### Managing Environment-Specific Secrets
 
 ```bash
-# Create secrets that only exist in certain environments
-
 # Development-only secret for debugging
 windkeep secrets create DEBUG_LOGGING \
   --dev "true"
