@@ -10,8 +10,13 @@ export default defineEventHandler(async (event) => {
     return { projects: cached }
   }
 
+  const activeMembership = await db.orgMembership.findFirst({ where: { userId: user.id, isActive: true } })
+  if (!activeMembership) {
+    return { projects: [] }
+  }
+
   const projects = await db.project.findMany({
-    where: { AND: [{ org: { memberships: { some: { userId: user.id } } } }, { memberships: { some: { userId: user.id } } }] },
+    where: { orgId: activeMembership.orgId, memberships: { some: { userId: user.id } } },
     include: {
       org: true,
       secrets: true,
