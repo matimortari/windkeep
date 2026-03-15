@@ -79,6 +79,24 @@ type SecretValue struct {
 	UpdatedAt   time.Time   `json:"updatedAt"`
 }
 
+type SecretHistoryEntry struct {
+	ID        string `json:"id"`
+	Value     string `json:"value"`
+	ChangedBy struct {
+		ID    string  `json:"id"`
+		Name  string  `json:"name"`
+		Email string  `json:"email"`
+		Image *string `json:"image"`
+	} `json:"changedBy"`
+	ChangedAt time.Time `json:"changedAt"`
+}
+
+type EnvironmentHistory struct {
+	Environment  Environment          `json:"environment"`
+	CurrentValue string               `json:"currentValue"`
+	History      []SecretHistoryEntry `json:"history"`
+}
+
 type CreateProjectRequest struct {
 	Name        string  `json:"name"`
 	Slug        string  `json:"slug"`
