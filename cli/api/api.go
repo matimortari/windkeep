@@ -64,7 +64,6 @@ func (c *Client) doRequest(method, endpoint string, body any) (*http.Response, e
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	// Set headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	if c.APIToken != "" {
@@ -86,7 +85,11 @@ func (c *Client) doRequest(method, endpoint string, body any) (*http.Response, e
 			return nil, fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(bodyBytes))
 		}
 
-		return nil, fmt.Errorf("API error: %s", errResp.Message)
+		msg := errResp.Message
+		if msg == "" {
+			msg = errResp.Error
+		}
+		return nil, fmt.Errorf("API error: %s", msg)
 	}
 
 	return resp, nil
@@ -281,4 +284,16 @@ func (c *Client) UpdateSecret(projectID, secretID string, req UpdateSecretReques
 // DeleteSecret deletes a secret
 func (c *Client) DeleteSecret(projectID, secretID string) error {
 	return c.Delete("/api/projects/" + projectID + "/secrets/" + secretID)
+}
+
+// GetSecretHistory retrieves the change history for a secret
+func (c *Client) GetSecretHistory(projectID, secretID string) ([]EnvironmentHistory, error) {
+	var response struct {
+		History []EnvironmentHistory `json:"history"`
+	}
+	if err := c.Get("/api/projects/"+projectID+"/secrets/"+secretID+"/history", &response); err != nil {
+		return nil, err
+	}
+
+	return response.History, nil
 }
