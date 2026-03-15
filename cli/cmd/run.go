@@ -16,17 +16,22 @@ var runCmd = &cobra.Command{
 	Use:   "run [command] [args...]",
 	Short: "Run a command with injected secrets",
 	Long: `Run a command with environment variables injected from your active project's secrets.
-	
-This command fetches all secrets from the specified environment and injects them
-as environment variables when running your command. Perfect for running your app
-with secrets without needing a .env file.`,
+
+Fetches all secrets from the specified environment and injects them as environment
+variables when running your command. No .env file needed.
+
+Examples:
+  windkeep run npm run dev
+  windkeep run -e prod -- ./server
+  windkeep run -e staging -p my-api -- go run main.go`,
 	Args:               cobra.MinimumNArgs(1),
 	DisableFlagParsing: false,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		environment, _ := cmd.Flags().GetString("env")
 		projectSlug, _ := cmd.Flags().GetString("project")
+		verbose, _ := cmd.Flags().GetBool("verbose")
 
-		// Validate environment
+		// Validate and parse environment
 		var env api.Environment
 		switch strings.ToUpper(environment) {
 		case "DEV", "DEVELOPMENT":
@@ -36,12 +41,12 @@ with secrets without needing a .env file.`,
 		case "PROD", "PRODUCTION":
 			env = api.EnvProduction
 		default:
-			return fmt.Errorf("invalid environment: %s (use dev, staging, or prod)", environment)
+			return fmt.Errorf("invalid environment '%s' — use: dev, staging, or prod", environment)
 		}
 
 		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		// Determine which project to use (default to active project, flag overrides)
+		// Resolve project: flag overrides active project
 		var projectID string
 		var projectName string
 		var err error
@@ -69,51 +74,48 @@ with secrets without needing a .env file.`,
 			if err != nil {
 				return err
 			}
-			projectName = cfg.ActiveProjectSlug
+			projectName = cfg.ActiveProjectName
+			if projectName == "" {
+				projectName = cfg.ActiveProjectSlug
+			}
 		}
 
 		secrets, err := client.GetSecrets(projectID)
 		if err != nil {
-			return fmt.Errorf("failed to get secrets: %w", err)
-		}
-		if len(secrets) == 0 {
-			ui.PrintWarning("No secrets found in project '%s'", projectName)
+			return fmt.Errorf("failed to fetch secrets: %w", err)
 		}
 
-		// Build environment variables map
+		// Build env vars map, filtering by environment
 		envVars := make(map[string]string)
-		secretsInjected := 0
 		for _, secret := range secrets {
 			for _, val := range secret.Values {
 				if val.Environment == env {
 					envVars[secret.Key] = val.Value
-					secretsInjected++
 					break
 				}
 			}
 		}
 
-		if secretsInjected == 0 {
-			ui.PrintWarning("No secrets found for environment '%s'", env)
-		} else {
-			verbose, _ := cmd.Flags().GetBool("verbose")
-			if verbose {
-				ui.PrintSuccess("Injecting %d secret(s) from %s environment", secretsInjected, string(env))
-				for key := range envVars {
-					ui.PrintInfo("%s", key)
-				}
-				fmt.Println()
+		injected := len(envVars)
+
+		if injected == 0 {
+			ui.PrintWarning("No secrets found for %s environment in project '%s'", string(env), projectName)
+		} else if verbose {
+			ui.PrintInfo("Project: %s  •  Env: %s  •  Injecting %d secret(s)",
+				ui.Highlight(projectName), ui.Info(string(env)), injected)
+			for key := range envVars {
+				fmt.Printf("  %s %s\n", ui.Info("→"), key)
 			}
+			fmt.Println()
 		}
 
-		// Prepare command
+		// Build and run the command
 		commandName := args[0]
-		commandArgs := []string{}
+		var commandArgs []string
 		if len(args) > 1 {
 			commandArgs = args[1:]
 		}
 
-		// Copy current environment and add secrets
 		execCmd := exec.Command(commandName, commandArgs...)
 		execCmd.Env = os.Environ()
 		for key, value := range envVars {
@@ -128,7 +130,7 @@ with secrets without needing a .env file.`,
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				os.Exit(exitErr.ExitCode())
 			}
-			return fmt.Errorf("failed to run command: %w", err)
+			return fmt.Errorf("command failed: %w", err)
 		}
 
 		return nil
@@ -136,7 +138,6 @@ with secrets without needing a .env file.`,
 }
 
 func init() {
-	runCmd.Flags().StringP("env", "e", "development", "Environment to use (dev/development, staging, prod/production)")
-	runCmd.Flags().StringP("project", "p", "", "Project slug to use (overrides active project)")
-	runCmd.Flags().BoolP("verbose", "v", false, "Show which secrets are being injected")
+	runCmd.Flags().StringP("env", "e", "development", "Environment (dev/development, staging, prod/production)")
+	runCmd.Flags().StringP("project", "p", "", "Project slug (overrides active project)")
 }
