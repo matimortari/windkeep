@@ -28,6 +28,7 @@ The API uses standard HTTP response codes to indicate success or failure:
 - `403 Forbidden` - Insufficient permissions
 - `404 Not Found` - Resource not found
 - `409 Conflict` - Resource conflict
+- `429 Too Many Requests` - Rate limit exceeded
 - `500 Internal Server Error` - Server error
 
 ---
