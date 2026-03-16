@@ -343,8 +343,5 @@ useHead({
   meta: [{ name: "description", content: "WindKeep organization page." }],
 })
 
-definePageMeta({
-  layout: "admin",
-  middleware: "auth",
-})
+definePageMeta({ layout: "admin", middleware: "auth" })
 </script>

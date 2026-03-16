@@ -14,22 +14,22 @@
     </div>
 
     <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
-      <button v-if="canManage" class="btn-primary" :disabled="hasPendingChanges" @click="emit('openSecretsDialog')">
+      <button
+        v-if="hasPermission" class="btn-primary"
+        :disabled="hasPendingChanges" aria-label="Add New Secret"
+        @click="emit('openSecretsDialog')"
+      >
         <span class="hidden md:inline">New Secret</span>
         <icon name="ph:plus-bold" size="20" />
       </button>
 
-      <button
-        v-if="canManage" class="btn-secondary"
-        aria-label="Import Secrets from .env File" :disabled="hasPendingChanges"
-        @click="emit('openImportDialog')"
-      >
-        <span>Import</span>
-        <icon name="ph:upload-bold" size="20" />
+      <button v-if="hasPermission" class="btn-secondary" :disabled="hasPendingChanges" @click="emit('openEditorDialog')">
+        <span>Raw Editor</span>
+        <icon name="ph:text-indent-bold" size="20" />
       </button>
 
       <div ref="dropdownRef" class="relative">
-        <button class="btn-secondary" aria-label="Export Secrets to .env File" :disabled="hasPendingChanges" @click="isDropdownOpen = !isDropdownOpen">
+        <button class="btn-secondary" :disabled="hasPendingChanges" @click="isDropdownOpen = !isDropdownOpen">
           <span>Export</span>
           <icon name="ph:download-bold" size="20" />
         </button>
@@ -67,14 +67,14 @@
 <script setup lang="ts">
 const props = defineProps<{
   project?: Project
-  canManage: boolean
+  hasPermission: boolean
   hasPendingChanges: boolean
   allVisible: boolean
 }>()
 
 const emit = defineEmits<{
   openSecretsDialog: []
-  openImportDialog: []
+  openEditorDialog: []
   export: [env: string]
   save: []
   discard: []

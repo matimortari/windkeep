@@ -1,10 +1,10 @@
 <template>
   <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
     <SecretsProjectActions
-      :project="project" :can-manage="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
+      :project="project" :has-permission="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
       :has-pending-changes="hasPendingChanges" :all-visible="allVisible"
       @open-secrets-dialog="() => { isSecretsDialogOpen = true; selectedSecret = null }"
-      @open-import-dialog="() => { isEnvDialogOpen = true; selectedSecret = null }"
+      @open-editor-dialog="() => { isEditorDialog = true; selectedSecret = null }"
       @export="exportToEnv" @save="saveAllChanges"
       @toggle-all-visible="allVisible = !allVisible" @discard="discardAllChanges"
     />
@@ -26,9 +26,9 @@
       @save="handleSecretChange"
     />
 
-    <SecretsImportDialog
-      :is-open="isEnvDialogOpen" :project-id="project?.id ?? ''"
-      :secrets="displayedSecrets" @close="() => { isEnvDialogOpen = false; selectedSecret = null }"
+    <SecretsEditorDialog
+      :is-open="isEditorDialog" :project-id="project?.id ?? ''"
+      :secrets="displayedSecrets" @close="() => { isEditorDialog = false; selectedSecret = null }"
       @save="handleImportSecrets"
     />
 
@@ -49,7 +49,7 @@ const { secrets, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
 const selectedSecret = ref<Secret | null>(null)
 const isSecretsDialogOpen = ref(false)
-const isEnvDialogOpen = ref(false)
+const isEditorDialog = ref(false)
 const isHistoryDialogOpen = ref(false)
 const historySecretId = ref("")
 const historySecretKey = ref("")
@@ -112,27 +112,28 @@ function handleSecretChange(secret: Secret) {
   selectedSecret.value = null
 }
 
-function handleImportSecrets(importedSecrets: any[]) {
-  isEnvDialogOpen.value = false
+function handleImportSecrets(importedSecrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[], removedKeys: { key: string, environment: Environment }[]) {
+  isEditorDialog.value = false
+
+  // Upsert added/updated secrets
   for (const importedSecret of importedSecrets) {
     const existingSecret = secrets.value.find(s => s.key === importedSecret.key)
     const pendingChange = pendingChanges.value.get(importedSecret.key)
     if (!existingSecret && !pendingChange) {
-      pendingChanges.value.set(importedSecret.key, { type: "create", secret: importedSecret })
+      pendingChanges.value.set(importedSecret.key, { type: "create", secret: importedSecret as unknown as Secret })
     }
     else {
       const baseSecret = pendingChange?.secret || existingSecret!
       const mergedValues = [...(baseSecret.values || [])]
       for (const newValue of importedSecret.values || []) {
-        const existingValueIndex = mergedValues.findIndex(v => v.environment === newValue.environment)
-        if (existingValueIndex >= 0) {
-          mergedValues[existingValueIndex] = newValue
+        const idx = mergedValues.findIndex(v => v.environment === newValue.environment)
+        if (idx >= 0) {
+          mergedValues[idx] = newValue as SecretValue
         }
         else {
-          mergedValues.push(newValue)
+          mergedValues.push(newValue as SecretValue)
         }
       }
-
       const mergedSecret: Secret = { ...baseSecret, values: mergedValues }
       if (!existingSecret) {
         pendingChanges.value.set(importedSecret.key, { type: "create", secret: mergedSecret })
@@ -140,6 +141,26 @@ function handleImportSecrets(importedSecrets: any[]) {
       else {
         pendingChanges.value.set(importedSecret.key, { type: "update", secret: mergedSecret, originalSecret: existingSecret })
       }
+    }
+  }
+
+  // Handle removed env values
+  for (const { key, environment } of removedKeys) {
+    const existingSecret = secrets.value.find(s => s.key === key)
+    if (!existingSecret) {
+      continue
+    }
+
+    const pendingChange = pendingChanges.value.get(key)
+    const baseSecret = pendingChange?.secret || existingSecret
+    const updatedValues = (baseSecret.values || []).filter(v => v.environment !== environment)
+
+    // If no values remain at all, mark as full delete
+    if (updatedValues.length === 0) {
+      pendingChanges.value.set(key, { type: "delete", secret: existingSecret, originalSecret: existingSecret })
+    }
+    else {
+      pendingChanges.value.set(key, { type: "update", secret: { ...baseSecret, values: updatedValues }, originalSecret: existingSecret })
     }
   }
 }
@@ -249,8 +270,5 @@ watch(() => project.value?.id, async (id) => {
   })
 }, { immediate: true })
 
-definePageMeta({
-  layout: "admin",
-  middleware: "auth",
-})
+definePageMeta({ layout: "admin", middleware: "auth" })
 </script>

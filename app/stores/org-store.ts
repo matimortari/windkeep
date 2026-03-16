@@ -4,7 +4,6 @@ export const useOrgStore = defineStore("org", () => {
   const toast = useToast()
   const userStore = useUserStore()
   const projectStore = useProjectStore()
-
   const organizations = ref<Organization[]>([])
   const activeOrg = ref<Organization | null>(null)
   const loading = ref(false)

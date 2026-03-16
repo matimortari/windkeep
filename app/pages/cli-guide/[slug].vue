@@ -9,10 +9,10 @@ const slug = route.params.slug as string
 const pageContent = await queryCollection("content").path(`/cli-${slug}`).first()
 
 const PAGE_TITLES: Record<string, string> = {
-  organizations: "Organizations",
-  projects: "Projects",
-  secrets: "Secrets Management",
-  guides: "Guides & Troubleshooting",
+  organizations: "CLI: Organizations",
+  projects: "CLI: Projects",
+  secrets: "CLI: Secrets Management",
+  guides: "CLI: Guides & Troubleshooting",
 }
 
 const PAGE_DESCRIPTIONS: Record<string, string> = {
@@ -23,12 +23,10 @@ const PAGE_DESCRIPTIONS: Record<string, string> = {
 }
 
 useHead({
-  title: `CLI – ${PAGE_TITLES[slug]}`,
+  title: `${PAGE_TITLES[slug]}`,
   link: [{ rel: "canonical", href: `${baseURL}/cli/${slug}` }],
   meta: [{ name: "description", content: PAGE_DESCRIPTIONS[slug] }],
 })
 
-definePageMeta({
-  layout: "content",
-})
+definePageMeta({ layout: "content" })
 </script>

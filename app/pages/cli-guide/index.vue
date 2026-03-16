@@ -12,7 +12,5 @@ useHead({
   meta: [{ name: "description", content: "WindKeep Command Line Interface." }],
 })
 
-definePageMeta({
-  layout: "content",
-})
+definePageMeta({ layout: "content" })
 </script>

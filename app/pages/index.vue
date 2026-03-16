@@ -171,12 +171,10 @@ const currentTab = computed(() => CLI_TABS.find(t => t.key === activeTab.value))
 useHead({
   title: "Securely Manage Your Environment Variables",
   link: [{ rel: "canonical", href: `${baseURL}` }],
-  meta: [{ name: "description", content: "Centralize, encrypt, and share your secrets with confidence. Fast, safe, and easy to use." }],
+  meta: [{ name: "description", content: "WindKeep is a secrets management platform that helps users and teams securely store, manage, and share sensitive information." }],
 })
 
-definePageMeta({
-  middleware: "guest",
-})
+definePageMeta({ middleware: "guest" })
 </script>
 
 <style scoped>

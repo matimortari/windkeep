@@ -409,8 +409,5 @@ watch(() => project.value?.id, async (id: string | undefined) => {
   })
 }, { immediate: true })
 
-definePageMeta({
-  layout: "admin",
-  middleware: "auth",
-})
+definePageMeta({ layout: "admin", middleware: "auth" })
 </script>
