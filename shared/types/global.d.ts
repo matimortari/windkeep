@@ -138,6 +138,14 @@ interface AuditFilters {
   actions: string[]
 }
 
+interface DiffItem {
+  key: string
+  type: "added" | "updated" | "removed"
+  value?: string
+  icon: string
+  class: string
+}
+
 interface PendingChange {
   type: "create" | "update" | "delete"
   secret: Secret

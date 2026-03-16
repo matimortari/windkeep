@@ -107,9 +107,7 @@ useHead({
   meta: [{ name: "description", content: "Get started with WindKeep by creating an organization or accepting an invitation." }],
 })
 
-definePageMeta({
-  middleware: "auth",
-})
+definePageMeta({ middleware: "auth" })
 </script>
 
 <style scoped>

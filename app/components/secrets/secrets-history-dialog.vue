@@ -142,13 +142,7 @@ function formatDate(date: Date | string) {
     return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`
   }
 
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
 // Reset state when dialog is closed or opened

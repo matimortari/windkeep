@@ -48,11 +48,7 @@ const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const projectStore = useProjectStore()
 const { loading } = storeToRefs(projectStore)
-const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({
-  key: "",
-  description: "",
-  values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
-})
+const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({ key: "", description: "", values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } })
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
 async function handleSubmit() {

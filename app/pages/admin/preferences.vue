@@ -220,8 +220,5 @@ useHead({
   meta: [{ name: "description", content: "WindKeep preferences page." }],
 })
 
-definePageMeta({
-  layout: "admin",
-  middleware: "auth",
-})
+definePageMeta({ layout: "admin", middleware: "auth" })
 </script>
