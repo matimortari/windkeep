@@ -1,28 +1,20 @@
+import SymbolMonoDark from "~/assets/symbol-mono-dark.png"
+import SymbolMonoLight from "~/assets/symbol-mono-light.png"
+import Symbol from "~/assets/symbol.png"
+import WordmarkDark from "~/assets/wordmark-dark.png"
+import WordmarkLight from "~/assets/wordmark-light.png"
+
+// Landing page constants
 export const HIGHLIGHTS = [
-  {
-    title: "Encrypted & Safe",
-    icon: "ph:lock-key-bold",
-  },
-  {
-    title: "Rapid Onboarding",
-    icon: "ph:users-three-bold",
-  },
-  {
-    title: "Free & Open Source",
-    icon: "ph:code-bold",
-  },
+  { title: "Encrypted & Safe", icon: "ph:lock-key-bold" },
+  { title: "Rapid Onboarding", icon: "ph:users-three-bold" },
+  { title: "Free & Open Source", icon: "ph:code-bold" },
 ]
 
 export const CLI_BULLETS = [
-  {
-    description: "Scriptable Workflows",
-  },
-  {
-    description: "No Hardcoded .env Files",
-  },
-  {
-    description: "Lightweight & Fast",
-  },
+  { description: "Scriptable Workflows" },
+  { description: "No Hardcoded .env Files" },
+  { description: "Lightweight & Fast" },
 ]
 
 export const FEATURES = [
@@ -117,6 +109,7 @@ export const CLI_TABS = [
   },
 ]
 
+// Admin dashboard constants
 export const SIDEBAR_NAV_LINKS = [
   { url: "/admin/projects", icon: "ph:folder-open-bold", label: "Projects" },
   { url: "/admin/organization", icon: "ph:building-office-bold", label: "Organization" },
@@ -124,18 +117,21 @@ export const SIDEBAR_NAV_LINKS = [
   { url: "/admin/preferences", icon: "ph:user-gear-bold", label: "Preferences" },
 ]
 
+// Organization and project roles
 export const ROLES = [
   { value: "OWNER", label: "Owner" },
   { value: "ADMIN", label: "Admin" },
   { value: "MEMBER", label: "Member" },
 ]
 
+// Environment options for secrets
 export const ENVIRONMENTS = [
   { value: "development", label: "Development" },
   { value: "staging", label: "Staging" },
   { value: "production", label: "Production" },
 ]
 
+// REST method label styles for documentation display
 export const REST_METHOD_LABELS = {
   GET: "text-xs font-semibold text-[#0ec187]",
   POST: "text-xs font-semibold text-[#74a2e7]",
@@ -143,8 +139,48 @@ export const REST_METHOD_LABELS = {
   DELETE: "text-xs font-semibold text-[#e99795]",
 }
 
+// OAuth providers
 export const OAUTH_PROVIDERS = [
   { name: "github", label: "Sign In With GitHub", icon: "simple-icons:github" },
   { name: "google", label: "Sign In With Google", icon: "simple-icons:google" },
   { name: "gitlab", label: "Sign In With GitLab", icon: "simple-icons:gitlab" },
+]
+
+// Brand constants
+export const BRAND_SECTIONS = [
+  { id: "wordmarks", label: "Wordmarks" },
+  { id: "symbols", label: "Symbols" },
+  { id: "brand", label: "Brand Colors" },
+  { id: "base", label: "Base Colors" },
+  { id: "accent", label: "Accent Colors" },
+]
+
+export const SYMBOLS = [
+  { name: "Symbol", image: Symbol, bgClass: "bg-background!" },
+  { name: "Symbol Mono (dark)", image: SymbolMonoDark, bgClass: "bg-[#fafafa]!" },
+  { name: "Symbol Mono (light)", image: SymbolMonoLight, bgClass: "bg-[#0a0a0a]!" },
+]
+
+export const WORDMARKS = [
+  { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-[#fafafa]!" },
+  { name: "Wordmark (light)", image: WordmarkLight, bgClass: "bg-[#0a0a0a]!" },
+]
+
+export const BRAND_COLORS = [
+  { name: "Primary", var: "--primary" },
+  { name: "Secondary", var: "--secondary" },
+]
+
+export const BASE_COLORS = [
+  { name: "Background", var: "--background" },
+  { name: "Foreground", var: "--foreground" },
+  { name: "Card", var: "--card" },
+  { name: "Input", var: "--input" },
+  { name: "Muted", var: "--muted" },
+  { name: "Muted Foreground", var: "--muted-foreground" },
+]
+
+export const ACCENT_COLORS = [
+  { name: "Danger", var: "--danger" },
+  { name: "Success", var: "--success" },
 ]
