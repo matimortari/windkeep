@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isOpen" title="Raw .env Editor" @update:is-open="emit('close')">
+  <Dialog :is-open="isRawEditorOpen" title="Raw .env Editor" @update:is-open="closeDialog('raw')">
     <div class="flex flex-col gap-3">
       <div class="flex flex-row gap-1 rounded-lg border p-1">
         <button
@@ -58,7 +58,6 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  isOpen: boolean
   projectId: string
   secrets: Secret[]
 }>()
@@ -68,6 +67,7 @@ const emit = defineEmits<{
   save: [secrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[], removedKeys: { key: string, environment: Environment }[]]
 }>()
 
+const { isRawEditorOpen, closeDialog } = useDialogs()
 const editorContent = ref("")
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const selectedEnv = ref<Environment>("DEVELOPMENT")
@@ -169,7 +169,7 @@ function handleSubmit() {
 }
 
 // Populate editor when dialog opens or env switches
-watch(() => props.isOpen, (open) => {
+watch(isRawEditorOpen, (open) => {
   if (open) {
     selectedEnv.value = "DEVELOPMENT"
     editorContent.value = buildEnvText("DEVELOPMENT")

@@ -31,7 +31,7 @@
         <button :aria-label="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" class="btn-ghost p-0!" @click="showAllProjects = !showAllProjects">
           <icon :name="showAllProjects ? 'ph:users-four-bold' : 'ph:user-bold'" size="20" />
         </button>
-        <button aria-label="Create New Project" class="btn-ghost p-0!" @click="isDialogOpen = true">
+        <button aria-label="Create New Project" class="btn-ghost p-0!" @click="openDialog('projects')">
           <icon name="ph:plus-bold" size="20" />
         </button>
       </div>
@@ -60,7 +60,7 @@
     </div>
   </aside>
 
-  <ProjectsDialog :is-open="isDialogOpen" @close="isDialogOpen = false" @save="handleCreateProject" />
+  <ProjectsDialog @close="closeDialog('projects')" @save="handleCreateProject" />
 </template>
 
 <script setup lang="ts">
@@ -76,7 +76,7 @@ const userStore = useUserStore()
 const { activeOrg } = storeToRefs(useOrgStore())
 const projectStore = useProjectStore()
 const { projects } = storeToRefs(projectStore)
-const isDialogOpen = ref(false)
+const { openDialog, closeDialog } = useDialogs()
 const showAllProjects = ref(false)
 const skeletonWidths = ["65%", "45%", "60%", "50%", "50%", "60%"]
 
@@ -95,14 +95,14 @@ const activeOrgProjects = computed(() => {
 const filteredProjects = computed(() => showAllProjects.value ? allProjects.value : activeOrgProjects.value)
 
 async function handleCreateProject(project: { name: string, description?: string }) {
-  if (!activeOrg.value?.id) {
+  if (!activeOrg.value || !project.name) {
     return
   }
 
   try {
     await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
     await projectStore.getProjects()
-    isDialogOpen.value = false
+    closeDialog("projects")
   }
   catch {
     // Silently fail

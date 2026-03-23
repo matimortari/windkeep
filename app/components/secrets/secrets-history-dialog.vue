@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isOpen" title="Secret History" @update:is-open="emit('close')">
+  <Dialog :is-open="isHistoryEditorOpen" title="Secret History" @update:is-open="closeDialog('history')">
     <p v-if="projectStore.loading" class="text-caption">
       Loading history...
     </p>
@@ -82,14 +82,13 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  isOpen: boolean
   secretId: string
   secretKey: string
   projectId: string
 }>()
 
-const emit = defineEmits<{ close: [] }>()
-
+defineEmits<{ close: [] }>()
+const { isHistoryEditorOpen, closeDialog } = useDialogs()
 const projectStore = useProjectStore()
 const history = ref<EnvironmentHistory[]>([])
 const visibleValues = ref<Record<string, boolean>>({})
@@ -98,7 +97,7 @@ const copyStates = ref<Record<string, boolean>>({})
 const allVisible = ref(false)
 
 async function fetchHistory() {
-  if (!props.isOpen || !props.secretId) {
+  if (!isHistoryEditorOpen.value || !props.secretId) {
     return
   }
 
@@ -145,8 +144,8 @@ function formatDate(date: Date | string) {
   return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
-// Reset state when dialog is closed or opened
-watch(() => props.isOpen, (newVal) => {
+// Reset state when dialog is closed
+watch(isHistoryEditorOpen, (newVal) => {
   if (newVal) {
     fetchHistory()
   }
