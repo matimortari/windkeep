@@ -176,7 +176,7 @@ async function saveAllChanges() {
       }
       pendingChanges.value.delete(key)
     }
-    catch (err: any) {
+    catch (err: unknown) {
       console.error(`Failed to save secret "${key}":`, err)
       failed.push(key)
     }
@@ -218,8 +218,12 @@ function exportToEnv(env: string | null | undefined) {
 
     return { success: true }
   }
-  catch (err: any) {
-    return { success: false, error: err.data?.message || "Failed to export secrets" }
+  catch (err: unknown) {
+    let errorMessage = "Failed to export secrets"
+    if (typeof err === "object" && err !== null && "data" in err && typeof (err as any).data?.message === "string") {
+      errorMessage = (err as any).data.message
+    }
+    return { success: false, error: errorMessage }
   }
 }
 

@@ -8,8 +8,8 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     }
 
     return data.value.toSorted((a, b) => {
-      const A = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], a as any)
-      const B = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], b as any)
+      const A = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], a)
+      const B = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], b)
 
       if (A == null && B == null) {
         return 0
