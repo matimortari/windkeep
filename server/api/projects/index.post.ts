@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `project:create:${user.id}`, 30, 60 * 60 * 1000)
+  await enforceRateLimit(event, `project:create:${user.id}`, 30)
 
   const body = await readBody(event)
   const result = createProjectSchema.safeParse(body)
@@ -28,9 +28,11 @@ export default defineEventHandler(async (event) => {
       orgId: result.data.orgId,
       memberships: { create: { userId: user.id, role: "OWNER" } },
     },
-    include: { org: { select: { id: true, name: true } }, memberships: {
-      include: { user: { select: { id: true, email: true, name: true, image: true } } },
-    }, _count: { select: { secrets: true } } },
+    include: {
+      org: { select: { id: true, name: true } },
+      memberships: { include: { user: { select: { id: true, email: true, name: true, image: true } } } },
+      _count: { select: { secrets: true } },
+    },
   })
 
   await createAuditLog({

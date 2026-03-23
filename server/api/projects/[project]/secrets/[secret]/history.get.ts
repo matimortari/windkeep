@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 100 requests per hour per user
-  await enforceRateLimit(event, `secret:history:${user.id}`, 100, 60 * 60 * 1000)
+  await enforceRateLimit(event, `secret:history:${user.id}`, 100)
 
   const projectId = getRouterParam(event, "project")
   const secretId = getRouterParam(event, "secret")
@@ -22,32 +22,13 @@ export default defineEventHandler(async (event) => {
 
   const secretValues = await db.secretValue.findMany({
     where: { secretId },
-    include: {
-      history: {
-        include: {
-          changedByUser: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-      },
-    },
+    include: { history: { include: { changedByUser: { select: { id: true, name: true, email: true, image: true } } }, orderBy: { createdAt: "desc" } } },
   })
 
   const history = secretValues.map(sv => ({
     environment: sv.environment,
     currentValue: decrypt(sv.value),
-    history: sv.history.map(h => ({
-      id: h.id,
-      value: decrypt(h.value),
-      changedBy: h.changedByUser,
-      changedAt: h.createdAt,
-    })),
+    history: sv.history.map(h => ({ id: h.id, value: decrypt(h.value), changedBy: h.changedByUser, changedAt: h.createdAt })),
   }))
 
   return { history }

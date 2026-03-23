@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 100 requests per hour per user
-  await enforceRateLimit(event, `audit:list:${user.id}`, 100, 60 * 60 * 1000)
+  await enforceRateLimit(event, `audit:list:${user.id}`, 100)
 
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
@@ -72,10 +72,7 @@ export default defineEventHandler(async (event) => {
 
   const auditLogs = await db.auditLog.findMany({
     where,
-    include: {
-      project: { select: { id: true, name: true } },
-      user: { select: { id: true, email: true, name: true, image: true } },
-    },
+    include: { project: { select: { id: true, name: true } }, user: { select: { id: true, email: true, name: true, image: true } } },
     orderBy: { createdAt: "desc" },
     take: limit,
     skip: offset,

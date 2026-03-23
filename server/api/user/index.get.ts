@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 200 requests per hour per user
-  await enforceRateLimit(event, `user:get:${user.id}`, 200, 60 * 60 * 1000)
+  await enforceRateLimit(event, `user:get:${user.id}`, 200)
 
   const cacheKey = CacheKeys.userData(user.id)
   const cached = await getCached<any>(cacheKey)
@@ -14,21 +14,7 @@ export default defineEventHandler(async (event) => {
     where: { id: user.id },
     include: {
       orgMemberships: { include: { org: true } },
-      projectMemberships: {
-        select: {
-          role: true,
-          projectId: true,
-          project: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              orgId: true,
-            },
-          },
-        },
-      },
-
+      projectMemberships: { select: { role: true, projectId: true, project: { select: { id: true, name: true, slug: true, orgId: true } } } },
     },
   })
   if (!userData) {

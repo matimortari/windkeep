@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `project:member:update:${user.id}`, 30, 60 * 60 * 1000)
+  await enforceRateLimit(event, `project:member:update:${user.id}`, 30)
 
   const projectId = getRouterParam(event, "project")
   const memberId = getRouterParam(event, "member")
@@ -34,10 +34,7 @@ export default defineEventHandler(async (event) => {
   const updatedRole = await db.projectMembership.update({
     where: { userId_projectId: { userId: memberId, projectId } },
     data: { role: result.data.role },
-    include: {
-      user: { select: { id: true, email: true, name: true, image: true } },
-      project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } },
-    },
+    include: { user: { select: { id: true, email: true, name: true, image: true } }, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
   })
 
   await createAuditLog({
