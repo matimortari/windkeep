@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `project:member:delete:${user.id}`, 30, 60 * 60 * 1000)
+  await enforceRateLimit(event, `project:member:delete:${user.id}`, 30)
 
   const projectId = getRouterParam(event, "project")
   const memberId = getRouterParam(event, "member")
@@ -12,10 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const targetRole = await db.projectMembership.findUnique({
     where: { userId_projectId: { userId: memberId, projectId } },
-    include: {
-      user: { select: { id: true, email: true, name: true } },
-      project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } },
-    },
+    include: { user: { select: { id: true, email: true, name: true } }, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
   })
   if (!targetRole) {
     throw createError({ status: 404, statusText: "Member not found in project" })

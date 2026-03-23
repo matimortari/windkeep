@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 5 requests per hour per user
-  await enforceRateLimit(event, `audit:delete:${user.id}`, 5, 60 * 60 * 1000)
+  await enforceRateLimit(event, `audit:delete:${user.id}`, 5)
 
   const org = getRouterParam(event, "org")
   if (!org) {
@@ -65,13 +65,13 @@ export default defineEventHandler(async (event) => {
       id: log.id,
       userId: log.userId ?? null,
       action: log.action,
-      resource: log.resource ?? null,
-      description: log.description ?? null,
-      ip: log.ip ?? null,
-      ua: log.ua ?? null,
-      metadata: log.metadata ? JSON.stringify(log.metadata) : null,
+      resource: log.resource ?? "",
+      description: log.description ?? "",
+      ip: log.ip ?? "",
+      ua: log.ua ?? "",
+      metadata: log.metadata ? JSON.stringify(log.metadata) : "",
       createdAt: log.createdAt,
-    } as any)
+    })
   }
 
   // Read generated parquet file and upload to cold storage

@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 200 requests per hour per user
-  await enforceRateLimit(event, `secrets:list:${user.id}`, 200, 60 * 60 * 1000)
+  await enforceRateLimit(event, `secrets:list:${user.id}`, 200)
 
   const projectId = getRouterParam(event, "project")
   if (!projectId) {

@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 100 requests per hour per user
-  await enforceRateLimit(event, `secret:delete:${user.id}`, 100, 60 * 60 * 1000)
+  await enforceRateLimit(event, `secret:delete:${user.id}`, 100)
 
   const projectId = getRouterParam(event, "project")
   const secretId = getRouterParam(event, "secret")
@@ -14,13 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const secretData = await db.secret.findUnique({
     where: { id: secretId },
-    select: {
-      id: true,
-      key: true,
-      projectId: true,
-      project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } },
-      _count: { select: { values: true } },
-    },
+    select: { id: true, key: true, projectId: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } }, _count: { select: { values: true } } },
   })
   if (!secretData) {
     throw createError({ status: 404, statusText: "Secret not found" })

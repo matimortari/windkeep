@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `project:member:add:${user.id}`, 30, 60 * 60 * 1000)
+  await enforceRateLimit(event, `project:member:add:${user.id}`, 30)
 
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
@@ -19,18 +19,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const project = await db.project.findUnique({
-    where: { id: projectId },
-    select: { id: true, name: true, org: { select: { id: true, name: true } } },
-  })
+  const project = await db.project.findUnique({ where: { id: projectId }, select: { id: true, name: true, org: { select: { id: true, name: true } } } })
   if (!project) {
     throw createError({ status: 404, statusText: "Project not found" })
   }
 
-  const targetUser = await db.user.findUnique({
-    where: { id: result.data.userId },
-    select: { id: true, email: true, name: true, image: true },
-  })
+  const targetUser = await db.user.findUnique({ where: { id: result.data.userId }, select: { id: true, email: true, name: true, image: true } })
   if (!targetUser) {
     throw createError({ status: 404, statusText: "User not found" })
   }

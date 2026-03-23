@@ -15,25 +15,9 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
   const authHeader = getHeader(event, "authorization")
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7)
-    const user = await db.user.findUnique({
-      where: { apiToken: token },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        image: true,
-        apiToken: true,
-      },
-    })
-
+    const user = await db.user.findUnique({ where: { apiToken: token }, select: { id: true, email: true, name: true, image: true, apiToken: true } })
     if (user) {
-      return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        image: user.image,
-        apiToken: user.apiToken,
-      }
+      return { id: user.id, email: user.email, name: user.name, image: user.image, apiToken: user.apiToken }
     }
   }
 
@@ -51,24 +35,10 @@ export async function requireRole(userId: string, scope: { type: "org", orgId: s
 
   let membership
   if (scope.type === "org") {
-    membership = await db.orgMembership.findUnique({
-      where: {
-        userId_orgId: {
-          userId,
-          orgId: scope.orgId,
-        },
-      },
-    })
+    membership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId, orgId: scope.orgId } } })
   }
   else {
-    membership = await db.projectMembership.findUnique({
-      where: {
-        userId_projectId: {
-          userId,
-          projectId: scope.projectId,
-        },
-      },
-    })
+    membership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })
   }
   if (!membership || !roles.includes(membership.role)) {
     throw createError({ status: 403, statusText: "Forbidden: insufficient permissions" })
@@ -109,10 +79,9 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
 /**
  * Returns the base URL used for invite links.
  */
-export function getInviteBaseUrl(event: any) {
-  const protocol = event.req.headers["x-forwarded-proto"] || "http"
-  const host = event.req.headers.host
-
+export function getInviteBaseUrl(event: H3Event<EventHandlerRequest>) {
+  const protocol = event.node.req.headers["x-forwarded-proto"] || "http"
+  const host = event.node.req.headers.host
   return `${protocol}://${host}`
 }
 
@@ -123,7 +92,6 @@ export async function getBinaryBlobUrl(binaryKey: string) {
     "windkeep-linux-amd64": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-linux-amd64`,
     "windkeep-windows-amd64.exe": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-windows-amd64.exe`,
   }
-
   if (!BINARIES[binaryKey]) {
     throw createError({ status: 404, message: "Binary not found" })
   }

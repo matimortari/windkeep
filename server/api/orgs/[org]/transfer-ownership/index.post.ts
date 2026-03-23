@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 5 requests per hour per user
-  await enforceRateLimit(event, `org:transfer:${user.id}`, 5, 60 * 60 * 1000)
+  await enforceRateLimit(event, `org:transfer:${user.id}`, 5)
 
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
@@ -38,14 +38,8 @@ export default defineEventHandler(async (event) => {
 
   // Make new owner and demote current owner to admin
   await db.$transaction([
-    db.orgMembership.update({
-      where: { userId_orgId: { userId: result.data.newOwnerId, orgId } },
-      data: { role: "OWNER" },
-    }),
-    db.orgMembership.update({
-      where: { userId_orgId: { userId: user.id, orgId } },
-      data: { role: "ADMIN" },
-    }),
+    db.orgMembership.update({ where: { userId_orgId: { userId: result.data.newOwnerId, orgId } }, data: { role: "OWNER" } }),
+    db.orgMembership.update({ where: { userId_orgId: { userId: user.id, orgId } }, data: { role: "ADMIN" } }),
   ])
 
   await createAuditLog({

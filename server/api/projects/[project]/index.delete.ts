@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 10 requests per hour per user
-  await enforceRateLimit(event, `project:delete:${user.id}`, 10, 60 * 60 * 1000)
+  await enforceRateLimit(event, `project:delete:${user.id}`, 10)
 
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
@@ -13,14 +13,7 @@ export default defineEventHandler(async (event) => {
 
   const projectData = await db.project.findUnique({
     where: { id: projectId },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      orgId: true,
-      org: { select: { name: true } },
-      _count: { select: { secrets: true, memberships: true } },
-    },
+    select: { id: true, name: true, slug: true, orgId: true, org: { select: { name: true } }, _count: { select: { secrets: true, memberships: true } } },
   })
   if (!projectData) {
     throw createError({ status: 404, statusText: "Project not found" })

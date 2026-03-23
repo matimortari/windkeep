@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `org:member:delete:${user.id}`, 30, 60 * 60 * 1000)
+  await enforceRateLimit(event, `org:member:delete:${user.id}`, 30)
 
   const orgId = getRouterParam(event, "org")
   const memberId = getRouterParam(event, "member")
@@ -41,9 +41,15 @@ export default defineEventHandler(async (event) => {
     await db.orgMembership.update({ where: { userId_orgId: { userId: memberId, orgId } }, data: { isActive: false } })
 
     // Switch to another org if possible
-    const next = await db.orgMembership.findFirst({ where: { userId: memberId, orgId: { not: orgId } }, orderBy: { createdAt: "asc" } })
+    const next = await db.orgMembership.findFirst({
+      where: { userId: memberId, orgId: { not: orgId } },
+      orderBy: { createdAt: "asc" },
+    })
     if (next) {
-      await db.orgMembership.update({ where: { userId_orgId: { userId: memberId, orgId: next.orgId } }, data: { isActive: true } })
+      await db.orgMembership.update({
+        where: { userId_orgId: { userId: memberId, orgId: next.orgId } },
+        data: { isActive: true },
+      })
     }
   }
 
