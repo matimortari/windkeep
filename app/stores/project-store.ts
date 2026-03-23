@@ -19,7 +19,7 @@ export const useProjectStore = defineStore("project", () => {
       projects.value = res.projects || []
       return res.projects
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to get projects")
       toast.error(message)
       console.error("getProjects error:", err)
@@ -39,7 +39,7 @@ export const useProjectStore = defineStore("project", () => {
       toast.success("Project created successfully")
       return res.project
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to create project")
       toast.error(message)
       console.error("createProject error:", err)
@@ -62,7 +62,7 @@ export const useProjectStore = defineStore("project", () => {
       toast.success("Project updated successfully")
       return res.project
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to update project")
       toast.error(message)
       console.error("updateProject error:", err)
@@ -81,7 +81,7 @@ export const useProjectStore = defineStore("project", () => {
       projects.value = projects.value.filter(p => p.id !== projectId)
       toast.success("Project deleted successfully")
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to delete project")
       toast.error(message)
       console.error("deleteProject error:", err)
@@ -100,7 +100,7 @@ export const useProjectStore = defineStore("project", () => {
       toast.success("Project member added successfully")
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to add project member")
       toast.error(message)
       console.error("addProjectMember error:", err)
@@ -119,7 +119,7 @@ export const useProjectStore = defineStore("project", () => {
       toast.success("Project member updated successfully")
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to update project member")
       toast.error(message)
       console.error("updateProjectMember error:", err)
@@ -137,7 +137,7 @@ export const useProjectStore = defineStore("project", () => {
       await $fetch(`/api/projects/${projectId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
       toast.success("Project member removed successfully")
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to remove project member")
       toast.error(message)
       console.error("removeProjectMember error:", err)
@@ -156,7 +156,7 @@ export const useProjectStore = defineStore("project", () => {
       secrets.value = Array.isArray(res.decryptedSecrets) ? res.decryptedSecrets : []
       return secrets.value
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to get project secrets")
       toast.error(message)
       console.error("getProjectSecrets error:", err)
@@ -176,7 +176,7 @@ export const useProjectStore = defineStore("project", () => {
       toast.success("Secret created successfully")
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to create project secret")
       toast.error(message)
       console.error("createProjectSecret error:", err)
@@ -199,7 +199,7 @@ export const useProjectStore = defineStore("project", () => {
       toast.success("Secret updated successfully")
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to update project secret")
       toast.error(message)
       console.error("updateProjectSecret error:", err)
@@ -218,7 +218,7 @@ export const useProjectStore = defineStore("project", () => {
       secrets.value = secrets.value.filter(s => s.id !== secretId)
       toast.success("Secret deleted successfully")
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to delete project secret")
       toast.error(message)
       console.error("deleteProjectSecret error:", err)
@@ -236,7 +236,7 @@ export const useProjectStore = defineStore("project", () => {
       const res = await $fetch<{ history: EnvironmentHistory[] }>(`/api/projects/${projectId}/secrets/${secretId}/history`, { method: "GET", credentials: "include" })
       return res.history
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to get secret history")
       toast.error(message)
       console.error("getSecretHistory error:", err)

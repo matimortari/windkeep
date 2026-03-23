@@ -29,7 +29,7 @@ export const useOrgStore = defineStore("org", () => {
       }
       return res.organization
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to get organization")
       toast.error(message)
       console.error("getOrg error:", err)
@@ -54,7 +54,7 @@ export const useOrgStore = defineStore("org", () => {
       toast.success("Organization created successfully")
       return res.organization
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to create organization")
       toast.error(message)
       console.error("createOrg error:", err)
@@ -80,7 +80,7 @@ export const useOrgStore = defineStore("org", () => {
       toast.success("Organization updated successfully")
       return res.updatedOrg
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to update organization")
       toast.error(message)
       console.error("updateOrg error:", err)
@@ -100,7 +100,7 @@ export const useOrgStore = defineStore("org", () => {
       toast.success("Organization ownership transferred successfully")
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to transfer organization ownership")
       toast.error(message)
       console.error("transferOrgOwnership error:", err)
@@ -122,7 +122,7 @@ export const useOrgStore = defineStore("org", () => {
       }
       toast.success("Organization deleted successfully")
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to delete organization")
       toast.error(message)
       console.error("deleteOrg error:", err)
@@ -141,7 +141,7 @@ export const useOrgStore = defineStore("org", () => {
       toast.success("Member role updated successfully")
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to update organization member")
       toast.error(message)
       console.error("updateOrgMember error:", err)
@@ -159,7 +159,7 @@ export const useOrgStore = defineStore("org", () => {
       await $fetch(`/api/orgs/${orgId}/members/${memberId}`, { method: "DELETE", credentials: "include" })
       toast.success("Member removed successfully")
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to remove organization member")
       toast.error(message)
       console.error("removeOrgMember error:", err)
@@ -177,7 +177,7 @@ export const useOrgStore = defineStore("org", () => {
       const res = await $fetch(`/api/orgs/${orgId}/invite/create`, { method: "POST", body: data, credentials: "include" })
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to create organization invite")
       toast.error(message)
       console.error("createInvite error:", err)
@@ -199,7 +199,7 @@ export const useOrgStore = defineStore("org", () => {
       toast.success("Invitation accepted successfully")
       return res
     }
-    catch (err: any) {
+    catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to accept organization invite")
       toast.error(message)
       console.error("acceptInvite error:", err)
