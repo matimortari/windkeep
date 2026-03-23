@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isOpen" title="Create New Project" @update:is-open="emit('close')">
+  <Dialog :is-open="isProjectsEditorOpen" title="Create New Project" @update:is-open="closeDialog('projects')">
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="name" class="text-sm font-semibold">Project Name</label>
@@ -28,22 +28,21 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  isOpen: boolean
-}>()
-
 const emit = defineEmits<{ close: [], save: [payload: { name: string, description: string }] }>()
 
+const { isProjectsEditorOpen, closeDialog } = useDialogs()
 const form = ref<{ name: string, description: string }>({ name: "", description: "" })
 
 async function handleSubmit() {
-  const payload = { name: form.value.name.trim(), description: form.value.description.trim() }
+  if (!form.value.name.trim()) {
+    return
+  }
 
-  emit("save", payload)
+  emit("save", { name: form.value.name.trim(), description: form.value.description.trim() })
 }
 
 // Reset form when dialog is opened
-watch(() => props.isOpen, (open) => {
+watch(isProjectsEditorOpen, (open) => {
   if (open) {
     form.value.name = ""
     form.value.description = ""

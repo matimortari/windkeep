@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isOpen" :title="isUpdateMode ? 'Edit Secret' : 'Create New Secret'" @update:is-open="emit('close')">
+  <Dialog :is-open="isSecretsEditorOpen" :title="isUpdateMode ? 'Edit Secret' : 'Create New Secret'" @update:is-open="closeDialog('secrets')">
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="key" class="text-sm font-semibold">Key</label>
@@ -38,13 +38,12 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  isOpen: boolean
-  selectedSecret?: Secret | null
+  selectedSecret: Secret | null
   projectId: string
 }>()
 
 const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
-
+const { isSecretsEditorOpen, closeDialog } = useDialogs()
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const projectStore = useProjectStore()
 const { loading } = storeToRefs(projectStore)
@@ -52,6 +51,11 @@ const form = ref<{ key: string, description: string, values: Record<Environment,
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
 async function handleSubmit() {
+  const normalizedKey = normalizeKey(form.value.key)
+  if (!normalizedKey) {
+    return
+  }
+
   const values = Object.entries(form.value.values).filter(([_, value]) => value.trim() !== "").map(([environment, value]) => ({
     environment: environment as Environment,
     value: value.trim(),
@@ -59,7 +63,7 @@ async function handleSubmit() {
 
   const secret: Secret = {
     id: props.selectedSecret?.id || "",
-    key: normalizeKey(form.value.key),
+    key: normalizedKey,
     description: form.value.description.trim(),
     projectId: props.projectId,
     project: {} as Project,
@@ -86,9 +90,9 @@ function resetForm() {
 }
 
 // Reset form when dialog is opened or selected secret changes
-watch([() => props.isOpen, () => props.selectedSecret], ([open]) => {
+watch([isSecretsEditorOpen, () => props.selectedSecret], ([open]) => {
   if (open) {
     resetForm()
   }
-}, { immediate: true, deep: true })
+}, { immediate: true })
 </script>

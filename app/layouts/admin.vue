@@ -18,7 +18,7 @@ const userStore = useUserStore()
 const orgStore = useOrgStore()
 const projectStore = useProjectStore()
 const { user } = storeToRefs(userStore)
-const isSidebarOpen = ref(false)
+const { isSidebarOpen } = useDialogs()
 const isLoading = ref(true)
 
 onMounted(async () => {

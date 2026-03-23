@@ -178,6 +178,19 @@ interface CalendarDay {
   isToday: boolean
 }
 
+interface UIState {
+  sidebar: boolean
+  dialogs: {
+    projects: boolean
+    secrets: {
+      isOpen: boolean
+      selectedSecret: Secret | null
+    }
+    history: boolean
+    raw: boolean
+  }
+}
+
 interface Toast {
   id: string
   message: string

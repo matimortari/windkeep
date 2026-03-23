@@ -6,7 +6,7 @@
       :is-owner="isOwner" :is-admin="isAdmin"
       @update:search="searchQuery = $event" @update:layout="layout = $event"
       @update:show-all="showAllProjects = $event" @toggle-sort="toggleSort"
-      @open-dialog="isDialogOpen = true"
+      @open-dialog="openDialog('projects')"
     />
 
     <Empty v-if="!filteredProjects.length" message="No projects yet. Create one to get started." icon-name="ph:folder-simple-minus-bold" />
@@ -24,18 +24,19 @@
         <ProjectsCard :project="project" />
       </li>
 
-      <button v-if="isOwner || isAdmin" class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! text-muted-foreground" @click="isDialogOpen = true">
+      <button v-if="isOwner || isAdmin" class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! text-muted-foreground" @click="openDialog('projects')">
         <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105 group-hover:text-primary" />
         <span class="font-semibold transition-transform group-hover:scale-105">New Project</span>
       </button>
     </ul>
 
-    <ProjectsDialog :is-open="isDialogOpen" @close="isDialogOpen = false" @save="handleCreateProject" />
+    <ProjectsDialog :is-open="isDialogOpen" @close="closeDialog('projects')" @save="handleCreateProject" />
   </div>
 </template>
 
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
+const { closeDialog, openDialog } = useDialogs()
 const userStore = useUserStore()
 const projectStore = useProjectStore()
 const { activeOrg, isOwner, isAdmin } = storeToRefs(useOrgStore())
@@ -70,14 +71,14 @@ function toggleSort() {
 }
 
 async function handleCreateProject(project: { name: string, description?: string }) {
-  if (!activeOrg.value) {
+  if (!activeOrg.value || !project.name) {
     return
   }
 
   try {
     await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
     await projectStore.getProjects()
-    isDialogOpen.value = false
+    closeDialog("projects")
   }
   catch {
     // Silently fail

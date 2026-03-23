@@ -3,8 +3,7 @@
     <SecretsProjectActions
       :project="project" :has-permission="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
       :has-pending-changes="hasPendingChanges" :all-visible="allVisible"
-      @open-secrets-dialog="() => { isSecretsDialogOpen = true; selectedSecret = null }"
-      @open-editor-dialog="() => { isEditorDialog = true; selectedSecret = null }"
+      @open-secrets-dialog="() => { selectSecret(null); openDialog('secrets') }" @open-editor-dialog="openDialog('raw')"
       @export="exportToEnv" @save="saveAllChanges"
       @toggle-all-visible="allVisible = !allVisible" @discard="discardAllChanges"
     />
@@ -20,23 +19,9 @@
       />
     </div>
 
-    <SecretsDialog
-      :is-open="isSecretsDialogOpen" :selected-secret="selectedSecret"
-      :project-id="project?.id ?? ''" @close="() => { isSecretsDialogOpen = false; selectedSecret = null }"
-      @save="handleSecretChange"
-    />
-
-    <SecretsEditorDialog
-      :is-open="isEditorDialog" :project-id="project?.id ?? ''"
-      :secrets="displayedSecrets" @close="() => { isEditorDialog = false; selectedSecret = null }"
-      @save="handleImportSecrets"
-    />
-
-    <SecretsHistoryDialog
-      :is-open="isHistoryDialogOpen" :secret-id="historySecretId"
-      :secret-key="historySecretKey" :project-id="project?.id ?? ''"
-      @close="() => { isHistoryDialogOpen = false; historySecretId = ''; historySecretKey = '' }"
-    />
+    <SecretsDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="closeDialog('secrets')" @save="handleSecretChange" />
+    <SecretsEditorDialog :project-id="project?.id ?? ''" :secrets="displayedSecrets" @close="closeDialog('raw')" @save="handleImportSecrets" />
+    <SecretsHistoryDialog :secret-id="historySecretId" :secret-key="historySecretKey" :project-id="project?.id ?? ''" @close="() => { closeDialog('history'); historySecretId = ''; historySecretKey = '' }" />
   </div>
 </template>
 
@@ -45,17 +30,14 @@ const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()
+const { openDialog, closeDialog, selectSecret, selectedSecret } = useDialogs()
 const { secrets, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
-const selectedSecret = ref<Secret | null>(null)
-const isSecretsDialogOpen = ref(false)
-const isEditorDialog = ref(false)
-const isHistoryDialogOpen = ref(false)
 const historySecretId = ref("")
 const historySecretKey = ref("")
+const allVisible = ref(false)
 const pendingChanges = ref<Map<string, PendingChange>>(new Map())
 const hasPendingChanges = computed(() => pendingChanges.value.size > 0)
-const allVisible = ref(false)
 
 const displayedSecrets = computed(() => {
   const secretsMap = new Map<string, Secret>()
@@ -70,14 +52,14 @@ const displayedSecrets = computed(() => {
 })
 
 function handleEditSecret(secret: Secret) {
-  isSecretsDialogOpen.value = true
-  selectedSecret.value = secret
+  selectSecret(secret)
+  openDialog("secrets")
 }
 
 function handleViewHistory(secret: Secret) {
   historySecretId.value = secret.id
   historySecretKey.value = secret.key
-  isHistoryDialogOpen.value = true
+  openDialog("history")
 }
 
 function handleDeleteSecret(key: string) {
@@ -108,12 +90,11 @@ function handleSecretChange(secret: Secret) {
     pendingChanges.value.set(secret.key, { type: "update", secret, originalSecret: existingSecret })
   }
 
-  isSecretsDialogOpen.value = false
-  selectedSecret.value = null
+  closeDialog("secrets")
 }
 
 function handleImportSecrets(importedSecrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[], removedKeys: { key: string, environment: Environment }[]) {
-  isEditorDialog.value = false
+  closeDialog("raw")
 
   // Upsert added/updated secrets
   for (const importedSecret of importedSecrets) {
