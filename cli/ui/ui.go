@@ -20,7 +20,6 @@ var (
 	YellowBold = color.New(color.FgYellow, color.Bold)
 )
 
-// CreateTable creates a new styled table
 func CreateTable(headers []string) *tablewriter.Table {
 	table := tablewriter.NewTable(os.Stdout)
 	headersAny := make([]any, len(headers))
@@ -31,26 +30,22 @@ func CreateTable(headers []string) *tablewriter.Table {
 	return table
 }
 
-// PrintSuccess prints a success message with checkmark
 func PrintSuccess(format string, args ...any) {
 	GreenBold.Print("✓ ")
 	fmt.Printf(format+"\n", args...)
 }
 
-// PrintError prints an error message with X mark
 func PrintError(format string, args ...any) {
-	RedBold.Print("✗ ")
-	fmt.Printf(format+"\n", args...)
+	RedBold.Fprint(os.Stderr, "✗ ")
+	fmt.Fprintf(os.Stderr, format+"\n", args...)
 }
 
-// PrintInfo prints an info message with bullet
+func PrintWarning(format string, args ...any) {
+	YellowBold.Fprint(os.Stderr, "⚠ ")
+	fmt.Fprintf(os.Stderr, format+"\n", args...)
+}
+
 func PrintInfo(format string, args ...any) {
 	CyanBold.Print("• ")
-	fmt.Printf(format+"\n", args...)
-}
-
-// PrintWarning prints a warning message
-func PrintWarning(format string, args ...any) {
-	YellowBold.Print("⚠ ")
 	fmt.Printf(format+"\n", args...)
 }
