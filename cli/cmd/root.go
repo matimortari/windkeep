@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	cfgFile string
 	cfg     *config.Config
 	Version = "dev"
 )
@@ -29,7 +28,7 @@ multiple environments with ease.`,
 		}
 
 		var err error
-		cfg, err = config.Load(cfgFile)
+		cfg, err = config.Load()
 		if err != nil {
 			return fmt.Errorf("failed to load config: %w\nRun 'windkeep login' to authenticate", err)
 		}
@@ -48,7 +47,6 @@ func Execute() error {
 
 func init() {
 	rootCmd.Version = Version
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file path (default: $HOME/.windkeep/config.yaml)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)

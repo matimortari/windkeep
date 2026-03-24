@@ -55,7 +55,7 @@ var loginCmd = &cobra.Command{
 			APIToken: apiToken,
 		}
 
-		if err := cfg.Save(cfgFile); err != nil {
+		if err := cfg.Save(); err != nil {
 			return fmt.Errorf("failed to save config: %w", err)
 		}
 

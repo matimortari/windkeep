@@ -13,7 +13,7 @@ var logoutCmd = &cobra.Command{
 	Short: "Remove authentication credentials",
 	Long:  `Remove stored authentication credentials from the configuration file.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := config.Delete(cfgFile); err != nil {
+		if err := config.Delete(); err != nil {
 			return fmt.Errorf("failed to logout: %w", err)
 		}
 

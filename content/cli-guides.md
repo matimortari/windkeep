@@ -160,7 +160,7 @@ windkeep whoami
 
 **GitHub Actions Example:**
 
-```yaml
+```yml
 name: Deploy
 
 on:
@@ -198,7 +198,7 @@ jobs:
 
 **GitLab CI Example:**
 
-```yaml
+```yml
 deploy:
   stage: deploy
   script:

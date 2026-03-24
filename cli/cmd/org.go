@@ -156,7 +156,7 @@ var orgsSwitchCmd = &cobra.Command{
 		// Clear active project since switching orgs
 		cfg.ActiveProjectSlug = ""
 		cfg.ActiveProjectName = ""
-		if err := cfg.Save(cfgFile); err != nil {
+		if err := cfg.Save(); err != nil {
 			ui.PrintWarning("Failed to clear active project: %v", err)
 		}
 

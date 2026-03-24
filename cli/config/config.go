@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"gopkg.in/yaml.v3"
 )
 
-const (
-	DefaultConfigDir  = ".windkeep"
-	DefaultConfigFile = "config.yaml"
-	APIURL            = "https://windkeep.up.railway.app"
-)
+const APIURL = "https://windkeep.up.railway.app"
 
 type Config struct {
 	APIToken          string `yaml:"api_token"`
@@ -21,34 +18,30 @@ type Config struct {
 	ActiveProjectName string `yaml:"active_project_name,omitempty"`
 }
 
-// GetConfigDir returns the configuration directory path
-func GetConfigDir() (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	configDir := filepath.Join(homeDir, DefaultConfigDir)
-	return configDir, nil
-}
-
 // GetConfigPath returns the full path to the config file
-func GetConfigPath(customPath string) (string, error) {
-	if customPath != "" {
-		return customPath, nil
+func GetConfigPath() (string, error) {
+	var baseDir string
+
+	if runtime.GOOS == "windows" {
+		baseDir = os.Getenv("APPDATA")
+		if baseDir == "" {
+			return "", fmt.Errorf("APPDATA not set")
+		}
+	} else {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		baseDir = filepath.Join(home, ".config")
 	}
 
-	configDir, err := GetConfigDir()
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Join(configDir, DefaultConfigFile), nil
+	dir := filepath.Join(baseDir, "windkeep")
+	return filepath.Join(dir, "config.yml"), nil
 }
 
 // Load reads the configuration from the file
-func Load(customPath string) (*Config, error) {
-	configPath, err := GetConfigPath(customPath)
+func Load() (*Config, error) {
+	configPath, err := GetConfigPath()
 	if err != nil {
 		return nil, err
 	}
@@ -70,19 +63,14 @@ func Load(customPath string) (*Config, error) {
 }
 
 // Save writes the configuration to the file
-func (c *Config) Save(customPath string) error {
-	configDir, err := GetConfigDir()
+func (c *Config) Save() error {
+	configPath, err := GetConfigPath()
 	if err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll(configDir, 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(configPath), 0700); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
-	}
-
-	configPath, err := GetConfigPath(customPath)
-	if err != nil {
-		return err
 	}
 
 	data, err := yaml.Marshal(c)
@@ -98,8 +86,8 @@ func (c *Config) Save(customPath string) error {
 }
 
 // Delete removes the configuration file
-func Delete(customPath string) error {
-	configPath, err := GetConfigPath(customPath)
+func Delete() error {
+	configPath, err := GetConfigPath()
 	if err != nil {
 		return err
 	}
