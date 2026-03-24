@@ -40,8 +40,6 @@ type OrgMembership struct {
 type Organization struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
-	Role      *Role     `json:"role,omitempty"`
-	IsActive  *bool     `json:"isActive,omitempty"`
 	Projects  []Project `json:"projects,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
