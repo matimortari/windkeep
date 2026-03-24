@@ -50,7 +50,7 @@ var whoamiCmd = &cobra.Command{
 		}
 		fmt.Println()
 
-		configPath, err := config.GetConfigPath(cfgFile)
+		configPath, err := config.GetConfigPath()
 		if err != nil {
 			return fmt.Errorf("failed to get config path: %w", err)
 		}

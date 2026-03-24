@@ -119,7 +119,7 @@ var projectsCreateCmd = &cobra.Command{
 		cfg.ActiveProjectID = project.ID
 		cfg.ActiveProjectSlug = project.Slug
 		cfg.ActiveProjectName = project.Name
-		if err := cfg.Save(cfgFile); err != nil {
+		if err := cfg.Save(); err != nil {
 			ui.PrintWarning("Failed to save active project to config: %v", err)
 		}
 
@@ -203,7 +203,7 @@ var projectsSwitchCmd = &cobra.Command{
 		cfg.ActiveProjectSlug = selectedProject.Slug
 		cfg.ActiveProjectName = selectedProject.Name
 
-		if err := cfg.Save(cfgFile); err != nil {
+		if err := cfg.Save(); err != nil {
 			return fmt.Errorf("failed to save config: %w", err)
 		}
 
@@ -270,7 +270,7 @@ var projectsUpdateCmd = &cobra.Command{
 			cfg.ActiveProjectID = project.ID
 			cfg.ActiveProjectSlug = project.Slug
 			cfg.ActiveProjectName = project.Name
-			if err := cfg.Save(cfgFile); err != nil {
+			if err := cfg.Save(); err != nil {
 				ui.PrintWarning("Failed to update config: %v", err)
 			}
 		}
@@ -331,7 +331,7 @@ var projectsDeleteCmd = &cobra.Command{
 			cfg.ActiveProjectID = ""
 			cfg.ActiveProjectSlug = ""
 			cfg.ActiveProjectName = ""
-			if err := cfg.Save(cfgFile); err != nil {
+			if err := cfg.Save(); err != nil {
 				ui.PrintWarning("Failed to update config: %v", err)
 			}
 		}
