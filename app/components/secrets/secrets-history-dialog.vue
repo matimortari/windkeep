@@ -88,7 +88,8 @@ const props = defineProps<{
 }>()
 
 defineEmits<{ close: [] }>()
-const { isHistoryEditorOpen, closeDialog } = useDialogs()
+
+const { isHistoryEditorOpen, closeDialog } = useUIState()
 const projectStore = useProjectStore()
 const history = ref<EnvironmentHistory[]>([])
 const visibleValues = ref<Record<string, boolean>>({})

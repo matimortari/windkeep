@@ -76,7 +76,7 @@ const userStore = useUserStore()
 const { activeOrg } = storeToRefs(useOrgStore())
 const projectStore = useProjectStore()
 const { projects } = storeToRefs(projectStore)
-const { openDialog, closeDialog } = useDialogs()
+const { openDialog, closeDialog } = useUIState()
 const showAllProjects = ref(false)
 const skeletonWidths = ["65%", "45%", "60%", "50%", "50%", "60%"]
 

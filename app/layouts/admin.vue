@@ -1,8 +1,8 @@
 <template>
-  <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+  <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" @toggle-sidebar="toggleSidebar" />
 
   <div class="flex min-h-screen overflow-hidden py-12">
-    <Sidebar :is-open="isSidebarOpen" :loading="isLoading" @update:is-open="isSidebarOpen = $event" />
+    <Sidebar :is-open="isSidebarOpen" :loading="isLoading" @update:is-open="value => value ? openSidebar() : closeSidebar()" />
 
     <main class="flex flex-1 flex-col overflow-x-hidden p-4">
       <Loading v-if="isLoading" />
@@ -18,7 +18,7 @@ const userStore = useUserStore()
 const orgStore = useOrgStore()
 const projectStore = useProjectStore()
 const { user } = storeToRefs(userStore)
-const { isSidebarOpen } = useDialogs()
+const { isSidebarOpen, toggleSidebar, openSidebar, closeSidebar } = useUIState()
 const isLoading = ref(true)
 
 onMounted(async () => {

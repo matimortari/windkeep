@@ -30,7 +30,7 @@ const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()
-const { openDialog, closeDialog, selectSecret, selectedSecret } = useDialogs()
+const { openDialog, closeDialog, selectSecret, selectedSecret } = useUIState()
 const { secrets, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
 const historySecretId = ref("")

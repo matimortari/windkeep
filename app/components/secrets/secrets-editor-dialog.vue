@@ -67,7 +67,7 @@ const emit = defineEmits<{
   save: [secrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[], removedKeys: { key: string, environment: Environment }[]]
 }>()
 
-const { isRawEditorOpen, closeDialog } = useDialogs()
+const { isRawEditorOpen, closeDialog } = useUIState()
 const editorContent = ref("")
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const selectedEnv = ref<Environment>("DEVELOPMENT")

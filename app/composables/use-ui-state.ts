@@ -1,6 +1,6 @@
 const uiState = reactive<UIState>({ sidebar: false, dialogs: { projects: false, secrets: { isOpen: false, selectedSecret: null }, history: false, raw: false } })
 
-export function useDialogs() {
+export function useUIState() {
   const openDialog = (type: "secrets" | "projects" | "history" | "raw") => {
     if (type === "secrets") {
       uiState.dialogs.secrets.isOpen = true
@@ -26,6 +26,7 @@ export function useDialogs() {
 
   const openSidebar = () => uiState.sidebar = true
   const closeSidebar = () => uiState.sidebar = false
+  const toggleSidebar = () => uiState.sidebar = !uiState.sidebar
 
   const isSecretsEditorOpen = computed(() => uiState.dialogs.secrets.isOpen)
   const selectedSecret = computed(() => uiState.dialogs.secrets.selectedSecret)
@@ -46,5 +47,6 @@ export function useDialogs() {
     closeDialog,
     openSidebar,
     closeSidebar,
+    toggleSidebar,
   }
 }
