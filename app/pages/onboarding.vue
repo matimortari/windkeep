@@ -77,6 +77,7 @@ const userStore = useUserStore()
 const orgStore = useOrgStore()
 const localOrg = ref({ name: "", description: "", website: "" })
 const token = ref(route.query.token as string || "")
+const orgId = ref(route.query.org as string || "")
 const activeSection = ref<"create" | "invite" | null>(route.query.token ? "invite" : "create")
 
 async function handleCreateOrg() {
@@ -90,7 +91,7 @@ async function handleCreateOrg() {
 }
 
 async function handleAcceptInvite() {
-  const res = await orgStore.acceptInvite(token.value, { token: token.value })
+  const res = await orgStore.acceptInvite(orgId.value, { token: token.value })
   if (res) {
     setTimeout(navigateTo, 2000, "/admin/projects")
   }
