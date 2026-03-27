@@ -30,7 +30,7 @@
 <script setup lang="ts">
 const emit = defineEmits<{ close: [], save: [payload: { name: string, description: string }] }>()
 
-const { isProjectsEditorOpen, closeDialog } = useDialogs()
+const { isProjectsEditorOpen, closeDialog } = useUIState()
 const form = ref<{ name: string, description: string }>({ name: "", description: "" })
 
 async function handleSubmit() {

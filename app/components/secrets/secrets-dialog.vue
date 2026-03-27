@@ -43,7 +43,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
-const { isSecretsEditorOpen, closeDialog } = useDialogs()
+const { isSecretsEditorOpen, closeDialog } = useUIState()
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const projectStore = useProjectStore()
 const { loading } = storeToRefs(projectStore)

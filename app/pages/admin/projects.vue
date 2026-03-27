@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
-const { closeDialog, openDialog } = useDialogs()
+const { closeDialog, openDialog } = useUIState()
 const userStore = useUserStore()
 const projectStore = useProjectStore()
 const { activeOrg, isOwner, isAdmin } = storeToRefs(useOrgStore())
