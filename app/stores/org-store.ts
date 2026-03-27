@@ -95,7 +95,7 @@ export const useOrgStore = defineStore("org", () => {
     loading.value = true
 
     try {
-      const res = await $fetch(`/api/orgs/${orgId}/transfer-ownership`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ success: boolean, message: string, newOwner: { id: string, name: string, email: string } }>(`/api/orgs/${orgId}/transfer-ownership`, { method: "POST", body: data, credentials: "include" })
       await getOrg(orgId)
       toast.success("Organization ownership transferred successfully")
       return res
@@ -174,7 +174,7 @@ export const useOrgStore = defineStore("org", () => {
     loading.value = true
 
     try {
-      const res = await $fetch(`/api/orgs/${orgId}/invite/create`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ invitation: Invitation, inviteUrl: string }>(`/api/orgs/${orgId}/invite/create`, { method: "POST", body: data, credentials: "include" })
       return res
     }
     catch (err: unknown) {
@@ -193,7 +193,7 @@ export const useOrgStore = defineStore("org", () => {
 
     try {
       const res = await $fetch<{ organization: Organization, membership: OrgMembership }>(`/api/orgs/${orgId}/invite/accept`, { method: "POST", body: data, credentials: "include" })
-      if (!organizations.value.some(o => o.id === orgId) && res.organization) {
+      if (res.organization && !organizations.value.some(o => o.id === res.organization.id)) {
         organizations.value.push(res.organization)
       }
       toast.success("Invitation accepted successfully")

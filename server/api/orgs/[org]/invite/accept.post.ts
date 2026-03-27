@@ -7,18 +7,22 @@ export default defineEventHandler(async (event) => {
   await enforceRateLimit(event, `org:invite:accept:${user.id}`, 20)
 
   const body = await readBody(event)
-
   const result = acceptInviteSchema.safeParse(body)
   if (!result.success) {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const invitation = await db.invitation.findUnique({
-    where: { token: result.data.token },
-    include: { org: { select: { id: true, name: true } } },
-  })
+  const orgId = getRouterParam(event, "org")
+  if (!orgId) {
+    throw createError({ status: 400, statusText: "Organization ID is required" })
+  }
+
+  const invitation = await db.invitation.findUnique({ where: { token: result.data.token }, include: { org: { select: { id: true, name: true } } } })
   if (!invitation) {
     throw createError({ status: 404, statusText: "Invitation not found or already used" })
+  }
+  if (invitation.orgId !== orgId) {
+    throw createError({ status: 403, statusText: "Invitation does not belong to this organization" })
   }
   if (invitation.expiresAt < new Date()) {
     throw createError({ status: 410, statusText: "Invitation has expired" })
@@ -26,7 +30,6 @@ export default defineEventHandler(async (event) => {
 
   const existingMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: user.id, orgId: invitation.orgId } } })
   if (existingMembership) {
-    await db.invitation.delete({ where: { id: invitation.id } })
     throw createError({ status: 409, statusText: "You are already a member of this organization" })
   }
 
@@ -35,7 +38,7 @@ export default defineEventHandler(async (event) => {
 
     const membership = await tx.orgMembership.create({
       data: { userId: user.id, orgId: invitation.orgId, role: "MEMBER", isActive: true },
-      include: { org: { select: { id: true, name: true } }, user: { select: { id: true, email: true, name: true, image: true } } },
+      include: { org: { select: { id: true, name: true, description: true, website: true } }, user: { select: { id: true, email: true, name: true, image: true } } },
     })
 
     await tx.invitation.delete({ where: { id: invitation.id } })
@@ -58,6 +61,8 @@ export default defineEventHandler(async (event) => {
       orgName: invitation.org.name,
     },
   })
+
+  await deleteCached(CacheKeys.userData(user.id))
 
   return { organization: newMembership.org, membership: newMembership }
 })
