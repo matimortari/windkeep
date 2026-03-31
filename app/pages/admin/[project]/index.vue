@@ -229,8 +229,7 @@ function exportToEnv(env: string | null | undefined) {
 
 onBeforeRouteLeave((_to, _from, next) => {
   if (hasPendingChanges.value) {
-    const confirmed = confirm("You have unsaved changes. Are you sure you want to leave?")
-    next(confirmed)
+    next(confirm("You have unsaved changes. Are you sure you want to leave?"))
   }
   else {
     next()
@@ -246,12 +245,11 @@ watch(() => project.value?.id, async (id) => {
   allVisible.value = false
   secrets.value = []
   await projectStore.getProjectSecrets(id)
-  const projectTitle = projectStore.projects.find(p => p.id === id)?.name
 
   useHead({
-    title: `${projectTitle}`,
+    title: `${project.value?.name}`,
     link: [{ rel: "canonical", href: `${baseURL}/${id}` }],
-    meta: [{ name: "description", content: `${projectTitle} project page.` }],
+    meta: [{ name: "description", content: `${project.value?.name} project page.` }],
   })
 }, { immediate: true })
 

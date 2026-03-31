@@ -99,14 +99,14 @@
       <div class="flex flex-col gap-1 md:navigation-group">
         <div v-if="availableOrgMembers.length" ref="addMemberDropdownRef" class="relative navigation-group">
           <button class="btn w-full justify-between md:w-auto" @click="isAddMemberDropdownOpen = !isAddMemberDropdownOpen">
-            <span class="truncate">{{ selectedMemberToAdd ? availableOrgMembers.find(m => m.user.id === selectedMemberToAdd)?.user.name : 'Select a member...' }}</span>
+            <span class="truncate">{{ newMemberToAdd ? availableOrgMembers.find(m => m.user.id === newMemberToAdd)?.user.name : 'Select a member...' }}</span>
             <icon name="ph:caret-down-bold" size="20" :class="[isAddMemberDropdownOpen ? 'rotate-180' : 'rotate-0']" />
           </button>
 
           <transition name="dropdown">
             <ul v-if="isAddMemberDropdownOpen" class="dropdown-menu left-0 max-h-60 w-full md:w-80" role="menu">
               <li v-for="member in availableOrgMembers" :key="member.user.id" class="truncate whitespace-nowrap">
-                <button class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="selectedMemberToAdd === member.user.id ? 'bg-muted' : ''" @click="selectedMemberToAdd = member.user.id; isAddMemberDropdownOpen = false">
+                <button class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="newMemberToAdd === member.user.id ? 'bg-muted' : ''" @click="newMemberToAdd = member.user.id; isAddMemberDropdownOpen = false">
                   <img :src="member.user.image" alt="Avatar" class="size-6 rounded-full border">
                   <div class="flex flex-col truncate">
                     <span class="truncate font-semibold">{{ member.user.name }}</span>
@@ -194,7 +194,7 @@ const { orgMembers } = storeToRefs(orgStore)
 const projectStore = useProjectStore()
 const { projects, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projects.value.find(p => p.slug === slug))
-const selectedMemberToAdd = ref<string>("")
+const newMemberToAdd = ref<string>("")
 const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
 const localProject = ref<Project | null>(null)
 const isAddMemberDropdownOpen = ref(false)
@@ -288,17 +288,17 @@ useClickOutside(addMemberDropdownRef, () => {
 }, { escapeKey: true })
 
 async function handleAddMember() {
-  if (!project.value?.id || !selectedMemberToAdd.value) {
+  if (!project.value?.id || !newMemberToAdd.value) {
     return
   }
 
   await projectStore.addProjectMember(project.value.id, {
-    userId: selectedMemberToAdd.value,
+    userId: newMemberToAdd.value,
     role: newMemberRole.value as "ADMIN" | "MEMBER",
   })
 
   await projectStore.getProjects()
-  selectedMemberToAdd.value = ""
+  newMemberToAdd.value = ""
   newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
 }
 
@@ -329,8 +329,6 @@ async function handleSubmit(index: number) {
     return
   }
 
-  const oldSlug = project.value.slug
-  const newSlug = localProject.value?.slug ?? ""
   await projectStore.updateProject(project.value.id, {
     name: localProject.value?.name ?? "",
     slug: localProject.value?.slug ?? "",
@@ -340,8 +338,8 @@ async function handleSubmit(index: number) {
 
   await projectStore.getProjects()
   saveIcon[index]?.triggerSuccess()
-  if (oldSlug !== newSlug) {
-    await navigateTo(`/admin/${newSlug}/settings`)
+  if (project.value.slug !== localProject.value?.slug) {
+    await navigateTo(`/admin/${localProject.value?.slug}/settings`)
   }
 }
 
@@ -400,12 +398,10 @@ watch(() => project.value, (proj) => {
 
 // Set page metadata when project changes
 watch(() => project.value?.id, async (id: string | undefined) => {
-  const projectTitle = projects.value.find(p => p.id === id)?.name
-
   useHead({
-    title: `${projectTitle} settings`,
+    title: `${project.value?.name} settings`,
     link: [{ rel: "canonical", href: `${baseURL}/${id}/settings` }],
-    meta: [{ name: "description", content: `${projectTitle} project settings page.` }],
+    meta: [{ name: "description", content: `${project.value?.name} project settings page.` }],
   })
 }, { immediate: true })
 

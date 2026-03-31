@@ -101,8 +101,7 @@ function updateFilter(type: "date" | "user" | "action", value: any) {
 
 async function handleDeleteLogs() {
   const hasFilters = dateFilter.value.start || dateFilter.value.end || currentFilters.value.action || currentFilters.value.userId
-  const filterDesc = hasFilters ? "matching the current filters" : "in this organization"
-  if (!confirm(`Are you sure you want to delete all audit logs ${filterDesc}? This action cannot be undone.`)) {
+  if (!confirm(`Are you sure you want to delete all audit logs ${hasFilters ? "matching the current filters" : "in this organization"}? This action cannot be undone.`)) {
     return
   }
 

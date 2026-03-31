@@ -1,12 +1,12 @@
 <template>
   <div ref="datePickerRef" class="relative">
-    <button class="btn" @click="isOpen = !isOpen">
+    <button class="btn" @click="isDatePickerOpen = !isDatePickerOpen">
       <span>{{ displayLabel }}</span>
       <icon name="ph:caret-down-bold" size="15" />
     </button>
 
     <transition name="dropdown">
-      <div v-if="isOpen" class="dropdown-menu max-h-none! min-w-72 space-y-2" role="dialog" aria-label="Select date range">
+      <div v-if="isDatePickerOpen" class="dropdown-menu max-h-none! min-w-72 space-y-2" role="dialog" aria-label="Select date range">
         <div class="navigation-group justify-between">
           <select v-model="currentMonth" aria-label="Month">
             <option v-for="(month, idx) in months" :key="idx" :value="idx">
@@ -60,7 +60,7 @@ const emit = defineEmits<{ "update:modelValue": [{ start?: string, end?: string 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
 const datePickerRef = ref<HTMLElement | null>(null)
-const isOpen = ref(false)
+const isDatePickerOpen = ref(false)
 const currentMonth = ref(new Date().getMonth())
 const currentYear = ref(new Date().getFullYear())
 const hoverDate = ref<Date | null>(null)
@@ -69,7 +69,7 @@ const endDate = computed(() => parseDate(props.modelValue?.end))
 const years = computed(() => Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i))
 
 useClickOutside(datePickerRef, () => {
-  isOpen.value = false
+  isDatePickerOpen.value = false
 }, { escapeKey: true })
 
 function parseDate(dateStr?: string) {

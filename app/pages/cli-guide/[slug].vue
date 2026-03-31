@@ -8,13 +8,7 @@ const route = useRoute()
 const slug = route.params.slug as string
 const pageContent = await queryCollection("content").path(`/cli-${slug}`).first()
 
-const PAGE_TITLES: Record<string, string> = {
-  organizations: "CLI: Organizations",
-  projects: "CLI: Projects",
-  secrets: "CLI: Secrets Management",
-  guides: "CLI: Guides & Troubleshooting",
-}
-
+const PAGE_TITLES: Record<string, string> = { organizations: "CLI: Organizations", projects: "CLI: Projects", secrets: "CLI: Secrets Management", guides: "CLI: Guides & Troubleshooting" }
 const PAGE_DESCRIPTIONS: Record<string, string> = {
   organizations: "Managing organizations and teams with the WindKeep CLI.",
   projects: "Managing projects and configurations with the WindKeep CLI.",
