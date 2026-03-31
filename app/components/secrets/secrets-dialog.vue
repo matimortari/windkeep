@@ -56,8 +56,8 @@ async function handleSubmit() {
     return
   }
 
-  const values = Object.entries(form.value.values).filter(([_, value]) => value.trim() !== "").map(([environment, value]) => ({
-    environment: environment as Environment,
+  const values = Object.entries(form.value.values).filter(([_, value]) => value.trim() !== "").map(([env, value]) => ({
+    environment: env as Environment,
     value: value.trim(),
   }))
 

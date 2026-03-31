@@ -102,7 +102,6 @@ const { createActionHandler } = useActionIcon()
 const copyMetadataActions = computed(() => {
   const actions = new Map()
   auditLogs.value.forEach(log => actions.set(log.id, createActionHandler("ph:copy")))
-
   return actions
 })
 
@@ -143,7 +142,7 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
     return "{}"
   }
 
-  const keyOrder = [
+  const KEY_ORDER = [
     "secretId",
     "secretKey",
     "memberId",
@@ -186,7 +185,7 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
   ]
 
   const sortedMetadata: Record<string, any> = {}
-  for (const key of keyOrder) {
+  for (const key of KEY_ORDER) {
     if (key in metadata) {
       sortedMetadata[key] = metadata[key]
     }
