@@ -24,11 +24,12 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
 
   // If still no user, create one
   if (!user) {
+    const r2PublicUrl = requireEnv("R2_PUBLIC_URL")
     user = await db.user.create({
       data: {
         email,
         name: name?.trim() ?? email.split("@")[0],
-        image: image || `${process.env.R2_PUBLIC_URL}/defaults/avatar.png`,
+        image: image || `${r2PublicUrl}/defaults/avatar.png`,
         apiToken: generateToken(),
         apiTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
       },

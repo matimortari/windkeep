@@ -2,6 +2,18 @@ import type { EventHandlerRequest, H3Event } from "h3"
 import { randomBytes } from "node:crypto"
 
 /**
+ * Helper function to ensure required environment variables are set, throwing an error if missing.
+ */
+export function requireEnv(name: string) {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+
+  return value
+}
+
+/**
  * Retrieves the authenticated user from the current session or API token.
  * Throws 401 if no valid session exists.
  */
@@ -15,8 +27,11 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
   const authHeader = getHeader(event, "authorization")
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7)
-    const user = await db.user.findUnique({ where: { apiToken: token }, select: { id: true, email: true, name: true, image: true, apiToken: true } })
-    if (user) {
+    const user = await db.user.findUnique({
+      where: { apiToken: token },
+      select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true },
+    })
+    if (user && user.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
       return { id: user.id, email: user.email, name: user.name, image: user.image, apiToken: user.apiToken }
     }
   }

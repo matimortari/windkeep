@@ -1,23 +1,30 @@
 import type { EventHandlerRequest, H3Event } from "h3"
 
-const configs: Record<string, any> = {
-  google: {
-    clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
-    clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
-    redirectURL: `${process.env.NUXT_PUBLIC_BASE_URL}/api/auth/google`,
-  },
-  github: {
-    emailRequired: true,
-    clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
-    clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
-    redirectURL: `${process.env.NUXT_PUBLIC_BASE_URL}/api/auth/github`,
-  },
-  gitlab: {
-    emailRequired: true,
-    clientId: process.env.NUXT_OAUTH_GITLAB_CLIENT_ID,
-    clientSecret: process.env.NUXT_OAUTH_GITLAB_CLIENT_SECRET,
-    redirectURL: `${process.env.NUXT_PUBLIC_BASE_URL}/api/auth/gitlab`,
-  },
+function getOAuthConfig(provider: string) {
+  const baseUrl = requireEnv("NUXT_PUBLIC_BASE_URL")
+  if (provider === "google") {
+    return {
+      clientId: requireEnv("NUXT_OAUTH_GOOGLE_CLIENT_ID"),
+      clientSecret: requireEnv("NUXT_OAUTH_GOOGLE_CLIENT_SECRET"),
+      redirectURL: `${baseUrl}/api/auth/google`,
+    }
+  }
+  if (provider === "github") {
+    return {
+      emailRequired: true,
+      clientId: requireEnv("NUXT_OAUTH_GITHUB_CLIENT_ID"),
+      clientSecret: requireEnv("NUXT_OAUTH_GITHUB_CLIENT_SECRET"),
+      redirectURL: `${baseUrl}/api/auth/github`,
+    }
+  }
+  if (provider === "gitlab") {
+    return {
+      emailRequired: true,
+      clientId: requireEnv("NUXT_OAUTH_GITLAB_CLIENT_ID"),
+      clientSecret: requireEnv("NUXT_OAUTH_GITLAB_CLIENT_SECRET"),
+      redirectURL: `${baseUrl}/api/auth/gitlab`,
+    }
+  }
 }
 
 const extractUserData: Record<string, (user: any) => any> = {
@@ -32,7 +39,12 @@ export default defineEventHandler(async (event: H3Event) => {
   await enforceRateLimit(event, `auth:${ip}`, 5, 60 * 1000)
 
   const provider = event.context.params?.provider
-  if (!provider || !configs[provider]) {
+  if (!provider) {
+    throw createError({ status: 400, message: "Unknown OAuth provider" })
+  }
+
+  const config = getOAuthConfig(provider)
+  if (!config) {
     throw createError({ status: 400, message: "Unknown OAuth provider" })
   }
 
@@ -42,7 +54,7 @@ export default defineEventHandler(async (event: H3Event) => {
       throw createError({ status: 400, message: `OAuth handler not found for provider: ${provider}` })
     }
 
-    return await oauthHandler({ config: configs[provider], async onSuccess(event: H3Event<EventHandlerRequest>, { user }: any) {
+    return await oauthHandler({ config, async onSuccess(event: H3Event<EventHandlerRequest>, { user }: any) {
       if (!user || typeof user !== "object") {
         throw createError({ status: 400, message: `Invalid user data from ${provider}` })
       }
