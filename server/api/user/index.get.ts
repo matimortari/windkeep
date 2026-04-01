@@ -21,7 +21,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, statusText: "User not found" })
   }
 
-  await setCached(cacheKey, userData, CACHE_TTL.SHORT)
+  const safeUserData = { ...userData, apiToken: null } // Never expose stored token material to the client
+  await setCached(cacheKey, safeUserData, CACHE_TTL.SHORT)
 
-  return { userData }
+  return { userData: safeUserData }
 })

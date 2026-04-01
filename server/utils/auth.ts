@@ -30,7 +30,7 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
         email,
         name: name?.trim() ?? email.split("@")[0],
         image: image || `${r2PublicUrl}/defaults/avatar.png`,
-        apiToken: generateToken(),
+        apiToken: hashApiToken(generateToken(24)),
         apiTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
       },
     })
@@ -58,7 +58,6 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
     email: user.email,
     name: user.name,
     image: user.image,
-    apiToken: user.apiToken ?? undefined,
     activeOrgId: activeMembership?.org?.id ?? null,
   }
 

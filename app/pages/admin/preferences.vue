@@ -188,8 +188,8 @@ async function handleRegenerateToken() {
   }
 
   const res = await userStore.updateUser({ regenerateApiToken: true })
-  if (res?.updatedUser?.apiToken && user.value) {
-    user.value.apiToken = res.updatedUser.apiToken
+  if (res?.newApiToken && user.value) {
+    user.value.apiToken = res.newApiToken
     user.value.apiTokenExpiresAt = res.updatedUser.apiTokenExpiresAt
     regenerateIcon[userFields.findIndex(f => f.onRegenerate)]?.triggerSuccess()
   }
