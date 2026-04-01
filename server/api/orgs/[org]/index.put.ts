@@ -48,8 +48,5 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for org data
-  await deleteCached(CacheKeys.orgData(user.id, orgId))
-
   return { updatedOrg }
 })

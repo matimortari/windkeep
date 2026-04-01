@@ -14,17 +14,34 @@ export default defineEventHandler(async (event) => {
   const cacheKey = CacheKeys.projectSecrets(projectId)
   const cached = await getCached<any>(cacheKey)
   if (cached) {
-    return { decryptedSecrets: cached }
+    if (typeof cached === "string") {
+      try {
+        return { decryptedSecrets: JSON.parse(decrypt(cached)) }
+      }
+      catch {
+        await deleteCached(cacheKey)
+      }
+    }
+
+    await deleteCached(cacheKey)
   }
 
   const secrets = await db.secret.findMany({
     where: { projectId },
-    include: { project: true, values: { orderBy: { environment: "asc" } } },
+    select: {
+      id: true,
+      key: true,
+      description: true,
+      projectId: true,
+      createdAt: true,
+      updatedAt: true,
+      values: { select: { id: true, secretId: true, environment: true, value: true, createdAt: true, updatedAt: true }, orderBy: { environment: "asc" } },
+    },
     orderBy: { key: "asc" },
   })
 
   const decryptedSecrets = secrets.map(secret => ({ ...secret, values: secret.values.map(val => ({ ...val, value: decrypt(val.value) })) }))
-  await setCached(cacheKey, decryptedSecrets, CACHE_TTL.SHORT)
+  await setCached(cacheKey, encrypt(JSON.stringify(decryptedSecrets)), CACHE_TTL.SHORT)
 
   return { decryptedSecrets }
 })

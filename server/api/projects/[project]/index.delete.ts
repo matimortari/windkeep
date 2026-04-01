@@ -40,8 +40,8 @@ export default defineEventHandler(async (event) => {
 
   await db.project.delete({ where: { id: projectId } })
 
-  // Invalidate cache for user projects, org data, and project secrets
-  await deleteCached(CacheKeys.userProjects(user.id), CacheKeys.orgData(user.id, projectData.orgId), CacheKeys.projectSecrets(projectId))
+  // Invalidate cache for user projects and project secrets
+  await deleteCached(CacheKeys.userProjects(user.id), CacheKeys.projectSecrets(projectId))
 
   return { success: true, message: "Project deleted successfully" }
 })

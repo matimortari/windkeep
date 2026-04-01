@@ -39,7 +39,23 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const updatedProject = await db.project.update({ where: { id: projectId }, data: result.data, include: { org: true } })
+  const updatedProject = await db.project.update({
+    where: { id: projectId },
+    data: result.data,
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      website: true,
+      orgId: true,
+      createdAt: true,
+      updatedAt: true,
+      org: { select: { id: true, name: true } },
+      secrets: { select: { id: true } },
+      memberships: { select: { userId: true, projectId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
+    },
+  })
 
   const changes = []
   if (result.data.name && result.data.name !== existingProject.name) {
@@ -76,8 +92,9 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for user projects and org data
-  await deleteCached(CacheKeys.userProjects(user.id), CacheKeys.orgData(user.id, updatedProject.org.id))
+  // Invalidate cache for user projects
+  await deleteCached(CacheKeys.userProjects(user.id))
 
-  return { project: updatedProject }
+  const { org: _org, ...project } = updatedProject
+  return { project }
 })
