@@ -16,12 +16,15 @@ async function getRedisClient() {
   if (connecting) {
     return null
   }
+  if (!process.env.REDIS_URL) {
+    return null
+  }
 
   connecting = true
 
   try {
     const client = createClient({
-      url: process.env.REDIS_URL,
+      url: requireEnv("REDIS_URL"),
       socket: {
         connectTimeout: 5000, // 5 seconds
         reconnectStrategy: (retries) => {
@@ -54,7 +57,6 @@ async function getRedisClient() {
 export const CacheKeys = {
   userData: (userId: string) => `user:data:${userId}`,
   userProjects: (userId: string) => `user:projects:${userId}`,
-  orgData: (userId: string, orgId: string) => `org:data:${userId}:${orgId}`,
   orgAuditLogs: (orgId: string, page: number, filters: string) => `org:audit:${orgId}:p${page}:${filters}`,
   projectSecrets: (projectId: string) => `project:secrets:${projectId}`,
   rateLimit: (identifier: string) => `ratelimit:${identifier}`,
