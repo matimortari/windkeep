@@ -2,9 +2,10 @@
   <section
     id="hero" v-motion
     :initial="{ opacity: 0 }" :visible-once="{ opacity: 1 }"
-    :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center px-4 md:p-20"
+    :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-4"
   >
     <div class="backdrop" />
+    <div class="dot-overlay" />
 
     <header class="z-20 flex w-full max-w-4xl flex-col gap-4">
       <div class="h-1 w-15 bg-primary" />
@@ -29,7 +30,7 @@
         </nuxt-link>
       </div>
 
-      <div class="flex flex-wrap items-center gap-4 border-t py-8">
+      <div class="flex flex-wrap items-center gap-4 py-8">
         <div
           v-for="(highlight, index) in HIGHLIGHTS" :key="index"
           v-motion :initial="{ opacity: 0 }"
@@ -43,15 +44,17 @@
     </header>
   </section>
 
-  <section id="cli" class="w-full border-y-2 px-4 py-12 md:p-20">
-    <div class="container mx-auto grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
+  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-20 md:max-w-6xl md:gap-20">
+    <section id="cli" class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
       <header class="flex flex-col gap-4 md:border-r md:pr-12">
-        <p class="section-label">
-          Command Line Interface
-        </p>
-        <h2>
-          Built for the Terminal.
-        </h2>
+        <div class="flex items-end justify-between border-b pb-4">
+          <h2>
+            WindKeep CLI
+          </h2>
+          <p class="section-label hidden md:block">
+            Command-line secrets management
+          </p>
+        </div>
 
         <p class="font-medium text-muted-foreground">
           Manage secrets and projects directly from your terminal. Fast, secure, and open-source.
@@ -88,78 +91,78 @@
           <Shiki lang="bash" :code="currentTab.code.join('\n')" class="code-block" />
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section
-    id="features" v-motion
-    :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
-    :duration="800" class="w-full px-4 py-12 md:p-20"
-  >
-    <div class="flex items-end justify-between border-b pb-4">
-      <h2>
-        Features
-      </h2>
-      <p class="section-label hidden md:block">
-        What WindKeep offers
-      </p>
-    </div>
+    <section
+      id="features" v-motion
+      :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
+      :duration="800"
+    >
+      <div class="flex items-end justify-between border-b pb-4">
+        <h2>
+          Features
+        </h2>
+        <p class="section-label hidden md:block">
+          What WindKeep offers
+        </p>
+      </div>
 
-    <div class="grid grid-cols-1 border-b md:grid-cols-2">
-      <div
-        v-for="(feature, index) in FEATURES" :key="index"
-        v-motion :initial="{ opacity: 0 }"
-        :visible-once="{ opacity: 1 }" :duration="600"
-        :delay="100 * index" class="feature-item"
-        :class="{ 'border-b': index < FEATURES.length - 2, 'max-md:border-b': index === FEATURES.length - 2, 'md:border-l': index % 2 === 1 }"
-      >
-        <div class="flex flex-col gap-2">
-          <div class="navigation-group">
-            <icon :name="feature.icon" class="text-primary" size="25" />
-            <h3 class="text-base! leading-none! font-bold">
-              {{ feature.title }}
-            </h3>
+      <div class="grid grid-cols-1 border-b md:grid-cols-2">
+        <div
+          v-for="(feature, index) in FEATURES" :key="index"
+          v-motion :initial="{ opacity: 0 }"
+          :visible-once="{ opacity: 1 }" :duration="600"
+          :delay="100 * index" class="feature-item"
+          :class="{ 'border-b': index < FEATURES.length - 2, 'max-md:border-b': index === FEATURES.length - 2, 'md:border-l': index % 2 === 1 }"
+        >
+          <div class="flex flex-col gap-2">
+            <div class="navigation-group">
+              <icon :name="feature.icon" class="text-primary" size="25" />
+              <h3 class="text-base! leading-none! font-bold">
+                {{ feature.title }}
+              </h3>
+            </div>
+            <p class="text-caption">
+              {{ feature.description }}
+            </p>
           </div>
-          <p class="text-caption">
-            {{ feature.description }}
-          </p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section
-    id="faq" v-motion
-    :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
-    :duration="800" class="w-full border-t px-4 py-12 md:p-20"
-  >
-    <div class="flex items-end justify-between border-b pb-4">
-      <h2>
-        FAQ
-      </h2>
-      <p class="section-label hidden md:block">
-        Frequently Asked Questions
-      </p>
-    </div>
-
-    <div class="flex flex-col divide-y">
-      <div v-for="(item, index) in FAQS" :key="index" class="py-4">
-        <button
-          class="group flex w-full items-start justify-between gap-4 text-left font-semibold transition-colors hover:text-primary"
-          @click="openIndex = openIndex === index ? null : index"
-        >
-          <span class="text-sm md:text-base">{{ item.question }}</span>
-          <icon name="ph:plus-bold" size="20" class="mt-0.5 shrink-0 transition-transform" :class="openIndex === index ? 'rotate-45 text-primary' : 'text-muted-foreground'" />
-        </button>
-
-        <transition name="accordion">
-          <p v-if="openIndex === index" class="text-caption max-w-4xl">
-            {{ item.answer }}
-          </p>
-        </transition>
+    <section
+      id="faq" v-motion
+      :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
+      :duration="800"
+    >
+      <div class="flex items-end justify-between border-b pb-4">
+        <h2>
+          FAQ
+        </h2>
+        <p class="section-label hidden md:block">
+          Frequently Asked Questions
+        </p>
       </div>
-    </div>
-  </section>
+
+      <div class="flex flex-col divide-y">
+        <div v-for="(item, index) in FAQS" :key="index" class="py-4">
+          <button
+            class="group flex w-full items-start justify-between gap-4 text-left font-semibold transition-colors hover:text-primary"
+            @click="openIndex = openIndex === index ? null : index"
+          >
+            <span class="text-sm md:text-base">{{ item.question }}</span>
+            <icon name="ph:plus-bold" size="20" class="mt-0.5 shrink-0 transition-transform" :class="openIndex === index ? 'rotate-45 text-primary' : 'text-muted-foreground'" />
+          </button>
+
+          <transition name="accordion">
+            <p v-if="openIndex === index" class="text-caption max-w-4xl">
+              {{ item.answer }}
+            </p>
+          </transition>
+        </div>
+      </div>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -184,7 +187,7 @@ h2 {
 }
 
 .hero-heading {
-  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-size: clamp(1.5rem, 3.75vw, 3.375rem);
   line-height: 1.05;
 }
 
@@ -202,6 +205,21 @@ h2 {
 }
 html.light .backdrop {
   opacity: 0;
+}
+
+.dot-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--foreground) 25%, transparent) 2px,
+    transparent 2px
+  );
+  background-size: 10px 10px;
+  mask-image: linear-gradient(135deg, black 0%, transparent 50%, transparent 70%, black 100%);
+  -webkit-mask-image: linear-gradient(135deg, black 0%, transparent 50%, transparent 70%, black 100%);
 }
 
 .cli-tab {

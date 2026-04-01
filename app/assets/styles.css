@@ -173,11 +173,14 @@ h6 {
   background-color: var(--card);
   border: var(--border-style);
   border-radius: var(--border-radius);
-  padding: 1.25rem;
-  transition: box-shadow var(--transition);
+  padding: 1rem;
+  transition:
+    box-shadow var(--transition),
+    background-color var(--transition);
 }
 .card:hover {
   box-shadow: 0 2px 4px 0px rgba(0, 0, 0, 0.2);
+  background-color: color-mix(in srgb, var(--card) 95%, var(--foreground));
 }
 
 .overlay {
@@ -186,11 +189,15 @@ h6 {
   border-radius: var(--border-radius);
   padding: 1.5rem;
   z-index: 50;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
   box-shadow: 0 2px 4px 0px rgba(0, 0, 0, 0.2);
-  transition: box-shadow var(--transition);
 }
-.overlay:hover {
-  box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.25);
+.overlay > section {
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .dropdown-menu {
