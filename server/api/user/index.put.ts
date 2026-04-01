@@ -14,20 +14,22 @@ export default defineEventHandler(async (event) => {
 
   // Only regenerate when the boolean is explicitly sent and true
   let apiTokenToUpdate: string | undefined
+  let apiTokenHashToUpdate: string | undefined
   let apiTokenExpiresAt: Date | undefined
   if (result.data.regenerateApiToken) {
-    apiTokenToUpdate = generateToken()
+    apiTokenToUpdate = generateToken(24)
+    apiTokenHashToUpdate = hashApiToken(apiTokenToUpdate)
     apiTokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
   }
 
   const updatedUser = await db.user.update({
     where: { id: user.id },
-    data: { name: result.data.name, ...(apiTokenToUpdate !== undefined && { apiToken: apiTokenToUpdate, apiTokenExpiresAt }) },
+    data: { name: result.data.name, ...(apiTokenHashToUpdate !== undefined && { apiToken: apiTokenHashToUpdate, apiTokenExpiresAt }) },
     select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true, createdAt: true, updatedAt: true },
   })
 
   // Invalidate cache for user data
   await deleteCached(CacheKeys.userData(user.id))
 
-  return { updatedUser }
+  return { updatedUser: { ...updatedUser, apiToken: null }, ...(apiTokenToUpdate !== undefined && { newApiToken: apiTokenToUpdate }) }
 })

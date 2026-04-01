@@ -2,13 +2,10 @@ import { Buffer } from "node:buffer"
 import crypto from "node:crypto"
 
 const algorithm = "aes-256-gcm"
-const secret = process.env.ENCRYPTION_KEY
-if (!secret) {
-  throw new Error("Encryption key is missing")
-}
+const encriptionKey = requireEnv("ENCRYPTION_KEY")
 
-// Derive a 32-byte key from the secret
-const key = crypto.createHash("sha256").update(secret).digest()
+// Derive a 32-byte key from the secret using SHA-256
+const key = crypto.createHash("sha256").update(encriptionKey).digest()
 
 export function encrypt(input: string): string {
   try {

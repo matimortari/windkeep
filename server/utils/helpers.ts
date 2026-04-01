@@ -1,5 +1,5 @@
 import type { EventHandlerRequest, H3Event } from "h3"
-import { randomBytes } from "node:crypto"
+import { createHmac, randomBytes } from "node:crypto"
 
 /**
  * Helper function to ensure required environment variables are set, throwing an error if missing.
@@ -11,6 +11,13 @@ export function requireEnv(name: string) {
   }
 
   return value
+}
+
+/**
+ * Hashes API tokens before persistence/comparison to avoid storing raw bearer credentials.
+ */
+export function hashApiToken(token: string): string {
+  return createHmac("sha256", requireEnv("ENCRYPTION_KEY")).update(token).digest("hex")
 }
 
 /**
@@ -27,11 +34,17 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
   const authHeader = getHeader(event, "authorization")
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7)
-    const user = await db.user.findUnique({
-      where: { apiToken: token },
+    const tokenHash = hashApiToken(token)
+    const user = await db.user.findFirst({
+      where: { apiToken: { in: [token, tokenHash] } },
       select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true },
     })
     if (user && user.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
+      // Transparent migration path for legacy plaintext tokens.
+      if (user.apiToken === token) {
+        await db.user.update({ where: { id: user.id }, data: { apiToken: tokenHash } })
+      }
+
       return { id: user.id, email: user.email, name: user.name, image: user.image, apiToken: user.apiToken }
     }
   }
@@ -94,10 +107,8 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
 /**
  * Returns the base URL used for invite links.
  */
-export function getInviteBaseUrl(event: H3Event<EventHandlerRequest>) {
-  const protocol = event.node.req.headers["x-forwarded-proto"] || "http"
-  const host = event.node.req.headers.host
-  return `${protocol}://${host}`
+export function getInviteBaseUrl(_event: H3Event<EventHandlerRequest>) {
+  return requireEnv("NUXT_PUBLIC_BASE_URL").trim().replace(/\/+$/, "")
 }
 
 export async function getBinaryBlobUrl(binaryKey: string) {

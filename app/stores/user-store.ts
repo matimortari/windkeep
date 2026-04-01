@@ -28,7 +28,7 @@ export const useUserStore = defineStore("user", () => {
     loading.value = true
 
     try {
-      const res = await $fetch<{ updatedUser: User }>("/api/user", { method: "PUT", body: data, credentials: "include" })
+      const res = await $fetch<{ updatedUser: User, newApiToken?: string }>("/api/user", { method: "PUT", body: data, credentials: "include" })
       user.value = res.updatedUser
       toast.success("User updated successfully")
       return res
