@@ -151,8 +151,8 @@ export const BRAND_SECTIONS = [
   { id: "wordmarks", label: "Wordmarks" },
   { id: "symbols", label: "Symbols" },
   { id: "brand", label: "Brand Colors" },
-  { id: "base", label: "Base Colors" },
-  { id: "accent", label: "Accent Colors" },
+  { id: "neutral", label: "Neutral Colors" },
+  { id: "status", label: "Status Colors" },
 ]
 
 export const SYMBOLS = [
@@ -171,7 +171,7 @@ export const BRAND_COLORS = [
   { name: "Secondary", var: "--secondary" },
 ]
 
-export const BASE_COLORS = [
+export const NEUTRAL_COLORS = [
   { name: "Background", var: "--background" },
   { name: "Foreground", var: "--foreground" },
   { name: "Card", var: "--card" },
@@ -180,7 +180,9 @@ export const BASE_COLORS = [
   { name: "Muted Foreground", var: "--muted-foreground" },
 ]
 
-export const ACCENT_COLORS = [
+export const STATUS_COLORS = [
   { name: "Danger", var: "--danger" },
   { name: "Success", var: "--success" },
+  { name: "Warning", var: "--warning" },
+  { name: "Info", var: "--info" },
 ]
