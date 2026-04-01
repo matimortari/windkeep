@@ -194,6 +194,6 @@ interface UIState {
 interface Toast {
   id: string
   message: string
-  type: "success" | "error"
+  type: "success" | "error" | "warning" | "info"
   duration?: number
 }
