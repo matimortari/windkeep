@@ -28,6 +28,8 @@
   --secondary: #334155;
   --danger: #b91c1c;
   --success: #047857;
+  --warning: #b45309;
+  --info: #0369a1;
 
   --border-style: 2px solid var(--muted);
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -45,6 +47,8 @@ html.light {
   --secondary: #334155;
   --danger: #b91c1c;
   --success: #047857;
+  --warning: #b45309;
+  --info: #0369a1;
 }
 
 @theme {
@@ -59,6 +63,8 @@ html.light {
   --color-secondary: var(--secondary);
   --color-danger: var(--danger);
   --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
 
   --font-default: "Roboto", sans-serif;
   --font-display: "Russo One", sans-serif;
@@ -129,7 +135,9 @@ h6 {
 
 .text-caption,
 .text-caption-success,
-.text-caption-danger {
+.text-caption-danger,
+.text-caption-warning,
+.text-caption-info {
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;
@@ -142,6 +150,12 @@ h6 {
 }
 .text-caption-danger {
   color: var(--danger);
+}
+.text-caption-warning {
+  color: var(--warning);
+}
+.text-caption-info {
+  color: var(--info);
 }
 
 .section-label {

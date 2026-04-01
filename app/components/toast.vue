@@ -8,7 +8,7 @@
           role="alert"
         >
           <div class="toast-content">
-            <icon :name="toast.type === 'success' ? 'ph:check-circle-bold' : 'ph:x-circle-bold'" size="20" />
+            <icon :name="getToastIcon(toast.type)" size="20" />
             <span class="toast-message">{{ toast.message }}</span>
           </div>
           <button class="toast-close" aria-label="Close notification" @click="dismiss(toast.id)">
@@ -22,6 +22,22 @@
 
 <script setup lang="ts">
 const { toasts, dismiss } = useToast()
+
+function getToastIcon(type: Toast["type"]) {
+  if (type === "success") {
+    return "ph:check-circle-bold"
+  }
+
+  if (type === "warning") {
+    return "ph:warning-circle-bold"
+  }
+
+  if (type === "info") {
+    return "ph:info-bold"
+  }
+
+  return "ph:x-circle-bold"
+}
 </script>
 
 <style scoped>
@@ -96,6 +112,16 @@ const { toasts, dismiss } = useToast()
 .toast-error {
   background-color: color-mix(in oklab, var(--color-danger) 20%, transparent);
   color: var(--danger);
+}
+
+.toast-warning {
+  background-color: color-mix(in oklab, var(--color-warning) 20%, transparent);
+  color: var(--warning);
+}
+
+.toast-info {
+  background-color: color-mix(in oklab, var(--color-info) 20%, transparent);
+  color: var(--info);
 }
 
 .toast-enter-active,
