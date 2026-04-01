@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
     },
     include: {
       org: { select: { id: true, name: true } },
-      memberships: { include: { user: { select: { id: true, email: true, name: true, image: true } } } },
-      _count: { select: { secrets: true } },
+      secrets: { select: { id: true } },
+      memberships: { select: { userId: true, projectId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
     },
   })
 
@@ -52,8 +52,8 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for user projects and org data
-  await deleteCached(CacheKeys.userProjects(user.id), CacheKeys.orgData(user.id, newProject.orgId))
+  // Invalidate cache for user projects
+  await deleteCached(CacheKeys.userProjects(user.id))
 
   return { project: newProject }
 })

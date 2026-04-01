@@ -30,8 +30,7 @@ export default defineEventHandler(async (event) => {
         website: true,
         createdAt: true,
         updatedAt: true,
-        memberships: { select: { userId: true, role: true, isActive: true, user: { select: { id: true, name: true, image: true } } } },
-        projects: true,
+        memberships: { select: { userId: true, role: true, isActive: true, user: { select: { id: true, name: true, email: true, image: true } } } },
       },
     } },
   })
