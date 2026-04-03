@@ -78,7 +78,7 @@
         <div class="grid grid-cols-2 gap-4">
           <div v-for="(color, index) in category.colors" :key="color.name" class="card group flex w-full flex-col items-start gap-2 p-2! md:flex-row md:items-center">
             <button
-              class="size-24 shrink-0 rounded-lg border" :style="{ backgroundColor: `var(${color.var})` }"
+              class="aspect-square w-full shrink-0 rounded-lg border md:size-24" :style="{ backgroundColor: `var(${color.var})` }"
               :aria-label="`Copy ${color.name}`" @click="handleCopyColor(color.var, index, category.actions)"
             />
             <div class="flex w-full flex-col items-start gap-1.5 px-0.5 md:min-w-0">
