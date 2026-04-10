@@ -98,25 +98,25 @@ function getPendingChangeType(key: string): "create" | "update" | "delete" | nul
 
 function getRowClass(key: string) {
   if (getPendingChangeType(key) === "create") {
-    return "bg-success/20 hover:bg-success/30!"
+    return "bg-success hover:bg-success-background/30!"
   }
   if (getPendingChangeType(key) === "update") {
-    return "bg-secondary/20 hover:bg-secondary/30!"
+    return "bg-info/20 hover:bg-info/30!"
   }
   if (getPendingChangeType(key) === "delete") {
-    return "bg-danger/20 hover:bg-danger/30! line-through decoration-danger"
+    return "bg-danger hover:bg-danger-background/30! line-through decoration-danger-foreground"
   }
 }
 
 function getSecretValueClass(key: string) {
   if (getPendingChangeType(key) === "create") {
-    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-success/40 group-hover:bg-success/50!"
+    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-success-background/40 group-hover:bg-success-background/50!"
   }
   if (getPendingChangeType(key) === "update") {
-    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-secondary/40 group-hover:bg-secondary/50!"
+    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-info/40 group-hover:bg-info/50!"
   }
   if (getPendingChangeType(key) === "delete") {
-    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-danger/40 group-hover:bg-danger/50!"
+    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-danger-background/40 group-hover:bg-danger-background/50!"
   }
 
   return "rounded-lg px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-muted"
