@@ -195,6 +195,7 @@ interface TocHeader {
   id: string
   text: string
   method?: string
+  level: number
 }
 
 interface Toast {

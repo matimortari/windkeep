@@ -33,18 +33,11 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
   // Fall back to API token auth (for CLI access)
   const authHeader = getHeader(event, "authorization")
   if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.substring(7)
-    const tokenHash = hashApiToken(token)
     const user = await db.user.findFirst({
-      where: { apiToken: { in: [token, tokenHash] } },
+      where: { apiToken: hashApiToken(authHeader.substring(7)) },
       select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true },
     })
     if (user && user.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
-      // Transparent migration path for legacy plaintext tokens.
-      if (user.apiToken === token) {
-        await db.user.update({ where: { id: user.id }, data: { apiToken: tokenHash } })
-      }
-
       return { id: user.id, email: user.email, name: user.name, image: user.image, apiToken: user.apiToken }
     }
   }
