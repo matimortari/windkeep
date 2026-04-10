@@ -129,7 +129,7 @@ const diffItems = computed<DiffItem[]>(() => {
   // Added or updated
   for (const [key, value] of Object.entries(next)) {
     if (!(key in current)) {
-      items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success/15 text-success" })
+      items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success" })
     }
     else if (current[key] !== value) {
       items.push({ key, value, type: "updated", icon: "ph:pencil-bold", class: "bg-secondary/15 text-secondary" })
@@ -139,7 +139,7 @@ const diffItems = computed<DiffItem[]>(() => {
   // Removed (existed before, not in editor anymore)
   for (const key of Object.keys(current)) {
     if (!(key in next)) {
-      items.push({ key, type: "removed", icon: "ph:minus-bold", class: "bg-danger/15 text-danger" })
+      items.push({ key, type: "removed", icon: "ph:minus-bold", class: "bg-danger" })
     }
   }
 

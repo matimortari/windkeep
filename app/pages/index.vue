@@ -20,7 +20,7 @@
       </p>
 
       <div class="navigation-group">
-        <nuxt-link to="/sign-in" class="group btn rounded-full! bg-linear-to-r from-primary to-secondary text-surface-foreground! shadow-lg shadow-primary/30 transition-all hover:shadow-primary/40">
+        <nuxt-link to="/sign-in" class="group btn rounded-full! bg-linear-to-r from-primary to-secondary text-[#eeeeee] shadow-lg shadow-primary/30 transition-all hover:shadow-primary/40">
           <span class="font-semibold">Get Started</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>

@@ -19,7 +19,7 @@
               {{ env.environment.charAt(0) + env.environment.slice(1).toLowerCase() }}
             </h4>
 
-            <div class="rounded-lg border-success/20 bg-success/10 p-2">
+            <div class="rounded-lg border-success bg-success p-2">
               <span class="text-caption-success text-sm font-medium">Current Value</span>
 
               <div class="navigation-group justify-between font-mono text-sm text-muted-foreground">
