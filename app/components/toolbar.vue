@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-1/2 z-50 w-full -translate-x-1/2">
+  <div class="fixed top-0 left-1/2 z-40 w-full -translate-x-1/2">
     <div class="flex flex-row items-center justify-between border-b-2 bg-card/50 p-2 backdrop-blur-xl">
       <nav class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
         <nuxt-link to="/">

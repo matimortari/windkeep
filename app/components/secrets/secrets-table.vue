@@ -15,20 +15,22 @@
       </thead>
 
       <tbody>
-        <tr v-for="(secret, index) in sortedSecrets" :key="`${secret.key}-${index}`" class="group hover:bg-muted/20" :class="getRowClass(secret.key)">
+        <tr
+          v-for="(secret, index) in sortedSecrets" :key="`${secret.key}-${index}`"
+          class="group hover:bg-muted/20" :class="getRowClass(secret.key)"
+          :data-change-type="getPendingChangeType(secret.key) ?? 'none'"
+        >
           <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
             <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold">
-              <icon v-if="getPendingChangeType(secret.key) === 'create'" name="ph:plus-circle-bold" size="20" class="text-caption-success shrink-0" />
-              <icon v-else-if="getPendingChangeType(secret.key) === 'update'" name="ph:pencil-circle-bold" size="20" class="shrink-0 text-secondary" />
-              <icon v-else-if="getPendingChangeType(secret.key) === 'delete'" name="ph:minus-circle-bold" size="20" class="text-caption-danger shrink-0" />
-              <span class="truncate"><span class="text-muted">{{ index + 1 }}.</span> {{ secret.key }}</span>
+              <icon v-if="getPendingIconName(secret.key)" :name="getPendingIconName(secret.key)!" size="20" class="shrink-0" />
+              <span class="truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
               <span v-if="secret.description" class="group/tooltip relative hidden shrink-0 cursor-pointer md:inline-flex">
                 <icon name="ph:info-bold" size="15" />
-                <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 rounded-lg p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
+                <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
               </span>
             </div>
 
-            <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm text-muted-foreground">
+            <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm">
               <span class="max-w-[80%] truncate select-none" aria-label="Hidden value" :class="[getSecretValue(secret.key, col.env) ? getSecretValueClass(secret.key) : '']">{{ renderValue(secret.key, col.env) }}</span>
               <button v-if="getSecretValue(secret.key, col.env)" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, getSecretValue(secret.key, col.env))">
                 <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
@@ -72,17 +74,41 @@ const { isOwner, isAdmin } = storeToRefs(useProjectStore())
 const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
 
+const rowClassByChangeType: Record<"create" | "update" | "delete", string> = {
+  create: "bg-success/50!",
+  update: "bg-info/50!",
+  delete: "bg-danger/50! line-through decoration-danger-foreground",
+}
+
+const valueClassByChangeType: Record<"create" | "update" | "delete", string> = {
+  create: "rounded-lg px-1 bg-success/50!",
+  update: "rounded-lg px-1 bg-info/50!",
+  delete: "rounded-lg px-1 bg-danger/50!",
+}
+
+const iconNameByChangeType: Record<"create" | "update" | "delete", string> = {
+  create: "ph:plus-circle-bold",
+  update: "ph:pencil-circle-bold",
+  delete: "ph:minus-circle-bold",
+}
+
+const secretValuesByKey = computed(() => {
+  const map = new Map<string, Map<string, string>>()
+  for (const secret of props.secrets) {
+    const valuesByEnvironment = new Map<string, string>()
+    for (const value of secret.values ?? []) {
+      valuesByEnvironment.set(value.environment, value.value)
+    }
+
+    map.set(secret.key, valuesByEnvironment)
+  }
+
+  return map
+})
+
 const columns = computed<Record<string, any>[]>(() => {
   const base = [{ key: "key", label: "Key", class: "w-full", type: "base", sortable: true }]
-  const envCols = environments.map(env => ({
-    key: env.toLowerCase(),
-    label: env.charAt(0) + env.slice(1).toLowerCase(),
-    env,
-    type: "env",
-    class: "max-w-40 md:max-w-52",
-    sortable: false,
-  }))
-
+  const envCols = environments.map(env => ({ key: env.toLowerCase(), label: env.charAt(0) + env.slice(1).toLowerCase(), env, type: "env", class: "max-w-40 md:max-w-52", sortable: false }))
   const actions = [{ key: "actions", label: "Actions", class: "w-20 text-right", type: "actions", sortable: false }]
   return [...base, ...envCols, ...actions]
 })
@@ -92,34 +118,34 @@ function getPendingChangeType(key: string): "create" | "update" | "delete" | nul
     return null
   }
 
-  const change = props.pendingChanges.get(key)
-  return change ? change.type : null
+  return props.pendingChanges.get(key)?.type ?? null
 }
 
 function getRowClass(key: string) {
-  if (getPendingChangeType(key) === "create") {
-    return "bg-success hover:bg-success-background/30!"
+  const changeType = getPendingChangeType(key)
+  if (!changeType) {
+    return ""
   }
-  if (getPendingChangeType(key) === "update") {
-    return "bg-info/20 hover:bg-info/30!"
+
+  return rowClassByChangeType[changeType]
+}
+
+function getPendingIconName(key: string) {
+  const changeType = getPendingChangeType(key)
+  if (!changeType) {
+    return null
   }
-  if (getPendingChangeType(key) === "delete") {
-    return "bg-danger hover:bg-danger-background/30! line-through decoration-danger-foreground"
-  }
+
+  return iconNameByChangeType[changeType]
 }
 
 function getSecretValueClass(key: string) {
-  if (getPendingChangeType(key) === "create") {
-    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-success-background/40 group-hover:bg-success-background/50!"
-  }
-  if (getPendingChangeType(key) === "update") {
-    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-info/40 group-hover:bg-info/50!"
-  }
-  if (getPendingChangeType(key) === "delete") {
-    return "rounded-lg px-1 transition-colors hover:text-secondary! bg-danger-background/40 group-hover:bg-danger-background/50!"
+  const changeType = getPendingChangeType(key)
+  if (!changeType) {
+    return "rounded-lg px-1 bg-muted"
   }
 
-  return "rounded-lg px-1 transition-colors group-hover:bg-card! hover:text-secondary! bg-muted"
+  return valueClassByChangeType[changeType]
 }
 
 function getCopyIcon(secretKey: string, env: string) {
@@ -140,7 +166,7 @@ function isKeyVisible(key: string): boolean {
 }
 
 function getSecretValue(key: string, env: string) {
-  return props.secrets.find(s => s.key === key)?.values?.find(v => v.environment === env)?.value ?? ""
+  return secretValuesByKey.value.get(key)?.get(env) ?? ""
 }
 
 function renderValue(key: string, env: string) {
@@ -148,3 +174,27 @@ function renderValue(key: string, env: string) {
   return val ? (isKeyVisible(key) ? val : "•".repeat(val.length)) : "—"
 }
 </script>
+
+<style scoped>
+tbody tr td {
+  color: var(--row-text, var(--muted-foreground)) !important;
+  box-shadow: inset 0 -1px 0 var(--row-divider, color-mix(in srgb, var(--muted) 30%, transparent)) !important;
+}
+
+tbody tr {
+  border-bottom: none !important;
+}
+
+tbody tr[data-change-type="create"] {
+  --row-text: var(--success-foreground);
+  --row-divider: color-mix(in srgb, var(--success) 50%, transparent);
+}
+tbody tr[data-change-type="update"] {
+  --row-text: var(--info-foreground);
+  --row-divider: color-mix(in srgb, var(--info) 50%, transparent);
+}
+tbody tr[data-change-type="delete"] {
+  --row-text: var(--danger-foreground);
+  --row-divider: color-mix(in srgb, var(--danger) 50%, transparent);
+}
+</style>

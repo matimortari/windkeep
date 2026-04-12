@@ -38,7 +38,7 @@
           <button
             v-for="day in calendarDays" :key="`${day.date}-${day.isCurrentMonth}`"
             :aria-label="`${day.isStart ? 'Start: ' : day.isEnd ? 'End: ' : ''}${day.date.toLocaleDateString('en-GB')}`"
-            class="aspect-square rounded-lg text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-primary': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
+            class="aspect-square rounded-lg text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-info': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
             :disabled="!day.isCurrentMonth" @mouseenter="hoverDate = day.date"
             @mouseleave="hoverDate = null" @click="selectDate(day)"
           >
