@@ -27,7 +27,7 @@
           <button class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
-          <button class="btn-success" type="submit" :disabled="loading">
+          <button class="btn-success" type="submit">
             Save
           </button>
         </div>
@@ -45,8 +45,6 @@ const props = defineProps<{
 const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 const { isSecretsEditorOpen, closeDialog } = useUIState()
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
-const projectStore = useProjectStore()
-const { loading } = storeToRefs(projectStore)
 const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({ key: "", description: "", values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } })
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 

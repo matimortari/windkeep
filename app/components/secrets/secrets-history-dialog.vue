@@ -102,13 +102,8 @@ async function fetchHistory() {
     return
   }
 
-  try {
-    const data = await projectStore.getSecretHistory(props.projectId, props.secretId)
-    history.value = data || []
-  }
-  catch {
-    // Silently fail
-  }
+  const data = await projectStore.getSecretHistory(props.projectId, props.secretId)
+  history.value = data || []
 }
 
 async function handleCopy(key: string, value: string) {

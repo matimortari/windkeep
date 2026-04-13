@@ -75,14 +75,9 @@ async function handleCreateProject(project: { name: string, description?: string
     return
   }
 
-  try {
-    await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
-    await projectStore.getProjects()
-    closeDialog("projects")
-  }
-  catch {
-    // Silently fail
-  }
+  await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
+  await projectStore.getProjects()
+  closeDialog("projects")
 }
 
 // Persist layout mode in localStorage

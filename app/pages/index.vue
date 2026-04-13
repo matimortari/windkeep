@@ -44,7 +44,7 @@
     </header>
   </section>
 
-  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-20 md:max-w-6xl md:gap-20">
+  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-20 md:max-w-7xl md:gap-20">
     <section id="cli" class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
       <header class="flex flex-col gap-4 md:border-r md:pr-12">
         <div class="flex items-end justify-between border-b pb-4">

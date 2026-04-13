@@ -49,10 +49,8 @@
       <nav v-else aria-label="Projects Navigation" class="flex flex-col gap-2">
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
-          :to="`/admin/${project.slug}`"
-          class="text-caption truncate border-l-2 border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
-          :class="{ 'border-primary! text-primary!': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }"
-          @click="emit('update:isOpen', false)"
+          :to="`/admin/${project.slug}`" class="text-caption truncate border-l-2 border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
+          :class="{ 'border-primary! text-primary!': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="emit('update:isOpen', false)"
         >
           {{ project.name }}
         </nuxt-link>
@@ -99,13 +97,8 @@ async function handleCreateProject(project: { name: string, description?: string
     return
   }
 
-  try {
-    await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
-    await projectStore.getProjects()
-    closeDialog("projects")
-  }
-  catch {
-    // Silently fail
-  }
+  await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
+  await projectStore.getProjects()
+  closeDialog("projects")
 }
 </script>
