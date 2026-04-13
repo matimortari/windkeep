@@ -33,22 +33,22 @@
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm">
               <span class="max-w-[80%] truncate select-none" aria-label="Hidden value" :class="[getSecretValue(secret.key, col.env) ? getSecretValueClass(secret.key) : '']">{{ renderValue(secret.key, col.env) }}</span>
               <button v-if="getSecretValue(secret.key, col.env)" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, getSecretValue(secret.key, col.env))">
-                <icon :name="getCopyIcon(secret.key, col.env)" size="20" class="hover:text-primary" />
+                <icon :name="getCopyIcon(secret.key, col.env)" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
             </div>
 
             <div v-else-if="col.key === 'actions'" class="navigation-group">
               <button aria-label="View history" @click="emit('history', secret)">
-                <icon name="ph:clock-counter-clockwise-bold" size="20" class="hover:text-primary" />
+                <icon name="ph:clock-counter-clockwise-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
               <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !isKeyVisible(secret.key)">
-                <icon :name="isKeyVisible(secret.key) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
+                <icon :name="isKeyVisible(secret.key) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
               <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Edit Secret" @click="emit('edit', secret)">
-                <icon name="ph:note-pencil-bold" size="20" class="hover:text-primary" />
+                <icon name="ph:note-pencil-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
               <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Delete Secret" @click="emit('delete', secret.key)">
-                <icon name="ph:x-bold" size="20" class="hover:text-danger" />
+                <icon name="ph:x-bold" size="20" :class="getActionIconClass(secret.key, 'danger')" />
               </button>
             </div>
           </td>
@@ -76,13 +76,13 @@ const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<
 
 const rowClassByChangeType: Record<"create" | "update" | "delete", string> = {
   create: "bg-success/50!",
-  update: "bg-info/50!",
+  update: "bg-warning/50!",
   delete: "bg-danger/50! line-through decoration-danger-foreground",
 }
 
 const valueClassByChangeType: Record<"create" | "update" | "delete", string> = {
   create: "rounded-lg px-1 bg-success/50!",
-  update: "rounded-lg px-1 bg-info/50!",
+  update: "rounded-lg px-1 bg-warning/50!",
   delete: "rounded-lg px-1 bg-danger/50!",
 }
 
@@ -148,6 +148,14 @@ function getSecretValueClass(key: string) {
   return valueClassByChangeType[changeType]
 }
 
+function getActionIconClass(key: string, defaultTone: "primary" | "danger" = "primary") {
+  if (getPendingChangeType(key)) {
+    return "hover:text-current"
+  }
+
+  return defaultTone === "danger" ? "hover:text-danger" : "hover:text-primary"
+}
+
 function getCopyIcon(secretKey: string, env: string) {
   return copyStates.value[`${secretKey}-${env}`] ? "ph:check-bold" : "ph:copy-bold"
 }
@@ -190,8 +198,8 @@ tbody tr[data-change-type="create"] {
   --row-divider: color-mix(in srgb, var(--success) 50%, transparent);
 }
 tbody tr[data-change-type="update"] {
-  --row-text: var(--info-foreground);
-  --row-divider: color-mix(in srgb, var(--info) 50%, transparent);
+  --row-text: var(--warning-foreground);
+  --row-divider: color-mix(in srgb, var(--warning) 50%, transparent);
 }
 tbody tr[data-change-type="delete"] {
   --row-text: var(--danger-foreground);

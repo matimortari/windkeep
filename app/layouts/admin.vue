@@ -21,23 +21,39 @@ const { user } = storeToRefs(userStore)
 const { isSidebarOpen, toggleSidebar, openSidebar, closeSidebar } = useUIState()
 const isLoading = ref(true)
 
-onMounted(async () => {
-  try {
-    await userStore.getUser()
-    const activeOrg = user.value?.orgMemberships?.find(m => m.isActive)
-    if (!activeOrg) {
-      return navigateTo("/onboarding")
-    }
+async function goTo(path: string) {
+  isLoading.value = false
+  await navigateTo(path)
+}
 
-    await orgStore.getOrg(activeOrg.orgId)
-    orgStore.setActiveOrg(activeOrg.orgId)
-    await projectStore.getProjects()
+function runSafely(task: () => Promise<unknown>) {
+  return task().then(() => true, () => false)
+}
+
+onMounted(async () => {
+  if (!await runSafely(() => userStore.getUser())) {
+    await goTo("/sign-in")
+    return
   }
-  catch {
-    await navigateTo("/sign-in")
+
+  const activeOrg = user.value?.orgMemberships?.find(m => m.isActive)
+  if (!activeOrg) {
+    await goTo("/onboarding")
+    return
   }
-  finally {
-    isLoading.value = false
+
+  if (!await runSafely(() => orgStore.getOrg(activeOrg.orgId))) {
+    await goTo("/sign-in")
+    return
   }
+
+  orgStore.setActiveOrg(activeOrg.orgId)
+
+  if (!await runSafely(() => projectStore.getProjects())) {
+    await goTo("/sign-in")
+    return
+  }
+
+  isLoading.value = false
 })
 </script>

@@ -4,7 +4,7 @@
       Organization
     </h2>
 
-    <section class="flex flex-col">
+    <section class="container mx-auto flex flex-col">
       <div class="gap-2 border-b p-4 md:navigation-group">
         <header class="flex flex-col gap-2">
           <h3>
@@ -17,7 +17,7 @@
       </div>
 
       <!-- Organization Details -->
-      <div v-for="(field, index) in orgFields" :key="index" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10">
+      <div v-for="(field, index) in orgFields" :key="index" class="container mx-auto flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h5>
             {{ field.label }}
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Organization Projects List -->
-      <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
+      <section class="container mx-auto flex flex-col justify-between gap-2 border-b p-4 md:px-10">
         <h5>
           Organization Projects
         </h5>
@@ -76,7 +76,7 @@
       </section>
 
       <!-- Organization Members List -->
-      <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
+      <section class="container mx-auto flex flex-col justify-between gap-2 border-b p-4 md:px-10">
         <h5>
           Organization Members
         </h5>
@@ -115,7 +115,7 @@
     </section>
 
     <!-- Invite Members -->
-    <section v-if="isOwner || isAdmin" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Invite Members">
+    <section v-if="isOwner || isAdmin" class="container mx-auto flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Invite Members">
       <header class="flex flex-col gap-1">
         <h5>
           Invite Members
@@ -134,7 +134,7 @@
     </section>
 
     <!-- Danger Zone -->
-    <section class="flex flex-col">
+    <section class="container mx-auto flex flex-col">
       <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
         <h3>
           Danger Zone

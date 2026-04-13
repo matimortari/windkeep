@@ -30,7 +30,7 @@
 
       <div ref="dropdownRef" class="relative">
         <button class="btn-secondary" :disabled="hasPendingChanges" @click="isDropdownOpen = !isDropdownOpen">
-          <span>Export</span>
+          <span>Export as .env</span>
           <icon name="ph:download-bold" size="20" />
         </button>
 

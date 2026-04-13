@@ -22,12 +22,16 @@ const { public: { baseURL } } = useRuntimeConfig()
 const orgStore = useOrgStore()
 const { activeOrg, isOwner, isAdmin } = storeToRefs(orgStore)
 const auditStore = useAuditStore()
+const { currentFilters } = storeToRefs(auditStore)
 const hasPermission = computed(() => isOwner.value || isAdmin.value)
+const defaultFilters = { page: 1, limit: 25 }
+
+onBeforeMount(() => currentFilters.value = { ...defaultFilters })
 
 // Get audit logs when organization changes and user has permission
 watch(activeOrg, async (org) => {
   if (org?.id && hasPermission.value) {
-    await auditStore.getAuditLogs(org.id)
+    await auditStore.getAuditLogs(org.id, { ...defaultFilters })
   }
 }, { immediate: true })
 

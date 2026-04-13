@@ -4,7 +4,7 @@
       Preferences
     </h2>
 
-    <section class="flex flex-col">
+    <section class="container mx-auto flex flex-col">
       <div class="gap-2 border-b p-4 md:navigation-group">
         <header class="flex flex-col gap-2">
           <h3>
@@ -68,7 +68,7 @@
     </section>
 
     <!-- Danger Zone -->
-    <section class="flex flex-col">
+    <section class="container mx-auto flex flex-col">
       <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
         <h3>
           Danger Zone

@@ -25,9 +25,14 @@
           <span v-else-if="!modelValue?.end">Select end date</span>
           <span v-else>Date range selected</span>
 
-          <button v-if="modelValue?.start" class="btn-danger p-1! text-xs!" @click="emit('update:modelValue', {})">
-            Clear range
-          </button>
+          <div class="navigation-group gap-1">
+            <button v-if="modelValue?.start" class="btn-danger p-1! text-xs!" @click="emit('update:modelValue', {})">
+              Clear range
+            </button>
+            <button class="btn-success p-1! text-xs!" @click="handleApply">
+              Apply
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-7 gap-1">
@@ -55,7 +60,7 @@ const props = defineProps<{
   modelValue?: { start?: string, end?: string }
 }>()
 
-const emit = defineEmits<{ "update:modelValue": [{ start?: string, end?: string }] }>()
+const emit = defineEmits<{ "update:modelValue": [{ start?: string, end?: string }], "apply": [] }>()
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
@@ -72,21 +77,18 @@ useClickOutside(datePickerRef, () => {
   isDatePickerOpen.value = false
 }, { escapeKey: true })
 
-function parseDate(dateStr?: string) {
-  if (!dateStr) {
-    return null
+const displayLabel = computed(() => {
+  const format = (dateStr?: string) => dateStr ? parseDate(dateStr)!.toLocaleDateString("en-GB") : ""
+  if (props.modelValue?.start && props.modelValue?.end) {
+    if (props.modelValue.start === props.modelValue.end) {
+      return `On ${format(props.modelValue.start)}`
+    }
+
+    return `${format(props.modelValue.start)} → ${format(props.modelValue.end)}`
   }
 
-  const [y, m, d] = dateStr.split("-").map(Number) as [number, number, number]
-  return new Date(y, m - 1, d)
-}
-
-function formatDateString(date: Date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
-}
+  return props.modelValue?.start ? `From ${format(props.modelValue.start)}` : "Date"
+})
 
 const calendarDays = computed(() => {
   const firstDay = new Date(currentYear.value, currentMonth.value, 1)
@@ -117,6 +119,22 @@ const calendarDays = computed(() => {
   })
 })
 
+function parseDate(dateStr?: string) {
+  if (!dateStr) {
+    return null
+  }
+
+  const [y, m, d] = dateStr.split("-").map(Number) as [number, number, number]
+  return new Date(y, m - 1, d)
+}
+
+function formatDateString(date: Date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
+}
+
 function selectDate(day: any) {
   if (!day.isCurrentMonth) {
     return
@@ -132,12 +150,8 @@ function selectDate(day: any) {
   }
 }
 
-const displayLabel = computed(() => {
-  const format = (dateStr?: string) => dateStr ? parseDate(dateStr)!.toLocaleDateString("en-GB") : ""
-  if (props.modelValue?.start && props.modelValue?.end) {
-    return `${format(props.modelValue.start)} → ${format(props.modelValue.end)}`
-  }
-
-  return props.modelValue?.start ? `From ${format(props.modelValue.start)}` : "Date"
-})
+function handleApply() {
+  emit("apply")
+  isDatePickerOpen.value = false
+}
 </script>

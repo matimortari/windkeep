@@ -1,6 +1,6 @@
 <template>
   <nav class="navigation-group w-full flex-wrap justify-start gap-2 md:justify-end" aria-label="Audit Filters">
-    <AuditDatePicker v-model="dateFilter" @update:model-value="updateFilter('date', $event)" />
+    <AuditDatePicker v-model="dateFilter" @update:model-value="updateFilter('date', $event, false)" @apply="applyDateFilter" />
 
     <div ref="actionDropdownRef" class="relative">
       <button class="btn" @click="isActionDropdownOpen = !isActionDropdownOpen">
@@ -79,7 +79,23 @@ function getUserDisplayName(userId?: string) {
   return availableUsers.value.find((u: { id: string, name: string | null }) => u.id === userId)?.name
 }
 
-function updateFilter(type: "date" | "user" | "action", value: any) {
+function toDateInput(value?: string | Date): string | undefined {
+  if (!value) {
+    return undefined
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return undefined
+  }
+
+  const y = date.getUTCFullYear()
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0")
+  const d = String(date.getUTCDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
+}
+
+function updateFilter(type: "date" | "user" | "action", value: any, shouldFetch = true) {
   const updated = { ...currentFilters.value, page: 1 }
 
   if (type === "date") {
@@ -94,9 +110,22 @@ function updateFilter(type: "date" | "user" | "action", value: any) {
     updated.action = value || undefined
     isActionDropdownOpen.value = false
   }
+  if (!shouldFetch) {
+    return
+  }
 
   auditStore.updateFilters(updated)
   auditStore.getAuditLogs(activeOrg.value!.id, updated)
+}
+
+function applyDateFilter() {
+  if (!activeOrg.value?.id) {
+    return
+  }
+
+  const updated = { ...currentFilters.value, page: 1 }
+  auditStore.updateFilters(updated)
+  auditStore.getAuditLogs(activeOrg.value.id, updated)
 }
 
 async function handleDeleteLogs() {
@@ -114,4 +143,11 @@ async function handleDeleteLogs() {
   auditStore.updateFilters({ ...currentFilters.value, page: 1 })
   await auditStore.getAuditLogs(activeOrg.value!.id, { ...currentFilters.value, page: 1 })
 }
+
+watch(() => [currentFilters.value.startDate, currentFilters.value.endDate], ([startDate, endDate]) => {
+  dateFilter.value = {
+    start: toDateInput(startDate),
+    end: toDateInput(endDate),
+  }
+}, { immediate: true })
 </script>

@@ -69,15 +69,39 @@ function handleDeleteSecret(key: string) {
   }
 
   const existingChange = pendingChanges.value.get(key)
+  if (existingChange?.type === "delete") {
+    if (existingChange.originalSecret && hasSecretChanges(existingChange.secret, existingChange.originalSecret)) {
+      pendingChanges.value.set(key, {
+        type: "update",
+        secret: existingChange.secret,
+        originalSecret: existingChange.originalSecret,
+      })
+    }
+    else {
+      pendingChanges.value.delete(key)
+    }
+
+    return
+  }
+
   if (existingChange?.type === "create") {
     pendingChanges.value.delete(key)
   }
   else {
     const originalSecret = secrets.value.find(s => s.key === key)
     if (originalSecret) {
-      pendingChanges.value.set(key, { type: "delete", secret: originalSecret, originalSecret })
+      pendingChanges.value.set(key, {
+        type: "delete",
+        secret: existingChange?.secret ?? originalSecret,
+        originalSecret,
+      })
     }
   }
+}
+
+function hasSecretChanges(secret: Secret, originalSecret: Secret): boolean {
+  const normalizeValues = (values: SecretValue[] | undefined) => Array.from(values ?? [], v => `${v.environment}:${v.value}`).sort()
+  return secret.description !== originalSecret.description || JSON.stringify(normalizeValues(secret.values)) !== JSON.stringify(normalizeValues(originalSecret.values))
 }
 
 function handleSecretChange(secret: Secret) {
@@ -152,35 +176,41 @@ async function saveAllChanges() {
   }
 
   const projectId = project.value.id
+  const changeEntries = [...pendingChanges.value.entries()]
   const failed: string[] = []
-  for (const [key, change] of pendingChanges.value) {
-    try {
-      if (change.type === "create") {
-        const { values, ...data } = change.secret
-        await projectStore.createProjectSecret(projectId, {
-          key: data.key,
-          description: data.description || "",
-          projectId,
-          values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
-        })
-      }
-      else if (change.type === "update" && change.secret.id) {
-        const { values, ...data } = change.secret
-        await projectStore.updateProjectSecret(projectId, change.secret.id, {
-          description: data.description || "",
-          values: values || [],
-        })
-      }
-      else if (change.type === "delete" && change.secret.id) {
-        await projectStore.deleteProjectSecret(projectId, change.secret.id)
-      }
-      pendingChanges.value.delete(key)
+  const results = await Promise.allSettled(changeEntries.map(async ([key, change]) => {
+    if (change.type === "create") {
+      const { values, ...data } = change.secret
+      await projectStore.createProjectSecret(projectId, {
+        key: data.key,
+        description: data.description || "",
+        projectId,
+        values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
+      })
     }
-    catch (err: unknown) {
-      console.error(`Failed to save secret "${key}":`, err)
+    else if (change.type === "update" && change.secret.id) {
+      const { values, ...data } = change.secret
+      await projectStore.updateProjectSecret(projectId, change.secret.id, {
+        description: data.description || "",
+        values: values || [],
+      })
+    }
+    else if (change.type === "delete" && change.secret.id) {
+      await projectStore.deleteProjectSecret(projectId, change.secret.id)
+    }
+    return key
+  }))
+
+  results.forEach((result, index) => {
+    const key = changeEntries[index]![0]
+    if (result.status === "fulfilled") {
+      pendingChanges.value.delete(result.value)
+    }
+    else {
       failed.push(key)
+      console.error(`Failed to save secret "${key}":`, result.reason)
     }
-  }
+  })
 
   await projectStore.getProjectSecrets(projectId)
 }
@@ -207,24 +237,15 @@ function exportToEnv(env: string | null | undefined) {
     return { success: false, error: "No secrets found for this environment" }
   }
 
-  try {
-    const blob = new Blob([filteredSecrets], { type: "text/plain" })
-    const a = document.createElement("a")
-    a.href = URL.createObjectURL(blob)
-    a.download = `.env.${project.value?.slug}.${env.toLowerCase()}`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+  const blob = new Blob([filteredSecrets], { type: "text/plain" })
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = `.env.${project.value?.slug}.${env.toLowerCase()}`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 
-    return { success: true }
-  }
-  catch (err: unknown) {
-    let errorMessage = "Failed to export secrets"
-    if (typeof err === "object" && err !== null && "data" in err && typeof (err as any).data?.message === "string") {
-      errorMessage = (err as any).data.message
-    }
-    return { success: false, error: errorMessage }
-  }
+  return { success: true }
 }
 
 onBeforeRouteLeave((_to, _from, next) => {

@@ -16,13 +16,7 @@
       </thead>
 
       <tbody>
-        <tr v-if="loading">
-          <td :colspan="columns.length" class="p-8 text-center">
-            Loading audit logs...
-          </td>
-        </tr>
-
-        <tr v-else-if="!auditLogs.length">
+        <tr v-if="!loading && !auditLogs.length">
           <td :colspan="columns.length" class="p-8 text-center">
             <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus-bold" />
           </td>
@@ -157,8 +151,6 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
     "projectName",
     "orgId",
     "orgName",
-    "orgDescription",
-    "orgWebsite",
     "fromUserId",
     "fromUserName",
     "fromUserEmail",
@@ -174,9 +166,6 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
     "oldSlug",
     "oldRole",
     "newRole",
-    "descriptionChanged",
-    "nameChanged",
-    "environmentCount",
     "environments",
     "secretsDeleted",
     "membersRemoved",
