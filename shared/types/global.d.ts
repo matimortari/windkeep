@@ -21,6 +21,8 @@ interface Organization {
   name: string
   description: string | null
   website: string | null
+  encryptionKeyVersion?: number
+  encryptionKeyUpdatedAt?: Date | string
   memberships?: OrgMembership[]
   projects?: Project[]
   invitations?: Invitation[]
