@@ -79,7 +79,6 @@ export default defineEventHandler(async (event) => {
       projectName: updatedSecret.project.name,
       orgId: updatedSecret.project.org.id,
       orgName: updatedSecret.project.org.name,
-      descriptionChanged: result.data.description !== undefined && result.data.description !== existingSecret.description,
       environments: updatedEnvironments,
     },
   })

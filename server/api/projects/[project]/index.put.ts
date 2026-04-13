@@ -86,7 +86,6 @@ export default defineEventHandler(async (event) => {
       oldSlug: existingProject.slug === updatedProject.slug ? undefined : existingProject.slug,
       oldWebsite: existingProject.website === updatedProject.website ? undefined : existingProject.website,
       newWebsite: updatedProject.website,
-      descriptionChanged: result.data.description !== undefined && result.data.description !== existingProject.description,
       orgId: updatedProject.org.id,
       orgName: updatedProject.org.name,
     },

@@ -48,7 +48,6 @@ export default defineEventHandler(async (event) => {
       projectName: newProject.name,
       orgId: newProject.org.id,
       orgName: newProject.org.name,
-      website: newProject.website,
     },
   })
 

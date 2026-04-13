@@ -15,12 +15,7 @@ export default defineEventHandler(async (event) => {
   const cached = await getCached<any>(cacheKey)
   if (cached) {
     if (typeof cached === "string") {
-      try {
-        return { decryptedSecrets: JSON.parse(decrypt(cached)) }
-      }
-      catch {
-        await deleteCached(cacheKey)
-      }
+      return { decryptedSecrets: JSON.parse(decrypt(cached)) }
     }
 
     await deleteCached(cacheKey)
