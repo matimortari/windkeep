@@ -11,11 +11,16 @@ export default defineEventHandler(async (event) => {
 
   await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
 
+  const project = await db.project.findUnique({ where: { id: projectId }, select: { orgId: true } })
+  if (!project?.orgId) {
+    throw createError({ status: 404, statusText: "Project not found" })
+  }
+
   const cacheKey = CacheKeys.projectSecrets(projectId)
   const cached = await getCached<any>(cacheKey)
   if (cached) {
     if (typeof cached === "string") {
-      return { decryptedSecrets: JSON.parse(decrypt(cached)) }
+      return { decryptedSecrets: JSON.parse(await decrypt(project.orgId, cached)) }
     }
 
     await deleteCached(cacheKey)
@@ -35,8 +40,8 @@ export default defineEventHandler(async (event) => {
     orderBy: { key: "asc" },
   })
 
-  const decryptedSecrets = secrets.map(secret => ({ ...secret, values: secret.values.map(val => ({ ...val, value: decrypt(val.value) })) }))
-  await setCached(cacheKey, encrypt(JSON.stringify(decryptedSecrets)), CACHE_TTL.SHORT)
+  const decryptedSecrets = await Promise.all(secrets.map(async secret => ({ ...secret, values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))) })))
+  await setCached(cacheKey, await encrypt(project.orgId, JSON.stringify(decryptedSecrets)), CACHE_TTL.SHORT)
 
   return { decryptedSecrets }
 })

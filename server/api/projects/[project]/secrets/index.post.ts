@@ -24,9 +24,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 409, statusText: "A secret with this key already exists in the project" })
   }
 
+  const project = await db.project.findUnique({ where: { id: projectId }, select: { orgId: true } })
+  if (!project?.orgId) {
+    throw createError({ status: 404, statusText: "Project not found" })
+  }
+
   const secretData: any = { key: result.data.key, description: result.data.description, projectId }
   if (result.data.values && Array.isArray(result.data.values)) {
-    secretData.values = { create: result.data.values.map((val: any) => ({ environment: val.environment, value: encrypt(val.value) })) }
+    secretData.values = { create: await Promise.all(result.data.values.map(async (val: any) => ({ environment: val.environment, value: await encrypt(project.orgId, val.value) }))) }
   }
 
   const secret = await db.secret.create({
@@ -57,5 +62,5 @@ export default defineEventHandler(async (event) => {
   await deleteCached(CacheKeys.projectSecrets(projectId))
   await deleteCached(CacheKeys.userProjects(user.id))
 
-  return { ...secret, values: secret.values.map(val => ({ ...val, value: decrypt(val.value) })) }
+  return { ...secret, values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))) }
 })

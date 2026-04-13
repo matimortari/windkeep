@@ -38,7 +38,10 @@ export default defineEventHandler(async (event) => {
 
     const membership = await tx.orgMembership.create({
       data: { userId: user.id, orgId: invitation.orgId, role: "MEMBER", isActive: true },
-      include: { org: { select: { id: true, name: true, description: true, website: true } }, user: { select: { id: true, email: true, name: true, image: true } } },
+      include: {
+        org: { select: { id: true, name: true, description: true, website: true, encryptionKeyVersion: true, encryptionKeyUpdatedAt: true, createdAt: true, updatedAt: true } },
+        user: { select: { id: true, email: true, name: true, image: true } },
+      },
     })
 
     await tx.invitation.delete({ where: { id: invitation.id } })

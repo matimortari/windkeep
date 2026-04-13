@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const existingSecret = await db.secret.findUnique({ where: { id: secretId }, select: { projectId: true, key: true, description: true } })
+  const existingSecret = await db.secret.findUnique({ where: { id: secretId }, select: { projectId: true, key: true, description: true, project: { select: { orgId: true } } } })
   if (!existingSecret) {
     throw createError({ status: 404, statusText: "Secret not found" })
   }
@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 403, statusText: "Secret does not belong to this project" })
   }
 
+  const orgId = existingSecret.project.orgId
   const updateData: any = {}
   if (result.data.description !== undefined) {
     updateData.description = result.data.description
@@ -46,8 +47,8 @@ export default defineEventHandler(async (event) => {
 
       await db.secretValue.upsert({
         where: { secretId_environment: { secretId, environment: val.environment } },
-        update: { value: encrypt(val.value) },
-        create: { secretId, environment: val.environment, value: encrypt(val.value) },
+        update: { value: await encrypt(orgId, val.value) },
+        create: { secretId, environment: val.environment, value: await encrypt(orgId, val.value) },
       })
     }
   }
@@ -87,5 +88,8 @@ export default defineEventHandler(async (event) => {
   await deleteCached(CacheKeys.projectSecrets(projectId))
   await deleteCached(CacheKeys.userProjects(user.id))
 
-  return { ...updatedSecret, values: updatedSecret.values.map(val => ({ ...val, value: decrypt(val.value) })) }
+  return {
+    ...updatedSecret,
+    values: await Promise.all(updatedSecret.values.map(async val => ({ ...val, value: await decrypt(orgId, val.value) }))),
+  }
 })

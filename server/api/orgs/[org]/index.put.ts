@@ -19,16 +19,27 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const existingOrg = await db.organization.findUnique({ where: { id: orgId }, select: { name: true, description: true, website: true } })
+  const existingOrg = await db.organization.findUnique({
+    where: { id: orgId },
+    select: { name: true, description: true, website: true, encryptionKeyVersion: true, encryptionKeyUpdatedAt: true },
+  })
   if (!existingOrg) {
     throw createError({ status: 404, statusText: "Organization not found" })
   }
 
-  const updatedOrg = await db.organization.update({ where: { id: orgId }, data: {
+  await db.organization.update({ where: { id: orgId }, data: {
     name: result.data.name,
     description: result.data.description || null,
     website: result.data.website || null,
   } })
+  if (result.data.rotateEncryptionKey) {
+    await rotateOrganizationKey(orgId, result.data.encryptionMode === "MANUAL" ? result.data.encryptionKey : undefined)
+  }
+
+  const updatedOrg = await db.organization.findUniqueOrThrow({
+    where: { id: orgId },
+    select: { id: true, name: true, description: true, website: true, encryptionKeyVersion: true, encryptionKeyUpdatedAt: true, createdAt: true, updatedAt: true },
+  })
 
   await createAuditLog({
     event,
@@ -45,6 +56,11 @@ export default defineEventHandler(async (event) => {
       newDescription: updatedOrg.description,
       oldWebsite: existingOrg.website,
       newWebsite: updatedOrg.website,
+      rotatedEncryptionKey: Boolean(result.data.rotateEncryptionKey),
+      oldEncryptionKeyVersion: existingOrg.encryptionKeyVersion,
+      newEncryptionKeyVersion: updatedOrg.encryptionKeyVersion,
+      oldEncryptionKeyUpdatedAt: existingOrg.encryptionKeyUpdatedAt,
+      newEncryptionKeyUpdatedAt: updatedOrg.encryptionKeyUpdatedAt,
     },
   })
 
