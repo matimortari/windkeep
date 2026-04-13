@@ -28,6 +28,8 @@ export default defineEventHandler(async (event) => {
         name: true,
         description: true,
         website: true,
+        encryptionKeyVersion: true,
+        encryptionKeyUpdatedAt: true,
         createdAt: true,
         updatedAt: true,
         memberships: { select: { userId: true, role: true, isActive: true, user: { select: { id: true, name: true, email: true, image: true } } } },
