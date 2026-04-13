@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer"
 import crypto from "node:crypto"
 
 const algorithm = "aes-256-gcm"
-const masterKeySecret = requireEnv("ORG_KEY_ENCRYPTION_KEY")
+const masterKeySecret = requireEnv("ENCRYPTION_KEY")
 const keyCacheTtlMs = 10 * 60 * 1000
 
 // Derive a stable 32-byte key from the master secret

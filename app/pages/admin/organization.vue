@@ -133,6 +133,39 @@
       </div>
     </section>
 
+    <section v-if="isOwner" class="container mx-auto flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Organization encryption settings">
+      <header class="flex flex-col gap-1">
+        <h5>
+          Organization Encryption Key
+        </h5>
+        <p class="text-caption">
+          Rotate your organization key to isolate future access. Existing secrets are re-encrypted automatically.
+        </p>
+      </header>
+
+      <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-end">
+        <select v-model="encryptionMode" class="md:max-w-64">
+          <option value="AUTO">
+            Auto-generate (recommended)
+          </option>
+          <option value="MANUAL">
+            Enter my own password
+          </option>
+        </select>
+
+        <input
+          v-if="encryptionMode === 'MANUAL'" v-model="manualEncryptionKey"
+          type="password" autocomplete="new-password"
+          placeholder="New encryption password (min 12 chars)"
+        >
+
+        <button class="btn-primary" aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey" @click="handleRotateEncryptionKey">
+          <icon :name="rotateKeyIcon.icon.value || 'ph:key-bold'" size="18" />
+          <span>Rotate Key</span>
+        </button>
+      </div>
+    </section>
+
     <!-- Danger Zone -->
     <section class="container mx-auto flex flex-col">
       <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
@@ -187,6 +220,8 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, orgMembers, orgProjects, isOwner, isAdmin } = storeToRefs(orgStore)
+const encryptionMode = ref<"AUTO" | "MANUAL">("AUTO")
+const manualEncryptionKey = ref("")
 
 const orgFields = [
   {
@@ -223,6 +258,16 @@ const orgFields = [
     copyable: true,
   },
   {
+    label: "Encryption Key Version",
+    description: "Current key version used to encrypt organization secrets.",
+    value: computed(() => activeOrg.value?.encryptionKeyVersion || 1),
+  },
+  {
+    label: "Encryption Key Updated At",
+    description: "When your organization encryption key was last rotated.",
+    value: computed(() => formatDate(activeOrg.value?.encryptionKeyUpdatedAt)),
+  },
+  {
     label: "Created At",
     description: "When your organization was created.",
     value: computed(() => formatDate(activeOrg.value?.createdAt)),
@@ -238,6 +283,8 @@ const copyIcon = orgFields.map(() => createActionHandler("ph:copy-bold"))
 const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 const memberRoleIcon = ref(new Map())
 const transferOwnershipIcon = ref(new Map())
+const rotateKeyIcon = createActionHandler("ph:key-bold")
+const canRotateEncryptionKey = computed(() => encryptionMode.value === "AUTO" || manualEncryptionKey.value.trim().length >= 12)
 
 async function handleCreateInvite() {
   if (!activeOrg.value?.id) {
@@ -302,6 +349,26 @@ async function handleSubmit(index: number) {
   await userStore.getUser()
   saveIcon[index]?.triggerSuccess()
 }
+
+async function handleRotateEncryptionKey() {
+  if (!activeOrg.value?.id || !canRotateEncryptionKey.value) {
+    return
+  }
+  if (!confirm("Rotate the organization encryption key now? This will re-encrypt all organization secrets.")) {
+    return
+  }
+
+  await orgStore.updateOrg(activeOrg.value.id, {
+    rotateEncryptionKey: true,
+    encryptionMode: encryptionMode.value,
+    encryptionKey: encryptionMode.value === "MANUAL" ? manualEncryptionKey.value : undefined,
+  })
+
+  manualEncryptionKey.value = ""
+  await orgStore.getOrg(activeOrg.value.id)
+  rotateKeyIcon.triggerSuccess()
+}
+
 async function handleLeaveOrg() {
   if (!activeOrg.value?.id || !user.value?.id) {
     return
