@@ -29,14 +29,12 @@
         <button class="btn rounded-full!" aria-label="Toggle Theme" @click="toggleTheme">
           <icon :name="themeIcon" size="20" />
         </button>
-
-        <nuxt-link v-if="!loggedIn" to="/sign-in" class="btn rounded-full!" aria-label="Sign In">
-          <icon name="ph:sign-in-bold" size="20" />
-        </nuxt-link>
-
         <button v-if="loggedIn" class="btn rounded-full!" aria-label="Sign Out" @click="signOut">
           <icon name="ph:sign-out-bold" size="20" />
         </button>
+        <nuxt-link v-else to="/sign-in" class="btn rounded-full!" aria-label="Sign In">
+          <icon name="ph:sign-in-bold" size="20" />
+        </nuxt-link>
       </nav>
     </div>
   </div>

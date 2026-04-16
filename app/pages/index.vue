@@ -4,7 +4,7 @@
     :initial="{ opacity: 0 }" :visible-once="{ opacity: 1 }"
     :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-4"
   >
-    <div class="backdrop" />
+    <div class="hero-backdrop" />
     <div class="dot-overlay" />
 
     <header class="z-20 flex w-full max-w-4xl flex-col gap-4">
@@ -20,11 +20,11 @@
       </p>
 
       <div class="navigation-group">
-        <nuxt-link to="/sign-in" class="group btn rounded-full! bg-linear-to-r from-primary to-secondary text-[#eeeeee] shadow-lg shadow-primary/30 transition-all hover:shadow-primary/40">
+        <nuxt-link to="/sign-in" class="btn-primary rounded-full! px-5 shadow-none">
           <span class="font-semibold">Get Started</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
-        <nuxt-link to="/cli-guide" class="btn-ghost group rounded-full! hover:border-primary/50!">
+        <nuxt-link to="/cli-guide" class="btn-ghost group rounded-full!">
           <icon name="ph:terminal-bold" size="20" class="text-primary" />
           <span>WindKeep CLI</span>
         </nuxt-link>
@@ -44,7 +44,7 @@
     </header>
   </section>
 
-  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-20 md:max-w-7xl md:gap-20">
+  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-24 md:max-w-7xl md:gap-20 2xl:gap-32">
     <section id="cli" class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
       <header class="flex flex-col gap-4 md:border-r md:pr-12">
         <div class="flex items-end justify-between border-b pb-4">
@@ -191,19 +191,19 @@ h2 {
   line-height: 1.05;
 }
 
-.backdrop {
+.hero-backdrop {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: url("@/assets/backdrop.jpg");
+  background-image: url("@/assets/hero-backdrop.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   mask-image: radial-gradient(ellipse at center, black 80%, transparent 100%);
   filter: brightness(0.3);
 }
-html.light .backdrop {
+html.light .hero-backdrop {
   opacity: 0;
 }
 
@@ -257,6 +257,11 @@ html.light .backdrop {
 @media (min-width: 768px) {
   .feature-item:nth-child(even) {
     padding-left: 3rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 3.375rem);
+    line-height: 1.1;
   }
 }
 

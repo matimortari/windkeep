@@ -66,7 +66,12 @@ const props = defineProps<{
   allVisible: boolean
 }>()
 
-const emit = defineEmits<{ edit: [secret: Secret], delete: [key: string], history: [secret: Secret], update: [] }>()
+const emit = defineEmits<{
+  edit: [secret: Secret]
+  delete: [key: string]
+  history: [secret: Secret]
+  update: []
+}>()
 
 const visibleKeys = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
