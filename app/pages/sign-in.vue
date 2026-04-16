@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen w-full items-center justify-center">
+  <div class="flex min-h-screen w-full items-center justify-center p-4">
     <div
       v-motion :initial="{ opacity: 0 }"
       :visible-once="{ opacity: 1 }" :duration="800"
@@ -22,7 +22,7 @@
         </button>
       </div>
 
-      <p class="text-caption mx-auto max-w-xs py-4 text-center">
+      <p class="text-caption py-4 text-center">
         By signing in, you agree to our
         <nuxt-link to="/legal/terms" class="text-primary hover:underline">
           Terms of Service
