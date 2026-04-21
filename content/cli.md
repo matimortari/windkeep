@@ -1,6 +1,6 @@
 # Command Line Interface
 
-> The WindKeep Command Line Interface allows you to manage secrets, organizations, and projects directly from your terminal. Fast, secure, and designed for developers who prefer working in the command line.
+The WindKeep Command Line Interface allows you to manage secrets, organizations, and projects directly from your terminal. Fast, secure, and designed for developers who prefer working in the command line.
 
 ---
 
@@ -65,7 +65,7 @@ windkeep --version
 
 ---
 
-#### Windows:
+#### Windows
 
 1. Download the `.exe` file
 2. Move it to:
