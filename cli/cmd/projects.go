@@ -54,7 +54,7 @@ var projectsListCmd = &cobra.Command{
 		// Filter by active org
 		var orgProjects []api.Project
 		for _, proj := range projects {
-			if proj.Org != nil && proj.Org.ID == activeOrg.OrgID {
+			if proj.OrgID == activeOrg.OrgID {
 				orgProjects = append(orgProjects, proj)
 			}
 		}
@@ -152,7 +152,7 @@ var projectsSwitchCmd = &cobra.Command{
 		// Filter to active org only
 		var projects []api.Project
 		for _, proj := range allProjects {
-			if proj.Org != nil && proj.Org.ID == activeOrg.OrgID {
+			if proj.OrgID == activeOrg.OrgID {
 				projects = append(projects, proj)
 			}
 		}
