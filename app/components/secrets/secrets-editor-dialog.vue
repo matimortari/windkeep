@@ -81,12 +81,12 @@ function buildEnvText(env: Environment): string {
 function parseEnv(text: string): Record<string, string> {
   const result: Record<string, string> = {}
   for (const line of text.split("\n")) {
-    const trimmed = line.trim()
-    if (!trimmed || trimmed.startsWith("#")) {
+    const trimmedKey = line.trim()
+    if (!trimmedKey || trimmedKey.startsWith("#")) {
       continue
     }
 
-    const match = trimmed.match(/^([^=]+)=(.*)$/)
+    const match = trimmedKey.match(/^([^=]+)=(.*)$/)
     if (!match) {
       continue
     }

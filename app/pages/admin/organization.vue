@@ -228,7 +228,7 @@ const orgFields = [
     label: "Organization Name",
     description: "The name of your organization.",
     type: "input",
-    model: computed(() => activeOrg.value?.name || ""),
+    model: computed(() => activeOrg.value?.name),
     update: (value: string) => { activeOrg.value!.name = value },
     onSave: handleSubmit,
     editable: isOwner,
@@ -237,7 +237,7 @@ const orgFields = [
     label: "Organization Description",
     description: "A brief description of your organization.",
     type: "input",
-    model: computed(() => activeOrg.value?.description || ""),
+    model: computed(() => activeOrg.value?.description),
     update: (value: string) => { activeOrg.value!.description = value },
     onSave: handleSubmit,
     editable: isOwner,
@@ -246,7 +246,7 @@ const orgFields = [
     label: "Organization Website",
     description: "The website URL for your organization.",
     type: "input",
-    model: computed(() => activeOrg.value?.website || ""),
+    model: computed(() => activeOrg.value?.website),
     update: (value: string) => { activeOrg.value!.website = value },
     onSave: handleSubmit,
     editable: isOwner,
@@ -341,11 +341,12 @@ async function handleSubmit(index: number) {
   }
 
   await orgStore.updateOrg(activeOrg.value.id, {
-    name: activeOrg.value.name || "",
+    name: activeOrg.value.name,
     description: activeOrg.value.description || undefined,
     website: activeOrg.value.website || undefined,
   })
 
+  await orgStore.getOrg(activeOrg.value.id)
   await userStore.getUser()
   saveIcon[index]?.triggerSuccess()
 }

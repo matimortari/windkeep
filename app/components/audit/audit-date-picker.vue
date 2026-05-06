@@ -26,10 +26,10 @@
           <span v-else>Date range selected</span>
 
           <div class="navigation-group gap-1">
-            <button v-if="modelValue?.start" class="btn-danger p-1! text-xs!" @click="emit('update:modelValue', {})">
+            <button v-if="modelValue?.start" class="btn-warning p-1! text-xs!" @click="emit('update:modelValue', {})">
               Clear range
             </button>
-            <button class="btn-success p-1! text-xs!" @click="handleApply">
+            <button class="btn-info p-1! text-xs!" @click="handleApply">
               Apply
             </button>
           </div>
@@ -78,16 +78,16 @@ useClickOutside(datePickerRef, () => {
 }, { escapeKey: true })
 
 const displayLabel = computed(() => {
-  const format = (dateStr?: string) => dateStr ? parseDate(dateStr)!.toLocaleDateString("en-GB") : ""
-  if (props.modelValue?.start && props.modelValue?.end) {
-    if (props.modelValue.start === props.modelValue.end) {
-      return `On ${format(props.modelValue.start)}`
-    }
-
-    return `${format(props.modelValue.start)} → ${format(props.modelValue.end)}`
+  const format = (date?: string) => date ? parseDate(date)!.toLocaleDateString("en-GB") : ""
+  const { start, end } = props.modelValue ?? {}
+  if (!start) {
+    return "Date"
+  }
+  if (!end) {
+    return `From ${format(start)}`
   }
 
-  return props.modelValue?.start ? `From ${format(props.modelValue.start)}` : "Date"
+  return start === end ? `On ${format(start)}` : `${format(start)} → ${format(end)}`
 })
 
 const calendarDays = computed(() => {
@@ -119,28 +119,24 @@ const calendarDays = computed(() => {
   })
 })
 
-function parseDate(dateStr?: string) {
-  if (!dateStr) {
+function parseDate(date?: string) {
+  if (!date) {
     return null
   }
 
-  const [y, m, d] = dateStr.split("-").map(Number) as [number, number, number]
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number]
   return new Date(y, m - 1, d)
 }
 
-function formatDateString(date: Date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
-}
-
-function selectDate(day: any) {
+function selectDate(day: { date: Date, isCurrentMonth: boolean }) {
   if (!day.isCurrentMonth) {
     return
   }
 
-  const selected = formatDateString(day.date)
+  const y = day.date.getFullYear()
+  const m = String(day.date.getMonth() + 1).padStart(2, "0")
+  const d = String(day.date.getDate()).padStart(2, "0")
+  const selected = `${y}-${m}-${d}`
   if (!props.modelValue?.start || props.modelValue.end) {
     emit("update:modelValue", { start: selected })
   }
