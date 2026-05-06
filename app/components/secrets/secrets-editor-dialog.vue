@@ -75,9 +75,7 @@ const parsedEditorValues = computed(() => parseEnv(editorContent.value))
 
 // Build .env text from existing secrets for the selected environment
 function buildEnvText(env: Environment): string {
-  return props.secrets.filter(s => s.values?.some(v => v.environment === env)).map((s) => {
-    return `${s.key}=${s.values?.find(v => v.environment === env)?.value ?? ""}`
-  }).join("\n")
+  return props.secrets.filter(s => s.values?.some(v => v.environment === env)).map(s => `${s.key}=${s.values?.find(v => v.environment === env)?.value ?? ""}`).join("\n")
 }
 
 function parseEnv(text: string): Record<string, string> {
@@ -99,9 +97,9 @@ function parseEnv(text: string): Record<string, string> {
       value = value.slice(1, -1)
     }
 
-    const normalized = normalizeKey(key)
-    if (normalized) {
-      result[normalized] = value
+    const normalizedKey = normalizeKey(key)
+    if (normalizedKey) {
+      result[normalizedKey] = value
     }
   }
 
@@ -126,17 +124,14 @@ const diffItems = computed<DiffItem[]>(() => {
   const next = parsedEditorValues.value
   const items: DiffItem[] = []
 
-  // Added or updated
   for (const [key, value] of Object.entries(next)) {
     if (!(key in current)) {
       items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success" })
     }
     else if (current[key] !== value) {
-      items.push({ key, value, type: "updated", icon: "ph:pencil-bold", class: "bg-secondary/15 text-secondary" })
+      items.push({ key, value, type: "updated", icon: "ph:pencil-bold", class: "bg-info" })
     }
   }
-
-  // Removed (existed before, not in editor anymore)
   for (const key of Object.keys(current)) {
     if (!(key in next)) {
       items.push({ key, type: "removed", icon: "ph:minus-bold", class: "bg-danger" })
@@ -149,10 +144,7 @@ const diffItems = computed<DiffItem[]>(() => {
 const hasDiff = computed(() => diffItems.value.length > 0)
 
 function handleSubmit() {
-  const next = parsedEditorValues.value
-
-  // Secrets to upsert (added or updated)
-  const upserted = Object.entries(next).filter(([key, value]) => {
+  const upserted = Object.entries(parsedEditorValues.value).filter(([key, value]) => {
     const current = currentEnvValues.value[key]
     return current === undefined || current !== value
   }).map(([key, value]) => ({
@@ -162,8 +154,7 @@ function handleSubmit() {
     values: [{ environment: selectedEnv.value, value }],
   }))
 
-  // Keys that were removed from the editor
-  const removed = Object.keys(currentEnvValues.value).filter(key => !(key in next)).map(key => ({ key, environment: selectedEnv.value }))
+  const removed = Object.keys(currentEnvValues.value).filter(key => !(key in parsedEditorValues.value)).map(key => ({ key, environment: selectedEnv.value }))
 
   emit("save", upserted, removed)
 }

@@ -13,64 +13,60 @@
           <span>{{ allVisible ? 'Hide all' : 'Reveal all' }}</span>
         </button>
 
-        <div class="scroll-area max-h-[70vh] space-y-4 overflow-y-auto pt-2 pr-2">
-          <div v-for="env in history" :key="env.environment" class="space-y-2 rounded-lg bg-muted/30 p-2">
-            <h4>
-              {{ env.environment.charAt(0) + env.environment.slice(1).toLowerCase() }}
-            </h4>
+        <div class="scroll-area max-h-[70vh] space-y-3 overflow-y-auto pt-2 pr-2">
+          <div v-for="env in history" :key="env.environment" class="space-y-2 rounded-lg border p-3">
+            <div class="navigation-group">
+              <span class="section-label">{{ env.environment }}</span>
+            </div>
 
-            <div class="rounded-lg border-success bg-success p-2">
-              <span class="text-caption-success text-sm font-medium">Current Value</span>
-
-              <div class="navigation-group justify-between font-mono text-sm text-muted-foreground">
+            <!-- Current value -->
+            <div class="space-y-1 rounded-lg bg-success p-2">
+              <span class="text-caption-success text-xs! tracking-wide uppercase">Current Value</span>
+              <div class="navigation-group justify-between font-mono text-sm">
                 <p class="truncate select-none">
                   {{ visibleValues[env.environment] || allVisible ? env.currentValue : "•".repeat(env.currentValue?.length || 0) }}
                 </p>
-
                 <div class="navigation-group">
                   <button :aria-label="`Toggle visibility for ${env.environment}`" @click="visibleValues[env.environment] = !visibleValues[env.environment]">
-                    <icon :name="visibleValues[env.environment] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
+                    <icon :name="visibleValues[env.environment] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
                   </button>
                   <button :aria-label="`Copy value for ${env.environment}`" @click="handleCopy(env.environment, env.currentValue)">
-                    <icon :name="copyStates[env.environment] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" class="hover:text-primary" />
+                    <icon :name="copyStates[env.environment] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" />
                   </button>
                 </div>
               </div>
             </div>
 
-            <div v-if="env.history && env.history.length > 0" class="space-y-2">
-              <h5>
-                Change History
-              </h5>
+            <!-- Change history -->
+            <template v-if="env.history && env.history.length > 0">
+              <span class="section-label block text-xs!">Change History</span>
 
-              <div v-for="item in env.history" :key="item.id" class="rounded-lg border-muted/20 bg-muted/10 p-2">
-                <div class="mb-2 flex items-center justify-between">
+              <div v-for="item in env.history" :key="item.id" class="space-y-1 rounded-lg p-2">
+                <div class="flex items-center justify-between text-muted-foreground">
                   <div class="navigation-group">
                     <img :src="item.changedBy.image || ''" :alt="item.changedBy.name" class="size-4 rounded-full border">
-                    <span class="text-caption">{{ item.changedBy.name }}</span>
+                    <span class="text-xs font-medium">{{ item.changedBy.name }}</span>
                   </div>
-
-                  <span class="text-caption">{{ formatDate(item.changedAt) }}</span>
+                  <span class="text-xs">{{ formatDate(item.changedAt) }}</span>
                 </div>
 
-                <div class="text-caption navigation-group justify-between font-mono">
+                <div class="navigation-group justify-between font-mono text-sm">
                   <p class="truncate select-none">
                     {{ visibleHistory[item.id] || allVisible ? item.value : "•".repeat(item.value?.length || 0) }}
                   </p>
-
-                  <div class="navigation-group">
+                  <div class="navigation-group text-muted-foreground">
                     <button :aria-label="`Toggle visibility for ${item.id}`" @click="visibleHistory[item.id] = !visibleHistory[item.id]">
-                      <icon :name="visibleHistory[item.id] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" class="hover:text-primary" />
+                      <icon :name="visibleHistory[item.id] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
                     </button>
                     <button :aria-label="`Copy value for ${item.id}`" @click="handleCopy(`history-${item.id}`, item.value)">
-                      <icon :name="copyStates[`history-${item.id}`] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" class="hover:text-primary" />
+                      <icon :name="copyStates[`history-${item.id}`] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" />
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
+            </template>
 
-            <p v-else class="text-caption py-4 text-center">
+            <p v-else class="text-caption py-2 text-center">
               No previous changes
             </p>
           </div>
@@ -96,15 +92,6 @@ const visibleValues = ref<Record<string, boolean>>({})
 const visibleHistory = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
 const allVisible = ref(false)
-
-async function fetchHistory() {
-  if (!isHistoryEditorOpen.value || !props.secretId) {
-    return
-  }
-
-  const data = await projectStore.getSecretHistory(props.projectId, props.secretId)
-  history.value = data || []
-}
 
 async function handleCopy(key: string, value: string) {
   if (!value) {
@@ -140,10 +127,13 @@ function formatDate(date: Date | string) {
   return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
-// Reset state when dialog is closed
-watch(isHistoryEditorOpen, (newVal) => {
+// Get history when dialog opens and reset state when dialog is closed
+watch(isHistoryEditorOpen, async (newVal) => {
   if (newVal) {
-    fetchHistory()
+    if (props.secretId) {
+      const data = await projectStore.getSecretHistory(props.projectId, props.secretId)
+      history.value = data || []
+    }
   }
   else {
     history.value = []
