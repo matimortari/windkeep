@@ -95,8 +95,8 @@ const route = useRoute()
 const userStore = useUserStore()
 const orgStore = useOrgStore()
 const localOrg = ref({ name: "", description: "", website: "", encryptionMode: "AUTO" as "AUTO" | "MANUAL", encryptionKey: "" })
-const token = ref(route.query.token as string || "")
-const orgId = ref(route.query.org as string || "")
+const token = ref(route.query.token as string)
+const orgId = ref(route.query.org as string)
 const activeSection = ref<"create" | "invite" | null>(route.query.token ? "invite" : "create")
 
 async function handleCreateOrg() {
