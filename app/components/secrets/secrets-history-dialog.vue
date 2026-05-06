@@ -47,7 +47,7 @@
                     <img :src="item.changedBy.image || ''" :alt="item.changedBy.name" class="size-4 rounded-full border">
                     <span class="text-xs font-medium">{{ item.changedBy.name }}</span>
                   </div>
-                  <span class="text-xs">{{ formatDate(item.changedAt) }}</span>
+                  <span class="text-xs">{{ formatChangedAt(item.changedAt) }}</span>
                 </div>
 
                 <div class="navigation-group justify-between font-mono text-sm">
@@ -103,7 +103,7 @@ async function handleCopy(key: string, value: string) {
   setTimeout(() => copyStates.value[key] = false, 1500)
 }
 
-function formatDate(date: Date | string) {
+function formatChangedAt(date: Date | string) {
   const d = new Date(date)
   const now = new Date()
   const diffMs = now.getTime() - d.getTime()

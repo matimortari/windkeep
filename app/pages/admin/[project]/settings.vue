@@ -388,8 +388,8 @@ watch(() => project.value, (proj) => {
   if (localProject.value) {
     localProject.value.name = proj.name
     localProject.value.slug = proj.slug
-    localProject.value.description = proj.description || ""
-    localProject.value.website = proj.website || ""
+    localProject.value.description = proj.description
+    localProject.value.website = proj.website
   }
   else {
     localProject.value = { ...proj }
