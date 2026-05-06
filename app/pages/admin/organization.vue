@@ -84,7 +84,7 @@
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
           <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 first:pt-0 last:border-b-0 last:pb-0">
             <div class="navigation-group items-start!">
-              <img :src="orgUser.user.image" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
+              <img :src="orgUser.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
 
               <div class="flex flex-col truncate">
                 <span class="font-semibold">{{ orgUser.user.name }}</span>
@@ -127,7 +127,7 @@
 
       <div class="navigation-group self-end">
         <button class="btn-primary" aria-label="Create Invite Link" @click="handleCreateInvite">
-          <icon name="ph:link-bold" size="20" />
+          <icon :name="inviteLinkIcon.icon.value" size="20" />
           <span>Copy Invite Link</span>
         </button>
       </div>
@@ -215,7 +215,6 @@
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
 const { createActionHandler } = useActionIcon()
-const toast = useToast()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
@@ -283,6 +282,7 @@ const copyIcon = orgFields.map(() => createActionHandler("ph:copy-bold"))
 const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 const memberRoleIcon = ref(new Map())
 const transferOwnershipIcon = ref(new Map())
+const inviteLinkIcon = createActionHandler("ph:link-bold")
 const rotateKeyIcon = createActionHandler("ph:key-bold")
 const canRotateEncryptionKey = computed(() => encryptionMode.value === "AUTO" || manualEncryptionKey.value.trim().length >= 12)
 
@@ -293,8 +293,7 @@ async function handleCreateInvite() {
 
   const result = await orgStore.createInvite(activeOrg.value.id, { orgId: activeOrg.value.id })
   if (result?.inviteUrl) {
-    await navigator.clipboard.writeText(result.inviteUrl)
-    toast.success("Invite link copied to clipboard!")
+    await inviteLinkIcon.triggerCopy(result.inviteUrl)
   }
 }
 

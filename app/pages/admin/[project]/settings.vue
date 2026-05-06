@@ -58,7 +58,7 @@
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
           <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 first:pt-0 last:border-b-0 last:pb-0">
             <div class="navigation-group items-start!">
-              <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border-2 md:block">
+              <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
 
               <div class="flex flex-col truncate">
                 <span class="font-semibold">{{ member.user?.name }}</span>

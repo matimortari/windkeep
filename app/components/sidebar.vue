@@ -3,7 +3,7 @@
   <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-40 bg-black/80 md:hidden" @click="emit('update:isOpen', false)" />
 
   <aside
-    class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r-2 bg-card px-4 py-20 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b-2 md:py-8 2xl:w-72"
+    class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r bg-card px-4 py-20 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b md:py-8 2xl:w-72"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <p class="section-label">
@@ -13,7 +13,7 @@
     <nav class="flex flex-col gap-1 font-semibold text-muted-foreground" aria-label="Main Navigation">
       <nuxt-link
         v-for="link in SIDEBAR_NAV_LINKS" :key="link.url"
-        :to="link.url" class="group navigation-group border-l-2 border-transparent p-2 text-sm transition-all hover:border-primary hover:text-foreground 2xl:text-base"
+        :to="link.url" class="group navigation-group border-l border-transparent p-2 text-sm transition-all hover:border-primary hover:text-foreground 2xl:text-base"
         :class="{ 'border-primary! text-foreground': route.path === link.url }"
         @click="emit('update:isOpen', false)"
       >
@@ -49,7 +49,7 @@
       <nav v-else aria-label="Projects Navigation" class="flex flex-col gap-2">
         <nuxt-link
           v-for="project in filteredProjects" :key="project.id"
-          :to="`/admin/${project.slug}`" class="text-caption truncate border-l-2 border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
+          :to="`/admin/${project.slug}`" class="text-caption truncate border-l border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
           :class="{ 'border-primary! text-primary!': route.path === `/admin/${project.slug}` || route.path === `/admin/${project.slug}/settings` }" @click="emit('update:isOpen', false)"
         >
           {{ project.name }}

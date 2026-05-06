@@ -1,5 +1,5 @@
 <template>
-  <header class="flex flex-col items-start gap-4 border-b py-2 md:flex-row md:items-center md:justify-between">
+  <header class="flex flex-col items-start gap-2 border-b py-2 md:flex-row md:items-center md:justify-between md:gap-4">
     <div class="navigation-group">
       <nuxt-link to="/admin/projects" aria-label="Go back" class="flex items-center">
         <icon name="ph:arrow-left-bold" size="30" class="text-muted-foreground hover:text-primary" />
@@ -53,14 +53,28 @@
         <icon name="ph:gear-bold" size="20" />
       </nuxt-link>
 
-      <button v-if="hasPendingChanges" class="btn-success" aria-label="Save All Changes" @click="emit('save')">
-        <icon name="ph:floppy-disk-bold" size="20" />
-      </button>
-
-      <button v-if="hasPendingChanges" class="btn-danger" aria-label="Discard Changes" @click="emit('discard')">
-        <icon name="ph:x-bold" size="20" />
-      </button>
+      <!-- Desktop actions -->
+      <template v-if="hasPendingChanges">
+        <button class="btn-success hidden md:flex" aria-label="Save All Changes" @click="emit('save')">
+          <icon name="ph:floppy-disk-bold" size="20" />
+        </button>
+        <button class="btn-danger hidden md:flex" aria-label="Discard Changes" @click="emit('discard')">
+          <icon name="ph:x-bold" size="20" />
+        </button>
+      </template>
     </nav>
+
+    <!-- Mobile actions -->
+    <div v-if="hasPendingChanges" class="flex w-full flex-row gap-2 md:hidden">
+      <button class="btn-success flex-1" @click="emit('save')">
+        <icon name="ph:floppy-disk-bold" size="20" />
+        <span>Save Changes</span>
+      </button>
+      <button class="btn-danger" @click="emit('discard')">
+        <icon name="ph:x-bold" size="20" />
+        <span>Discard</span>
+      </button>
+    </div>
   </header>
 </template>
 
