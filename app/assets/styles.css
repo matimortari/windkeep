@@ -28,7 +28,7 @@
   --info: #4872a5;
   --info-foreground: #b7c9dd;
 
-  --border-style: 2px solid var(--muted);
+  --border-style: 1px solid var(--muted);
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -194,6 +194,13 @@ h6 {
   overflow: hidden;
   box-shadow: 0 2px 4px 0px rgba(0, 0, 0, 0.2);
 }
+@media (max-width: 767px) {
+  .overlay {
+    border: none;
+    max-height: 90dvh;
+    box-shadow: 0 -2px 8px 0px rgba(0, 0, 0, 0.15);
+  }
+}
 .overlay > section {
   min-height: 0;
   overflow-y: auto;
@@ -270,11 +277,11 @@ select {
 }
 
 table {
-  background-color: var(--card);
   min-width: 100%;
   width: 100%;
   table-layout: auto;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   border-radius: var(--border-radius);
 }
 @media (min-width: 768px) {
@@ -296,14 +303,27 @@ th {
   white-space: nowrap;
 }
 th {
-  background: color-mix(in srgb, var(--muted) 50%, transparent);
+  background: color-mix(in srgb, var(--muted) 20%, transparent);
   text-align: start;
-  border-inline-style: solid;
   z-index: 10;
   font-weight: 600;
+  border-top: var(--border-style);
+  border-bottom: var(--border-style);
+}
+th:first-child {
+  border-left: var(--border-style);
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+th:last-child {
+  border-right: var(--border-style);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+thead {
+  border: var(--border-style);
 }
 tbody tr {
   border-bottom: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+  border-radius: var(--border-radius);
 }
 tbody tr:last-child {
   border-bottom: none;

@@ -144,10 +144,8 @@ async function handleDeleteLogs() {
   await auditStore.getAuditLogs(activeOrg.value!.id, { ...currentFilters.value, page: 1 })
 }
 
+// Sync date filter inputs with current filters
 watch(() => [currentFilters.value.startDate, currentFilters.value.endDate], ([startDate, endDate]) => {
-  dateFilter.value = {
-    start: toDateInput(startDate),
-    end: toDateInput(endDate),
-  }
+  dateFilter.value = { start: toDateInput(startDate), end: toDateInput(endDate) }
 }, { immediate: true })
 </script>

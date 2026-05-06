@@ -1,13 +1,13 @@
 <template>
   <div class="fixed top-2 left-1/2 z-40 w-[95%] -translate-x-1/2 transition-all" :class="[scrolled ? 'max-w-4xl' : 'max-w-5xl']">
     <div
-      class="flex flex-row items-center justify-between rounded-full border-2 py-2 backdrop-blur-xl transition-all"
+      class="flex flex-row items-center justify-between rounded-full border py-2 backdrop-blur-xl transition-all"
       :class="[scrolled ? 'bg-card/80 px-2 shadow-lg' : 'bg-card/50 px-4 shadow-none']"
     >
       <nav class="navigation-group gap-4!" aria-label="Main Navigation">
         <Logo />
 
-        <div class="hidden gap-4! border-l-2 pl-4! text-muted-foreground md:navigation-group">
+        <div class="hidden gap-4! border-l pl-4! text-muted-foreground md:navigation-group">
           <nuxt-link to="/#features" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
             <icon name="ph:star-bold" size="20" />
             <span>Features</span>
