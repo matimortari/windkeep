@@ -2,12 +2,12 @@
   <section
     id="hero" v-motion
     :initial="{ opacity: 0 }" :visible-once="{ opacity: 1 }"
-    :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-4"
+    :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-8"
   >
     <div class="hero-backdrop" />
     <div class="dot-overlay" />
 
-    <header class="z-20 flex w-full max-w-4xl flex-col gap-4">
+    <header class="z-20 flex w-full max-w-4xl flex-col items-center gap-4 text-center md:items-start md:text-start">
       <div class="h-1 w-15 bg-primary" />
 
       <h1 class="hero-heading">
@@ -19,18 +19,18 @@
         that helps organizations securely store, manage, and share sensitive information.
       </p>
 
-      <div class="navigation-group">
-        <nuxt-link to="/sign-in" class="btn-primary rounded-full! px-5 shadow-none">
+      <div class="flex flex-row items-center gap-4 md:items-start">
+        <nuxt-link to="/sign-in" class="btn-primary rounded-full! shadow-none">
           <span class="font-semibold">Get Started</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
-        <nuxt-link to="/cli-guide" class="btn-ghost group rounded-full!">
+        <nuxt-link to="/cli-guide" class="btn-ghost rounded-full!">
           <icon name="ph:terminal-bold" size="20" class="text-primary" />
           <span>WindKeep CLI</span>
         </nuxt-link>
       </div>
 
-      <div class="flex flex-wrap items-center gap-4 py-8">
+      <div class="flex w-full max-w-md flex-col items-center gap-4 py-8 whitespace-nowrap md:flex-row md:items-start">
         <div
           v-for="(highlight, index) in HIGHLIGHTS" :key="index"
           v-motion :initial="{ opacity: 0 }"
@@ -44,7 +44,7 @@
     </header>
   </section>
 
-  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-24 md:max-w-7xl md:gap-20 2xl:gap-32">
+  <div class="container mx-auto flex w-full flex-col gap-12 px-8 py-24 md:max-w-7xl md:gap-20 2xl:gap-32">
     <section id="cli" class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
       <header class="flex flex-col gap-4 md:border-r md:pr-12">
         <div class="flex items-end justify-between border-b pb-4">
@@ -107,17 +107,16 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 border-b md:grid-cols-2">
+      <div class="features-grid">
         <div
           v-for="(feature, index) in FEATURES" :key="index"
           v-motion :initial="{ opacity: 0 }"
           :visible-once="{ opacity: 1 }" :duration="600"
           :delay="100 * index" class="feature-item"
-          :class="{ 'border-b': index < FEATURES.length - 2, 'max-md:border-b': index === FEATURES.length - 2, 'md:border-l': index % 2 === 1 }"
         >
           <div class="flex flex-col gap-2">
             <div class="navigation-group">
-              <icon :name="feature.icon" class="text-primary" size="25" />
+              <icon :name="feature.icon" class="feature-icon text-primary" size="25" />
               <h3 class="text-base! leading-none! font-bold">
                 {{ feature.title }}
               </h3>
@@ -147,7 +146,7 @@
       <div class="flex flex-col divide-y">
         <div v-for="(item, index) in FAQS" :key="index" class="py-4">
           <button
-            class="group flex w-full items-start justify-between gap-4 text-left font-semibold transition-colors hover:text-primary"
+            class="group flex w-full items-start justify-between gap-4 text-start font-semibold transition-colors hover:text-primary"
             @click="openIndex = openIndex === index ? null : index"
           >
             <span class="text-sm md:text-base">{{ item.question }}</span>
@@ -155,11 +154,32 @@
           </button>
 
           <transition name="accordion">
-            <p v-if="openIndex === index" class="text-caption max-w-4xl">
+            <p v-if="openIndex === index" class="text-caption max-w-4xl p-2">
               {{ item.answer }}
             </p>
           </transition>
         </div>
+      </div>
+    </section>
+
+    <section
+      id="cta" v-motion
+      :initial="{ opacity: 0, y: 16 }" :visible-once="{ opacity: 1, y: 0 }"
+      :duration="700" class="cta-banner"
+    >
+      <div class="cta-accent" />
+      <div class="relative z-10 flex flex-col items-center gap-4">
+        <div class="h-1 w-15 bg-primary" />
+        <h2>
+          Ready to ditch the .env file?
+        </h2>
+        <p class="max-w-md text-center font-medium text-muted-foreground">
+          WindKeep is free to use and open source. Get your team set up in minutes.
+        </p>
+        <nuxt-link to="/sign-in" class="btn-primary rounded-full!">
+          <span class="font-semibold">Get Started for Free</span>
+          <icon name="ph:arrow-right-bold" size="20" />
+        </nuxt-link>
       </div>
     </section>
   </div>
@@ -187,7 +207,7 @@ h2 {
 }
 
 .hero-heading {
-  font-size: clamp(1.5rem, 3.75vw, 3.375rem);
+  font-size: clamp(2.4rem, 4.5vw, 4.05rem);
   line-height: 1.05;
 }
 
@@ -232,6 +252,9 @@ html.light .hero-backdrop {
   border: none;
   border-right: var(--border-style);
   transition: all var(--transition);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .cli-tab:last-child {
   border-right: none;
@@ -245,23 +268,64 @@ html.light .hero-backdrop {
   background-color: color-mix(in srgb, var(--muted) 20%, transparent);
 }
 
+/* Feature grid — border logic handled in CSS, decoupled from item count */
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: var(--border-style);
+}
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .feature-item:nth-child(even) {
+    border-left: var(--border-style);
+    padding-left: 3rem;
+  }
+  .feature-item:nth-last-child(-n + 2):nth-child(odd):last-child,
+  .feature-item:nth-last-child(-n + 2) {
+    border-bottom: none;
+  }
+}
+
 .feature-item {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   gap: 1.25rem;
   padding: 2rem 1rem;
+  border-bottom: var(--border-style);
   transition: background-color var(--transition);
 }
-@media (min-width: 768px) {
-  .feature-item:nth-child(even) {
-    padding-left: 3rem;
-  }
+.feature-item:hover {
+  background-color: color-mix(in srgb, var(--muted) 10%, transparent);
+}
+.feature-item:hover .feature-icon {
+  opacity: 0.7;
+}
 
-  h1 {
-    font-size: clamp(2rem, 4vw, 3.375rem);
-    line-height: 1.1;
-  }
+/* CTA banner */
+.cta-banner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  border: var(--border-style);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+.cta-accent {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    ellipse at 50% 0%,
+    color-mix(in srgb, var(--primary) 12%, transparent) 0%,
+    transparent 70%
+  );
 }
 
 .accordion-enter-active,
