@@ -15,7 +15,7 @@
     "db:reset": "prisma db push --force-reset"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1045.0",
+    "@aws-sdk/client-s3": "3.1060.0",
     "@nuxt/content": "3.11.2",
     "@nuxtjs/color-mode": "4.0.0",
     "@nuxtjs/seo": "5.1.0",
@@ -28,16 +28,14 @@
     "nuxt-auth-utils": "0.5.29",
     "nuxt-shiki": "0.3.2",
     "parquetjs": "0.11.2",
-    "pg": "8.20.0",
-    "redis": "5.11.0",
-    "vue": "3.5.34",
-    "vue-router": "5.0.6",
+    "pg": "8.21.0",
+    "redis": "6.0.0",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@antfu/eslint-config": "9.0.0",
     "@iconify-json/ph": "1.2.2",
-    "@iconify-json/simple-icons": "1.2.81",
+    "@iconify-json/simple-icons": "1.2.85",
     "@nuxt/fonts": "0.14.0",
     "@nuxt/icon": "2.2.2",
     "@tailwindcss/vite": "4.3.0",

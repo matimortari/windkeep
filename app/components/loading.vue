@@ -8,7 +8,7 @@
 
 <style scoped>
 .animate-slide {
-  animation: slide 1.4s ease-in-out infinite;
+  animation: slide 1.5s ease-in-out infinite;
 }
 @keyframes slide {
   0% {
