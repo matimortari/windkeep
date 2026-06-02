@@ -31,7 +31,7 @@
             </div>
 
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm">
-              <span class="max-w-[80%] truncate select-none" aria-label="Hidden value" :class="[getSecretValue(secret.key, col.env) ? getSecretValueClass(secret.key) : '']">{{ renderValue(secret.key, col.env) }}</span>
+              <span class="max-w-[80%] truncate tracking-wide select-none" aria-label="Hidden value" :class="getSecretValueClass(secret.key, !!getSecretValue(secret.key, col.env))">{{ renderValue(secret.key, col.env) }}</span>
               <button v-if="getSecretValue(secret.key, col.env)" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, getSecretValue(secret.key, col.env))">
                 <icon :name="getCopyIcon(secret.key, col.env)" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
@@ -80,15 +80,15 @@ const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
 
 const rowClassByChangeType: Record<"create" | "update" | "delete", string> = {
-  create: "bg-success/50!",
-  update: "bg-warning/50!",
-  delete: "bg-danger/50! line-through decoration-danger-foreground",
+  create: "bg-success/10 text-success-foreground!",
+  update: "bg-warning/10 text-warning-foreground!",
+  delete: "bg-danger/10 text-danger-foreground! line-through decoration-danger",
 }
 
 const valueClassByChangeType: Record<"create" | "update" | "delete", string> = {
-  create: "rounded-lg px-1 bg-success/50!",
-  update: "rounded-lg px-1 bg-warning/50!",
-  delete: "rounded-lg px-1 bg-danger/50!",
+  create: "rounded px-1.5 py-0.5 bg-success/15 text-success-foreground font-medium",
+  update: "rounded px-1.5 py-0.5 bg-warning/15 text-warning-foreground font-medium",
+  delete: "rounded px-1.5 py-0.5 bg-danger/15 text-danger-foreground font-medium line-through",
 }
 
 const iconNameByChangeType: Record<"create" | "update" | "delete", string> = {
@@ -128,26 +128,18 @@ function getPendingChangeType(key: string): "create" | "update" | "delete" | nul
 
 function getRowClass(key: string) {
   const changeType = getPendingChangeType(key)
-  if (!changeType) {
-    return ""
-  }
-
-  return rowClassByChangeType[changeType]
+  return changeType ? rowClassByChangeType[changeType] : ""
 }
 
 function getPendingIconName(key: string) {
   const changeType = getPendingChangeType(key)
-  if (!changeType) {
-    return null
-  }
-
-  return iconNameByChangeType[changeType]
+  return changeType ? iconNameByChangeType[changeType] : null
 }
 
-function getSecretValueClass(key: string) {
+function getSecretValueClass(key: string, hasValue: boolean) {
   const changeType = getPendingChangeType(key)
   if (!changeType) {
-    return "rounded-lg px-1 bg-muted"
+    return hasValue ? "rounded px-1.5 py-0.5 bg-muted text-muted-foreground font-medium" : "text-muted-foreground/40"
   }
 
   return valueClassByChangeType[changeType]
@@ -155,10 +147,10 @@ function getSecretValueClass(key: string) {
 
 function getActionIconClass(key: string, defaultTone: "primary" | "danger" = "primary") {
   if (getPendingChangeType(key)) {
-    return "hover:text-current"
+    return "text-current opacity-80 hover:opacity-100"
   }
 
-  return defaultTone === "danger" ? "hover:text-danger" : "hover:text-primary"
+  return defaultTone === "danger" ? "hover:text-danger text-muted-foreground" : "hover:text-primary text-muted-foreground"
 }
 
 function getCopyIcon(secretKey: string, env: string) {
@@ -184,30 +176,24 @@ function getSecretValue(key: string, env: string) {
 
 function renderValue(key: string, env: string) {
   const val = getSecretValue(key, env)
-  return val ? (isKeyVisible(key) ? val : "•".repeat(val.length)) : "—"
+  return val ? (isKeyVisible(key) ? val : "••••••••") : "—"
 }
 </script>
 
 <style scoped>
-tbody tr td {
-  color: var(--row-text, var(--muted-foreground)) !important;
-  box-shadow: inset 0 -1px 0 var(--row-divider, color-mix(in srgb, var(--muted) 30%, transparent)) !important;
-}
-
 tbody tr {
-  border-bottom: none !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--muted) 40%, transparent);
 }
-
+tbody tr:last-child {
+  border-bottom: none;
+}
 tbody tr[data-change-type="create"] {
-  --row-text: var(--success-foreground);
-  --row-divider: color-mix(in srgb, var(--success) 50%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--success) 30%, transparent);
 }
 tbody tr[data-change-type="update"] {
-  --row-text: var(--warning-foreground);
-  --row-divider: color-mix(in srgb, var(--warning) 50%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--warning) 30%, transparent);
 }
 tbody tr[data-change-type="delete"] {
-  --row-text: var(--danger-foreground);
-  --row-divider: color-mix(in srgb, var(--danger) 50%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--danger) 30%, transparent);
 }
 </style>

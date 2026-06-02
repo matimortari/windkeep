@@ -268,7 +268,6 @@ html.light .hero-backdrop {
   background-color: color-mix(in srgb, var(--muted) 20%, transparent);
 }
 
-/* Feature grid — border logic handled in CSS, decoupled from item count */
 .features-grid {
   display: grid;
   grid-template-columns: 1fr;
