@@ -8,19 +8,9 @@
         <Logo />
 
         <div class="hidden gap-4! border-l pl-4! text-muted-foreground md:navigation-group">
-          <nuxt-link to="/#features" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
-            <icon name="ph:star-bold" size="20" />
-            <span>Features</span>
-          </nuxt-link>
-
-          <nuxt-link to="/#faq" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
-            <icon name="ph:question-bold" size="20" />
-            <span>FAQ</span>
-          </nuxt-link>
-
-          <nuxt-link to="/cli-guide" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
-            <icon name="ph:terminal-bold" size="20" />
-            <span>CLI Guide</span>
+          <nuxt-link v-for="link in NAVBAR_LINKS" :key="link.to" :to="link.to" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
+            <icon :name="link.icon" size="15" />
+            <span>{{ link.label }}</span>
           </nuxt-link>
         </div>
       </nav>
@@ -44,6 +34,12 @@
 const { toggleTheme, themeIcon } = useTheme()
 const { loggedIn } = useUserSession()
 const scrolled = ref(false)
+
+const NAVBAR_LINKS = [
+  { to: "/#features", icon: "ph:star-bold", label: "Features" },
+  { to: "/#faq", icon: "ph:question-bold", label: "FAQ" },
+  { to: "/cli-guide", icon: "ph:terminal-bold", label: "CLI Guide" },
+]
 
 const handleScroll = () => scrolled.value = window.scrollY > 50
 onMounted(() => window.addEventListener("scroll", handleScroll, { passive: true }))

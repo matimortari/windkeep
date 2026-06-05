@@ -2,7 +2,9 @@
   <footer class="relative z-20 w-full border-t bg-card">
     <div class="container mx-auto flex flex-col-reverse p-8 md:flex-row md:justify-between">
       <div class="flex flex-col justify-end gap-2 border-t py-4 md:border-0">
-        <img :src="themeTitle" alt="Wordmark" width="100">
+        <ClientOnly>
+          <img :src="themeTitle" alt="Wordmark" width="100">
+        </ClientOnly>
 
         <div class="flex flex-row items-center justify-between gap-4">
           <p class="text-caption whitespace-nowrap">
@@ -15,7 +17,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-8 py-4">
+      <div class="grid grid-cols-2 gap-8 py-4">
         <div v-for="(section, index) in FOOTER_SECTIONS" :key="index">
           <p class="mb-4 font-semibold">
             {{ section.title }}
@@ -41,7 +43,7 @@
 const { themeTitle } = useTheme()
 const { loggedIn } = useUserSession()
 
-const FOOTER_SECTIONS = [
+const FOOTER_SECTIONS = computed(() => [
   {
     title: "Product",
     links: [...(!loggedIn.value
@@ -62,10 +64,10 @@ const FOOTER_SECTIONS = [
     title: "Resources",
     links: [
       { label: "API Reference", href: "/api-spec" },
+      { label: "Brand Assets", href: "/brand" },
       { label: "Privacy Policy", href: "/legal/privacy" },
       { label: "Terms of Service", href: "/legal/terms" },
-      { label: "Brand", href: "/brand" },
     ],
   },
-]
+])
 </script>

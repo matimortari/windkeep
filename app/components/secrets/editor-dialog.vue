@@ -19,8 +19,7 @@
         <textarea
           id="env-content" v-model="editorContent"
           name="env-content" placeholder="KEY=value&#10;ANOTHER_KEY=another_value"
-          rows="10" class="scroll-area resize-none font-mono text-sm"
-          spellcheck="false"
+          class="scroll-area h-80 resize-none font-mono text-sm" spellcheck="false"
         />
       </div>
 

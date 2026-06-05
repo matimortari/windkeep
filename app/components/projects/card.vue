@@ -28,12 +28,12 @@
 
         <div class="navigation-group">
           <nuxt-link :to="`/admin/${project.slug}/settings`" class="group btn-ghost rounded-full!" @click.stop>
-            <icon name="ph:gear-bold" size="25" class="text-muted-foreground group-hover:text-primary" />
+            <icon name="ph:gear-bold" size="25" class="text-muted-foreground group-hover:text-secondary" />
             <span class="text-caption hidden whitespace-nowrap xl:block">Settings</span>
           </nuxt-link>
 
           <div class="group btn-ghost rounded-full!">
-            <icon name="ph:arrow-right-bold" size="25" class="text-muted-foreground group-hover:text-primary" />
+            <icon name="ph:arrow-right-bold" size="25" class="text-muted-foreground group-hover:text-secondary" />
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@
           <th v-for="col in columns" :key="col.key" :class="col.class">
             <div class="navigation-group">
               <span>{{ col.label }}</span>
-              <button v-if="col.sortable" class="flex items-center hover:text-primary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+              <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
                 <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
               </button>
             </div>
@@ -21,7 +21,7 @@
           :data-change-type="getPendingChangeType(secret.key) ?? 'none'"
         >
           <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
-            <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold">
+            <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold" :class="getKeyTextClass(secret.key)">
               <icon v-if="getPendingIconName(secret.key)" :name="getPendingIconName(secret.key)!" size="20" class="shrink-0" />
               <span class="truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
               <span v-if="secret.description" class="group/tooltip relative hidden shrink-0 cursor-pointer md:inline-flex">
@@ -78,24 +78,26 @@ const copyStates = ref<Record<string, boolean>>({})
 const { isOwner, isAdmin } = storeToRefs(useProjectStore())
 const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
-
-const rowClassByChangeType: Record<"create" | "update" | "delete", string> = {
-  create: "bg-success/10 text-success-foreground!",
-  update: "bg-warning/10 text-warning-foreground!",
-  delete: "bg-danger/10 text-danger-foreground! line-through decoration-danger",
-}
-
-const valueClassByChangeType: Record<"create" | "update" | "delete", string> = {
-  create: "rounded px-1.5 py-0.5 bg-success/15 text-success-foreground font-medium",
-  update: "rounded px-1.5 py-0.5 bg-warning/15 text-warning-foreground font-medium",
-  delete: "rounded px-1.5 py-0.5 bg-danger/15 text-danger-foreground font-medium line-through",
-}
-
-const iconNameByChangeType: Record<"create" | "update" | "delete", string> = {
-  create: "ph:plus-circle-bold",
-  update: "ph:pencil-circle-bold",
-  delete: "ph:minus-circle-bold",
-}
+const changeTypeConfig = {
+  create: {
+    rowClass: "bg-success/10 text-success!",
+    keyTextClass: "text-success-foreground",
+    valueClass: "rounded px-1.5 py-0.5 bg-success/15 text-success font-medium",
+    icon: "ph:plus-circle-bold",
+  },
+  update: {
+    rowClass: "bg-warning/10 text-warning!",
+    keyTextClass: "text-warning-foreground",
+    valueClass: "rounded px-1.5 py-0.5 bg-warning/15 text-warning font-medium",
+    icon: "ph:pencil-circle-bold",
+  },
+  delete: {
+    rowClass: "bg-danger/10 text-danger! line-through decoration-danger",
+    keyTextClass: "text-danger-foreground",
+    valueClass: "rounded px-1.5 py-0.5 bg-danger/15 text-danger font-medium line-through",
+    icon: "ph:minus-circle-bold",
+  },
+} satisfies Record<string, { rowClass: string, keyTextClass: string, valueClass: string, icon: string }>
 
 const secretValuesByKey = computed(() => {
   const map = new Map<string, Map<string, string>>()
@@ -126,31 +128,37 @@ function getPendingChangeType(key: string): "create" | "update" | "delete" | nul
   return props.pendingChanges.get(key)?.type ?? null
 }
 
-function getRowClass(key: string) {
+function getChangeConfig(key: string) {
   const changeType = getPendingChangeType(key)
-  return changeType ? rowClassByChangeType[changeType] : ""
+  return changeType ? changeTypeConfig[changeType] : null
+}
+
+function getRowClass(key: string) {
+  return getChangeConfig(key)?.rowClass ?? ""
 }
 
 function getPendingIconName(key: string) {
-  const changeType = getPendingChangeType(key)
-  return changeType ? iconNameByChangeType[changeType] : null
+  return getChangeConfig(key)?.icon ?? null
+}
+
+function getKeyTextClass(key: string) {
+  return getChangeConfig(key)?.keyTextClass ?? ""
 }
 
 function getSecretValueClass(key: string, hasValue: boolean) {
-  const changeType = getPendingChangeType(key)
-  if (!changeType) {
-    return hasValue ? "rounded px-1.5 py-0.5 bg-muted text-muted-foreground font-medium" : "text-muted-foreground/40"
+  if (!getChangeConfig(key)) {
+    return hasValue ? "rounded-xl px-1.5 py-0.5 bg-muted/30 font-medium" : "text-muted-foreground/40"
   }
 
-  return valueClassByChangeType[changeType]
+  return getChangeConfig(key)?.valueClass ?? ""
 }
 
 function getActionIconClass(key: string, defaultTone: "primary" | "danger" = "primary") {
-  if (getPendingChangeType(key)) {
+  if (getChangeConfig(key)) {
     return "text-current opacity-80 hover:opacity-100"
   }
 
-  return defaultTone === "danger" ? "hover:text-danger text-muted-foreground" : "hover:text-primary text-muted-foreground"
+  return defaultTone === "danger" ? "hover:text-danger text-muted-foreground" : "hover:text-secondary text-muted-foreground"
 }
 
 function getCopyIcon(secretKey: string, env: string) {

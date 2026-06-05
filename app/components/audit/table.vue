@@ -7,7 +7,7 @@
             <div class="navigation-group">
               <icon :name="col.icon" size="20" />
               <span>{{ col.label }}</span>
-              <button v-if="col.sortable" class="flex items-center hover:text-primary focus:outline-none" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+              <button v-if="col.sortable" class="flex items-center hover:text-secondary focus:outline-none" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
                 <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
               </button>
             </div>
@@ -25,7 +25,7 @@
         <template v-for="log in sortedLogs" v-else :key="log.id">
           <tr class="cursor-pointer hover:bg-muted/20" :aria-expanded="expandedRows.has(log.id)" @click="toggleRow(log.id)">
             <td>
-              <icon name="ph:caret-right-bold" size="15" class="hover:text-primary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
+              <icon name="ph:caret-right-bold" size="15" class="hover:text-secondary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
             <td>
               <div class="navigation-group max-w-xs truncate">
@@ -74,7 +74,7 @@
 
               <div v-if="(log.metadata || {})" class="relative">
                 <button class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="copyMetadataActions.get(log.id)?.triggerCopy(formatMetadata(log.metadata))">
-                  <icon :name="copyMetadataActions.get(log.id)?.icon.value || 'ph:copy-bold'" size="15" />
+                  <icon :name="copyMetadataActions.get(log.id)?.icon.value || 'ph:copy-bold'" size="20" />
                 </button>
                 <Shiki lang="json" :code="formatMetadata(log.metadata)" class="code-block" />
               </div>

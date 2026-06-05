@@ -250,7 +250,7 @@ h6 {
 }
 
 .code-block {
-  background-color: #2e3440;
+  background-color: #1b1e28;
   padding: 1rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
@@ -304,7 +304,7 @@ table {
 
 td,
 th {
-  color: var(--foreground);
+  color: var(--muted-foreground);
   padding: 1rem;
   font-size: 0.875rem;
   line-height: 1.25rem;

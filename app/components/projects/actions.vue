@@ -24,7 +24,7 @@
         <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
       </button>
 
-      <button class="btn" :aria-label="showAll ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="emit('update:show-all', !showAll)">
+      <button class="btn" :aria-label="showAll ? 'Show Projects Inside Organization' : 'Show All My Projects'" @click="emit('update:showAll', !showAll)">
         <icon :name="showAll ? 'ph:users-four-bold' : 'ph:user-bold'" size="20" />
       </button>
 
@@ -49,7 +49,7 @@ defineProps<{
 const emit = defineEmits<{
   "update:search": [value: string]
   "update:layout": [value: "grid" | "list"]
-  "update:show-all": [value: boolean]
+  "update:showAll": [value: boolean]
   "toggleSort": []
   "openDialog": []
 }>()

@@ -59,7 +59,7 @@ export default defineNuxtConfig({
   site: { url: process.env.NUXT_PUBLIC_BASE_URL, name: "WindKeep" },
   shiki: {
     bundledLangs: ["bash", "go", "html", "javascript", "json", "markdown", "typescript", "vue"],
-    bundledThemes: ["nord"],
-    highlightOptions: { theme: "nord" },
+    bundledThemes: ["poimandres"],
+    highlightOptions: { theme: "poimandres" },
   },
 })

@@ -18,14 +18,14 @@
     <ul
       v-else v-motion
       :initial="{ opacity: 0 }" :enter="{ opacity: 1 }"
-      :duration="600" class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3 2xl:grid-cols-4"
+      :duration="600" class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3 2xl:grid-cols-4 2xl:gap-4"
     >
       <li v-for="project in filteredProjects" :key="project.id">
         <ProjectsCard :project="project" />
       </li>
 
       <button v-if="isOwner || isAdmin" class="card group flex h-50 flex-col items-center justify-center gap-4 border-dashed! bg-transparent! text-muted-foreground" @click="openDialog('projects')">
-        <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105 group-hover:text-primary" />
+        <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105 group-hover:text-secondary" />
         <span class="font-semibold transition-transform group-hover:scale-105">New Project</span>
       </button>
     </ul>
