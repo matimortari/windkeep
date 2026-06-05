@@ -141,48 +141,43 @@ export const REST_METHOD_LABELS = {
 
 // OAuth providers
 export const OAUTH_PROVIDERS = [
-  { name: "github", label: "Sign In With GitHub", icon: "simple-icons:github" },
   { name: "google", label: "Sign In With Google", icon: "simple-icons:google" },
+  { name: "github", label: "Sign In With GitHub", icon: "simple-icons:github" },
   { name: "gitlab", label: "Sign In With GitLab", icon: "simple-icons:gitlab" },
 ]
 
 // Brand constants
-export const BRAND_SECTIONS = [
-  { id: "wordmarks", label: "Wordmarks" },
-  { id: "symbols", label: "Symbols" },
-  { id: "brand", label: "Brand Colors" },
-  { id: "neutral", label: "Neutral Colors" },
-  { id: "status", label: "Status Colors" },
-]
-
 export const SYMBOLS = [
-  { name: "Symbol", image: Symbol, bgClass: "bg-background!" },
-  { name: "Symbol Mono (dark)", image: SymbolMonoDark, bgClass: "bg-[#fafafa]!" },
-  { name: "Symbol Mono (light)", image: SymbolMonoLight, bgClass: "bg-[#0a0a0a]!" },
+  { name: "Symbol", image: Symbol, bgClass: "bg-neutral-100" },
+  { name: "Symbol Mono (dark)", image: SymbolMonoDark, bgClass: "bg-white" },
+  { name: "Symbol Mono (light)", image: SymbolMonoLight, bgClass: "bg-neutral-900" },
 ]
 
 export const WORDMARKS = [
-  { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-[#fafafa]!" },
-  { name: "Wordmark (light)", image: WordmarkLight, bgClass: "bg-[#0a0a0a]!" },
+  { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-white" },
+  { name: "Wordmark (light)", image: WordmarkLight, bgClass: "bg-neutral-900" },
+]
+
+export const NEUTRAL_SCALE = [
+  { name: "Neutral/100", var: "--neutral-100", value: "#fafafa" },
+  { name: "Neutral/200", var: "--neutral-200", value: "#f5f5f5" },
+  { name: "Neutral/300", var: "--neutral-300", value: "#d4d4d4" },
+  { name: "Neutral/400", var: "--neutral-400", value: "#a3a3a3" },
+  { name: "Neutral/500", var: "--neutral-500", value: "#737373" },
+  { name: "Neutral/600", var: "--neutral-600", value: "#525252" },
+  { name: "Neutral/700", var: "--neutral-700", value: "#404040" },
+  { name: "Neutral/800", var: "--neutral-800", value: "#171717" },
+  { name: "Neutral/900", var: "--neutral-900", value: "#0a0a0a" },
 ]
 
 export const BRAND_COLORS = [
-  { name: "Primary", var: "--primary" },
-  { name: "Secondary", var: "--secondary" },
-]
-
-export const NEUTRAL_COLORS = [
-  { name: "Background", var: "--background" },
-  { name: "Foreground", var: "--foreground" },
-  { name: "Card", var: "--card" },
-  { name: "Input", var: "--input" },
-  { name: "Muted", var: "--muted" },
-  { name: "Muted Foreground", var: "--muted-foreground" },
+  { name: "Primary", var: "--brand-primary", value: "#3d536d" },
+  { name: "Secondary", var: "--brand-secondary", value: "#597c8b" },
 ]
 
 export const STATUS_COLORS = [
-  { name: "Danger", var: "--danger" },
-  { name: "Success", var: "--success" },
-  { name: "Warning", var: "--warning" },
-  { name: "Info", var: "--info" },
+  { name: "Danger", darkVar: "--red-dark", darkVal: "#8d2525", lightVar: "--red-light", lightVal: "#daa0a0" },
+  { name: "Success", darkVar: "--green-dark", darkVal: "#0a6647", lightVar: "--green-light", lightVal: "#98cfb8" },
+  { name: "Warning", darkVar: "--orange-dark", darkVal: "#8f4210", lightVar: "--orange-light", lightVal: "#e6cfa3" },
+  { name: "Info", darkVar: "--blue-dark", darkVal: "#4872a5", lightVar: "--blue-light", lightVal: "#b7c9dd" },
 ]

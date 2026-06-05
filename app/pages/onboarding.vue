@@ -15,10 +15,7 @@
       </header>
 
       <div class="border-y">
-        <button
-          class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary"
-          @click="activeSection = activeSection === 'create' ? null : 'create'"
-        >
+        <button class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary" @click="activeSection = activeSection === 'create' ? null : 'create'">
           <h5>
             New Organization
           </h5>
@@ -63,17 +60,11 @@
       </div>
 
       <div class="border-b">
-        <button
-          class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary"
-          @click="activeSection = activeSection === 'invite' ? null : 'invite'"
-        >
+        <button class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary" @click="activeSection = activeSection === 'invite' ? null : 'invite'">
           <h5>
             Accept Invitation
           </h5>
-          <icon
-            name="ph:caret-down-bold" size="20"
-            class="shrink-0 text-muted-foreground transition-transform group-hover:text-primary" :class="activeSection === 'invite' ? 'rotate-180' : 'rotate-0'"
-          />
+          <icon name="ph:caret-down-bold" size="20" class="shrink-0 text-muted-foreground transition-transform group-hover:text-primary" :class="activeSection === 'invite' ? 'rotate-180' : 'rotate-0'" />
         </button>
 
         <transition name="accordion">

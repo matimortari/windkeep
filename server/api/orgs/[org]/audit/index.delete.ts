@@ -2,8 +2,8 @@ import { Buffer } from "node:buffer"
 import { promises as fs } from "node:fs"
 import os from "node:os"
 import path from "node:path"
-import { deleteAuditLogsSchema } from "#shared/schemas/audit-schema"
 import parquet from "parquetjs"
+import { deleteAuditLogsSchema } from "#shared/schemas/audit-schema"
 
 export default defineEventHandler(async (event) => {
   const user = await getUserFromSession(event)

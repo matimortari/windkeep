@@ -110,11 +110,11 @@ function updateFilter(type: "date" | "user" | "action", value: any, shouldFetch 
     updated.action = value || undefined
     isActionDropdownOpen.value = false
   }
+  auditStore.updateFilters(updated)
   if (!shouldFetch) {
     return
   }
 
-  auditStore.updateFilters(updated)
   auditStore.getAuditLogs(activeOrg.value!.id, updated)
 }
 

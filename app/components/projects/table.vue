@@ -6,7 +6,7 @@
           <th v-for="col in columns" :key="col.key" :class="col.class">
             <div class="navigation-group">
               <span>{{ col.label }}</span>
-              <button v-if="col.sortable" class="flex items-center hover:text-primary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+              <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
                 <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
               </button>
             </div>
@@ -42,10 +42,10 @@
           <td>
             <div class="navigation-group">
               <nuxt-link :to="`/admin/${project.slug}/settings`" aria-label="Project Settings" @click.stop>
-                <icon name="ph:gear-bold" size="20" class="transition-colors hover:text-primary" />
+                <icon name="ph:gear-bold" size="20" class="transition-colors hover:text-secondary" />
               </nuxt-link>
               <nuxt-link :to="`/admin/${project.slug}`" aria-label="Open Project" @click.stop>
-                <icon name="ph:arrow-right-bold" size="20" class="transition-colors hover:text-primary" />
+                <icon name="ph:arrow-right-bold" size="20" class="transition-colors hover:text-secondary" />
               </nuxt-link>
             </div>
           </td>

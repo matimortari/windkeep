@@ -8,7 +8,7 @@
     <div class="dot-overlay" />
 
     <header class="z-20 flex w-full max-w-4xl flex-col items-center gap-4 text-center md:items-start md:text-start">
-      <div class="h-1 w-15 bg-primary" />
+      <div class="h-1 w-15 bg-secondary" />
 
       <h1 class="hero-heading">
         Your Secrets, Secured.
@@ -145,10 +145,7 @@
 
       <div class="flex flex-col divide-y">
         <div v-for="(item, index) in FAQS" :key="index" class="py-4">
-          <button
-            class="group flex w-full items-start justify-between gap-4 text-start font-semibold transition-colors hover:text-primary"
-            @click="openIndex = openIndex === index ? null : index"
-          >
+          <button class="group flex w-full items-start justify-between gap-4 text-start font-semibold transition-colors hover:text-primary" @click="openIndex = openIndex === index ? null : index">
             <span class="text-sm md:text-base">{{ item.question }}</span>
             <icon name="ph:plus-bold" size="20" class="mt-0.5 shrink-0 transition-transform" :class="openIndex === index ? 'rotate-45 text-primary' : 'text-muted-foreground'" />
           </button>
@@ -169,14 +166,14 @@
     >
       <div class="cta-accent" />
       <div class="relative z-10 flex flex-col items-center gap-4">
-        <div class="h-1 w-15 bg-primary" />
+        <div class="h-1 w-15 bg-secondary" />
         <h2>
           Ready to ditch the .env file?
         </h2>
         <p class="max-w-md text-center font-medium text-muted-foreground">
           WindKeep is free to use and open source. Get your team set up in minutes.
         </p>
-        <nuxt-link to="/sign-in" class="btn-primary rounded-full!">
+        <nuxt-link to="/sign-in" class="btn-secondary rounded-full!">
           <span class="font-semibold">Get Started for Free</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
