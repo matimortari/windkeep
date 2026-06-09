@@ -116,7 +116,7 @@ interface AuditLog {
   action: string
   resource?: string | null
   description?: string | null
-  metadata?: Record<string, any> | null
+  metadata?: Record<string, unknown> | null
   ip: string
   ua: string
   user?: User

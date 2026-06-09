@@ -2,9 +2,9 @@ import type { EventHandlerRequest, H3Event } from "h3"
 import { createHmac, randomBytes } from "node:crypto"
 
 /**
- * Helper function to ensure required environment variables are set, throwing an error if missing.
+ * Ensure required environment variables are set, throwing an error if missing.
  */
-export function requireEnv(name: string) {
+export function requireEnv(name: string): string {
   const value = process.env[name]
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`)
@@ -24,10 +24,11 @@ export function hashApiToken(token: string): string {
  * Retrieves the authenticated user from the current session or API token.
  * Throws 401 if no valid session exists.
  */
-export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
+export async function getUserFromSession(event: H3Event<EventHandlerRequest>): Promise<{ id: string, email: string, name: string, image: string | null }> {
   const session = await getUserSession(event)
   if (session?.user?.id) {
-    return session.user
+    const { id, email, name, image } = session.user
+    return { id, email, name, image: image ?? null }
   }
 
   // Fall back to API token auth (for CLI access)
@@ -35,10 +36,10 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>) {
   if (authHeader?.startsWith("Bearer ")) {
     const user = await db.user.findFirst({
       where: { apiToken: hashApiToken(authHeader.substring(7)) },
-      select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true },
+      select: { id: true, email: true, name: true, image: true, apiTokenExpiresAt: true },
     })
     if (user && user.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
-      return { id: user.id, email: user.email, name: user.name, image: user.image, apiToken: user.apiToken }
+      return { id: user.id, email: user.email, name: user.name, image: user.image ?? null }
     }
   }
 
@@ -78,7 +79,6 @@ export function generateToken(byteLength: number = 12): string {
 
 /**
  * Creates an audit log entry for a user action, capturing relevant metadata.
- * This helps maintain a record of significant events for security and compliance.
  */
 export async function createAuditLog({ userId, orgId, projectId, action, resource, metadata, description, event }: {
   userId: string
@@ -86,7 +86,7 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
   projectId?: string
   action: string
   resource?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   description?: string
   event?: H3Event<EventHandlerRequest>
 }) {
@@ -94,26 +94,45 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
   const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(",")[0]?.trim()) || event?.node?.req?.socket?.remoteAddress || "unknown"
   const ua = event?.node?.req?.headers?.["user-agent"] || "unknown"
 
-  await db.auditLog.create({ data: { userId, orgId, projectId, action, resource, metadata, ip, ua, description: description || `${action} performed on ${resource || "resource"}` } })
+  await db.auditLog.create({
+    data: {
+      userId,
+      orgId,
+      projectId,
+      action,
+      resource,
+      metadata: metadata ? JSON.stringify(metadata) : undefined,
+      ip,
+      ua,
+      description: description || `${action} performed on ${resource || "resource"}`,
+    },
+  })
 }
 
 /**
  * Returns the base URL used for invite links.
  */
-export function getInviteBaseUrl(_event: H3Event<EventHandlerRequest>) {
+export function getInviteBaseUrl(_event: H3Event<EventHandlerRequest>): string {
   return requireEnv("NUXT_PUBLIC_BASE_URL").trim().replace(/\/+$/, "")
 }
 
-export async function getBinaryBlobUrl(binaryKey: string) {
-  const BINARIES: Record<string, string | undefined> = {
-    "windkeep-darwin-amd64": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-darwin-amd64`,
-    "windkeep-darwin-arm64": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-darwin-arm64`,
-    "windkeep-linux-amd64": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-linux-amd64`,
-    "windkeep-windows-amd64.exe": `${process.env.R2_PUBLIC_URL}/binaries/windkeep-windows-amd64.exe`,
+/**
+ * Returns the public URL for a given binary key.
+ * Throws 404 if the binary key is not recognized.
+ */
+export async function getBinaryBlobUrl(binaryKey: string): Promise<string> {
+  const baseUrl = requireEnv("R2_PUBLIC_URL")
+  const BINARIES: Record<string, string> = {
+    "windkeep-darwin-amd64": `${baseUrl}/binaries/windkeep-darwin-amd64`,
+    "windkeep-darwin-arm64": `${baseUrl}/binaries/windkeep-darwin-arm64`,
+    "windkeep-linux-amd64": `${baseUrl}/binaries/windkeep-linux-amd64`,
+    "windkeep-windows-amd64.exe": `${baseUrl}/binaries/windkeep-windows-amd64.exe`,
   }
-  if (!BINARIES[binaryKey]) {
+
+  const url = BINARIES[binaryKey]
+  if (!url) {
     throw createError({ status: 404, message: "Binary not found" })
   }
 
-  return BINARIES[binaryKey]
+  return url
 }
