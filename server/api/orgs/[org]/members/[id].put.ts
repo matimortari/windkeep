@@ -15,24 +15,25 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateOrgMemberRoleSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
-  const targetRole = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: memberId, orgId } } })
-  if (!targetRole) {
+  const targetMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: memberId, orgId } } })
+  if (!targetMembership) {
     throw createError({ status: 404, statusText: "Member not found in organization" })
   }
-  if (targetRole.role === "OWNER") {
+  if (targetMembership.role === "OWNER") {
     throw createError({ status: 403, statusText: "Cannot change the role of organization owners" })
   }
   if (memberId === sessionUser.id) {
     throw createError({ status: 400, statusText: "You cannot change your own role" })
   }
 
-  const updatedRole = await db.orgMembership.update({
+  const updatedMembership = await db.orgMembership.update({
     where: { userId_orgId: { userId: memberId, orgId } },
     data: { role: result.data.role },
-    include: {
+    select: {
+      role: true,
       user: { select: { id: true, email: true, name: true, image: true } },
       org: { select: { id: true, name: true } },
     },
@@ -41,22 +42,22 @@ export default defineEventHandler(async (event) => {
   await createAuditLog({
     event,
     userId: sessionUser.id,
-    orgId,
+    orgId: updatedMembership.org.id,
     action: "UPDATE.ORG_MEMBER_ROLE",
-    resource: "organization_member",
-    description: `Updated ${updatedRole.user.name} (${updatedRole.user.email}) role from ${targetRole.role} to ${updatedRole.role} in organization "${updatedRole.org.name}"`,
+    resource: "org_member",
+    description: `Updated ${updatedMembership.user.name} (${updatedMembership.user.email}) role from ${targetMembership.role} to ${updatedMembership.role} in organization "${updatedMembership.org.name}"`,
     metadata: {
-      memberId: updatedRole.user.id,
-      memberName: updatedRole.user.name,
-      memberEmail: updatedRole.user.email,
-      oldRole: targetRole.role,
-      newRole: updatedRole.role,
-      orgId: updatedRole.org.id,
-      orgName: updatedRole.org.name,
+      memberId: updatedMembership.user.id,
+      memberName: updatedMembership.user.name,
+      memberEmail: updatedMembership.user.email,
+      oldRole: targetMembership.role,
+      newRole: updatedMembership.role,
+      orgId: updatedMembership.org.id,
+      orgName: updatedMembership.org.name,
     },
   })
 
-  await deleteCached(CacheKeys.userData(memberId))
+  await deleteCached(CacheKeys.userData(memberId), CacheKeys.userProjects(memberId, updatedMembership.org.id))
 
-  return { updatedRole }
+  return { membership: updatedMembership }
 })
