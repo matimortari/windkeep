@@ -40,10 +40,11 @@ model User {
   apiTokenExpiresAt  DateTime?
   orgMemberships     OrgMembership[]
   projectMemberships ProjectMembership[]
-  invitations        Invitation[]
+  invitations        Invitation[]         @relation("InvitedByUser")
   auditLogs          AuditLog[]
   secretHistory      SecretValueHistory[]
   accounts           Account[]
+  serviceTokens      ServiceToken[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 }
@@ -58,7 +59,7 @@ model Organization {
   encryptionKeyUpdatedAt DateTime        @default(now())
   memberships            OrgMembership[]
   projects               Project[]
-  invitations            Invitation[]
+  invitations            Invitation[]    @relation("OrgInvitations")
   auditLogs              AuditLog[]
   createdAt              DateTime        @default(now())
   updatedAt              DateTime        @updatedAt
@@ -78,18 +79,19 @@ model OrgMembership {
 }
 
 model Project {
-  id          String              @id @default(cuid())
-  name        String
-  slug        String
-  description String?
-  website     String?
-  orgId       String
-  org         Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  secrets     Secret[]
-  memberships ProjectMembership[]
-  auditLogs   AuditLog[]
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  id            String              @id @default(cuid())
+  name          String
+  slug          String
+  description   String?
+  website       String?
+  orgId         String
+  org           Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  secrets       Secret[]
+  memberships   ProjectMembership[]
+  serviceTokens ServiceToken[]
+  auditLogs     AuditLog[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 
   @@unique([slug, orgId])
 }
@@ -110,6 +112,7 @@ model Secret {
   id          String        @id @default(cuid())
   key         String
   description String?
+  tags        String[]      @default([])
   projectId   String
   project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   values      SecretValue[]
@@ -137,43 +140,68 @@ model SecretValueHistory {
   secretValueId String
   secretValue   SecretValue @relation(fields: [secretValueId], references: [id], onDelete: Cascade)
   value         String
-  changedBy     String
-  changedByUser User        @relation(fields: [changedBy], references: [id], onDelete: Cascade)
+  changedBy     String?
+  changedByUser User?       @relation(fields: [changedBy], references: [id], onDelete: SetNull)
   createdAt     DateTime    @default(now())
 
   @@index([secretValueId, createdAt])
 }
 
+model ServiceToken {
+  id          String        @id @default(cuid())
+  name        String
+  tokenHash   String        @unique
+  environment Environment[]
+  projectId   String
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy   String
+  user        User          @relation(fields: [createdBy], references: [id])
+  auditLogs   AuditLog[]
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([projectId])
+}
+
 model Invitation {
   id          String       @id @default(cuid())
+  email       String
+  role        Role         @default(MEMBER)
   orgId       String
   token       String       @unique
-  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  invitedBy   User         @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+  org         Organization @relation("OrgInvitations", fields: [orgId], references: [id], onDelete: Cascade)
+  invitedBy   User         @relation("InvitedByUser", fields: [invitedById], references: [id], onDelete: Cascade)
   invitedById String
+  acceptedAt  DateTime?
   expiresAt   DateTime
   createdAt   DateTime     @default(now())
+
+  @@unique([email, orgId])
 }
 
 model AuditLog {
-  id          String        @id @default(cuid())
-  userId      String
-  orgId       String?
-  projectId   String?
-  action      String
-  resource    String?
-  description String?
-  metadata    Json?
-  ip          String
-  ua          String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  org         Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)
-  project     Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  createdAt   DateTime      @default(now())
+  id             String        @id @default(cuid())
+  userId         String?
+  serviceTokenId String?
+  orgId          String?
+  projectId      String?
+  action         String
+  resource       String?
+  description    String?
+  metadata       Json?
+  ip             String
+  ua             String
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  serviceToken   ServiceToken? @relation(fields: [serviceTokenId], references: [id], onDelete: SetNull)
+  org            Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  project        Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdAt      DateTime      @default(now())
 
   @@index([orgId, createdAt])
   @@index([projectId, createdAt])
   @@index([userId, createdAt])
+  @@index([serviceTokenId, createdAt])
   @@index([action, createdAt])
-  @@index([resource, createdAt])
 }
