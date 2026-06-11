@@ -1,17 +1,15 @@
 import { updateOrgSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 20 requests per hour per user
-  await enforceRateLimit(event, `org:update:${user.id}`, 20)
-
+  const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
     throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "org", orgId }, ["OWNER"])
+  // Rate limit: 20 requests per hour per user
+  await enforceRateLimit(event, `org:update:${sessionUser.id}`, 20)
+  await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER"])
 
   const body = await readBody(event)
   const result = updateOrgSchema.safeParse(body)
@@ -43,7 +41,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId,
     action: "UPDATE.ORG",
     resource: "organization",

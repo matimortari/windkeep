@@ -1,10 +1,10 @@
 import { updateUserSchema } from "#shared/schemas/user-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
+  const sessionUser = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `user:update:${user.id}`, 30, 60 * 60 * 1000)
+  await enforceRateLimit(event, `user:update:${sessionUser.id}`, 30, 60 * 60 * 1000)
 
   const body = await readBody(event)
   const result = updateUserSchema.safeParse(body)
@@ -14,22 +14,29 @@ export default defineEventHandler(async (event) => {
 
   // Only regenerate when the boolean is explicitly sent and true
   let apiTokenToUpdate: string | undefined
-  let apiTokenHashToUpdate: string | undefined
   let apiTokenExpiresAt: Date | undefined
   if (result.data.regenerateApiToken) {
-    apiTokenToUpdate = generateToken(24)
-    apiTokenHashToUpdate = hashApiToken(apiTokenToUpdate)
+    apiTokenToUpdate = generateToken(32)
     apiTokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
   }
 
   const updatedUser = await db.user.update({
-    where: { id: user.id },
-    data: { name: result.data.name, ...(apiTokenHashToUpdate !== undefined && { apiToken: apiTokenHashToUpdate, apiTokenExpiresAt }) },
-    select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true, createdAt: true, updatedAt: true },
+    where: { id: sessionUser.id },
+    data: {
+      name: result.data.name,
+      ...(apiTokenToUpdate && { apiToken: hashApiToken(apiTokenToUpdate), apiTokenExpiresAt }),
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   })
 
-  // Invalidate cache for user data
-  await deleteCached(CacheKeys.userData(user.id))
+  await deleteCached(CacheKeys.userData(sessionUser.id))
 
-  return { updatedUser: { ...updatedUser, apiToken: null }, ...(apiTokenToUpdate !== undefined && { newApiToken: apiTokenToUpdate }) }
+  return { updatedUser, ...(apiTokenToUpdate && { newApiToken: apiTokenToUpdate }) }
 })

@@ -1,16 +1,14 @@
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 100 requests per hour per user
-  await enforceRateLimit(event, `secret:delete:${user.id}`, 100)
-
+  const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
-  const secretId = getRouterParam(event, "secret")
+  const secretId = getRouterParam(event, "id")
   if (!projectId || !secretId) {
     throw createError({ status: 400, statusText: "Project ID and Secret ID are required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
+  // Rate limit: 100 requests per hour per user
+  await enforceRateLimit(event, `secret:delete:${sessionUser.id}`, 100)
+  await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const secretData = await db.secret.findUnique({
     where: { id: secretId },
@@ -26,7 +24,7 @@ export default defineEventHandler(async (event) => {
   // Create audit log before deletion
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId: secretData.project.org.id,
     projectId,
     action: "DELETE.SECRET",
@@ -45,9 +43,8 @@ export default defineEventHandler(async (event) => {
 
   await db.secret.delete({ where: { id: secretId } })
 
-  // Invalidate cache for project secrets and user projects list
   await deleteCached(CacheKeys.projectSecrets(projectId))
-  await deleteCached(CacheKeys.userProjects(user.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id))
 
   return { success: true, message: `Secret deleted successfully` }
 })

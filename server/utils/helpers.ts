@@ -14,13 +14,6 @@ export function requireEnv(name: string): string {
 }
 
 /**
- * Hashes API tokens before persistence/comparison to avoid storing raw bearer credentials.
- */
-export function hashApiToken(token: string): string {
-  return createHmac("sha256", requireEnv("ENCRYPTION_KEY")).update(token).digest("hex")
-}
-
-/**
  * Retrieves the authenticated user from the current session or API token.
  * Throws 401 if no valid session exists.
  */
@@ -44,6 +37,29 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>): P
   }
 
   throw createError({ status: 401, statusText: "Unauthorized" })
+}
+
+/**
+ * Hashes API tokens before persistence/comparison to avoid storing raw bearer credentials.
+ */
+export function hashApiToken(token: string): string {
+  return createHmac("sha256", requireEnv("ENCRYPTION_KEY")).update(token).digest("hex")
+}
+
+/**
+ * Generates a unique slug based on the provided base string.
+ */
+export async function generateSlug(base: string, orgId: string): Promise<string> {
+  const cleaned = base.normalize("NFKD").replace(/[\u0300-\u036F]/g, "").toLowerCase().replace(/[^\w-]/g, "").replace(/[-\s]+/g, "-").replace(/^-+|-+$/g, "").substring(0, 50)
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const slug = attempt === 0 ? cleaned : `${cleaned}-${crypto.randomUUID().slice(0, 6)}`
+    const exists = await db.project.findUnique({ where: { slug_orgId: { slug, orgId } }, select: { id: true } })
+    if (!exists) {
+      return slug
+    }
+  }
+
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 12)
 }
 
 /**

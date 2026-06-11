@@ -1,18 +1,16 @@
 import { updateSecretSchema } from "#shared/schemas/secret-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 100 requests per hour per user
-  await enforceRateLimit(event, `secret:update:${user.id}`, 100)
-
+  const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
-  const secretId = getRouterParam(event, "secret")
+  const secretId = getRouterParam(event, "id")
   if (!projectId || !secretId) {
     throw createError({ status: 400, statusText: "Project ID and Secret ID are required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
+  // Rate limit: 100 requests per hour per user
+  await enforceRateLimit(event, `secret:update:${sessionUser.id}`, 100)
+  await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateSecretSchema.safeParse(body)
@@ -42,7 +40,7 @@ export default defineEventHandler(async (event) => {
 
       const existingValue = await db.secretValue.findUnique({ where: { secretId_environment: { secretId, environment: val.environment } } })
       if (existingValue) {
-        await db.secretValueHistory.create({ data: { secretValueId: existingValue.id, value: existingValue.value, changedBy: user.id } })
+        await db.secretValueHistory.create({ data: { secretValueId: existingValue.id, value: existingValue.value, changedBy: sessionUser.id } })
       }
 
       await db.secretValue.upsert({
@@ -67,7 +65,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId: updatedSecret.project.org.id,
     projectId,
     action: "UPDATE.SECRET",
@@ -84,9 +82,8 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for project secrets and user projects list
   await deleteCached(CacheKeys.projectSecrets(projectId))
-  await deleteCached(CacheKeys.userProjects(user.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id))
 
   return {
     ...updatedSecret,

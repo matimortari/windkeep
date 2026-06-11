@@ -1,17 +1,15 @@
 import { createSecretSchema } from "#shared/schemas/secret-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 100 requests per hour per user
-  await enforceRateLimit(event, `secret:create:${user.id}`, 100)
-
+  const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
     throw createError({ status: 400, statusText: "Project ID is required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
+  // Rate limit: 100 requests per hour per user
+  await enforceRateLimit(event, `secret:create:${sessionUser.id}`, 100)
+  await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = createSecretSchema.safeParse({ ...body, projectId })
@@ -41,7 +39,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId: secret.project.org.id,
     projectId,
     action: "CREATE.SECRET",
@@ -58,9 +56,8 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for project secrets and user projects list
   await deleteCached(CacheKeys.projectSecrets(projectId))
-  await deleteCached(CacheKeys.userProjects(user.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id))
 
   return { ...secret, values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))) }
 })

@@ -1,48 +1,53 @@
 import { createProjectSchema } from "#shared/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
+  const sessionUser = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `project:create:${user.id}`, 30)
+  await enforceRateLimit(event, `project:create:${sessionUser.id}`, 30)
 
   const body = await readBody(event)
   const result = createProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
-  await requireRole(user.id, { type: "org", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
+  await requireRole(sessionUser.id, { type: "org", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
 
-  const conflictingProject = await db.project.findFirst({ where: { orgId: result.data.orgId, name: result.data.name } })
-  if (conflictingProject) {
-    throw createError({ status: 409, statusText: "A project with this name already exists in the organization" })
-  }
+  const slug = await generateSlug(result.data.name, result.data.orgId)
 
   const newProject = await db.project.create({
     data: {
       name: result.data.name,
-      slug: result.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").substring(0, 50),
+      slug,
       description: result.data.description ?? null,
       website: result.data.website ?? null,
       orgId: result.data.orgId,
-      memberships: { create: { userId: user.id, role: "OWNER" } },
+      memberships: { create: { userId: sessionUser.id, role: "OWNER" } },
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      website: true,
+      orgId: true,
+      createdAt: true,
+      updatedAt: true,
       org: { select: { id: true, name: true } },
-      secrets: { select: { id: true } },
-      memberships: { select: { userId: true, projectId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
+      _count: { select: { secrets: true } },
+      memberships: { select: { userId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
     },
   })
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId: newProject.orgId,
     projectId: newProject.id,
     action: "CREATE.PROJECT",
     resource: "project",
-    description: `Created project "${newProject.name}" (${newProject.slug}) in organization "${newProject.org.name}"`,
+    description: `Created project "${newProject.name}" in organization "${newProject.org.name}"`,
     metadata: {
       projectId: newProject.id,
       projectName: newProject.name,
@@ -51,8 +56,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for user projects
-  await deleteCached(CacheKeys.userProjects(user.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id, result.data.orgId))
 
   return { project: newProject }
 })
