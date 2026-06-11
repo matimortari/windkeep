@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   // Rate limit: 200 requests per hour per user
   await enforceRateLimit(event, `org:switch:${sessionUser.id}`, 200)
-  await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "MEMBER", "ADMIN"])
+  await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN", "MEMBER"])
 
   // Set this org as active and deactivate others
   await db.$transaction([
@@ -15,29 +15,38 @@ export default defineEventHandler(async (event) => {
     db.orgMembership.update({ where: { userId_orgId: { userId: sessionUser.id, orgId } }, data: { isActive: true } }),
   ])
 
-  await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id))
-
   const membership = await db.orgMembership.findUnique({
     where: { userId_orgId: { userId: sessionUser.id, orgId } },
-    select: { role: true, isActive: true, org: {
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        website: true,
-        encryptionKeyVersion: true,
-        encryptionKeyUpdatedAt: true,
-        createdAt: true,
-        updatedAt: true,
-        memberships: { select: { userId: true, role: true, isActive: true, user: { select: { id: true, name: true, email: true, image: true } } } },
+    select: {
+      role: true,
+      isActive: true,
+      org: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          website: true,
+          encryptionKeyVersion: true,
+          encryptionKeyUpdatedAt: true,
+          createdAt: true,
+          updatedAt: true,
+          memberships: {
+            select: {
+              userId: true,
+              role: true,
+              isActive: true,
+              user: { select: { id: true, name: true, email: true, image: true } },
+            },
+          },
+        },
       },
-    } },
+    },
   })
   if (!membership) {
     throw createError({ status: 404, statusText: "Organization not found" })
   }
 
-  const organization = { ...membership.org, role: membership.role, isActive: membership.isActive }
+  await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id, orgId))
 
-  return { organization }
+  return { organization: { ...membership.org, role: membership.role, isActive: membership.isActive } }
 })

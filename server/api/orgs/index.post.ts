@@ -7,13 +7,10 @@ export default defineEventHandler(async (event) => {
   await enforceRateLimit(event, `org:create:${sessionUser.id}`, 10)
 
   const body = await readBody(event)
-
   const result = createOrgSchema.safeParse(body)
   if (!result.success) {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
-
-  const wrappedEncryptionKey = createWrappedOrganizationKey(result.data.encryptionMode === "MANUAL" ? result.data.encryptionKey : undefined)
 
   const organization = await db.$transaction(async (tx) => {
     const org = await tx.organization.create({
@@ -21,7 +18,7 @@ export default defineEventHandler(async (event) => {
         name: result.data.name,
         description: result.data.description || null,
         website: result.data.website || null,
-        wrappedEncryptionKey,
+        wrappedEncryptionKey: createWrappedOrganizationKey(result.data.encryptionMode === "MANUAL" ? result.data.encryptionKey : undefined),
         memberships: { create: { userId: sessionUser.id, role: "OWNER", isActive: true } },
       },
     })

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateOrgSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
   const existingOrg = await db.organization.findUnique({
@@ -25,18 +25,26 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, statusText: "Organization not found" })
   }
 
-  await db.organization.update({ where: { id: orgId }, data: {
-    name: result.data.name,
-    description: result.data.description || null,
-    website: result.data.website || null,
-  } })
+  await db.organization.update({
+    where: { id: orgId },
+    data: { name: result.data.name, description: result.data.description ?? null, website: result.data.website ?? null },
+  })
   if (result.data.rotateEncryptionKey) {
     await rotateOrganizationKey(orgId, result.data.encryptionMode === "MANUAL" ? result.data.encryptionKey : undefined)
   }
 
   const updatedOrg = await db.organization.findUniqueOrThrow({
     where: { id: orgId },
-    select: { id: true, name: true, description: true, website: true, encryptionKeyVersion: true, encryptionKeyUpdatedAt: true, createdAt: true, updatedAt: true },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      website: true,
+      encryptionKeyVersion: true,
+      encryptionKeyUpdatedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   })
 
   await createAuditLog({
@@ -61,6 +69,8 @@ export default defineEventHandler(async (event) => {
       newEncryptionKeyUpdatedAt: updatedOrg.encryptionKeyUpdatedAt,
     },
   })
+
+  await deleteCached(CacheKeys.userData(sessionUser.id))
 
   return { updatedOrg }
 })
