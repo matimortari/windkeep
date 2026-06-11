@@ -1,28 +1,41 @@
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
+  const sessionUser = await getUserFromSession(event)
 
   // Rate limit: 200 requests per hour per user
-  await enforceRateLimit(event, `user:get:${user.id}`, 200)
+  await enforceRateLimit(event, `user:get:${sessionUser.id}`, 200)
 
-  const cacheKey = CacheKeys.userData(user.id)
-  const cached = await getCached<any>(cacheKey)
+  const cacheKey = CacheKeys.userData(sessionUser.id)
+  const cached = await getCached<User>(cacheKey)
   if (cached) {
-    return { userData: cached }
+    return { user: cached }
   }
 
-  const userData = await db.user.findUnique({
-    where: { id: user.id },
-    include: {
-      orgMemberships: { include: { org: { select: { id: true, name: true } } } },
-      projectMemberships: { select: { role: true, projectId: true, project: { select: { id: true, name: true, slug: true, orgId: true } } } },
+  const user = await db.user.findUnique({
+    where: { id: sessionUser.id },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+      orgMemberships: {
+        select: { role: true, isActive: true, org: { select: { id: true, name: true } } },
+      },
+      projectMemberships: {
+        select: {
+          role: true,
+          projectId: true,
+          project: { select: { id: true, name: true, slug: true, orgId: true } },
+        },
+      },
     },
   })
-  if (!userData) {
+  if (!user) {
     throw createError({ status: 404, statusText: "User not found" })
   }
 
-  const safeUserData = { ...userData, apiToken: null } // Never expose stored token material to the client
-  await setCached(cacheKey, safeUserData, CACHE_TTL.SHORT)
+  await setCached(cacheKey, user, CACHE_TTL.SHORT)
 
-  return { userData: safeUserData }
+  return { user }
 })

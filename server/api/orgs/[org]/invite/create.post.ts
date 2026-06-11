@@ -1,17 +1,15 @@
 import { createInviteSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 20 requests per hour per user
-  await enforceRateLimit(event, `org:invite:create:${user.id}`, 20, 60 * 60 * 1000)
-
+  const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
     throw createError({ status: 400, statusText: "Organization ID is required" })
   }
 
-  await requireRole(user.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
+  // Rate limit: 20 requests per hour per user
+  await enforceRateLimit(event, `org:invite:create:${sessionUser.id}`, 20, 60 * 60 * 1000)
+  await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = createInviteSchema.safeParse({ ...body, orgId })
@@ -32,13 +30,13 @@ export default defineEventHandler(async (event) => {
 
   const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000) // 12 hours
   const invitation = await db.invitation.create({
-    data: { orgId, token, expiresAt, invitedById: user.id },
+    data: { orgId, token, expiresAt, invitedById: sessionUser.id },
     include: { org: { select: { id: true, name: true } }, invitedBy: { select: { id: true, email: true, name: true } } },
   })
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId,
     action: "CREATE.ORG_INVITE",
     resource: "organization_invite",

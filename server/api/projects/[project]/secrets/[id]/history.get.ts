@@ -1,16 +1,14 @@
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 100 requests per hour per user
-  await enforceRateLimit(event, `secret:history:${user.id}`, 100)
-
+  const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
-  const secretId = getRouterParam(event, "secret")
+  const secretId = getRouterParam(event, "id")
   if (!projectId || !secretId) {
     throw createError({ status: 400, statusText: "Project ID and Secret ID are required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
+  // Rate limit: 100 requests per hour per user
+  await enforceRateLimit(event, `secret:history:${sessionUser.id}`, 100)
+  await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
 
   const secret = await db.secret.findUnique({
     where: { id: secretId },

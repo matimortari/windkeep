@@ -1,22 +1,25 @@
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
+  const sessionUser = await getUserFromSession(event)
 
   // Rate limit: 200 requests per hour per user
-  await enforceRateLimit(event, `projects:list:${user.id}`, 200)
+  await enforceRateLimit(event, `projects:list:${sessionUser.id}`, 200)
 
-  const cacheKey = CacheKeys.userProjects(user.id)
-  const cached = await getCached<any>(cacheKey)
-  if (cached) {
-    return { projects: cached }
-  }
-
-  const activeMembership = await db.orgMembership.findFirst({ where: { userId: user.id, isActive: true } })
+  const activeMembership = await db.orgMembership.findFirst({ where: { userId: sessionUser.id, isActive: true }, select: { orgId: true } })
   if (!activeMembership) {
     return { projects: [] }
   }
 
+  const cacheKey = CacheKeys.userProjects(sessionUser.id, activeMembership.orgId)
+  const cached = await getCached<Project[]>(cacheKey)
+  if (cached) {
+    return { projects: cached }
+  }
+
   const projects = await db.project.findMany({
-    where: { orgId: activeMembership.orgId, memberships: { some: { userId: user.id } } },
+    where: {
+      memberships: { some: { userId: sessionUser.id } },
+      org: { memberships: { some: { userId: sessionUser.id, isActive: true } } },
+    },
     select: {
       id: true,
       name: true,
@@ -26,8 +29,9 @@ export default defineEventHandler(async (event) => {
       orgId: true,
       createdAt: true,
       updatedAt: true,
-      secrets: { select: { id: true } },
-      memberships: { select: { userId: true, projectId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
+      org: { select: { id: true, name: true } },
+      _count: { select: { secrets: true } },
+      memberships: { select: { userId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
     },
     orderBy: { createdAt: "desc" },
   })

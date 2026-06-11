@@ -1,14 +1,13 @@
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `org:member:delete:${user.id}`, 30)
-
+  const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
-  const memberId = getRouterParam(event, "member")
+  const memberId = getRouterParam(event, "id")
   if (!orgId || !memberId) {
     throw createError({ status: 400, statusText: "Organization ID and Member ID are required" })
   }
+
+  // Rate limit: 30 requests per hour per user
+  await enforceRateLimit(event, `org:member:delete:${sessionUser.id}`, 30)
 
   const targetRole = await db.orgMembership.findUnique({
     where: { userId_orgId: { userId: memberId, orgId } },
@@ -19,8 +18,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check permissions for non-self removal
-  if (memberId !== user.id) {
-    await requireRole(user.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
+  if (memberId !== sessionUser.id) {
+    await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
     if (targetRole.role === "OWNER") {
       throw createError({ status: 403, statusText: "Cannot remove organization owners." })
     }
@@ -63,11 +62,11 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId,
     action: "REMOVE.ORG_MEMBER",
     resource: "organization_member",
-    description: memberId === user.id ? `${targetRole.user.name} left organization "${targetRole.org.name}"` : `Removed ${targetRole.user.name} from organization "${targetRole.org.name}"`,
+    description: memberId === sessionUser.id ? `${targetRole.user.name} left organization "${targetRole.org.name}"` : `Removed ${targetRole.user.name} from organization "${targetRole.org.name}"`,
     metadata: {
       memberId: targetRole.user.id,
       memberName: targetRole.user.name,
@@ -78,7 +77,6 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for removed user's data
   await deleteCached(CacheKeys.userData(memberId))
 
   return { success: true, message: "Member removed successfully" }
