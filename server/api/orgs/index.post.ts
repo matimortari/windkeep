@@ -1,10 +1,10 @@
 import { createOrgSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
+  const sessionUser = await getUserFromSession(event)
 
   // Rate limit: 10 requests per hour per user
-  await enforceRateLimit(event, `org:create:${user.id}`, 10)
+  await enforceRateLimit(event, `org:create:${sessionUser.id}`, 10)
 
   const body = await readBody(event)
 
@@ -22,12 +22,12 @@ export default defineEventHandler(async (event) => {
         description: result.data.description || null,
         website: result.data.website || null,
         wrappedEncryptionKey,
-        memberships: { create: { userId: user.id, role: "OWNER", isActive: true } },
+        memberships: { create: { userId: sessionUser.id, role: "OWNER", isActive: true } },
       },
     })
 
     // Deactivate all other orgs for the user
-    await tx.orgMembership.updateMany({ where: { userId: user.id, orgId: { not: org.id }, isActive: true }, data: { isActive: false } })
+    await tx.orgMembership.updateMany({ where: { userId: sessionUser.id, orgId: { not: org.id }, isActive: true }, data: { isActive: false } })
 
     return tx.organization.findUniqueOrThrow({
       where: { id: org.id },
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId: organization.id,
     action: "CREATE.ORG",
     resource: "organization",
@@ -48,8 +48,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for user data
-  await deleteCached(CacheKeys.userData(user.id))
+  await deleteCached(CacheKeys.userData(sessionUser.id))
 
   return { organization }
 })

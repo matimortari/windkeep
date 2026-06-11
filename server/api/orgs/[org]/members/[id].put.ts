@@ -1,21 +1,19 @@
-import { updateMemberRoleSchema } from "#shared/schemas/org-schema"
+import { updateOrgMemberRoleSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `org:member:update:${user.id}`, 30)
-
+  const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
-  const memberId = getRouterParam(event, "member")
+  const memberId = getRouterParam(event, "id")
   if (!orgId || !memberId) {
     throw createError({ status: 400, statusText: "Organization ID and Member ID are required" })
   }
 
-  await requireRole(user.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
+  // Rate limit: 30 requests per hour per user
+  await enforceRateLimit(event, `org:member:update:${sessionUser.id}`, 30)
+  await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
-  const result = updateMemberRoleSchema.safeParse(body)
+  const result = updateOrgMemberRoleSchema.safeParse(body)
   if (!result.success) {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
@@ -27,7 +25,7 @@ export default defineEventHandler(async (event) => {
   if (targetRole.role === "OWNER") {
     throw createError({ status: 403, statusText: "Cannot change the role of organization owners" })
   }
-  if (memberId === user.id) {
+  if (memberId === sessionUser.id) {
     throw createError({ status: 400, statusText: "You cannot change your own role" })
   }
 
@@ -42,7 +40,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId,
     action: "UPDATE.ORG_MEMBER_ROLE",
     resource: "organization_member",
@@ -58,7 +56,6 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for affected user's data
   await deleteCached(CacheKeys.userData(memberId))
 
   return { updatedRole }

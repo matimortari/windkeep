@@ -25,7 +25,7 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
           email,
           name: name?.trim() ?? email.split("@")[0]!,
           image: image ?? `${r2PublicUrl}/defaults/avatar.png`,
-          apiToken: hashApiToken(generateToken(24)),
+          apiToken: hashApiToken(generateToken(32)),
           apiTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
           accounts: { create: { provider, providerAccountId } },
         },

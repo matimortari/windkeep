@@ -1,35 +1,38 @@
 import { updateProjectSchema } from "#shared/schemas/project-schema"
 
 export default defineEventHandler(async (event) => {
-  const user = await getUserFromSession(event)
-
-  // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `project:update:${user.id}`, 30)
-
+  const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
     throw createError({ status: 400, statusText: "Project ID is required" })
   }
 
-  await requireRole(user.id, { type: "project", projectId }, ["OWNER"])
+  // Rate limit: 30 requests per hour per user
+  await enforceRateLimit(event, `project:update:${sessionUser.id}`, 30)
+  await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER"])
 
   const body = await readBody(event)
   const result = updateProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
-  const existingProject = await db.project.findUnique({ where: { id: projectId }, select: { name: true, slug: true, description: true, website: true, orgId: true } })
+  const existingProject = await db.project.findUnique({
+    where: { id: projectId },
+    select: { name: true, slug: true, description: true, website: true, orgId: true },
+  })
   if (!existingProject) {
     throw createError({ status: 404, statusText: "Project not found" })
   }
 
-  // Check if project with same name or slug already exists in this organization
   if (result.data.name || result.data.slug) {
     const conflictingProject = await db.project.findFirst({
       where: {
         orgId: existingProject.orgId,
-        OR: [...(result.data.name ? [{ name: result.data.name }] : []), ...(result.data.slug ? [{ slug: result.data.slug }] : [])],
+        OR: [
+          ...(result.data.name ? [{ name: result.data.name }] : []),
+          ...(result.data.slug ? [{ slug: result.data.slug }] : []),
+        ],
         NOT: { id: projectId },
       },
     })
@@ -52,8 +55,8 @@ export default defineEventHandler(async (event) => {
       createdAt: true,
       updatedAt: true,
       org: { select: { id: true, name: true } },
-      secrets: { select: { id: true } },
-      memberships: { select: { userId: true, projectId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
+      _count: { select: { secrets: true } },
+      memberships: { select: { userId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
     },
   })
 
@@ -73,7 +76,7 @@ export default defineEventHandler(async (event) => {
 
   await createAuditLog({
     event,
-    userId: user.id,
+    userId: sessionUser.id,
     orgId: updatedProject.org.id,
     projectId,
     action: "UPDATE.PROJECT",
@@ -91,8 +94,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Invalidate cache for user projects
-  await deleteCached(CacheKeys.userProjects(user.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id, existingProject.orgId))
 
   const { org: _org, ...project } = updatedProject
   return { project }
