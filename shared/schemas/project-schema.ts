@@ -8,8 +8,8 @@ export const createProjectSchema = z.object({
     .transform(val => val.trim())
     .refine(val => val.length >= 3, { message: "Project name cannot be empty" }),
   description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
-  website: z.string().trim().url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional(),
-  orgId: z.cuid(),
+  website: z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional(),
+  orgId: z.cuid2(),
 })
 
 export const updateProjectSchema = z.object({
@@ -27,19 +27,15 @@ export const updateProjectSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
     .optional(),
   description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
-  website: z.string().trim().url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional(),
+  website: z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional(),
 })
 
-export const addProjectMemberSchema = z.object({
-  userId: z.cuid(),
-  role: z.enum(["ADMIN", "MEMBER"]).optional().default("MEMBER"),
-})
-
-export const updateProjectMemberSchema = z.object({
-  role: z.enum(["ADMIN", "MEMBER"]),
-})
+export const addProjectMemberSchema = z.object({ userId: z.cuid2(), role: z.enum(["ADMIN", "MEMBER"]).optional().default("MEMBER") })
+export const updateProjectMemberSchema = z.object({ role: z.enum(["ADMIN", "MEMBER"]) })
+export const removeProjectMemberSchema = z.object({ projectId: z.cuid2(), userId: z.cuid2() })
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>
 export type AddProjectMemberInput = z.infer<typeof addProjectMemberSchema>
 export type UpdateProjectMemberInput = z.infer<typeof updateProjectMemberSchema>
+export type RemoveProjectMemberInput = z.infer<typeof removeProjectMemberSchema>

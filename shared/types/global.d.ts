@@ -5,11 +5,12 @@ interface User {
   id: string
   email: string
   name: string
-  image: string
+  image: string | null
   apiToken: string | null
-  apiTokenExpiresAt: Date | null
+  apiTokenExpiresAt: Date | string | null
   orgMemberships?: OrgMembership[]
   projectMemberships?: ProjectMembership[]
+  serviceTokens?: ServiceToken[]
   invitations?: Invitation[]
   auditLogs?: AuditLog[]
   createdAt?: Date | string
@@ -52,6 +53,7 @@ interface Project {
   org: Organization
   secrets?: Secret[]
   memberships?: ProjectMembership[]
+  serviceTokens?: ServiceToken[]
   auditLogs?: AuditLog[]
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -71,6 +73,7 @@ interface Secret {
   id: string
   key: string
   description: string | null
+  tags: string[]
   projectId: string
   project: Project
   values?: SecretValue[]
@@ -92,25 +95,46 @@ interface SecretValueHistory {
   id: string
   secretValueId: string
   value: string
-  changedBy: string
-  changedByUser?: User
+  changedBy: string | null
+  changedByUser?: User | null
   createdAt?: Date | string
+}
+
+interface ServiceToken {
+  id: string
+  name: string
+  tokenHash: string
+  environment: Environment[]
+  projectId: string
+  project: Project
+  createdBy: string
+  user: User
+  auditLogs?: AuditLog[]
+  expiresAt: Date | string | null
+  lastUsedAt: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 interface Invitation {
   id: string
+  email: string
+  role: Role
   orgId: string
   token: string
   org: Organization
   invitedById: string
   invitedBy: User
+  acceptedAt?: Date | string
   expiresAt: Date | string
   createdAt?: Date | string
 }
 
 interface AuditLog {
   id: string
-  userId: string
+  userId: string | null
+  serviceTokenId?: string | null
+  serviceToken?: ServiceToken | null
   orgId?: string
   projectId?: string
   action: string
@@ -119,7 +143,7 @@ interface AuditLog {
   metadata?: Record<string, unknown> | null
   ip: string
   ua: string
-  user?: User
+  user?: User | null
   org?: Organization
   project?: Project
   createdAt?: Date | string
@@ -136,6 +160,7 @@ interface AuditLogsPagination {
 
 interface AuditFilters {
   users: Array<{ id: string, name: string | null, email: string }>
+  serviceTokens?: Array<{ id: string, name: string }>
   projects: Array<{ id: string, name: string }>
   actions: string[]
 }
@@ -162,7 +187,7 @@ interface HistoryItem {
     name: string
     email: string
     image: string | null
-  }
+  } | null
   changedAt: Date | string
 }
 

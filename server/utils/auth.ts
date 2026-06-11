@@ -3,67 +3,46 @@ import type { H3Event } from "h3"
 export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
   const { id: providerAccountId, name, email, image, provider } = userData
 
-  // Find existing account by provider
-  let account = await db.account.findUnique({
+  const account = await db.account.findUnique({
     where: { provider_providerAccountId: { provider, providerAccountId } },
-    include: { user: true },
+    select: { user: { select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true } } },
   })
 
-  let user: any = account?.user ?? null
-  if (!user) {
-    user = await db.user.findUnique({
+  let sessionUser: User | null = account?.user ?? null
+  if (!sessionUser) {
+    const existingUser = await db.user.findUnique({
       where: { email },
-      include: {
-        orgMemberships: true,
-        projectMemberships: true,
-        invitations: true,
-        auditLogs: true,
-      },
+      select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true },
     })
+    if (existingUser) {
+      await db.account.create({ data: { userId: existingUser.id, provider, providerAccountId } })
+      sessionUser = existingUser
+    }
+    else {
+      const r2PublicUrl = requireEnv("R2_PUBLIC_URL")
+      const newUser = await db.user.create({
+        data: {
+          email,
+          name: name?.trim() ?? email.split("@")[0]!,
+          image: image ?? `${r2PublicUrl}/defaults/avatar.png`,
+          apiToken: hashApiToken(generateToken(24)),
+          apiTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          accounts: { create: { provider, providerAccountId } },
+        },
+        select: { id: true, email: true, name: true, image: true, slug: true, apiToken: true, apiTokenExpiresAt: true },
+      })
+      sessionUser = newUser
+    }
   }
 
-  // If still no user, create one
-  if (!user) {
-    const r2PublicUrl = requireEnv("R2_PUBLIC_URL")
-    user = await db.user.create({
-      data: {
-        email,
-        name: name?.trim() ?? email.split("@")[0],
-        image: image || `${r2PublicUrl}/defaults/avatar.png`,
-        apiToken: hashApiToken(generateToken(24)),
-        apiTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      },
-    })
-  }
-
-  // Upsert account
-  account = await db.account.upsert({
-    where: { provider_providerAccountId: { provider, providerAccountId } },
-    update: {},
-    create: { userId: user.id, provider, providerAccountId },
-    include: { user: true },
-  })
-
-  user = account.user
-
-  // Determine user's active organization
-  const activeMembership = await db.orgMembership.findFirst({
-    where: { userId: user.id, isActive: true },
-    include: { org: true },
-  })
-
-  // Build session object
-  const sessionUser = {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    image: user.image,
-    activeOrgId: activeMembership?.org?.id ?? null,
-  }
-
+  const activeMembership = await db.orgMembership.findFirst({ where: { userId: sessionUser.id, isActive: true }, include: { org: true } })
   const now = new Date()
-  const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days
-  await setUserSession(event, { user: sessionUser, loggedInAt: now, expiresAt, lastActivityAt: now })
+  await setUserSession(event, {
+    user: sessionUser,
+    loggedInAt: now,
+    expiresAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    lastActivityAt: now,
+  })
 
   return sendRedirect(event, activeMembership?.org ? "/admin/projects" : "/onboarding")
 }
