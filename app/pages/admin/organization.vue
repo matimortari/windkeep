@@ -121,12 +121,20 @@
           Invite Members
         </h5>
         <p class="text-caption">
-          Create an invite link to share with others and allow them to join your organization.
+          Create an invite link to add new members to your organization.
         </p>
       </header>
 
-      <div class="navigation-group self-end">
-        <button class="btn-primary" aria-label="Create Invite Link" @click="handleCreateInvite">
+      <div class="flex w-full flex-col gap-2 md:flex-row md:items-center md:justify-end">
+        <input v-model="inviteEmail" type="email" placeholder="colleague@example.com" class="w-full md:max-w-64">
+
+        <select v-model="inviteRole" class="md:max-w-32">
+          <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
+            {{ capitalizeFirst(role.label) }}
+          </option>
+        </select>
+
+        <button class="btn-primary" :disabled="!inviteEmail.trim()" @click="handleCreateInvite">
           <icon :name="inviteLinkIcon.icon.value" size="20" />
           <span>Copy Invite Link</span>
         </button>
@@ -220,6 +228,8 @@ const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, orgMembers, orgProjects, isOwner, isAdmin } = storeToRefs(orgStore)
 const encryptionMode = ref<"AUTO" | "MANUAL">("AUTO")
+const inviteEmail = ref("")
+const inviteRole = ref<"ADMIN" | "MEMBER">("MEMBER")
 const manualEncryptionKey = ref("")
 
 const orgFields = [
@@ -257,11 +267,6 @@ const orgFields = [
     copyable: true,
   },
   {
-    label: "Encryption Key Version",
-    description: "Current key version used to encrypt organization secrets.",
-    value: computed(() => activeOrg.value?.encryptionKeyVersion || 1),
-  },
-  {
     label: "Encryption Key Updated At",
     description: "When your organization encryption key was last rotated.",
     value: computed(() => formatDate(activeOrg.value?.encryptionKeyUpdatedAt)),
@@ -287,13 +292,14 @@ const rotateKeyIcon = createActionHandler("ph:key-bold")
 const canRotateEncryptionKey = computed(() => encryptionMode.value === "AUTO" || manualEncryptionKey.value.trim().length >= 12)
 
 async function handleCreateInvite() {
-  if (!activeOrg.value?.id) {
+  if (!activeOrg.value?.id || !inviteEmail.value.trim()) {
     return
   }
 
-  const result = await orgStore.createInvite(activeOrg.value.id, { orgId: activeOrg.value.id })
+  const result = await orgStore.createInvite(activeOrg.value.id, { orgId: activeOrg.value.id, email: inviteEmail.value.trim(), role: inviteRole.value })
   if (result?.inviteUrl) {
     await inviteLinkIcon.triggerCopy(result.inviteUrl)
+    inviteEmail.value = ""
   }
 }
 

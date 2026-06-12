@@ -30,7 +30,7 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
           apiTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
           accounts: { create: { provider, providerAccountId } },
         },
-        select: { id: true, email: true, name: true, image: true, slug: true, apiToken: true, apiTokenExpiresAt: true },
+        select: { id: true, email: true, name: true, image: true, apiToken: true, apiTokenExpiresAt: true },
       })
       sessionUser = { ...newUser, image: newUser.image ?? defaultAvatar }
     }
