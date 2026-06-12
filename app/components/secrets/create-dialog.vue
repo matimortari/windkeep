@@ -64,6 +64,7 @@ async function handleSubmit() {
     id: props.selectedSecret?.id || "",
     key: normalizedKey,
     description: form.value.description.trim(),
+    tags: props.selectedSecret?.tags || [],
     projectId: props.projectId,
     project: {} as Project,
     values: values as SecretValue[],

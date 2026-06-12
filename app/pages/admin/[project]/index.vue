@@ -19,7 +19,7 @@
       />
     </div>
 
-    <SecretsDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="closeDialog('secrets')" @save="handleSecretChange" />
+    <SecretsCreateDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="closeDialog('secrets')" @save="handleSecretChange" />
     <SecretsEditorDialog :project-id="project?.id ?? ''" :secrets="displayedSecrets" @close="closeDialog('raw')" @save="handleImportSecrets" />
     <SecretsHistoryDialog :secret-id="historySecretId" :secret-key="historySecretKey" :project-id="project?.id ?? ''" @close="() => { closeDialog('history'); historySecretId = ''; historySecretKey = '' }" />
   </div>
@@ -184,6 +184,7 @@ async function saveAllChanges() {
       await projectStore.createProjectSecret(projectId, {
         key: data.key,
         description: data.description || "",
+        tags: (data as any).tags || [],
         projectId,
         values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
       })
@@ -192,6 +193,7 @@ async function saveAllChanges() {
       const { values, ...data } = change.secret
       await projectStore.updateProjectSecret(projectId, change.secret.id, {
         description: data.description || "",
+        tags: (data as any).tags || undefined,
         values: values || [],
       })
     }
