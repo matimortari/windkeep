@@ -21,17 +21,25 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 403, statusText: "Secret does not belong to this project" })
   }
 
-  const orgId = secret.project.orgId
-  const secretValues = await db.secretValue.findMany({
-    where: { secretId },
-    include: { history: { include: { changedByUser: { select: { id: true, name: true, email: true, image: true } } }, orderBy: { createdAt: "desc" } } },
+  const secretValues = await db.secretValue.findMany({ where: { secretId }, select: { id: true, environment: true, value: true } })
+  const historyRecords = await db.secretValueHistory.findMany({
+    where: { secretValueId: { in: secretValues.map(sv => sv.id) } },
+    include: { changedByUser: { select: { id: true, name: true, email: true, image: true } } },
+    orderBy: { createdAt: "desc" },
   })
 
-  const history = await Promise.all(secretValues.map(async sv => ({
-    environment: sv.environment,
-    currentValue: await decrypt(orgId, sv.value),
-    history: await Promise.all(sv.history.map(async h => ({ id: h.id, value: await decrypt(orgId, h.value), changedBy: h.changedByUser, changedAt: h.createdAt }))),
-  })))
+  const history = await Promise.all(
+    secretValues.map(async (sv) => {
+      return { environment: sv.environment, currentValue: await decrypt(secret.project.orgId, sv.value), history: await Promise.all(
+        historyRecords.filter(log => log.secretValueId === sv.id).map(async h => ({
+          id: h.id,
+          value: await decrypt(secret.project.orgId, h.value),
+          changedBy: h.changedByUser ?? { id: "deleted", name: "Deleted User", email: "noreply@system.local", image: null },
+          changedAt: h.createdAt,
+        })),
+      ) }
+    }),
+  )
 
   return { history }
 })

@@ -27,14 +27,30 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, statusText: "Project not found" })
   }
 
-  const secretData: any = { key: result.data.key, description: result.data.description, projectId }
-  if (result.data.values && Array.isArray(result.data.values)) {
-    secretData.values = { create: await Promise.all(result.data.values.map(async (val: any) => ({ environment: val.environment, value: await encrypt(project.orgId, val.value) }))) }
+  const secretData: any = {
+    key: result.data.key,
+    description: result.data.description,
+    tags: result.data.tags || [],
+    projectId,
   }
 
-  const secret = await db.secret.create({
-    data: secretData,
-    include: { values: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
+  // Create secret and associated values within a transaction to ensure atomicity and proper history tracking
+  const secret = await db.$transaction(async (tx) => {
+    if (result.data.values && Array.isArray(result.data.values)) {
+      secretData.values = { create: await Promise.all(result.data.values.map(async (val: any) => {
+        const encryptedValue = await encrypt(project.orgId, val.value)
+        return {
+          environment: val.environment,
+          value: encryptedValue,
+          history: { create: { value: encryptedValue, changedBy: sessionUser.id } }, // Seed initial history record tracking point directly upon entity creation
+        }
+      })) }
+    }
+
+    return await tx.secret.create({
+      data: secretData,
+      include: { values: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
+    })
   })
 
   await createAuditLog({
@@ -57,7 +73,12 @@ export default defineEventHandler(async (event) => {
   })
 
   await deleteCached(CacheKeys.projectSecrets(projectId))
-  await deleteCached(CacheKeys.userProjects(sessionUser.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id, secret.project.org.id))
 
-  return { ...secret, values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))) }
+  const decryptedSecret = {
+    ...secret,
+    values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))),
+  }
+
+  return { decryptedSecret }
 })
