@@ -1,3 +1,4 @@
+import type { GetAuditLogsInput } from "#shared/schemas/audit-schema"
 import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/schemas/org-schema"
 
 export const useOrgStore = defineStore("org", () => {
@@ -6,13 +7,38 @@ export const useOrgStore = defineStore("org", () => {
   const projectStore = useProjectStore()
   const organizations = ref<Organization[]>([])
   const activeOrg = ref<Organization | null>(null)
+  const invitations = ref<Invitation[]>([])
   const loading = ref(false)
+  const auditLogs = ref<AuditLog[]>([])
+  const auditPagination = ref<AuditLogsPagination | null>(null)
+  const auditFilters = ref<AuditFilters | null>(null)
+  const currentAuditFilters = ref<GetAuditLogsInput>({ page: 1, limit: 25 })
 
   const orgMembers = computed(() => activeOrg.value?.memberships ?? [])
   const orgProjects = computed(() => projectStore.projects.filter((p: Project) => p.orgId === activeOrg.value?.id) ?? [])
 
   const isOwner = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "OWNER")
   const isAdmin = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "ADMIN")
+
+  const auditActions = computed(() => [
+    { label: "Organization Created", value: "CREATE.ORG" },
+    { label: "Organization Updated", value: "UPDATE.ORG" },
+    { label: "Organization Ownership Transferred", value: "TRANSFER.ORG_OWNERSHIP" },
+    { label: "Organization Invite Accepted", value: "ACCEPT.ORG_INVITE" },
+    { label: "Organization Invite Created", value: "CREATE.ORG_INVITE" },
+    { label: "Organization Invite Revoked", value: "REVOKE.ORG_INVITE" },
+    { label: "Organization Member Removed", value: "REMOVE.ORG_MEMBER" },
+    { label: "Organization Member Role Updated", value: "UPDATE.ORG_MEMBER_ROLE" },
+    { label: "Project Created", value: "CREATE.PROJECT" },
+    { label: "Project Deleted", value: "DELETE.PROJECT" },
+    { label: "Project Updated", value: "UPDATE.PROJECT" },
+    { label: "Project Member Removed", value: "REMOVE.PROJECT_MEMBER" },
+    { label: "Project Member Role Updated", value: "UPDATE.PROJECT_MEMBER_ROLE" },
+    { label: "Project Member Added", value: "ADD.PROJECT_MEMBER" },
+    { label: "Secret Deleted", value: "DELETE.SECRET" },
+    { label: "Secret Updated", value: "UPDATE.SECRET" },
+    { label: "Secret Created", value: "CREATE.SECRET" },
+  ])
 
   async function getOrg(orgId: string) {
     loading.value = true
@@ -170,11 +196,39 @@ export const useOrgStore = defineStore("org", () => {
     }
   }
 
+  async function getInvitations(orgId: string) {
+    loading.value = true
+
+    try {
+      const res = await $fetch<{ invitations: Invitation[] }>(`/api/orgs/${orgId}/invitations`, { method: "GET", credentials: "include" })
+      invitations.value = res.invitations
+      return res.invitations
+    }
+    catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to load open organization invitations")
+      toast.error(message)
+      console.error("getInvitations error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
   async function createInvite(orgId: string, data: CreateInviteInput) {
     loading.value = true
 
     try {
-      const res = await $fetch<{ invitation: Invitation, inviteUrl: string }>(`/api/orgs/${orgId}/invite/create`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ invitation: Invitation, inviteUrl: string }>(`/api/orgs/${orgId}/invitations`, { method: "POST", body: data, credentials: "include" })
+      const idx = invitations.value.findIndex(i => i.id === res.invitation.id)
+      if (idx !== -1) {
+        invitations.value[idx] = res.invitation
+      }
+      else {
+        invitations.value.push(res.invitation)
+      }
+
+      toast.success("Invitation created successfully")
       return res
     }
     catch (err: unknown) {
@@ -188,11 +242,29 @@ export const useOrgStore = defineStore("org", () => {
     }
   }
 
+  async function revokeInvite(orgId: string, inviteId: string) {
+    loading.value = true
+    try {
+      await $fetch(`/api/orgs/${orgId}/invitations/${inviteId}`, { method: "DELETE", credentials: "include" })
+      invitations.value = invitations.value.filter(i => i.id !== inviteId)
+      toast.success("Invitation revoked successfully")
+    }
+    catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to revoke invitation")
+      toast.error(message)
+      console.error("revokeInvite error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
   async function acceptInvite(orgId: string, data: AcceptInviteInput) {
     loading.value = true
 
     try {
-      const res = await $fetch<{ organization: Organization, membership: OrgMembership }>(`/api/orgs/${orgId}/invite/accept`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ organization: Organization, membership: OrgMembership }>(`/api/orgs/${orgId}/invitations/accept`, { method: "POST", body: data, credentials: "include" })
       if (res.organization && !organizations.value.some(o => o.id === res.organization.id)) {
         organizations.value.push(res.organization)
       }
@@ -210,10 +282,64 @@ export const useOrgStore = defineStore("org", () => {
     }
   }
 
+  async function getAuditLogs(orgId: string, params?: GetAuditLogsInput) {
+    loading.value = true
+
+    try {
+      const queryParams = new URLSearchParams()
+      const effectiveParams = params || currentAuditFilters.value
+      for (const [key, value] of Object.entries(effectiveParams)) {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value))
+        }
+      }
+
+      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`/api/orgs/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
+      auditLogs.value = res.auditLogs
+      auditPagination.value = res.pagination
+      auditFilters.value = res.filters
+      if (params) {
+        currentAuditFilters.value = { ...currentAuditFilters.value, ...params }
+      }
+      return res
+    }
+    catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to fetch audit logs")
+      toast.error(message)
+      console.error("getAuditLogs error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
+  function updateFilters(newFilters: Partial<GetAuditLogsInput>) {
+    currentAuditFilters.value = { ...currentAuditFilters.value, ...newFilters, page: newFilters.page ?? 1 }
+  }
+
+  async function nextPage(orgId: string) {
+    if (auditPagination.value?.hasNext) {
+      return await getAuditLogs(orgId, { ...currentAuditFilters.value, page: currentAuditFilters.value.page! + 1 })
+    }
+  }
+
+  async function prevPage(orgId: string) {
+    if (auditPagination.value?.hasPrev) {
+      return await getAuditLogs(orgId, { ...currentAuditFilters.value, page: Math.max(1, currentAuditFilters.value.page! - 1) })
+    }
+  }
+
   return {
     loading,
     organizations,
     activeOrg,
+    invitations,
+    auditLogs,
+    auditPagination,
+    auditFilters,
+    currentAuditFilters,
+    auditActions,
     orgMembers,
     orgProjects,
     isOwner,
@@ -223,10 +349,16 @@ export const useOrgStore = defineStore("org", () => {
     createOrg,
     updateOrg,
     transferOrgOwnership,
+    getAuditLogs,
     deleteOrg,
     updateOrgMember,
     removeOrgMember,
+    getInvitations,
     createInvite,
+    revokeInvite,
     acceptInvite,
+    updateFilters,
+    nextPage,
+    prevPage,
   }
 })

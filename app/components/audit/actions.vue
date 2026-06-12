@@ -4,19 +4,19 @@
 
     <div ref="actionDropdownRef" class="relative">
       <button class="btn" @click="isActionDropdownOpen = !isActionDropdownOpen">
-        <span>{{ auditActions?.find((a: { value: string; label: string }) => a.value === currentFilters.action)?.label || 'All Actions' }}</span>
+        <span>{{ auditActions?.find((a: { value: string; label: string }) => a.value === currentAuditFilters.action)?.label || 'All Actions' }}</span>
         <icon name="ph:caret-down-bold" size="15" />
       </button>
 
       <transition name="dropdown">
         <ul v-if="isActionDropdownOpen" class="dropdown-menu -left-24! whitespace-nowrap" role="menu">
           <li>
-            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', '')">
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', '')">
               All Actions
             </button>
           </li>
           <li v-for="action in auditActions" :key="action.value">
-            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="action.value === currentFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', action.value)">
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="action.value === currentAuditFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', action.value)">
               {{ action.label }}
             </button>
           </li>
@@ -26,42 +26,37 @@
 
     <div ref="userDropdownRef" class="relative">
       <button class="btn" @click="isUserDropdownOpen = !isUserDropdownOpen">
-        <span>{{ getUserDisplayName(currentFilters.userId) || 'All Users' }}</span>
+        <span>{{ getUserDisplayName(currentAuditFilters.userId) || 'All Users' }}</span>
         <icon name="ph:caret-down-bold" size="15" />
       </button>
 
       <transition name="dropdown">
         <ul v-if="isUserDropdownOpen" class="dropdown-menu whitespace-nowrap" role="menu">
           <li>
-            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', '')">
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', '')">
               All Users
             </button>
           </li>
           <li v-for="user in availableUsers" :key="user.id">
-            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="user.id === currentFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', user.id)">
+            <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="user.id === currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', user.id)">
               {{ user.name }}
             </button>
           </li>
         </ul>
       </transition>
     </div>
-
-    <button class="btn-danger" :disabled="!auditLogs.length" aria-label="Delete Audit Logs" @click="handleDeleteLogs">
-      <icon name="ph:trash-bold" size="20" />
-    </button>
   </nav>
 </template>
 
 <script setup lang="ts">
-const auditStore = useAuditStore()
-const { auditLogs, auditActions, filters, currentFilters } = storeToRefs(auditStore)
-const { activeOrg } = storeToRefs(useOrgStore())
+const auditStore = useOrgStore()
+const { activeOrg, auditActions, auditFilters, currentAuditFilters } = storeToRefs(useOrgStore())
 const dateFilter = ref<{ start?: string, end?: string }>({})
 const isUserDropdownOpen = ref(false)
 const isActionDropdownOpen = ref(false)
 const userDropdownRef = ref<HTMLElement | null>(null)
 const actionDropdownRef = ref<HTMLElement | null>(null)
-const availableUsers = computed(() => filters.value?.users || [])
+const availableUsers = computed(() => auditFilters.value?.users || [])
 
 useClickOutside(userDropdownRef, () => {
   isUserDropdownOpen.value = false
@@ -96,7 +91,7 @@ function toDateInput(value?: string | Date): string | undefined {
 }
 
 function updateFilter(type: "date" | "user" | "action", value: any, shouldFetch = true) {
-  const updated = { ...currentFilters.value, page: 1 }
+  const updated = { ...currentAuditFilters.value, page: 1 }
 
   if (type === "date") {
     updated.startDate = value?.start ? `${value.start}T00:00:00.000Z` : undefined
@@ -123,29 +118,13 @@ function applyDateFilter() {
     return
   }
 
-  const updated = { ...currentFilters.value, page: 1 }
+  const updated = { ...currentAuditFilters.value, page: 1 }
   auditStore.updateFilters(updated)
   auditStore.getAuditLogs(activeOrg.value.id, updated)
 }
 
-async function handleDeleteLogs() {
-  const hasFilters = dateFilter.value.start || dateFilter.value.end || currentFilters.value.action || currentFilters.value.userId
-  if (!confirm(`Are you sure you want to delete all audit logs ${hasFilters ? "matching the current filters" : "in this organization"}? This action cannot be undone.`)) {
-    return
-  }
-
-  await auditStore.deleteAuditLogs(activeOrg.value!.id, {
-    olderThan: dateFilter.value.end ? new Date(dateFilter.value.end).toISOString() : undefined,
-    action: currentFilters.value.action || undefined,
-    userId: currentFilters.value.userId || undefined,
-  })
-
-  auditStore.updateFilters({ ...currentFilters.value, page: 1 })
-  await auditStore.getAuditLogs(activeOrg.value!.id, { ...currentFilters.value, page: 1 })
-}
-
 // Sync date filter inputs with current filters
-watch(() => [currentFilters.value.startDate, currentFilters.value.endDate], ([startDate, endDate]) => {
+watch(() => [currentAuditFilters.value.startDate, currentAuditFilters.value.endDate], ([startDate, endDate]) => {
   dateFilter.value = { start: toDateInput(startDate), end: toDateInput(endDate) }
 }, { immediate: true })
 </script>
