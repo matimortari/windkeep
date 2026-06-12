@@ -28,7 +28,7 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>): P
   const authHeader = getHeader(event, "authorization")
   if (authHeader?.startsWith("Bearer ")) {
     const user = await db.user.findFirst({
-      where: { apiToken: hashApiToken(authHeader.substring(7)) },
+      where: { apiToken: hashToken(authHeader.substring(7)) },
       select: { id: true, email: true, name: true, image: true, apiTokenExpiresAt: true },
     })
     if (user && user.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
@@ -40,9 +40,9 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>): P
 }
 
 /**
- * Hashes API tokens before persistence/comparison to avoid storing raw bearer credentials.
+ * Hashes tokens before persistence/comparison to avoid storing raw bearer credentials.
  */
-export function hashApiToken(token: string): string {
+export function hashToken(token: string): string {
   return createHmac("sha256", requireEnv("ENCRYPTION_KEY")).update(token).digest("hex")
 }
 
