@@ -10,14 +10,14 @@ export default defineEventHandler(async (event) => {
   await enforceRateLimit(event, `secret:delete:${sessionUser.id}`, 100)
   await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
-  const secretData = await db.secret.findUnique({
+  const existingSecret = await db.secret.findUnique({
     where: { id: secretId },
     select: { id: true, key: true, projectId: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } }, _count: { select: { values: true } } },
   })
-  if (!secretData) {
+  if (!existingSecret) {
     throw createError({ status: 404, statusText: "Secret not found" })
   }
-  if (secretData.projectId !== projectId) {
+  if (existingSecret.projectId !== projectId) {
     throw createError({ status: 403, statusText: "Secret does not belong to this project" })
   }
 
@@ -25,26 +25,26 @@ export default defineEventHandler(async (event) => {
   await createAuditLog({
     event,
     userId: sessionUser.id,
-    orgId: secretData.project.org.id,
+    orgId: existingSecret.project.org.id,
     projectId,
     action: "DELETE.SECRET",
     resource: "secret",
-    description: `Deleted secret "${secretData.key}" from project "${secretData.project.name}" (${secretData._count.values} value(s) deleted)`,
+    description: `Deleted secret "${existingSecret.key}" from project "${existingSecret.project.name}" (${existingSecret._count.values} value(s) deleted)`,
     metadata: {
-      secretId: secretData.id,
-      secretKey: secretData.key,
-      projectId: secretData.project.id,
-      projectName: secretData.project.name,
-      orgId: secretData.project.org.id,
-      orgName: secretData.project.org.name,
-      valuesDeleted: secretData._count.values,
+      secretId: existingSecret.id,
+      secretKey: existingSecret.key,
+      projectId: existingSecret.project.id,
+      projectName: existingSecret.project.name,
+      orgId: existingSecret.project.org.id,
+      orgName: existingSecret.project.org.name,
+      valuesDeleted: existingSecret._count.values,
     },
   })
 
   await db.secret.delete({ where: { id: secretId } })
 
   await deleteCached(CacheKeys.projectSecrets(projectId))
-  await deleteCached(CacheKeys.userProjects(sessionUser.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id, existingSecret.project.org.id))
 
   return { success: true, message: `Secret deleted successfully` }
 })

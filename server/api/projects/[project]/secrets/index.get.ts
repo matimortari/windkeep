@@ -34,12 +34,19 @@ export default defineEventHandler(async (event) => {
       projectId: true,
       createdAt: true,
       updatedAt: true,
-      values: { select: { id: true, secretId: true, environment: true, value: true, createdAt: true, updatedAt: true }, orderBy: { environment: "asc" } },
+      values: {
+        select: { id: true, secretId: true, environment: true, value: true, createdAt: true, updatedAt: true },
+        orderBy: { environment: "asc" },
+      },
     },
     orderBy: { key: "asc" },
   })
 
-  const decryptedSecrets = await Promise.all(secrets.map(async secret => ({ ...secret, values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))) })))
+  const decryptedSecrets = await Promise.all(secrets.map(async secret => ({
+    ...secret,
+    values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))),
+  })))
+
   await setCached(cacheKey, await encrypt(project.orgId, JSON.stringify(decryptedSecrets)), CACHE_TTL.SHORT)
 
   return { decryptedSecrets }
