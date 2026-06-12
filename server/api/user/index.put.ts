@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     where: { id: sessionUser.id },
     data: {
       name: result.data.name,
-      ...(apiTokenToUpdate && { apiToken: hashApiToken(apiTokenToUpdate), apiTokenExpiresAt }),
+      ...(apiTokenToUpdate && { apiToken: hashToken(apiTokenToUpdate), apiTokenExpiresAt }),
     },
     select: {
       id: true,
