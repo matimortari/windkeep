@@ -38,12 +38,18 @@ export default defineEventHandler(async (event) => {
   // Update secret values within a transaction to ensure atomicity and proper history tracking
   const updatedSecret = await db.$transaction(async (tx) => {
     if (result.data.values && Array.isArray(result.data.values)) {
+      const incomingEnvironments = result.data.values.map(val => val.environment)
+      const valuesToDelete = await tx.secretValue.findMany({ where: { secretId, environment: { notIn: incomingEnvironments } } })
+      for (const valToDelete of valuesToDelete) {
+        await tx.secretValueHistory.deleteMany({ where: { secretValueId: valToDelete.id } })
+        await tx.secretValue.delete({ where: { id: valToDelete.id } })
+      }
+
       for (const val of result.data.values) {
         if (!val.environment || val.value === undefined) {
           continue
         }
 
-        // If the secret value hasn't changed, skip mutating history or running updates
         const encryptedNewValue = await encrypt(orgId, val.value)
         const existingValue = await tx.secretValue.findUnique({ where: { secretId_environment: { secretId, environment: val.environment } } })
         if (existingValue) {

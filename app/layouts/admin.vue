@@ -37,17 +37,18 @@ onMounted(async () => {
   }
 
   const activeOrg = user.value?.orgMemberships?.find(m => m.isActive)
-  if (!activeOrg) {
+  const orgId = activeOrg?.orgId || activeOrg?.org?.id
+  if (!activeOrg || !orgId) {
     await goTo("/onboarding")
     return
   }
 
-  if (!await runSafely(() => orgStore.getOrg(activeOrg.orgId))) {
+  if (!await runSafely(() => orgStore.getOrg(orgId))) {
     await goTo("/sign-in")
     return
   }
 
-  orgStore.setActiveOrg(activeOrg.orgId)
+  orgStore.setActiveOrg(orgId)
 
   if (!await runSafely(() => projectStore.getProjects())) {
     await goTo("/sign-in")

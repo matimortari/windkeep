@@ -44,8 +44,8 @@
               <div v-for="item in env.history" :key="item.id" class="space-y-1 rounded-lg p-2">
                 <div class="flex items-center justify-between text-muted-foreground">
                   <div class="navigation-group">
-                    <img :src="item.changedBy.image || ''" :alt="item.changedBy.name" class="size-4 rounded-full border">
-                    <span class="text-xs font-medium">{{ item.changedBy.name }}</span>
+                    <img :src="item.changedBy?.image || ''" :alt="item.changedBy?.name || 'Unknown'" class="size-4 rounded-full border">
+                    <span class="text-xs font-medium">{{ item.changedBy?.name || 'Unknown' }}</span>
                   </div>
                   <span class="text-xs">{{ formatChangedAt(item.changedAt) }}</span>
                 </div>
