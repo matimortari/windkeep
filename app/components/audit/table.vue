@@ -87,8 +87,8 @@
 </template>
 
 <script setup lang="ts">
-const auditStore = useAuditStore()
-const { auditLogs, auditActions, loading } = storeToRefs(auditStore)
+const orgStore = useOrgStore()
+const { auditLogs, auditActions, loading } = storeToRefs(orgStore)
 const expandedRows = ref<Set<string>>(new Set())
 const { sortedData: sortedLogs, toggleSort, getSortIconName } = useTableSort(auditLogs)
 const { createActionHandler } = useActionIcon()
@@ -144,6 +144,8 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
     "memberEmail",
     "memberRole",
     "inviteId",
+    "inviteeEmail",
+    "inviteeRole",
     "userId",
     "userName",
     "userEmail",

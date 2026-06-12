@@ -1,11 +1,13 @@
 import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/schemas/project-schema"
 import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
+import type { CreateServiceTokenInput } from "#shared/schemas/service-token-schema" // Added for schema validation types
 
 export const useProjectStore = defineStore("project", () => {
   const toast = useToast()
   const userStore = useUserStore()
   const projects = ref<Project[]>([])
   const secrets = ref<Secret[]>([])
+  const serviceTokens = ref<ServiceToken[]>([])
   const loading = ref(false)
 
   const isOwner = computed(() => (projectId: string) => projects.value.find(p => p.id === projectId)?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "OWNER") ?? false)
@@ -148,6 +150,64 @@ export const useProjectStore = defineStore("project", () => {
     }
   }
 
+  async function getProjectServiceTokens(projectId: string) {
+    loading.value = true
+
+    try {
+      const res = await $fetch<{ tokens: any[] }>(`/api/projects/${projectId}/service-tokens`, { method: "GET", credentials: "include" })
+      serviceTokens.value = res.tokens || []
+      return serviceTokens.value
+    }
+    catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to fetch service tokens")
+      toast.error(message)
+      console.error("getProjectServiceTokens error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
+  async function createProjectServiceToken(projectId: string, data: Omit<CreateServiceTokenInput, "projectId">) {
+    loading.value = true
+
+    try {
+      const res = await $fetch<{ serviceToken: any, rawToken: string, message: string }>(`/api/projects/${projectId}/service-tokens`, { method: "POST", body: data, credentials: "include" })
+      serviceTokens.value.push(res.serviceToken)
+      toast.success("Service token generated successfully")
+      return res
+    }
+    catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to generate service token")
+      toast.error(message)
+      console.error("createProjectServiceToken error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
+  async function revokeProjectServiceToken(projectId: string, tokenId: string) {
+    loading.value = true
+
+    try {
+      await $fetch(`/api/projects/${projectId}/service-tokens/${tokenId}`, { method: "DELETE", credentials: "include" })
+      serviceTokens.value = serviceTokens.value.filter(token => token.id !== tokenId)
+      toast.success("Service token revoked successfully")
+    }
+    catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to revoke service token")
+      toast.error(message)
+      console.error("revokeProjectServiceToken error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
   async function getProjectSecrets(projectId: string) {
     loading.value = true
 
@@ -251,6 +311,7 @@ export const useProjectStore = defineStore("project", () => {
     loading,
     projects,
     secrets,
+    serviceTokens,
     isOwner,
     isAdmin,
     getProjects,
@@ -260,6 +321,9 @@ export const useProjectStore = defineStore("project", () => {
     addProjectMember,
     updateProjectMember,
     removeProjectMember,
+    getProjectServiceTokens,
+    createProjectServiceToken,
+    revokeProjectServiceToken,
     getProjectSecrets,
     createProjectSecret,
     updateProjectSecret,

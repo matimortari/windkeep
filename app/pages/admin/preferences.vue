@@ -29,11 +29,12 @@
 
         <div v-if="field.copyable" class="navigation-group justify-end">
           <p v-if="field.label === 'CLI Token'">
-            <span v-if="isTokenExpired(field.expiresAt?.value)" class="text-caption-danger px-4">Expired</span>
+            <span v-if="!field.hasToken?.value" class="text-caption px-4">No Active Token</span>
+            <span v-else-if="isTokenExpired(field.expiresAt?.value)" class="text-caption-danger px-4">Expired</span>
             <span v-else class="text-caption px-4">Expires {{ formatDate(field.expiresAt?.value) }}</span>
           </p>
 
-          <span>{{ field.value?.value }}</span>
+          <span :class="{ 'font-mono font-bold text-success': field.label === 'CLI Token' && generatedToken }">{{ field.value?.value }}</span>
 
           <button class="btn" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
@@ -102,8 +103,9 @@ const { public: { baseURL } } = useRuntimeConfig()
 const { clear } = useUserSession()
 const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
-const { user } = storeToRefs(userStore)
+const { user, tokenMetadata } = storeToRefs(userStore)
 const { activeOrg } = storeToRefs(useOrgStore())
+const generatedToken = ref("")
 
 const userFields = [
   {
@@ -133,7 +135,7 @@ const userFields = [
   {
     label: "Current Organization Role",
     description: "Your role within the current organization.",
-    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find((m: OrgMembership) => m.userId === user.value?.id)?.role || "N/A")),
+    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find((m: any) => m.userId === user.value?.id)?.role || "N/A")),
   },
   {
     label: "Joined On",
@@ -143,8 +145,14 @@ const userFields = [
   {
     label: "CLI Token",
     description: "Use this token to login to the WindKeep CLI. Keep it secure and do not share it.",
-    value: computed(() => user.value?.apiToken),
-    expiresAt: computed(() => user.value?.apiTokenExpiresAt),
+    value: computed(() => {
+      if (generatedToken.value) {
+        return generatedToken.value
+      }
+      return tokenMetadata.value?.hasToken ? "••••••••••••••••••••••••••••••••" : "No active token generated"
+    }),
+    expiresAt: computed(() => tokenMetadata.value?.expiresAt),
+    hasToken: computed(() => tokenMetadata.value?.hasToken),
     onRegenerate: handleRegenerateToken,
     copyable: true,
   },
@@ -183,15 +191,19 @@ async function handleUpdateImage(event: Event) {
 }
 
 async function handleRegenerateToken() {
-  if (!user.value?.id) {
-    return
+  if (tokenMetadata.value?.hasToken) {
+    if (!confirm("Regenerating your token will instantly revoke CLI access using the current token. Are you sure you want to proceed?")) {
+      return
+    }
   }
 
-  const res = await userStore.updateUser({ regenerateApiToken: true })
-  if (res?.newApiToken && user.value) {
-    user.value.apiToken = res.newApiToken
-    user.value.apiTokenExpiresAt = res.updatedUser.apiTokenExpiresAt
-    regenerateIcon[userFields.findIndex(f => f.onRegenerate)]?.triggerSuccess()
+  const res = await userStore.generateApiToken()
+  if (res?.rawToken) {
+    generatedToken.value = res.rawToken
+    const cliTokenIndex = userFields.findIndex(f => f.label === "CLI Token")
+    if (cliTokenIndex !== -1) {
+      regenerateIcon[cliTokenIndex]?.triggerSuccess()
+    }
   }
 }
 
@@ -213,6 +225,8 @@ async function handleDeleteUser() {
   await clear()
   await navigateTo("/sign-in", { replace: true })
 }
+
+onMounted(async () => await userStore.getTokenMetadata())
 
 useHead({
   title: "Preferences",
