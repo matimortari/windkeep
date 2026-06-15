@@ -17,11 +17,11 @@ export function requireEnv(name: string): string {
  * Retrieves the authenticated user from the current session or API token.
  * Throws 401 if no valid session exists.
  */
-export async function getUserFromSession(event: H3Event<EventHandlerRequest>): Promise<{ id: string, email: string, name: string, image: string | null }> {
+export async function getUserFromSession(event: H3Event<EventHandlerRequest>): Promise<User> {
   const session = await getUserSession(event)
   if (session?.user?.id) {
     const { id, email, name, image } = session.user
-    return { id, email, name, image: image ?? null }
+    return { id, email, name, image: image ?? "" }
   }
 
   // Fall back to API token auth (for CLI access)
@@ -32,7 +32,7 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>): P
       select: { id: true, email: true, name: true, image: true, apiTokenExpiresAt: true },
     })
     if (user && user.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
-      return { id: user.id, email: user.email, name: user.name, image: user.image ?? null }
+      return { id: user.id, email: user.email, name: user.name, image: user.image ?? "" }
     }
   }
 

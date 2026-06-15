@@ -26,29 +26,28 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid query parameters" })
   }
 
-  const { page, limit, projectId, action, userId, serviceTokenId, startDate, endDate } = result.data
-  const filterHash = JSON.stringify({ projectId, action, userId, serviceTokenId, startDate, endDate })
-  const cacheKey = CacheKeys.orgAuditLogs(orgId, page, filterHash)
+  const filterHash = JSON.stringify({ projectId: result.data.projectId, action: result.data.action, userId: result.data.userId, serviceTokenId: result.data.serviceTokenId, startDate: result.data.startDate, endDate: result.data.endDate })
+  const cacheKey = CacheKeys.orgAuditLogs(orgId, result.data.page, filterHash)
   const cached = await getCached<any>(cacheKey)
   if (cached) {
     return cached
   }
 
   const where: Record<string, unknown> = { orgId }
-  if (projectId) {
-    where.projectId = projectId
+  if (result.data.projectId) {
+    where.projectId = result.data.projectId
   }
-  if (action) {
-    where.action = action
+  if (result.data.action) {
+    where.action = result.data.action
   }
-  if (userId) {
-    where.userId = userId
+  if (result.data.userId) {
+    where.userId = result.data.userId
   }
-  if (serviceTokenId) {
-    where.serviceTokenId = serviceTokenId
+  if (result.data.serviceTokenId) {
+    where.serviceTokenId = result.data.serviceTokenId
   }
-  if (startDate || endDate) {
-    where.createdAt = { ...(startDate && { gte: new Date(startDate) }), ...(endDate && { lte: new Date(endDate) }) }
+  if (result.data.startDate || result.data.endDate) {
+    where.createdAt = { ...(result.data.startDate && { gte: new Date(result.data.startDate) }), ...(result.data.endDate && { lte: new Date(result.data.endDate) }) }
   }
 
   const [totalItems, auditLogs, users, projects, actionsResult] = await Promise.all([
@@ -69,8 +68,8 @@ export default defineEventHandler(async (event) => {
         project: { select: { id: true, name: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: limit,
-      skip: (page - 1) * limit,
+      take: result.data.limit,
+      skip: (result.data.page - 1) * result.data.limit,
     }),
     db.user.findMany({
       where: { auditLogs: { some: { orgId } } },
@@ -90,11 +89,11 @@ export default defineEventHandler(async (event) => {
     }),
   ])
 
-  const totalPages = Math.ceil(totalItems / limit)
+  const totalPages = Math.ceil(totalItems / result.data.limit)
   const logs = {
     auditLogs,
     filters: { users, projects, actions: actionsResult.map(l => l.action) },
-    pagination: { page, limit, totalPages, totalItems, hasNext: page < totalPages, hasPrev: page > 1 },
+    pagination: { page: result.data.page, limit: result.data.limit, totalPages, totalItems, hasNext: result.data.page < totalPages, hasPrev: result.data.page > 1 },
   }
 
   await setCached(cacheKey, logs, CACHE_TTL.SHORT)
