@@ -17,10 +17,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const { email, role } = result.data
-
   // Ensure the target email is not already a member of the organization
-  const userExists = await db.user.findUnique({ where: { email } })
+  const userExists = await db.user.findUnique({ where: { email: result.data.email } })
   if (userExists) {
     const activeMember = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: userExists.id, orgId } } })
     if (activeMember) {
@@ -41,18 +39,18 @@ export default defineEventHandler(async (event) => {
 
   const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000) // 12 hours
   const invitation = await db.invitation.upsert({
-    where: { email_orgId: { email, orgId } },
+    where: { email_orgId: { email: result.data.email, orgId } },
     update: {
       token,
-      role,
+      role: result.data.role,
       expiresAt,
       invitedById: sessionUser.id,
       acceptedAt: null, // Reset acceptance if re-invited
     },
     create: {
-      email,
+      email: result.data.email,
       orgId,
-      role,
+      role: result.data.role,
       token,
       expiresAt,
       invitedById: sessionUser.id,
@@ -69,11 +67,11 @@ export default defineEventHandler(async (event) => {
     orgId,
     action: "CREATE.ORG_INVITE",
     resource: "organization_invite",
-    description: `Created invite link for ${email} to join organization "${invitation.org.name}" as ${role}`,
+    description: `Created invite link for ${result.data.email} to join organization "${invitation.org.name}" as ${result.data.role}`,
     metadata: {
       inviteId: invitation.id,
-      inviteeEmail: email,
-      inviteeRole: role,
+      inviteeEmail: result.data.email,
+      inviteeRole: result.data.role,
       orgId: invitation.org.id,
       orgName: invitation.org.name,
       expiresAt: invitation.expiresAt.toISOString(),

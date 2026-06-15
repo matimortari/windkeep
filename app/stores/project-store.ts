@@ -293,7 +293,7 @@ export const useProjectStore = defineStore("project", () => {
     loading.value = true
 
     try {
-      const res = await $fetch<{ history: EnvironmentHistory[] }>(`/api/projects/${projectId}/secrets/${secretId}/history`, { method: "GET", credentials: "include" })
+      const res = await $fetch<{ history: EnvironmentHistory[] }>(`/api/projects/${projectId}/secrets/history/${secretId}`, { method: "GET", credentials: "include" })
       return res.history
     }
     catch (err: unknown) {
