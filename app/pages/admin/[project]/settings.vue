@@ -243,7 +243,7 @@ const projectFields = [
   },
   {
     label: "Project Website",
-    description: "The official website for your project (optional).",
+    description: "The official website for your project.",
     type: "input",
     model: computed(() => localProject.value?.website ?? ""),
     update: (value: string) => {

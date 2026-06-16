@@ -17,7 +17,7 @@
         <div class="flex flex-row items-center gap-4">
           <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">
             <icon name="ph:key-bold" size="20" />
-            <span>{{ project.secrets?.length }}</span>
+            <span>{{ (project as any)._count?.secrets ?? 0 }}</span>
           </div>
 
           <div class="flex flex-row items-center gap-1 text-sm font-semibold text-muted-foreground">

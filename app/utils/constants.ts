@@ -149,12 +149,12 @@ export const OAUTH_PROVIDERS = [
 // Brand constants
 export const SYMBOLS = [
   { name: "Symbol", image: Symbol, bgClass: "bg-neutral-100" },
-  { name: "Symbol Mono (dark)", image: SymbolMonoDark, bgClass: "bg-white" },
+  { name: "Symbol Mono (dark)", image: SymbolMonoDark, bgClass: "bg-neutral-100" },
   { name: "Symbol Mono (light)", image: SymbolMonoLight, bgClass: "bg-neutral-900" },
 ]
 
 export const WORDMARKS = [
-  { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-white" },
+  { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-neutral-100" },
   { name: "Wordmark (light)", image: WordmarkLight, bgClass: "bg-neutral-900" },
 ]
 
@@ -176,8 +176,8 @@ export const BRAND_COLORS = [
 ]
 
 export const STATUS_COLORS = [
-  { name: "Danger", darkVar: "--red-dark", darkVal: "#a11f1f", lightVar: "--red-light", lightVal: "#e69191" },
-  { name: "Success", darkVar: "--green-dark", darkVal: "#00754a", lightVar: "--green-light", lightVal: "#81dbb3" },
-  { name: "Warning", darkVar: "--orange-dark", darkVal: "#a64503", lightVar: "--orange-light", lightVal: "#fad08c" },
-  { name: "Info", darkVar: "--blue-dark", darkVal: "#3773ba", lightVar: "--blue-light", lightVal: "#a3c7f0" },
+  { name: "Danger", darkVar: "--red-dark", darkVal: "#811919", lightVar: "--red-light", lightVal: "#c12525" },
+  { name: "Success", darkVar: "--green-dark", darkVal: "#005e3b", lightVar: "--green-light", lightVal: "#008c59" },
+  { name: "Warning", darkVar: "--orange-dark", darkVal: "#ae5f05", lightVar: "--orange-light", lightVal: "#f88e13" },
+  { name: "Info", darkVar: "--blue-dark", darkVal: "#2c5c95", lightVar: "--blue-light", lightVal: "#558ccd" },
 ]
