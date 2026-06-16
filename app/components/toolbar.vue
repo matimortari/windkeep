@@ -3,7 +3,7 @@
     <div class="flex flex-row items-center justify-between border-b bg-card/50 p-2 backdrop-blur-xl">
       <nav class="navigation-group text-sm" aria-label="Breadcrumbs Navigation">
         <nuxt-link to="/">
-          <img src="/assets/symbol.png" alt="Logo" width="30">
+          <img src="/assets/symbol.png" alt="Logo" width="35">
         </nuxt-link>
 
         <span class="hidden text-muted-foreground md:block">/</span>
@@ -17,7 +17,11 @@
           <button class="navigation-group gap-1!" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span v-if="activeOrg?.name" class="text-caption">{{ activeOrg.name }}</span>
             <span v-else class="inline-block h-4 w-20 animate-pulse rounded-sm bg-muted" />
-            <icon name="ph:caret-down-bold" size="15" class="transition-transform" :class="isDropdownOpen ? 'rotate-180' : 'rotate-0'" />
+            <icon
+              v-if="activeOrg" name="ph:caret-down-bold"
+              size="15" class="transition-transform"
+              :class="isDropdownOpen ? 'rotate-180' : 'rotate-0'"
+            />
           </button>
 
           <transition name="dropdown">
@@ -41,9 +45,10 @@
           </transition>
         </div>
 
-        <p v-if="currentPage" class="hidden md:navigation-group">
+        <p class="hidden md:navigation-group">
           <span class="text-muted-foreground">/</span>
-          <span class="text-caption capitalize">{{ currentPage }}</span>
+          <span v-if="currentPage && activeOrg" class="text-caption capitalize">{{ currentPage }}</span>
+          <span v-else class="inline-block h-4 w-16 animate-pulse rounded-sm bg-muted" />
         </p>
       </nav>
 

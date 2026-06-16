@@ -13,11 +13,34 @@
         <span class="text-xs text-muted-foreground">An optional description for the secret usage.</span>
       </div>
 
-      <h5 class="border-t py-2">
+      <div class="flex flex-col items-start gap-1">
+        <label for="new-tag" class="text-sm font-semibold">Tags</label>
+        <div class="flex w-full flex-row gap-2">
+          <input
+            id="new-tag" v-model="newTagInput"
+            type="text" placeholder="Add a tag..."
+            @keydown.enter.prevent="addTag"
+          >
+          <button type="button" class="btn" aria-label="Add tag" @click="addTag">
+            <icon name="ph:plus-bold" size="15" />
+          </button>
+        </div>
+
+        <div v-if="form.tags.length" class="mt-1 flex flex-wrap gap-1.5">
+          <span v-for="tag in form.tags" :key="tag" class="inline-flex items-center gap-1 rounded-sm border bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            {{ tag }}
+            <button type="button" class="text-muted-foreground hover:text-danger" @click="removeTag(tag)">
+              <icon name="ph:x-bold" size="15" />
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <h5 class="mt-2 border-t py-2">
         Environments
       </h5>
 
-      <div v-for="env in environments" :key="env" class="flex flex-col items-start gap-1">
+      <div v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env" class="flex flex-col items-start gap-1">
         <label :for="env" class="text-xs font-medium">{{ capitalizeFirst(env) }}</label>
         <input :id="env" v-model="form.values[env]" type="text">
       </div>
@@ -45,8 +68,14 @@ const props = defineProps<{
 const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 
 const { isSecretsEditorOpen, closeDialog } = useUIState()
-const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
-const form = ref<{ key: string, description: string, values: Record<Environment, string> }>({ key: "", description: "", values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } })
+const newTagInput = ref("")
+const form = ref<{ key: string, description: string, tags: string[], values: Record<Environment, string> }>({
+  key: "",
+  description: "",
+  tags: [],
+  values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
+})
+
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
 async function handleSubmit() {

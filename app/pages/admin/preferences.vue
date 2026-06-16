@@ -34,7 +34,7 @@
             <span v-else class="text-caption px-4">Expires {{ formatDate(field.expiresAt?.value) }}</span>
           </p>
 
-          <span :class="{ 'font-mono font-bold text-success': field.label === 'CLI Token' && generatedToken }">{{ field.value?.value }}</span>
+          <span :class="{ 'text-caption-success font-mono!': field.label === 'CLI Token' && generatedToken }">{{ field.value?.value }}</span>
 
           <button class="btn" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
@@ -135,7 +135,7 @@ const userFields = [
   {
     label: "Current Organization Role",
     description: "Your role within the current organization.",
-    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find((m: any) => m.userId === user.value?.id)?.role || "N/A")),
+    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find(m => m.userId === user.value?.id)?.role || "N/A")),
   },
   {
     label: "Joined On",

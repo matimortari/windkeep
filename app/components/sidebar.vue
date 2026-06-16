@@ -1,6 +1,6 @@
 <template>
   <!-- Mobile overlay -->
-  <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-40 bg-black/80 md:hidden" @click="emit('update:isOpen', false)" />
+  <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-40 bg-black/70 md:hidden" @click="emit('update:isOpen', false)" />
 
   <aside
     class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r bg-card px-4 py-20 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b md:py-8"
