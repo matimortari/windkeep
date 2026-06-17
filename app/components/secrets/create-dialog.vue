@@ -47,7 +47,7 @@
 
       <footer class="flex flex-row items-center justify-end">
         <div class="navigation-group">
-          <button class="btn-ghost" @click="emit('close')">
+          <button type="button" class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
           <button class="btn-success" type="submit">
@@ -68,7 +68,7 @@ const props = defineProps<{
 const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 
 const { isSecretsEditorOpen, closeDialog } = useUIState()
-const newTagInput = ref("")
+const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const form = ref<{ key: string, description: string, tags: string[], values: Record<Environment, string> }>({
   key: "",
   description: "",
@@ -76,7 +76,23 @@ const form = ref<{ key: string, description: string, tags: string[], values: Rec
   values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
 })
 
+const newTagInput = ref("")
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
+
+function addTag() {
+  const tag = newTagInput.value.trim()
+  if (!tag) {
+    return
+  }
+  if (!form.value.tags.includes(tag)) {
+    form.value.tags.push(tag)
+  }
+  newTagInput.value = ""
+}
+
+function removeTag(tagToRemove: string) {
+  form.value.tags = form.value.tags.filter(tag => tag !== tagToRemove)
+}
 
 async function handleSubmit() {
   const normalizedKey = normalizeKey(form.value.key)
@@ -93,7 +109,7 @@ async function handleSubmit() {
     id: props.selectedSecret?.id || "",
     key: normalizedKey,
     description: form.value.description.trim(),
-    tags: props.selectedSecret?.tags || [],
+    tags: form.value.tags,
     projectId: props.projectId,
     project: {} as Project,
     values: values as SecretValue[],
@@ -111,11 +127,17 @@ function resetForm() {
       }
     }
 
-    form.value = { key: props.selectedSecret.key, description: props.selectedSecret.description || "", values: mappedValues }
+    form.value = {
+      key: props.selectedSecret.key,
+      description: props.selectedSecret.description || "",
+      tags: props.selectedSecret.tags ? [...props.selectedSecret.tags] : [],
+      values: mappedValues,
+    }
   }
   else {
-    form.value = { key: "", description: "", values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } }
+    form.value = { key: "", description: "", tags: [], values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" } }
   }
+  newTagInput.value = ""
 }
 
 // Reset form when dialog is opened or selected secret changes

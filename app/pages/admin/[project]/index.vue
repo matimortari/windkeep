@@ -3,9 +3,12 @@
     <SecretsProjectActions
       :project="project" :has-permission="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
       :has-pending-changes="hasPendingChanges" :all-visible="allVisible"
-      @open-secrets-dialog="() => { selectSecret(null); openDialog('secrets') }" @open-editor-dialog="openDialog('raw')"
-      @export="exportToEnv" @save="saveAllChanges"
-      @toggle-all-visible="allVisible = !allVisible" @discard="discardAllChanges"
+      :available-tags="availableTags" :active-tag-filter="activeTagFilter"
+      @open-secrets-dialog="() => { selectSecret(null); openDialog('secrets') }"
+      @open-editor-dialog="openDialog('raw')" @export="exportToEnv"
+      @save="saveAllChanges" @toggle-all-visible="allVisible = !allVisible"
+      @discard="discardAllChanges" @filter-by-tag="activeTagFilter = $event"
+      @search="searchQuery = $event"
     />
 
     <Empty v-if="!displayedSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus-bold" />
@@ -14,8 +17,9 @@
       <SecretsTable
         :secrets="displayedSecrets" :project-id="project?.id ?? ''"
         :pending-changes="pendingChanges" :all-visible="allVisible"
-        @edit="handleEditSecret" @delete="handleDeleteSecret"
-        @history="handleViewHistory"
+        :active-tag-filter="activeTagFilter" @edit="handleEditSecret"
+        @delete="handleDeleteSecret" @history="handleViewHistory"
+        @filter-by-tag="activeTagFilter = $event"
       />
     </div>
 
@@ -33,8 +37,10 @@ const projectStore = useProjectStore()
 const { openDialog, closeDialog, selectSecret, selectedSecret } = useUIState()
 const { secrets, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
+const activeTagFilter = ref<string | null>(null)
 const historySecretId = ref("")
 const historySecretKey = ref("")
+const searchQuery = ref("")
 const allVisible = ref(false)
 const pendingChanges = ref<Map<string, PendingChange>>(new Map())
 const hasPendingChanges = computed(() => pendingChanges.value.size > 0)
@@ -48,7 +54,25 @@ const displayedSecrets = computed(() => {
     secretsMap.set(change.secret.key, change.secret)
   }
 
-  return [...secretsMap.values()]
+  let list = [...secretsMap.values()]
+
+  if (activeTagFilter.value) {
+    list = list.filter(secret => secret.tags?.includes(activeTagFilter.value!))
+  }
+
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    list = list.filter(secret => secret.key.toLowerCase().includes(query) || secret.description?.toLowerCase().includes(query) || secret.values?.some(v => v.value.toLowerCase().includes(query)),
+    )
+  }
+
+  return list
+})
+
+const availableTags = computed(() => {
+  const tags = new Set<string>()
+  displayedSecrets.value.forEach(secret => secret.tags?.forEach(tag => tags.add(tag)))
+  return Array.from(tags).sort()
 })
 
 function handleEditSecret(secret: Secret) {
