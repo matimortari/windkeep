@@ -12,21 +12,16 @@
     <section class="container mx-auto flex flex-col">
       <div class="gap-2 border-b p-4 md:navigation-group">
         <header class="flex flex-col gap-2">
-          <h3>
-            Project Details
-          </h3>
+          <h3>Project Details</h3>
           <p class="text-caption">
             Manage project details and settings.
           </p>
         </header>
       </div>
 
-      <!-- Project Details -->
       <div v-for="(field, index) in projectFields" :key="index" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
-          <h5>
-            {{ field.label }}
-          </h5>
+          <h5>{{ field.label }}</h5>
           <p v-if="field.description" class="text-caption">
             {{ field.description }}
           </p>
@@ -49,17 +44,13 @@
         <span v-else class="navigation-group justify-end">{{ field.value }}</span>
       </div>
 
-      <!-- Project Members List -->
+      <!-- Project Members -->
       <section class="flex flex-col justify-between gap-2 border-b p-4 md:px-10">
-        <h5>
-          Project Members
-        </h5>
-
+        <h5>Project Members</h5>
         <ul class="scroll-area card flex max-h-52 flex-col items-start overflow-y-auto">
           <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 first:pt-0 last:border-b-0 last:pb-0">
             <div class="navigation-group items-start!">
               <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
-
               <div class="flex flex-col truncate">
                 <span class="font-semibold">{{ member.user?.name }}</span>
                 <span class="text-caption">Role: {{ capitalizeFirst(member.role) }}</span>
@@ -72,7 +63,6 @@
                   {{ capitalizeFirst(role.label) }}
                 </option>
               </select>
-
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(member.userId, member.role)">
                 <icon :name="memberRoleIcon.get(member.userId)?.icon || 'ph:floppy-disk-bold'" size="15" />
               </button>
@@ -88,9 +78,7 @@
     <!-- Add New Member -->
     <section v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="container mx-auto flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Add New Member">
       <header class="flex flex-col gap-1">
-        <h5>
-          Add New Member
-        </h5>
+        <h5>Add New Member</h5>
         <p class="text-caption">
           Invite users to join this project.
         </p>
@@ -137,12 +125,120 @@
       </div>
     </section>
 
+    <!-- Service Tokens -->
+    <section v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="container mx-auto flex flex-col justify-between gap-4 border-b p-4 md:px-10" aria-label="Service Tokens">
+      <header class="flex flex-col gap-1">
+        <h3>Service Tokens</h3>
+        <p class="text-caption">
+          Manage programmatic access keys for CI/CD pipelines and backend deployments.
+        </p>
+      </header>
+
+      <!-- Token list -->
+      <ul class="scroll-area card flex max-h-64 flex-col items-start overflow-y-auto">
+        <li v-if="!serviceTokens.length" class="w-full py-4 text-center text-sm text-muted-foreground">
+          No service tokens generated yet for this project.
+        </li>
+        <li v-for="token in serviceTokens" :key="token.id" class="navigation-group w-full justify-between border-y py-2 first:border-t-0 first:pt-0 last:border-b-0 last:pb-0">
+          <div class="flex flex-col gap-1 truncate">
+            <span class="font-semibold">{{ token.name }}</span>
+            <div class="navigation-group flex-wrap">
+              <span v-for="env in token.environment" :key="env" class="rounded-sm bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
+                {{ capitalizeFirst(env) }}
+              </span>
+            </div>
+            <div class="navigation-group gap-3 text-xs text-muted-foreground">
+              <span>Expires: {{ token.expiresAt ? formatDate(token.expiresAt) : 'Never' }}</span>
+              <span>Last used: {{ token.lastUsedAt ? formatDate(token.lastUsedAt) : 'Never' }}</span>
+              <span>By: {{ token.user?.name }}</span>
+            </div>
+          </div>
+
+          <button class="btn shrink-0" aria-label="Revoke Token" @click="handleRevokeToken(token.id)">
+            <icon name="ph:trash-bold" size="16" class="text-muted-foreground hover:text-danger" />
+          </button>
+        </li>
+      </ul>
+
+      <!-- Accordion create form -->
+      <div class="flex flex-col gap-3">
+        <button class="btn-primary self-end" @click="toggleCreateForm">
+          <icon :name="showCreateForm ? 'ph:x-bold' : 'ph:key-bold'" size="18" />
+          <span>{{ showCreateForm ? 'Cancel' : 'Generate Token' }}</span>
+        </button>
+
+        <transition name="accordion">
+          <div v-if="showCreateForm" class="card flex flex-col gap-4 border p-4">
+            <!-- Raw token reveal -->
+            <template v-if="generatedRawToken">
+              <div class="flex flex-col gap-2">
+                <p class="text-sm font-semibold text-success">
+                  Token generated successfully
+                </p>
+                <p class="text-caption">
+                  Copy this token now. <strong>You will not be able to see it again.</strong>
+                </p>
+                <div class="navigation-group rounded-sm border bg-muted p-3 font-mono text-xs break-all">
+                  <span class="flex-1">{{ generatedRawToken }}</span>
+                  <button class="btn ml-2 shrink-0" aria-label="Copy token" @click="copyToken">
+                    <icon :name="tokenCopyIcon.icon.value" size="18" />
+                  </button>
+                </div>
+                <button class="btn self-end" @click="dismissToken">
+                  I've saved this token securely
+                </button>
+              </div>
+            </template>
+
+            <!-- Create form -->
+            <template v-else>
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold">Name</label>
+                <input v-model="tokenForm.name" type="text" placeholder="e.g. GitHub Actions, Vercel Deploy">
+                <span class="text-xs text-muted-foreground">A descriptive name to identify this token.</span>
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold">Environments</label>
+                <div class="navigation-group flex-wrap">
+                  <button
+                    v-for="env in ENVIRONMENTS" :key="env.value"
+                    class="rounded-md border px-3 py-1.5 text-sm font-medium transition-colors"
+                    :class="tokenForm.environments.includes(env.value as Environment) ? 'text-primary-foreground border-primary bg-primary' : 'text-muted-foreground hover:text-foreground'"
+                    @click="toggleEnvironment(env.value as Environment)"
+                  >
+                    {{ capitalizeFirst(env.label) }}
+                  </button>
+                </div>
+                <span class="text-xs text-muted-foreground">Token will only be able to read secrets from selected environments.</span>
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold">Expires in (days)</label>
+                <input
+                  v-model.number="tokenForm.expiresInDays" type="number"
+                  min="1" max="365"
+                  placeholder="Leave empty for no expiration" class="md:max-w-64"
+                >
+                <span class="text-xs text-muted-foreground">Optional. Maximum 365 days.</span>
+              </div>
+
+              <div class="flex justify-end">
+                <button class="btn-success" :disabled="!canSubmitToken" @click="handleCreateToken">
+                  <icon name="ph:key-bold" size="18" />
+                  <span>Generate</span>
+                </button>
+              </div>
+            </template>
+          </div>
+        </transition>
+      </div>
+    </section>
+
     <!-- Danger Zone -->
     <section class="container mx-auto flex flex-col">
       <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
-        <h3>
-          Danger Zone
-        </h3>
+        <h3>Danger Zone</h3>
         <p class="text-caption">
           This section contains actions that can significantly affect your account. Please proceed with caution.
         </p>
@@ -150,14 +246,11 @@
 
       <nav v-if="!isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Leave Project">
         <header class="flex flex-col gap-1">
-          <h5>
-            Leave Project
-          </h5>
+          <h5>Leave Project</h5>
           <p class="text-caption-danger">
             This action is irreversible. You will no longer have access to this project.
           </p>
         </header>
-
         <button class="btn-danger self-end" aria-label="Leave Project" @click="handleLeaveProject">
           <icon name="ph:sign-out-bold" size="20" />
           <span>Confirm</span>
@@ -166,14 +259,11 @@
 
       <nav v-if="isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Project">
         <header class="flex flex-col gap-1">
-          <h5>
-            Delete Project
-          </h5>
+          <h5>Delete Project</h5>
           <p class="text-caption-danger">
             This action is irreversible. All data associated with this project will be permanently deleted.
           </p>
         </header>
-
         <button class="btn-danger self-end" aria-label="Delete Project" @click="handleDeleteProject">
           <icon name="ph:trash-bold" size="20" />
           <span>Confirm</span>
@@ -192,19 +282,26 @@ const { user } = storeToRefs(useUserStore())
 const orgStore = useOrgStore()
 const { orgMembers } = storeToRefs(orgStore)
 const projectStore = useProjectStore()
-const { projects, isOwner, isAdmin } = storeToRefs(projectStore)
+const { projects, serviceTokens, isOwner, isAdmin } = storeToRefs(projectStore)
 const project = computed(() => projects.value.find(p => p.slug === slug))
 const newMemberToAdd = ref<string>("")
 const newMemberRole = ref(ROLES[0]?.value ?? "MEMBER")
 const localProject = ref<Project | null>(null)
 const isAddMemberDropdownOpen = ref(false)
 const addMemberDropdownRef = ref<HTMLElement | null>(null)
+const showCreateForm = ref(false)
+const generatedRawToken = ref("")
+const tokenForm = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({
+  name: "",
+  environments: [],
+  expiresInDays: null,
+})
+const canSubmitToken = computed(() => tokenForm.value.name.trim().length >= 3 && tokenForm.value.environments.length > 0)
 
 const availableOrgMembers = computed(() => {
   if (!project.value || !orgMembers.value) {
     return []
   }
-
   return orgMembers.value.filter(member => !new Set(project.value?.memberships?.map(m => m.userId) || []).has(member.user.id))
 })
 
@@ -279,6 +376,7 @@ const projectFields = [
   },
 ]
 
+const tokenCopyIcon = createActionHandler("ph:copy-bold")
 const copyIcon = projectFields.map(() => createActionHandler("ph:copy-bold"))
 const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk-bold"))
 const memberRoleIcon = ref(new Map())
@@ -287,16 +385,66 @@ useClickOutside(addMemberDropdownRef, () => {
   isAddMemberDropdownOpen.value = false
 }, { escapeKey: true })
 
+function toggleCreateForm() {
+  showCreateForm.value = !showCreateForm.value
+  if (!showCreateForm.value) {
+    resetTokenForm()
+  }
+}
+
+function toggleEnvironment(env: Environment) {
+  const value = env.toUpperCase() as Environment
+  const idx = tokenForm.value.environments.indexOf(value)
+  if (idx === -1) {
+    tokenForm.value.environments.push(value)
+  }
+  else {
+    tokenForm.value.environments.splice(idx, 1)
+  }
+}
+
+function resetTokenForm() {
+  tokenForm.value = { name: "", environments: [], expiresInDays: null }
+  generatedRawToken.value = ""
+}
+
+async function copyToken() {
+  await tokenCopyIcon.triggerCopy(generatedRawToken.value)
+}
+
+function dismissToken() {
+  showCreateForm.value = false
+  resetTokenForm()
+}
+
+async function handleCreateToken() {
+  if (!project.value?.id || !canSubmitToken.value) {
+    return
+  }
+
+  const res = await projectStore.createProjectServiceToken(project.value.id, {
+    name: tokenForm.value.name.trim(),
+    environment: tokenForm.value.environments,
+    expiresInDays: tokenForm.value.expiresInDays ?? undefined,
+  })
+
+  if (res?.rawToken) {
+    generatedRawToken.value = res.rawToken
+  }
+}
+
+async function handleRevokeToken(tokenId: string) {
+  if (!confirm("Are you sure you want to revoke this service token? Any system using it will lose access immediately.")) {
+    return
+  }
+  await projectStore.revokeProjectServiceToken(project.value?.id ?? "", tokenId)
+}
+
 async function handleAddMember() {
   if (!project.value?.id || !newMemberToAdd.value) {
     return
   }
-
-  await projectStore.addProjectMember(project.value.id, {
-    userId: newMemberToAdd.value,
-    role: newMemberRole.value as "ADMIN" | "MEMBER",
-  })
-
+  await projectStore.addProjectMember(project.value.id, { userId: newMemberToAdd.value, role: newMemberRole.value as "ADMIN" | "MEMBER" })
   await projectStore.getProjects()
   newMemberToAdd.value = ""
   newMemberRole.value = ROLES[0]?.value ?? "MEMBER"
@@ -306,7 +454,6 @@ async function handleUpdateMemberRole(memberId: string, newRole: "ADMIN" | "MEMB
   if (!project.value?.id) {
     return
   }
-
   await projectStore.updateProjectMember(project.value.id, memberId, { role: newRole })
   await projectStore.getProjects()
   memberRoleIcon.value.get(memberId)?.triggerSuccess()
@@ -319,7 +466,6 @@ async function handleRemoveMember(memberId: string) {
   if (!confirm("Are you sure you want to remove this member?")) {
     return
   }
-
   await projectStore.removeProjectMember(project.value.id, memberId)
   await projectStore.getProjects()
 }
@@ -328,14 +474,12 @@ async function handleSubmit(index: number) {
   if (!project.value?.id) {
     return
   }
-
   await projectStore.updateProject(project.value.id, {
     name: localProject.value?.name ?? "",
     slug: localProject.value?.slug ?? "",
     description: localProject.value?.description || undefined,
     website: localProject.value?.website || undefined,
   })
-
   await projectStore.getProjects()
   saveIcon[index]?.triggerSuccess()
   if (project.value.slug !== localProject.value?.slug) {
@@ -350,7 +494,6 @@ async function handleDeleteProject() {
   if (!confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
     return
   }
-
   await projectStore.deleteProject(project.value.id)
   await navigateTo("/admin/projects")
 }
@@ -362,7 +505,6 @@ async function handleLeaveProject() {
   if (!confirm("Are you sure you want to leave this project? This action cannot be undone.")) {
     return
   }
-
   await projectStore.removeProjectMember(project.value.id, user.value.id)
   await navigateTo("/admin/projects")
 }
@@ -384,7 +526,6 @@ watch(() => project.value, (proj) => {
   if (!proj) {
     return
   }
-
   if (localProject.value) {
     localProject.value.name = proj.name
     localProject.value.slug = proj.slug
@@ -397,7 +538,11 @@ watch(() => project.value, (proj) => {
 }, { immediate: true })
 
 // Set page metadata when project changes
-watch(() => project.value?.id, async (id: string | undefined) => {
+watch(() => project.value?.id, async (id) => {
+  if (!id) {
+    return
+  }
+  await projectStore.getProjectServiceTokens(id)
   useHead({
     title: `${project.value?.name} settings`,
     link: [{ rel: "canonical", href: `${baseURL}/${id}/settings` }],
@@ -407,3 +552,17 @@ watch(() => project.value?.id, async (id: string | undefined) => {
 
 definePageMeta({ layout: "admin", middleware: "auth" })
 </script>
+
+<style scoped>
+.accordion-enter-active,
+.accordion-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.accordion-enter-from,
+.accordion-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>
