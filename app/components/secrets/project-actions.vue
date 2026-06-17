@@ -13,7 +13,41 @@
       </nuxt-link>
     </div>
 
-    <nav class="navigation-group w-full flex-1 justify-start md:justify-end" aria-label="Project Actions">
+    <nav class="navigation-group w-full flex-1 flex-wrap justify-start md:justify-end" aria-label="Project Actions">
+      <div class="relative hidden md:block">
+        <input
+          id="search" :value="searchQuery"
+          type="text" placeholder="Search secrets..."
+          @input="searchQuery = ($event.target as HTMLInputElement).value; emit('search', searchQuery)"
+        >
+        <span class="absolute inset-y-0 right-0 flex flex-row items-center pr-4 text-muted-foreground">
+          <icon name="ph:magnifying-glass-bold" size="20" />
+        </span>
+      </div>
+
+      <div v-if="availableTags.length" ref="tagDropdownRef" class="relative">
+        <button class="btn" :class="activeTagFilter ? 'border-secondary text-secondary' : ''" :disabled="hasPendingChanges" @click="isTagDropdownOpen = !isTagDropdownOpen">
+          <icon name="ph:tag-bold" size="20" />
+          <span class="hidden md:inline">{{ activeTagFilter ? activeTagFilter : 'Tags' }}</span>
+          <icon
+            v-if="activeTagFilter" name="ph:x-bold"
+            size="15" class="ml-0.5"
+            @click.stop="emit('filterByTag', null)"
+          />
+          <icon v-else name="ph:caret-down-bold" size="15" />
+        </button>
+
+        <transition name="dropdown">
+          <ul v-if="isTagDropdownOpen" class="dropdown-menu" role="menu">
+            <li v-for="tag in availableTags" :key="tag">
+              <button class="w-full rounded-lg p-2 text-left text-sm hover:bg-muted/60" :class="tag === activeTagFilter ? 'bg-muted font-medium' : ''" role="menuitem" @click="selectTag(tag)">
+                {{ tag }}
+              </button>
+            </li>
+          </ul>
+        </transition>
+      </div>
+
       <button
         v-if="hasPermission" class="btn-primary"
         :disabled="hasPendingChanges" aria-label="Add New Secret"
@@ -28,14 +62,14 @@
         <icon name="ph:text-indent-bold" size="20" />
       </button>
 
-      <div ref="dropdownRef" class="relative">
-        <button class="btn-secondary" :disabled="hasPendingChanges" @click="isDropdownOpen = !isDropdownOpen">
+      <div ref="exportDropdownRef" class="relative">
+        <button class="btn-secondary" :disabled="hasPendingChanges" @click="isExportDropdownOpen = !isExportDropdownOpen">
           <span>Export as .env</span>
           <icon name="ph:download-bold" size="20" />
         </button>
 
         <transition name="dropdown">
-          <ul v-if="isDropdownOpen" class="dropdown-menu -left-8" role="menu">
+          <ul v-if="isExportDropdownOpen" class="dropdown-menu -left-8" role="menu">
             <li v-for="env in ENVIRONMENTS" :key="env.value">
               <button role="menuitem" class="w-full rounded-lg p-2 text-left capitalize hover:bg-muted/60" @click="handleExport(env.value)">
                 {{ capitalizeFirst(env.label) }}
@@ -58,7 +92,7 @@
         <button class="btn-success hidden md:flex" aria-label="Save All Changes" @click="emit('save')">
           <icon name="ph:floppy-disk-bold" size="20" />
         </button>
-        <button class="btn-danger hidden md:flex" aria-label="Discard Changes" @click="emit('discard')">
+        <button class="btn-warning hidden md:flex" aria-label="Discard Changes" @click="emit('discard')">
           <icon name="ph:x-bold" size="20" />
         </button>
       </template>
@@ -70,7 +104,7 @@
         <icon name="ph:floppy-disk-bold" size="20" />
         <span>Save Changes</span>
       </button>
-      <button class="btn-danger" @click="emit('discard')">
+      <button class="btn-warning" @click="emit('discard')">
         <icon name="ph:x-bold" size="20" />
         <span>Discard</span>
       </button>
@@ -84,6 +118,8 @@ const props = defineProps<{
   hasPermission: boolean
   hasPendingChanges: boolean
   allVisible: boolean
+  availableTags: string[]
+  activeTagFilter: string | null
 }>()
 
 const emit = defineEmits<{
@@ -93,17 +129,31 @@ const emit = defineEmits<{
   save: []
   discard: []
   toggleAllVisible: []
+  filterByTag: [tag: string | null]
+  search: [query: string]
 }>()
 
-const dropdownRef = ref<HTMLElement | null>(null)
-const isDropdownOpen = ref(false)
+const exportDropdownRef = ref<HTMLElement | null>(null)
+const tagDropdownRef = ref<HTMLElement | null>(null)
+const isExportDropdownOpen = ref(false)
+const isTagDropdownOpen = ref(false)
+const searchQuery = ref("")
 
-useClickOutside(dropdownRef, () => {
-  isDropdownOpen.value = false
+useClickOutside(exportDropdownRef, () => {
+  isExportDropdownOpen.value = false
+}, { escapeKey: true })
+
+useClickOutside(tagDropdownRef, () => {
+  isTagDropdownOpen.value = false
 }, { escapeKey: true })
 
 function handleExport(env: string) {
   emit("export", env)
-  isDropdownOpen.value = false
+  isExportDropdownOpen.value = false
+}
+
+function selectTag(tag: string) {
+  emit("filterByTag", tag === props.activeTagFilter ? null : tag)
+  isTagDropdownOpen.value = false
 }
 </script>

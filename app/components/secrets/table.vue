@@ -28,6 +28,16 @@
                 <icon name="ph:info-bold" size="15" />
                 <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
               </span>
+
+              <div v-if="secret.tags?.length" class="hidden flex-wrap items-center gap-1 md:flex">
+                <button
+                  v-for="tag in secret.tags" :key="tag"
+                  class="rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors" :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
+                  :aria-label="`Filter by tag ${tag}`" @click="emit('filterByTag', activeTagFilter === tag ? null : tag)"
+                >
+                  {{ tag }}
+                </button>
+              </div>
             </div>
 
             <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm">
@@ -64,6 +74,7 @@ const props = defineProps<{
   projectId: string
   pendingChanges: Map<string, PendingChange>
   allVisible: boolean
+  activeTagFilter: string | null
 }>()
 
 const emit = defineEmits<{
@@ -71,6 +82,7 @@ const emit = defineEmits<{
   delete: [key: string]
   history: [secret: Secret]
   update: []
+  filterByTag: [tag: string | null]
 }>()
 
 const visibleKeys = ref<Record<string, boolean>>({})
@@ -82,19 +94,19 @@ const changeTypeConfig = {
   create: {
     rowClass: "bg-success/10 text-success!",
     keyTextClass: "text-success-foreground",
-    valueClass: "rounded px-1.5 py-0.5 bg-success/15 text-success font-medium",
+    valueClass: "rounded-full px-1.5 py-0.5 bg-success/10 text-success font-medium",
     icon: "ph:plus-circle-bold",
   },
   update: {
     rowClass: "bg-warning/10 text-warning!",
     keyTextClass: "text-warning-foreground",
-    valueClass: "rounded px-1.5 py-0.5 bg-warning/15 text-warning font-medium",
+    valueClass: "rounded-full px-1.5 py-0.5 bg-warning/10 text-warning font-medium",
     icon: "ph:pencil-circle-bold",
   },
   delete: {
     rowClass: "bg-danger/10 text-danger! line-through decoration-danger",
     keyTextClass: "text-danger-foreground",
-    valueClass: "rounded px-1.5 py-0.5 bg-danger/15 text-danger font-medium line-through",
+    valueClass: "rounded-full px-1.5 py-0.5 bg-danger/10 text-danger font-medium line-through",
     icon: "ph:minus-circle-bold",
   },
 } satisfies Record<string, { rowClass: string, keyTextClass: string, valueClass: string, icon: string }>
@@ -147,7 +159,7 @@ function getKeyTextClass(key: string) {
 
 function getSecretValueClass(key: string, hasValue: boolean) {
   if (!getChangeConfig(key)) {
-    return hasValue ? "rounded-xl px-1.5 py-0.5 bg-muted/30 font-medium" : "text-muted-foreground/40"
+    return hasValue ? "rounded-full px-1.5 py-0.5 bg-muted/30 font-medium" : "text-muted-foreground/40"
   }
 
   return getChangeConfig(key)?.valueClass ?? ""
