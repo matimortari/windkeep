@@ -1,12 +1,10 @@
 import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/schemas/project-schema"
-import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 import type { CreateServiceTokenInput } from "#shared/schemas/service-token-schema" // Added for schema validation types
 
 export const useProjectStore = defineStore("project", () => {
   const toast = useToast()
   const userStore = useUserStore()
   const projects = ref<Project[]>([])
-  const secrets = ref<Secret[]>([])
   const serviceTokens = ref<ServiceToken[]>([])
   const loading = ref(false)
 
@@ -208,109 +206,9 @@ export const useProjectStore = defineStore("project", () => {
     }
   }
 
-  async function getProjectSecrets(projectId: string) {
-    loading.value = true
-
-    try {
-      const res = await $fetch<{ decryptedSecrets: Secret[] }>(`/api/projects/${projectId}/secrets`, { method: "GET", credentials: "include" })
-      secrets.value = Array.isArray(res.decryptedSecrets) ? res.decryptedSecrets : []
-      return secrets.value
-    }
-    catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to get project secrets")
-      toast.error(message)
-      console.error("getProjectSecrets error:", err)
-      throw err
-    }
-    finally {
-      loading.value = false
-    }
-  }
-
-  async function createProjectSecret(projectId: string, data: CreateSecretInput) {
-    loading.value = true
-
-    try {
-      const res = await $fetch<Secret>(`/api/projects/${projectId}/secrets`, { method: "POST", body: data, credentials: "include" })
-      secrets.value.push(res)
-      toast.success("Secret created successfully")
-      return res
-    }
-    catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to create project secret")
-      toast.error(message)
-      console.error("createProjectSecret error:", err)
-      throw err
-    }
-    finally {
-      loading.value = false
-    }
-  }
-
-  async function updateProjectSecret(projectId: string, secretId: string, data: UpdateSecretInput) {
-    loading.value = true
-
-    try {
-      const res = await $fetch<Secret>(`/api/projects/${projectId}/secrets/${secretId}`, { method: "PUT", body: data, credentials: "include" })
-      const index = secrets.value.findIndex(s => s.id === secretId)
-      if (index !== -1) {
-        secrets.value[index] = res
-      }
-      toast.success("Secret updated successfully")
-      return res
-    }
-    catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to update project secret")
-      toast.error(message)
-      console.error("updateProjectSecret error:", err)
-      throw err
-    }
-    finally {
-      loading.value = false
-    }
-  }
-
-  async function deleteProjectSecret(projectId: string, secretId: string) {
-    loading.value = true
-
-    try {
-      await $fetch(`/api/projects/${projectId}/secrets/${secretId}`, { method: "DELETE", credentials: "include" })
-      secrets.value = secrets.value.filter(s => s.id !== secretId)
-      toast.success("Secret deleted successfully")
-    }
-    catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to delete project secret")
-      toast.error(message)
-      console.error("deleteProjectSecret error:", err)
-      throw err
-    }
-    finally {
-      loading.value = false
-    }
-  }
-
-  async function getSecretHistory(projectId: string, secretId: string) {
-    loading.value = true
-
-    try {
-      const res = await $fetch<{ history: EnvironmentHistory[] }>(`/api/projects/${projectId}/secrets/history/${secretId}`, { method: "GET", credentials: "include" })
-      return res.history
-    }
-    catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to get secret history")
-      toast.error(message)
-      console.error("getSecretHistory error:", err)
-      throw err
-    }
-    finally {
-      loading.value = false
-    }
-  }
-
   return {
     loading,
     projects,
-    secrets,
     serviceTokens,
     isOwner,
     isAdmin,
@@ -324,10 +222,5 @@ export const useProjectStore = defineStore("project", () => {
     getProjectServiceTokens,
     createProjectServiceToken,
     revokeProjectServiceToken,
-    getProjectSecrets,
-    createProjectSecret,
-    updateProjectSecret,
-    deleteProjectSecret,
-    getSecretHistory,
   }
 })

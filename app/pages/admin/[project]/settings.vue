@@ -134,7 +134,6 @@
         </p>
       </header>
 
-      <!-- Token list -->
       <ul class="scroll-area card flex max-h-64 flex-col items-start overflow-y-auto">
         <li v-if="!serviceTokens.length" class="w-full py-4 text-center text-sm text-muted-foreground">
           No service tokens generated yet for this project.
@@ -147,7 +146,7 @@
                 {{ capitalizeFirst(env) }}
               </span>
             </div>
-            <div class="navigation-group gap-3 text-xs text-muted-foreground">
+            <div class="navigation-group text-xs text-muted-foreground">
               <span>Expires: {{ token.expiresAt ? formatDate(token.expiresAt) : 'Never' }}</span>
               <span>Last used: {{ token.lastUsedAt ? formatDate(token.lastUsedAt) : 'Never' }}</span>
               <span>By: {{ token.user?.name }}</span>
@@ -161,7 +160,7 @@
       </ul>
 
       <!-- Accordion create form -->
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <button class="btn-primary self-end" @click="toggleCreateForm">
           <icon :name="showCreateForm ? 'ph:x-bold' : 'ph:key-bold'" size="18" />
           <span>{{ showCreateForm ? 'Cancel' : 'Generate Token' }}</span>
@@ -203,8 +202,7 @@
                 <div class="navigation-group flex-wrap">
                   <button
                     v-for="env in ENVIRONMENTS" :key="env.value"
-                    class="rounded-md border px-3 py-1.5 text-sm font-medium transition-colors"
-                    :class="tokenForm.environments.includes(env.value as Environment) ? 'text-primary-foreground border-primary bg-primary' : 'text-muted-foreground hover:text-foreground'"
+                    class="btn-ghost" :class="tokenForm.environments.includes(env.value as Environment) ? 'border-secondary! text-secondary!' : ''"
                     @click="toggleEnvironment(env.value as Environment)"
                   >
                     {{ capitalizeFirst(env.label) }}
@@ -393,7 +391,7 @@ function toggleCreateForm() {
 }
 
 function toggleEnvironment(env: Environment) {
-  const value = env.toUpperCase() as Environment
+  const value = env
   const idx = tokenForm.value.environments.indexOf(value)
   if (idx === -1) {
     tokenForm.value.environments.push(value)
@@ -422,12 +420,12 @@ async function handleCreateToken() {
     return
   }
 
+  const daysValue = tokenForm.value.expiresInDays
   const res = await projectStore.createProjectServiceToken(project.value.id, {
     name: tokenForm.value.name.trim(),
-    environment: tokenForm.value.environments,
-    expiresInDays: tokenForm.value.expiresInDays ?? undefined,
+    environment: tokenForm.value.environments.map(env => env.toUpperCase() as Environment),
+    expiresInDays: daysValue && Number(daysValue) > 0 ? Number(daysValue) : undefined,
   })
-
   if (res?.rawToken) {
     generatedRawToken.value = res.rawToken
   }

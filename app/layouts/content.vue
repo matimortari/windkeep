@@ -1,7 +1,7 @@
 <template>
   <Masthead :is-toc-open="isTocOpen" @toggle-toc="isTocOpen = !isTocOpen" />
 
-  <div class="relative flex min-h-screen overflow-x-hidden border-b">
+  <div class="relative flex min-h-screen border-b">
     <div v-if="isTocOpen" aria-hidden="true" class="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm xl:hidden" @click="isTocOpen = false" />
 
     <div class="mx-auto px-4 xl:grid xl:grid-cols-[1fr_320px] xl:gap-8">

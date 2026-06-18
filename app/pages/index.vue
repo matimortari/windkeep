@@ -2,7 +2,7 @@
   <section
     id="hero" v-motion
     :initial="{ opacity: 0 }" :visible-once="{ opacity: 1 }"
-    :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-8"
+    :duration="800" class="relative flex min-h-[75vh] w-full flex-col items-center justify-center border-b px-8"
   >
     <div class="hero-backdrop" />
     <div class="dot-overlay" />
