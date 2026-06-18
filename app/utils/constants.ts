@@ -4,7 +4,7 @@ import Symbol from "~/assets/symbol.png"
 import WordmarkDark from "~/assets/wordmark-dark.png"
 import WordmarkLight from "~/assets/wordmark-light.png"
 
-// Landing page constants
+// Landing page data
 export const HIGHLIGHTS = [
   { title: "Encrypted & Safe", icon: "ph:lock-key-bold" },
   { title: "Rapid Onboarding", icon: "ph:users-three-bold" },
@@ -109,7 +109,7 @@ export const CLI_TABS = [
   },
 ]
 
-// Admin dashboard constants
+// Admin dashboard data
 export const SIDEBAR_NAV_LINKS = [
   { url: "/admin/projects", icon: "ph:folder-open-bold", label: "Projects" },
   { url: "/admin/organization", icon: "ph:building-office-bold", label: "Organization" },
@@ -131,8 +131,8 @@ export const ENVIRONMENTS = [
   { value: "production", label: "Production" },
 ]
 
-// REST method label styles for documentation display
-export const REST_METHOD_LABELS = {
+// REST method label styles for API documentation display
+export const REST_METHOD_LABELS: Record<string, string> = {
   GET: "text-xs font-semibold text-[#0ec187]",
   POST: "text-xs font-semibold text-[#74a2e7]",
   PUT: "text-xs font-semibold text-[#cef1a7]",
@@ -146,7 +146,7 @@ export const OAUTH_PROVIDERS = [
   { name: "gitlab", label: "Sign In With GitLab", icon: "simple-icons:gitlab" },
 ]
 
-// Brand constants
+// Brand assets
 export const SYMBOLS = [
   { name: "Symbol", image: Symbol, bgClass: "bg-neutral-100" },
   { name: "Symbol Mono (dark)", image: SymbolMonoDark, bgClass: "bg-neutral-100" },

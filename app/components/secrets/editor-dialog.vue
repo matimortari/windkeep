@@ -63,7 +63,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  save: [secrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[], removedKeys: { key: string, environment: Environment }[]]
+  save: [secrets: Secret[], removedKeys: { key: string, environment: Environment }[]]
 }>()
 
 const { isRawEditorOpen, closeDialog } = useUIState()
@@ -119,20 +119,18 @@ const currentEnvValues = computed<Record<string, string>>(() => {
 })
 
 const diffItems = computed<DiffItem[]>(() => {
-  const current = currentEnvValues.value
-  const next = parsedEditorValues.value
   const items: DiffItem[] = []
 
-  for (const [key, value] of Object.entries(next)) {
-    if (!(key in current)) {
+  for (const [key, value] of Object.entries(parsedEditorValues.value)) {
+    if (!(key in currentEnvValues.value)) {
       items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success" })
     }
-    else if (current[key] !== value) {
+    else if (currentEnvValues.value[key] !== value) {
       items.push({ key, value, type: "updated", icon: "ph:pencil-bold", class: "bg-info" })
     }
   }
-  for (const key of Object.keys(current)) {
-    if (!(key in next)) {
+  for (const key of Object.keys(currentEnvValues.value)) {
+    if (!(key in parsedEditorValues.value)) {
       items.push({ key, type: "removed", icon: "ph:minus-bold", class: "bg-danger" })
     }
   }
@@ -155,7 +153,7 @@ function handleSubmit() {
 
   const removed = Object.keys(currentEnvValues.value).filter(key => !(key in parsedEditorValues.value)).map(key => ({ key, environment: selectedEnv.value }))
 
-  emit("save", upserted, removed)
+  emit("save", upserted as Secret[], removed)
 }
 
 // Populate editor when dialog opens or env switches

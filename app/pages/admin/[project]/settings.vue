@@ -92,7 +92,7 @@
           </button>
 
           <transition name="dropdown">
-            <ul v-if="isAddMemberDropdownOpen" class="dropdown-menu left-0 max-h-60 w-full md:w-80" role="menu">
+            <ul v-if="isAddMemberDropdownOpen" class="dropdown-menu max-h-60 w-full md:w-80" role="menu">
               <li v-for="member in availableOrgMembers" :key="member.user.id" class="truncate whitespace-nowrap">
                 <button class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" :class="newMemberToAdd === member.user.id ? 'bg-muted' : ''" @click="newMemberToAdd = member.user.id; isAddMemberDropdownOpen = false">
                   <img :src="member.user.image" alt="Avatar" class="size-6 rounded-full border">
