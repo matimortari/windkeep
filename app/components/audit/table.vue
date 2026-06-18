@@ -92,7 +92,6 @@ const { auditLogs, auditActions, loading } = storeToRefs(orgStore)
 const expandedRows = ref<Set<string>>(new Set())
 const { sortedData: sortedLogs, toggleSort, getSortIconName } = useTableSort(auditLogs)
 const { createActionHandler } = useActionIcon()
-
 const copyMetadataActions = computed(() => {
   const actions = new Map()
   auditLogs.value.forEach(log => actions.set(log.id, createActionHandler("ph:copy")))
@@ -132,12 +131,12 @@ function formatAuditDate(date: string | Date) {
   }).format(new Date(date))
 }
 
-function formatMetadata(metadata: Record<string, any> | null | undefined): string {
+function formatMetadata(metadata: Record<string, any> | string | null | undefined): string {
   if (!metadata) {
     return "{}"
   }
 
-  const KEY_ORDER = [
+  const METADATA_KEY_ORDER = [
     "secretId",
     "secretKey",
     "memberId",
@@ -176,19 +175,12 @@ function formatMetadata(metadata: Record<string, any> | null | undefined): strin
     "expiresAt",
   ]
 
-  const sortedMetadata: Record<string, any> = {}
-  for (const key of KEY_ORDER) {
-    if (key in metadata) {
-      sortedMetadata[key] = metadata[key]
-    }
-  }
-  for (const key of Object.keys(metadata)) {
-    if (!(key in sortedMetadata)) {
-      sortedMetadata[key] = metadata[key]
-    }
+  const parsed: Record<string, any> = typeof metadata === "string" ? JSON.parse(metadata) : metadata
+  if (typeof parsed !== "object" || parsed === null) {
+    return "{}"
   }
 
-  return JSON.stringify(sortedMetadata, null, 2)
+  return JSON.stringify(Object.fromEntries(METADATA_KEY_ORDER.map(key => [key, parsed[key]]).filter(([key]) => key in parsed)), null, 2)
 }
 </script>
 

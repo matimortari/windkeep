@@ -95,11 +95,7 @@ function handleDeleteSecret(key: string) {
   const existingChange = pendingChanges.get(key)
   if (existingChange?.type === "delete") {
     if (existingChange.originalSecret && hasSecretChanges(existingChange.secret, existingChange.originalSecret)) {
-      pendingChanges.set(key, {
-        type: "update",
-        secret: existingChange.secret,
-        originalSecret: existingChange.originalSecret,
-      })
+      pendingChanges.set(key, { type: "update", secret: existingChange.secret, originalSecret: existingChange.originalSecret })
     }
     else {
       pendingChanges.delete(key)
@@ -114,11 +110,7 @@ function handleDeleteSecret(key: string) {
   else {
     const originalSecret = secrets.value.find(s => s.key === key)
     if (originalSecret) {
-      pendingChanges.set(key, {
-        type: "delete",
-        secret: existingChange?.secret ?? originalSecret,
-        originalSecret,
-      })
+      pendingChanges.set(key, { type: "delete", secret: existingChange?.secret ?? originalSecret, originalSecret })
     }
   }
 }
@@ -137,11 +129,7 @@ function handleSecretChange(secret: Secret) {
     else {
       const originalSecret = secrets.value.find(s => s.key === oldKey)
       if (originalSecret) {
-        pendingChanges.set(oldKey, {
-          type: "delete",
-          secret: originalSecret,
-          originalSecret,
-        })
+        pendingChanges.set(oldKey, { type: "delete", secret: originalSecret, originalSecret })
       }
     }
     secret.id = ""
@@ -159,7 +147,7 @@ function handleSecretChange(secret: Secret) {
   closeDialog("secrets")
 }
 
-function handleImportSecrets(importedSecrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[], removedKeys: { key: string, environment: Environment }[]) {
+function handleImportSecrets(importedSecrets: Secret[], removedKeys: { key: string, environment: Environment }[]) {
   closeDialog("raw")
 
   for (const importedSecret of importedSecrets) {
@@ -223,12 +211,11 @@ function discardAllChanges() {
 }
 
 function exportToEnv(env: string | null | undefined) {
-  const currentProjectId = project.value?.id
-  if (!env || !currentProjectId) {
+  if (!env || !project.value?.id) {
     return { success: false, error: "Environment or project not specified" }
   }
 
-  const filteredSecrets = secrets.value.filter((s: Secret) => s.projectId === currentProjectId).map((s: Secret) => {
+  const filteredSecrets = secrets.value.filter((s: Secret) => s.projectId === project.value?.id).map((s: Secret) => {
     const value = s.values?.find((v: SecretValue) => v.environment.toLowerCase() === env.toLowerCase())?.value
     return value ? `${s.key}="${value}"` : null
   }).filter(Boolean).join("\n")
@@ -240,20 +227,16 @@ function exportToEnv(env: string | null | undefined) {
   const a = document.createElement("a")
   a.href = URL.createObjectURL(blob)
   a.download = `.env.${project.value?.slug}.${env.toLowerCase()}`
-  document.body.appendChild(a)
   a.click()
-  document.body.removeChild(a)
-
   return { success: true }
 }
 
-onBeforeRouteLeave((_to, _from, next) => {
+onBeforeRouteLeave(() => {
   if (hasPendingChanges.value) {
-    next(confirm("You have unsaved changes. Are you sure you want to leave?"))
+    return confirm("You have unsaved changes. Are you sure you want to leave?")
   }
-  else {
-    next()
-  }
+
+  return true
 })
 
 // Get secrets and set page metadata when project changes
