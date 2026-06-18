@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     userId: sessionUser.id,
     orgId: invitation.org.id,
     action: "REVOKE.ORG_INVITE",
-    resource: "organization_invite",
+    resource: "org_invite",
     description: `Revoked pending invite sent to ${invitation.email} for organization "${invitation.org.name}"`,
     metadata: {
       inviteId: invitation.id,

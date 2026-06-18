@@ -109,10 +109,11 @@ const columns = [
 
 const resourceMap: Record<string, string> = {
   organization: "ph:buildings-bold",
-  organization_invite: "ph:envelope-bold",
-  organization_member: "ph:users-three-bold",
+  org_invite: "ph:envelope-bold",
+  org_member: "ph:users-three-bold",
   project: "ph:folder-bold",
   project_member: "ph:user-plus-bold",
+  service_token: "ph:terminal-bold",
   secret: "ph:key-bold",
 }
 

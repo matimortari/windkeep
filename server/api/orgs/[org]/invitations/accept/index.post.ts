@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     userId: sessionUser.id,
     orgId: invitation.orgId,
     action: "ACCEPT.ORG_INVITE",
-    resource: "organization_invite",
+    resource: "org_invite",
     description: `${newMembership.user.name} (${newMembership.user.email}) joined organization "${newMembership.org.name}" via invite link`,
     metadata: {
       userId: newMembership.user.id,
