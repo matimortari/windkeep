@@ -228,6 +228,6 @@ interface TocHeader {
 interface Toast {
   id: string
   message: string
-  type: "success" | "error" | "warning" | "info"
+  type: "danger" | "success" | "warning" | "info"
   duration?: number
 }

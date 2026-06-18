@@ -295,14 +295,11 @@ export const useOrgStore = defineStore("org", () => {
         }
       }
 
-      const res = await $fetch<{ data: { auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters } }>(`/api/orgs/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
+      const res = await $fetch<{ data: { auditLogs: AuditLog[], filters: AuditFilters, pagination: AuditLogsPagination } }>(`/api/orgs/${orgId}/audit?${queryParams.toString()}`, { method: "GET", credentials: "include" })
       auditLogs.value = res.data.auditLogs
-      auditPagination.value = res.data.pagination
       auditFilters.value = res.data.filters
-      if (params) {
-        currentAuditFilters.value = { ...currentAuditFilters.value, ...params }
-      }
-      return res
+      auditPagination.value = res.data.pagination
+      return res.data
     }
     catch (err: unknown) {
       const message = getErrorMessage(err, "Failed to fetch audit logs")

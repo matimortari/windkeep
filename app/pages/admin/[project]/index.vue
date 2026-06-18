@@ -34,36 +34,35 @@ const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()
+const secretsStore = useSecretsStore()
 const { openDialog, closeDialog, selectSecret, selectedSecret } = useUIState()
-const { secrets, isOwner, isAdmin } = storeToRefs(projectStore)
+const { isOwner, isAdmin } = storeToRefs(projectStore)
+const { secrets } = storeToRefs(secretsStore)
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
 const activeTagFilter = ref<string | null>(null)
 const historySecretId = ref("")
 const historySecretKey = ref("")
 const searchQuery = ref("")
 const allVisible = ref(false)
-const pendingChanges = ref<Map<string, PendingChange>>(new Map())
-const hasPendingChanges = computed(() => pendingChanges.value.size > 0)
+const pendingChanges = reactive<Map<string, PendingChange>>(new Map())
+const hasPendingChanges = computed(() => pendingChanges.size > 0)
 
 const displayedSecrets = computed(() => {
   const secretsMap = new Map<string, Secret>()
   for (const secret of secrets.value) {
     secretsMap.set(secret.key, secret)
   }
-  for (const [_key, change] of pendingChanges.value) {
+  for (const [_key, change] of pendingChanges) {
     secretsMap.set(change.secret.key, change.secret)
   }
 
   let list = [...secretsMap.values()]
-
   if (activeTagFilter.value) {
     list = list.filter(secret => secret.tags?.includes(activeTagFilter.value!))
   }
-
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim()
-    list = list.filter(secret => secret.key.toLowerCase().includes(query) || secret.description?.toLowerCase().includes(query) || secret.values?.some(v => v.value.toLowerCase().includes(query)),
-    )
+    list = list.filter(secret => secret.key.toLowerCase().includes(query) || secret.description?.toLowerCase().includes(query) || secret.values?.some(v => v.value.toLowerCase().includes(query)))
   }
 
   return list
@@ -71,7 +70,8 @@ const displayedSecrets = computed(() => {
 
 const availableTags = computed(() => {
   const tags = new Set<string>()
-  displayedSecrets.value.forEach(secret => secret.tags?.forEach(tag => tags.add(tag)))
+  secrets.value.forEach(secret => secret.tags?.forEach(tag => tags.add(tag)))
+  pendingChanges.forEach(change => change.secret.tags?.forEach(tag => tags.add(tag)))
   return Array.from(tags).sort()
 })
 
@@ -92,29 +92,29 @@ function handleDeleteSecret(key: string) {
     return
   }
 
-  const existingChange = pendingChanges.value.get(key)
+  const existingChange = pendingChanges.get(key)
   if (existingChange?.type === "delete") {
     if (existingChange.originalSecret && hasSecretChanges(existingChange.secret, existingChange.originalSecret)) {
-      pendingChanges.value.set(key, {
+      pendingChanges.set(key, {
         type: "update",
         secret: existingChange.secret,
         originalSecret: existingChange.originalSecret,
       })
     }
     else {
-      pendingChanges.value.delete(key)
+      pendingChanges.delete(key)
     }
 
     return
   }
 
   if (existingChange?.type === "create") {
-    pendingChanges.value.delete(key)
+    pendingChanges.delete(key)
   }
   else {
     const originalSecret = secrets.value.find(s => s.key === key)
     if (originalSecret) {
-      pendingChanges.value.set(key, {
+      pendingChanges.set(key, {
         type: "delete",
         secret: existingChange?.secret ?? originalSecret,
         originalSecret,
@@ -129,13 +129,31 @@ function hasSecretChanges(secret: Secret, originalSecret: Secret): boolean {
 }
 
 function handleSecretChange(secret: Secret) {
+  if (selectedSecret.value && selectedSecret.value.key !== secret.key) {
+    const oldKey = selectedSecret.value.key
+    if (pendingChanges.get(oldKey)?.type === "create") {
+      pendingChanges.delete(oldKey)
+    }
+    else {
+      const originalSecret = secrets.value.find(s => s.key === oldKey)
+      if (originalSecret) {
+        pendingChanges.set(oldKey, {
+          type: "delete",
+          secret: originalSecret,
+          originalSecret,
+        })
+      }
+    }
+    secret.id = ""
+  }
+
   const existingSecret = secrets.value.find(s => s.key === secret.key)
-  const existingChange = pendingChanges.value.get(secret.key)
+  const existingChange = pendingChanges.get(secret.key)
   if (!existingSecret || existingChange?.type === "create") {
-    pendingChanges.value.set(secret.key, { type: "create", secret })
+    pendingChanges.set(secret.key, { type: "create", secret })
   }
   else {
-    pendingChanges.value.set(secret.key, { type: "update", secret, originalSecret: existingSecret })
+    pendingChanges.set(secret.key, { type: "update", secret, originalSecret: existingSecret })
   }
 
   closeDialog("secrets")
@@ -144,12 +162,11 @@ function handleSecretChange(secret: Secret) {
 function handleImportSecrets(importedSecrets: { key: string, description: string, projectId: string, values: { environment: Environment, value: string }[] }[], removedKeys: { key: string, environment: Environment }[]) {
   closeDialog("raw")
 
-  // Upsert added/updated secrets
   for (const importedSecret of importedSecrets) {
     const existingSecret = secrets.value.find(s => s.key === importedSecret.key)
-    const pendingChange = pendingChanges.value.get(importedSecret.key)
+    const pendingChange = pendingChanges.get(importedSecret.key)
     if (!existingSecret && !pendingChange) {
-      pendingChanges.value.set(importedSecret.key, { type: "create", secret: importedSecret as unknown as Secret })
+      pendingChanges.set(importedSecret.key, { type: "create", secret: importedSecret as unknown as Secret })
     }
     else {
       const baseSecret = pendingChange?.secret || existingSecret!
@@ -165,31 +182,26 @@ function handleImportSecrets(importedSecrets: { key: string, description: string
       }
       const mergedSecret: Secret = { ...baseSecret, values: mergedValues }
       if (!existingSecret) {
-        pendingChanges.value.set(importedSecret.key, { type: "create", secret: mergedSecret })
+        pendingChanges.set(importedSecret.key, { type: "create", secret: mergedSecret })
       }
       else {
-        pendingChanges.value.set(importedSecret.key, { type: "update", secret: mergedSecret, originalSecret: existingSecret })
+        pendingChanges.set(importedSecret.key, { type: "update", secret: mergedSecret, originalSecret: existingSecret })
       }
     }
   }
-
-  // Handle removed env values
   for (const { key, environment } of removedKeys) {
     const existingSecret = secrets.value.find(s => s.key === key)
     if (!existingSecret) {
       continue
     }
 
-    const pendingChange = pendingChanges.value.get(key)
-    const baseSecret = pendingChange?.secret || existingSecret
+    const baseSecret = pendingChanges.get(key)?.secret || existingSecret
     const updatedValues = (baseSecret.values || []).filter(v => v.environment !== environment)
-
-    // If no values remain at all, mark as full delete
     if (updatedValues.length === 0) {
-      pendingChanges.value.set(key, { type: "delete", secret: existingSecret, originalSecret: existingSecret })
+      pendingChanges.set(key, { type: "delete", secret: existingSecret, originalSecret: existingSecret })
     }
     else {
-      pendingChanges.value.set(key, { type: "update", secret: { ...baseSecret, values: updatedValues }, originalSecret: existingSecret })
+      pendingChanges.set(key, { type: "update", secret: { ...baseSecret, values: updatedValues }, originalSecret: existingSecret })
     }
   }
 }
@@ -199,54 +211,15 @@ async function saveAllChanges() {
     return
   }
 
-  const projectId = project.value.id
-  const changeEntries = [...pendingChanges.value.entries()]
-  const failed: string[] = []
-  const results = await Promise.allSettled(changeEntries.map(async ([key, change]) => {
-    if (change.type === "create") {
-      const { values, ...data } = change.secret
-      await projectStore.createProjectSecret(projectId, {
-        key: data.key,
-        description: data.description || "",
-        tags: (data as any).tags || [],
-        projectId,
-        values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
-      })
-    }
-    else if (change.type === "update" && change.secret.id) {
-      const { values, ...data } = change.secret
-      await projectStore.updateProjectSecret(projectId, change.secret.id, {
-        description: data.description || "",
-        tags: (data as any).tags || undefined,
-        values: values || [],
-      })
-    }
-    else if (change.type === "delete" && change.secret.id) {
-      await projectStore.deleteProjectSecret(projectId, change.secret.id)
-    }
-    return key
-  }))
-
-  results.forEach((result, index) => {
-    const key = changeEntries[index]![0]
-    if (result.status === "fulfilled") {
-      pendingChanges.value.delete(result.value)
-    }
-    else {
-      failed.push(key)
-      console.error(`Failed to save secret "${key}":`, result.reason)
-    }
-  })
-
-  await projectStore.getProjectSecrets(projectId)
+  const { succeeded } = await secretsStore.saveAllSecretChanges(project.value.id, pendingChanges)
+  succeeded.forEach(key => pendingChanges.delete(key))
 }
 
 function discardAllChanges() {
   if (!confirm("Are you sure you want to discard all pending changes?")) {
     return
   }
-
-  pendingChanges.value.clear()
+  pendingChanges.clear()
 }
 
 function exportToEnv(env: string | null | undefined) {
@@ -291,7 +264,7 @@ watch(() => project.value?.id, async (id) => {
 
   allVisible.value = false
   secrets.value = []
-  await projectStore.getProjectSecrets(id)
+  await secretsStore.getProjectSecrets(id)
 
   useHead({
     title: `${project.value?.name}`,
