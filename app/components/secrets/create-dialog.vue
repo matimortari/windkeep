@@ -68,7 +68,7 @@ const props = defineProps<{
 const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 
 const { isSecretsEditorOpen, closeDialog } = useUIState()
-const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
+const newTagInput = ref("")
 const form = ref<{ key: string, description: string, tags: string[], values: Record<Environment, string> }>({
   key: "",
   description: "",
@@ -76,7 +76,6 @@ const form = ref<{ key: string, description: string, tags: string[], values: Rec
   values: { DEVELOPMENT: "", STAGING: "", PRODUCTION: "" },
 })
 
-const newTagInput = ref("")
 const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
 function addTag() {

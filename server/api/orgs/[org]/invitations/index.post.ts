@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
     userId: sessionUser.id,
     orgId,
     action: "CREATE.ORG_INVITE",
-    resource: "organization_invite",
+    resource: "org_invite",
     description: `Created invite link for ${result.data.email} to join organization "${invitation.org.name}" as ${result.data.role}`,
     metadata: {
       inviteId: invitation.id,

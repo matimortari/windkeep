@@ -154,7 +154,7 @@ export const useProjectStore = defineStore("project", () => {
     loading.value = true
 
     try {
-      const res = await $fetch<{ tokens: any[] }>(`/api/projects/${projectId}/service-tokens`, { method: "GET", credentials: "include" })
+      const res = await $fetch<{ tokens: ServiceToken[] }>(`/api/projects/${projectId}/service-tokens`, { method: "GET", credentials: "include" })
       serviceTokens.value = res.tokens || []
       return serviceTokens.value
     }
@@ -173,7 +173,7 @@ export const useProjectStore = defineStore("project", () => {
     loading.value = true
 
     try {
-      const res = await $fetch<{ serviceToken: any, rawToken: string, message: string }>(`/api/projects/${projectId}/service-tokens`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ serviceToken: ServiceToken, rawToken: string, message: string }>(`/api/projects/${projectId}/service-tokens`, { method: "POST", body: data, credentials: "include" })
       serviceTokens.value.push(res.serviceToken)
       toast.success("Service token generated successfully")
       return res

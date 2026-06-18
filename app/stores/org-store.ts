@@ -35,6 +35,8 @@ export const useOrgStore = defineStore("org", () => {
     { label: "Project Member Removed", value: "REMOVE.PROJECT_MEMBER" },
     { label: "Project Member Role Updated", value: "UPDATE.PROJECT_MEMBER_ROLE" },
     { label: "Project Member Added", value: "ADD.PROJECT_MEMBER" },
+    { label: "Service Token Created", value: "CREATE.SERVICE_TOKEN" },
+    { label: "Service Token Revoked", value: "REVOKE.SERVICE_TOKEN" },
     { label: "Secret Deleted", value: "DELETE.SECRET" },
     { label: "Secret Updated", value: "UPDATE.SECRET" },
     { label: "Secret Created", value: "CREATE.SECRET" },
@@ -287,17 +289,16 @@ export const useOrgStore = defineStore("org", () => {
 
     try {
       const queryParams = new URLSearchParams()
-      const effectiveParams = params || currentAuditFilters.value
-      for (const [key, value] of Object.entries(effectiveParams)) {
+      for (const [key, value] of Object.entries(params || currentAuditFilters.value)) {
         if (value !== undefined && value !== null) {
           queryParams.append(key, String(value))
         }
       }
 
-      const res = await $fetch<{ auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters }>(`/api/orgs/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
-      auditLogs.value = res.auditLogs
-      auditPagination.value = res.pagination
-      auditFilters.value = res.filters
+      const res = await $fetch<{ data: { auditLogs: AuditLog[], pagination: AuditLogsPagination, filters: AuditFilters } }>(`/api/orgs/${orgId}/audit${queryParams.toString() ? `?${queryParams.toString()}` : ""}`, { method: "GET", credentials: "include" })
+      auditLogs.value = res.data.auditLogs
+      auditPagination.value = res.data.pagination
+      auditFilters.value = res.data.filters
       if (params) {
         currentAuditFilters.value = { ...currentAuditFilters.value, ...params }
       }

@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   // Rate limit: 5 requests per hour per user
   await enforceRateLimit(event, `user:token:create:${sessionUser.id}`, 5)
 
-  const rawToken = `usr_${randomBytes(24).toString("hex")}`
+  const rawToken = `${randomBytes(24).toString("hex")}`
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 90) // 90 days
 

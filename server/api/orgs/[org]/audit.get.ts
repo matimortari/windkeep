@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
   const cacheKey = CacheKeys.orgAuditLogs(orgId, result.data.page, filterHash)
   const cached = await getCached<any>(cacheKey)
   if (cached) {
-    return cached
+    return { data: cached }
   }
 
   const where: Record<string, unknown> = { orgId }
@@ -90,13 +90,13 @@ export default defineEventHandler(async (event) => {
   ])
 
   const totalPages = Math.ceil(totalItems / result.data.limit)
-  const logs = {
+  const data = {
     auditLogs,
     filters: { users, projects, actions: actionsResult.map(l => l.action) },
     pagination: { page: result.data.page, limit: result.data.limit, totalPages, totalItems, hasNext: result.data.page < totalPages, hasPrev: result.data.page > 1 },
   }
 
-  await setCached(cacheKey, logs, CACHE_TTL.SHORT)
+  await setCached(cacheKey, data, CACHE_TTL.SHORT)
 
-  return { logs }
+  return { data }
 })

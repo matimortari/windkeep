@@ -30,7 +30,7 @@
           <td>
             <div class="navigation-group">
               <icon name="ph:key-bold" size="20" />
-              <span>{{ project.secrets?.length }}</span>
+              <span>{{ (project as any)._count?.secrets ?? 0 }}</span>
             </div>
           </td>
           <td>
