@@ -40,9 +40,9 @@
         Environments
       </h5>
 
-      <div v-for="env in ['DEVELOPMENT', 'STAGING', 'PRODUCTION']" :key="env" class="flex flex-col items-start gap-1">
-        <label :for="env" class="text-xs font-medium">{{ capitalizeFirst(env) }}</label>
-        <input :id="env" v-model="form.values[env]" type="text">
+      <div v-for="env in ENVIRONMENTS" :key="env.value" class="flex flex-col items-start gap-1">
+        <label :for="env.value" class="text-xs font-medium">{{ env.label }}</label>
+        <input :id="env.value" v-model="form.values[env.value]" type="text">
       </div>
 
       <footer class="flex flex-row items-center justify-end">

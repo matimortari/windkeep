@@ -123,7 +123,7 @@ export const useOrgStore = defineStore("org", () => {
     loading.value = true
 
     try {
-      const res = await $fetch<{ success: boolean, message: string, newOwner: { id: string, name: string, email: string } }>(`/api/orgs/${orgId}/transfer-ownership`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ success: boolean, message: string, newOwner: { id: string, name: string, email: string } }>(`/api/orgs/${orgId}/transfer`, { method: "POST", body: data, credentials: "include" })
       await getOrg(orgId)
       toast.success("Organization ownership transferred successfully")
       return res

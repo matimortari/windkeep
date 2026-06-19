@@ -12,13 +12,6 @@ export function formatDate(date?: string | Date | null): string {
 }
 
 /**
- * Capitalizes the first letter of the given string.
- */
-export function capitalizeFirst(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
-}
-
-/**
  * Normalizes a string to be used as an environment variable key.
  */
 export function normalizeKey(key: string): string {

@@ -75,7 +75,7 @@
           <ul v-if="isExportDropdownOpen" class="dropdown-menu" role="menu">
             <li v-for="env in ENVIRONMENTS" :key="env.value">
               <button role="menuitem" class="w-full rounded-lg p-2 text-left capitalize hover:bg-muted/60" @click="handleExport(env.value)">
-                {{ capitalizeFirst(env.label) }}
+                {{ env.label }}
               </button>
             </li>
           </ul>

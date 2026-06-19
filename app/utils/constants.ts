@@ -5,19 +5,19 @@ import WordmarkDark from "~/assets/wordmark-dark.png"
 import WordmarkLight from "~/assets/wordmark-light.png"
 
 // Landing page data
-export const HIGHLIGHTS = [
+export const HIGHLIGHTS: { title: string, icon: string }[] = [
   { title: "Encrypted & Safe", icon: "ph:lock-key-bold" },
   { title: "Rapid Onboarding", icon: "ph:users-three-bold" },
   { title: "Free & Open Source", icon: "ph:code-bold" },
 ]
 
-export const CLI_BULLETS = [
+export const CLI_BULLETS: { description: string }[] = [
   { description: "Scriptable Workflows" },
   { description: "No Hardcoded .env Files" },
   { description: "Lightweight & Fast" },
 ]
 
-export const FEATURES = [
+export const FEATURES: { title: string, description: string, icon: string }[] = [
   {
     title: "Controlled Access",
     description: "Role-based permissions allow you to control who can manage secrets at both the organization and project levels.",
@@ -40,7 +40,7 @@ export const FEATURES = [
   },
 ]
 
-export const FAQS = [
+export const FAQS: { question: string, answer: string }[] = [
   {
     question: "How does role-based access control work for organizations?",
     answer: "Each organization has a single Owner, who can manage its projects and members, and configure org-wide settings. Admins can invite and manage members, but they don't have full control over organization settings. Members can access the data for the organization and the projects they belong to, but they cannot modify settings or manage other users. This structure keeps sensitive operations secure while allowing teams to collaborate effectively.",
@@ -59,7 +59,7 @@ export const FAQS = [
   },
 ]
 
-export const CLI_TABS = [
+export const CLI_TABS: { key: string, label: string, description: string, code: string[] }[] = [
   {
     key: "install",
     label: "Installation",
@@ -110,7 +110,7 @@ export const CLI_TABS = [
 ]
 
 // Admin dashboard data
-export const SIDEBAR_NAV_LINKS = [
+export const SIDEBAR_NAV_LINKS: { url: string, icon: string, label: string }[] = [
   { url: "/admin/projects", icon: "ph:folder-open-bold", label: "Projects" },
   { url: "/admin/organization", icon: "ph:building-office-bold", label: "Organization" },
   { url: "/admin/audit-logs", icon: "ph:clipboard-text-bold", label: "Audit Logs" },
@@ -118,17 +118,17 @@ export const SIDEBAR_NAV_LINKS = [
 ]
 
 // Organization and project roles
-export const ROLES = [
+export const ROLES: { value: Role, label: string }[] = [
   { value: "OWNER", label: "Owner" },
   { value: "ADMIN", label: "Admin" },
   { value: "MEMBER", label: "Member" },
 ]
 
 // Environment options for secrets
-export const ENVIRONMENTS = [
-  { value: "development", label: "Development" },
-  { value: "staging", label: "Staging" },
-  { value: "production", label: "Production" },
+export const ENVIRONMENTS: { value: Environment, label: string }[] = [
+  { value: "DEVELOPMENT", label: "Development" },
+  { value: "STAGING", label: "Staging" },
+  { value: "PRODUCTION", label: "Production" },
 ]
 
 // REST method label styles for API documentation display
@@ -140,25 +140,25 @@ export const REST_METHOD_LABELS: Record<string, string> = {
 }
 
 // OAuth providers
-export const OAUTH_PROVIDERS = [
+export const OAUTH_PROVIDERS: { name: string, label: string, icon: string }[] = [
   { name: "google", label: "Sign In With Google", icon: "simple-icons:google" },
   { name: "github", label: "Sign In With GitHub", icon: "simple-icons:github" },
   { name: "gitlab", label: "Sign In With GitLab", icon: "simple-icons:gitlab" },
 ]
 
 // Brand assets
-export const SYMBOLS = [
+export const SYMBOLS: { name: string, image: any, bgClass: string }[] = [
   { name: "Symbol", image: Symbol, bgClass: "bg-neutral-100" },
   { name: "Symbol Mono (dark)", image: SymbolMonoDark, bgClass: "bg-neutral-100" },
   { name: "Symbol Mono (light)", image: SymbolMonoLight, bgClass: "bg-neutral-900" },
 ]
 
-export const WORDMARKS = [
+export const WORDMARKS: { name: string, image: any, bgClass: string }[] = [
   { name: "Wordmark (dark)", image: WordmarkDark, bgClass: "bg-neutral-100" },
   { name: "Wordmark (light)", image: WordmarkLight, bgClass: "bg-neutral-900" },
 ]
 
-export const NEUTRAL_SCALE = [
+export const NEUTRAL_SCALE: { name: string, var: string, value: string }[] = [
   { name: "Neutral/100", var: "--neutral-100", value: "#fafafa" },
   { name: "Neutral/200", var: "--neutral-200", value: "#f5f5f5" },
   { name: "Neutral/300", var: "--neutral-300", value: "#d4d4d4" },
@@ -170,12 +170,12 @@ export const NEUTRAL_SCALE = [
   { name: "Neutral/900", var: "--neutral-900", value: "#0a0a0a" },
 ]
 
-export const BRAND_COLORS = [
+export const BRAND_COLORS: { name: string, var: string, value: string }[] = [
   { name: "Primary", var: "--brand-primary", value: "#3d536d" },
   { name: "Secondary", var: "--brand-secondary", value: "#597c8b" },
 ]
 
-export const STATUS_COLORS = [
+export const STATUS_COLORS: { name: string, darkVar: string, darkVal: string, lightVar: string, lightVal: string }[] = [
   { name: "Danger", darkVar: "--red-dark", darkVal: "#811919", lightVar: "--red-light", lightVal: "#c12525" },
   { name: "Success", darkVar: "--green-dark", darkVal: "#005e3b", lightVar: "--green-light", lightVal: "#008c59" },
   { name: "Warning", darkVar: "--orange-dark", darkVal: "#ae5f05", lightVar: "--orange-light", lightVal: "#f88e13" },

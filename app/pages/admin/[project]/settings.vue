@@ -53,14 +53,14 @@
               <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
               <div class="flex flex-col truncate">
                 <span class="font-semibold">{{ member.user?.name }}</span>
-                <span class="text-caption">Role: {{ capitalizeFirst(member.role) }}</span>
+                <span class="text-caption">Role: {{ ROLES.find(role => role.value === member.role)?.label }}</span>
               </div>
             </div>
 
             <nav v-if="(isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')) && member.userId !== user?.id && member.role !== 'OWNER'" class="navigation-group" aria-label="Project Member Actions">
               <select v-model="member.role">
                 <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
-                  {{ capitalizeFirst(role.label) }}
+                  {{ role.label }}
                 </option>
               </select>
               <button class="btn" aria-label="Update Member Role" @click="handleUpdateMemberRole(member.userId, member.role)">
@@ -107,7 +107,7 @@
 
           <select v-model="newMemberRole" class="md:min-w-30">
             <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
-              {{ capitalizeFirst(role.label) }}
+              {{ role.label }}
             </option>
           </select>
         </div>
@@ -143,7 +143,7 @@
             <span class="font-semibold">{{ token.name }}</span>
             <div class="navigation-group flex-wrap">
               <span v-for="env in token.environment" :key="env" class="rounded-sm bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
-                {{ capitalizeFirst(env) }}
+                {{ ENVIRONMENTS.find(e => e.value === env)?.label }}
               </span>
             </div>
             <div class="navigation-group text-xs text-muted-foreground">
@@ -205,7 +205,7 @@
                     class="btn-ghost" :class="tokenForm.environments.includes(env.value as Environment) ? 'border-secondary! text-secondary!' : ''"
                     @click="toggleEnvironment(env.value as Environment)"
                   >
-                    {{ capitalizeFirst(env.label) }}
+                    {{ env.label }}
                   </button>
                 </div>
                 <span class="text-xs text-muted-foreground">Token will only be able to read secrets from selected environments.</span>
