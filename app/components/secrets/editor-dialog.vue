@@ -3,18 +3,18 @@
     <div class="flex flex-col gap-3">
       <div class="flex flex-row gap-1 rounded-lg border p-1">
         <button
-          v-for="env in environments" :key="env"
-          class="flex-1 rounded-md px-2 py-1 text-sm font-medium transition-colors" :class="selectedEnv === env ? 'text-primary-foreground bg-primary' : 'text-muted-foreground hover:text-foreground'"
-          @click=" selectedEnv = env; editorContent = buildEnvText(env) "
+          v-for="env in ENVIRONMENTS" :key="env.value"
+          class="flex-1 rounded-md px-2 py-1 text-sm font-medium transition-colors" :class="selectedEnv === env.value ? 'text-primary-foreground bg-primary' : 'text-muted-foreground hover:text-foreground'"
+          @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
         >
-          {{ capitalizeFirst(env) }}
+          {{ env.label }}
         </button>
       </div>
 
       <div class="flex flex-col gap-1">
         <div class="flex items-center justify-between">
           <label for="env-content" class="text-sm font-semibold">.env content</label>
-          <span class="text-xs text-muted-foreground">{{ capitalizeFirst(selectedEnv) }} environment</span>
+          <span class="text-xs text-muted-foreground">{{ environments.find(env => env.value === selectedEnv)?.label }} environment</span>
         </div>
         <textarea
           id="env-content" v-model="editorContent"
@@ -68,7 +68,7 @@ const emit = defineEmits<{
 
 const { isRawEditorOpen, closeDialog } = useUIState()
 const editorContent = ref("")
-const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
+const environments: { value: Environment, label: string }[] = ENVIRONMENTS
 const selectedEnv = ref<Environment>("DEVELOPMENT")
 const parsedEditorValues = computed(() => parseEnv(editorContent.value))
 

@@ -88,14 +88,14 @@
 
               <div class="flex flex-col truncate">
                 <span class="font-semibold">{{ orgUser.user.name }}</span>
-                <span class="text-caption">Role: {{ capitalizeFirst(orgUser.role) }}</span>
+                <span class="text-caption">Role: {{ ROLES.find(role => role.value === orgUser.role)?.label }}</span>
               </div>
             </div>
 
             <nav v-if="isOwner && orgUser.user.id !== user?.id" class="navigation-group" aria-label="Organization Member Actions">
               <select v-model="orgUser.role">
                 <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
-                  {{ capitalizeFirst(role.label) }}
+                  {{ role.label }}
                 </option>
               </select>
 
@@ -130,7 +130,7 @@
 
         <select v-model="inviteRole" class="md:max-w-32">
           <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
-            {{ capitalizeFirst(role.label) }}
+            {{ role.label }}
           </option>
         </select>
 

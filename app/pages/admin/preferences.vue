@@ -135,7 +135,7 @@ const userFields = [
   {
     label: "Current Organization Role",
     description: "Your role within the current organization.",
-    value: computed(() => capitalizeFirst(activeOrg.value?.memberships?.find(m => m.userId === user.value?.id)?.role || "N/A")),
+    value: computed(() => ROLES.find(role => role.value === activeOrg.value?.memberships?.find(m => m.userId === user.value?.id)?.role)?.label || "N/A"),
   },
   {
     label: "Joined On",
@@ -158,7 +158,7 @@ const userFields = [
   },
   {
     label: "Profile Image",
-    description: "Supported formats: JPG, PNG. Maximum size: 5MB.",
+    description: "Supported formats: JPG, PNG. Maximum size: 2MB.",
     type: "image",
     src: computed(() => user.value?.image),
     onUpload: handleUpdateImage,

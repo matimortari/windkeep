@@ -57,7 +57,7 @@ export const useUserStore = defineStore("user", () => {
       const formData = new FormData()
       formData.append("file", file)
 
-      const res = await $fetch<{ imageUrl: string }>("/api/user/image-upload", { method: "PUT", body: formData, credentials: "include" })
+      const res = await $fetch<{ imageUrl: string }>("/api/user/image", { method: "PUT", body: formData, credentials: "include" })
       if (user.value && res.imageUrl) {
         user.value.image = res.imageUrl
       }
