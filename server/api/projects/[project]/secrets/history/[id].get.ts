@@ -43,3 +43,22 @@ export default defineEventHandler(async (event) => {
 
   return { history }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Get secret history",
+    description: "Returns the full value history for each environment of a secret, including who made each change. Values are decrypted. Requires any project role.",
+    tags: ["Secrets"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+      { in: "path", name: "id", required: true, schema: { type: "string" }, description: "Secret ID" },
+    ],
+    responses: {
+      200: { description: "Per-environment history with decrypted values and change attribution" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role or secret belongs to a different project" },
+      404: { description: "Secret not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

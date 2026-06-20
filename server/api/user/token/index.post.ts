@@ -16,3 +16,16 @@ export default defineEventHandler(async (event) => {
 
   return { rawToken, expiresAt, message: "Make sure to copy your personal API token now. You will not be able to see it again." }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Create API token",
+    description: "Generates a new personal API token valid for 90 days. The plaintext token is returned only once.",
+    tags: ["User"],
+    responses: {
+      200: { description: "Returns `rawToken` and `expiresAt`. Copy the token — it won't be shown again." },
+      401: { description: "Unauthenticated" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

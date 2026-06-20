@@ -40,3 +40,18 @@ export default defineEventHandler(async (event) => {
 
   return { success: true, message: "Your account and all associated data have been permanently deleted." }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Delete current user",
+    description: "Permanently deletes the account. Blocks if the user owns orgs with other members.",
+    tags: ["User"],
+    responses: {
+      200: { description: "Account deleted" },
+      400: { description: "User owns orgs with other members" },
+      401: { description: "Unauthenticated" },
+      404: { description: "User not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

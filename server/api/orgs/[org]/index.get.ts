@@ -50,3 +50,19 @@ export default defineEventHandler(async (event) => {
 
   return { organization: { ...membership.org, role: membership.role, isActive: membership.isActive } }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Get organization",
+    description: "Switches the active org to the given one and returns its details and full membership list.",
+    tags: ["Organizations"],
+    parameters: [{ in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" }],
+    responses: {
+      200: { description: "Organization with members and current user role" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role" },
+      404: { description: "Organization not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

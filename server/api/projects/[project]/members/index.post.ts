@@ -70,3 +70,38 @@ export default defineEventHandler(async (event) => {
 
   return { membership: newMembership }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Add project member",
+    description: "Adds an existing org member to the project. Requires project OWNER or ADMIN role.",
+    tags: ["Projects"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["userId", "role"],
+            properties: {
+              userId: { type: "string" },
+              role: { type: "string", enum: ["ADMIN", "MEMBER"] },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Member added" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role or user not in org" },
+      404: { description: "Project or user not found" },
+      409: { description: "User is already a project member" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

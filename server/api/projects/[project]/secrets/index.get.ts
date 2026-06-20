@@ -84,3 +84,22 @@ export default defineEventHandler(async (event) => {
 
   return { decryptedSecrets }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "List secrets",
+    description: "Returns all decrypted secrets for the project. Accepts either a session cookie (user auth) or a `Bearer st_*` service token. Service tokens only return values for their allowed environments.",
+    tags: ["Secrets"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+      { in: "header", name: "Authorization", required: false, schema: { type: "string" }, description: "Bearer token — service token auth (e.g. `Bearer st_...`). Falls back to session if omitted." },
+    ],
+    responses: {
+      200: { description: "Decrypted secrets, filtered by environment if using a service token" },
+      401: { description: "Unauthenticated or invalid/expired service token" },
+      403: { description: "Insufficient role" },
+      404: { description: "Project not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

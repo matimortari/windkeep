@@ -24,3 +24,20 @@ export default defineEventHandler(async (event) => {
 
   return { invitations }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "List pending invitations",
+    description: "Returns all pending (unaccepted) invitations for the organization. Requires OWNER or ADMIN.",
+    tags: ["Invitations"],
+    parameters: [
+      { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
+    ],
+    responses: {
+      200: { description: "List of pending invitations" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

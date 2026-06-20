@@ -61,3 +61,37 @@ export default defineEventHandler(async (event) => {
 
   return { membership: updatedMembership }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Update member role",
+    description: "Updates a member's role. Cannot change owner roles or your own role. Requires OWNER or ADMIN.",
+    tags: ["Organizations"],
+    parameters: [
+      { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
+      { in: "path", name: "id", required: true, schema: { type: "string" }, description: "Member user ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["role"],
+            properties: {
+              role: { type: "string", enum: ["ADMIN", "MEMBER"] },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Updated membership with user details" },
+      400: { description: "Validation error or attempting to change own role" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role or attempting to change an owner's role" },
+      404: { description: "Member not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

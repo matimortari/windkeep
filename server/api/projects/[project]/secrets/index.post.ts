@@ -82,3 +82,50 @@ export default defineEventHandler(async (event) => {
 
   return { decryptedSecret }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Create secret",
+    description: "Creates a new secret with optional per-environment values. Values are encrypted at rest. Seeds initial history for each value. Requires project OWNER or ADMIN.",
+    tags: ["Secrets"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["key"],
+            properties: {
+              key: { type: "string" },
+              description: { type: "string" },
+              tags: { type: "array", items: { type: "string" } },
+              values: {
+                type: "array",
+                items: {
+                  type: "object",
+                  required: ["environment", "value"],
+                  properties: {
+                    environment: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"] },
+                    value: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Created secret with decrypted values" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role" },
+      404: { description: "Project not found" },
+      409: { description: "A secret with this key already exists in the project" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

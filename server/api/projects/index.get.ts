@@ -40,3 +40,16 @@ export default defineEventHandler(async (event) => {
 
   return { projects }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "List projects",
+    description: "Returns all projects the user is a member of within their active organization.",
+    tags: ["Projects"],
+    responses: {
+      200: { description: "List of projects with members and secret counts" },
+      401: { description: "Unauthenticated" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

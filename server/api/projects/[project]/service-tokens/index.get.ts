@@ -31,3 +31,21 @@ export default defineEventHandler(async (event) => {
 
   return { tokens }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "List service tokens",
+    description: "Returns all service tokens for the project. Requires project OWNER or ADMIN role.",
+    tags: ["Service Tokens"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+    ],
+    responses: {
+      200: { description: "List of service tokens (token hashes are never returned)" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role" },
+      404: { description: "Project not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

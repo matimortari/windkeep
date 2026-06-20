@@ -97,5 +97,42 @@ export default defineEventHandler(async (event) => {
   await deleteCached(CacheKeys.userProjects(sessionUser.id, existingProject.orgId))
 
   const { org: _org, ...project } = updatedProject
+
   return { project }
+})
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Update project",
+    description: "Updates project metadata. Name and slug must be unique within the org. Requires project OWNER role.",
+    tags: ["Projects"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              slug: { type: "string" },
+              description: { type: "string" },
+              website: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Updated project" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role — requires project OWNER" },
+      404: { description: "Project not found" },
+      409: { description: "Name or slug already taken in the organization" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
 })

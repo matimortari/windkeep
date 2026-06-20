@@ -39,3 +39,17 @@ export default defineEventHandler(async (event) => {
 
   return { user }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Get current user",
+    description: "Returns the authenticated user's profile, org and project memberships.",
+    tags: ["User"],
+    responses: {
+      200: { description: "User profile with memberships" },
+      401: { description: "Unauthenticated" },
+      404: { description: "User not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

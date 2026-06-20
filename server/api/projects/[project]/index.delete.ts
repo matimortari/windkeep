@@ -44,7 +44,26 @@ export default defineEventHandler(async (event) => {
   })
 
   await db.project.delete({ where: { id: projectId } })
+
   await deleteCached(CacheKeys.userProjects(sessionUser.id, projectData.orgId), CacheKeys.projectSecrets(projectId))
 
   return { success: true, message: "Project deleted successfully" }
+})
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Delete project",
+    description: "Permanently deletes the project and all related data. Requires project OWNER role.",
+    tags: ["Projects"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+    ],
+    responses: {
+      200: { description: "Project deleted" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role — requires project OWNER" },
+      404: { description: "Project not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
 })

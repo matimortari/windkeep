@@ -100,3 +100,29 @@ export default defineEventHandler(async (event) => {
 
   return { data }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Get audit logs",
+    description: "Returns paginated audit logs for the organization with filter options. Requires OWNER or ADMIN role.",
+    tags: ["Organizations"],
+    parameters: [
+      { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
+      { in: "query", name: "page", schema: { type: "integer" } },
+      { in: "query", name: "limit", schema: { type: "integer" } },
+      { in: "query", name: "projectId", schema: { type: "string" } },
+      { in: "query", name: "action", schema: { type: "string" } },
+      { in: "query", name: "userId", schema: { type: "string" } },
+      { in: "query", name: "serviceTokenId", schema: { type: "string" } },
+      { in: "query", name: "startDate", schema: { type: "string", format: "date-time" } },
+      { in: "query", name: "endDate", schema: { type: "string", format: "date-time" } },
+    ],
+    responses: {
+      200: { description: "Paginated audit logs with available filter options" },
+      400: { description: "Invalid query parameters" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role — requires OWNER or ADMIN" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})
