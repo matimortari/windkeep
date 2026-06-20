@@ -21,3 +21,19 @@ export default defineEventHandler(async (event) => {
 
   return { success: true, message: "Organization deleted successfully" }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Delete organization",
+    description: "Permanently deletes the organization and all related data. Requires OWNER role.",
+    tags: ["Organizations"],
+    parameters: [{ in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" }],
+    responses: {
+      200: { description: "Organization deleted" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role — requires OWNER" },
+      404: { description: "Organization not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

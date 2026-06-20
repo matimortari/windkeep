@@ -50,3 +50,23 @@ export default defineEventHandler(async (event) => {
 
   return { success: true, message: "Member removed successfully" }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Remove or leave organization",
+    description: "Removes a member from the org. Members can remove themselves (leave). Admins can remove members. Owners cannot be removed — transfer ownership first.",
+    tags: ["Organizations"],
+    parameters: [
+      { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
+      { in: "path", name: "id", required: true, schema: { type: "string" }, description: "Member user ID" },
+    ],
+    responses: {
+      200: { description: "Member removed" },
+      400: { description: "Cannot remove owner — transfer ownership first" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role or attempting to remove an owner" },
+      404: { description: "Member not found in organization" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

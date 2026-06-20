@@ -40,3 +40,23 @@ export default defineEventHandler(async (event) => {
 
   return { success: true, message: "Invitation revoked successfully" }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Revoke invitation",
+    description: "Deletes a pending invitation. Cannot revoke already-accepted invitations. Requires OWNER or ADMIN.",
+    tags: ["Invitations"],
+    parameters: [
+      { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
+      { in: "path", name: "id", required: true, schema: { type: "string" }, description: "Invitation ID" },
+    ],
+    responses: {
+      200: { description: "Invitation revoked" },
+      400: { description: "Invitation already accepted" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role" },
+      404: { description: "Invitation not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

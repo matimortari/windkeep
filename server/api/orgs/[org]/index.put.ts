@@ -74,3 +74,38 @@ export default defineEventHandler(async (event) => {
 
   return { updatedOrg }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Update organization",
+    description: "Updates org metadata. Optionally rotates the encryption key. Requires OWNER role.",
+    tags: ["Organizations"],
+    parameters: [{ in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" }],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              description: { type: "string" },
+              website: { type: "string" },
+              rotateEncryptionKey: { type: "boolean" },
+              encryptionMode: { type: "string", enum: ["AUTO", "MANUAL"] },
+              encryptionKey: { type: "string", description: "Required when encryptionMode is MANUAL" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Updated organization" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role — requires OWNER" },
+      404: { description: "Organization not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

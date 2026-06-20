@@ -62,3 +62,38 @@ export default defineEventHandler(async (event) => {
 
   return { serviceToken, rawToken, message: "Store this token securely. You will not be able to see it again." }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Create service token",
+    description: "Creates a new service token scoped to one or more environments. The raw token is returned only once — store it securely. Requires project OWNER or ADMIN.",
+    tags: ["Service Tokens"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["name", "environment"],
+            properties: {
+              name: { type: "string" },
+              environment: { type: "array", items: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"] } },
+              expiresInDays: { type: "integer", description: "Omit for a non-expiring token" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Token created. Returns `rawToken` — only shown once." },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role" },
+      404: { description: "Project not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

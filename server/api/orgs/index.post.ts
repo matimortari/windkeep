@@ -49,3 +49,35 @@ export default defineEventHandler(async (event) => {
 
   return { organization }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Create organization",
+    description: "Creates a new organization and sets the creator as OWNER. Deactivates all other org memberships for the user.",
+    tags: ["Organizations"],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["name"],
+            properties: {
+              name: { type: "string" },
+              description: { type: "string" },
+              website: { type: "string" },
+              encryptionMode: { type: "string", enum: ["AUTO", "MANUAL"] },
+              encryptionKey: { type: "string", description: "Required when encryptionMode is MANUAL" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Organization created" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

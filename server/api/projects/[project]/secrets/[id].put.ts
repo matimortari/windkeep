@@ -118,3 +118,49 @@ export default defineEventHandler(async (event) => {
 
   return { decryptedSecret }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Update secret",
+    description: "Updates a secret's metadata and/or per-environment values. Values are encrypted at rest and history is tracked per environment. Removing an environment from the values array deletes it. Requires project OWNER or ADMIN.",
+    tags: ["Secrets"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+      { in: "path", name: "id", required: true, schema: { type: "string" }, description: "Secret ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              description: { type: "string" },
+              tags: { type: "array", items: { type: "string" } },
+              values: {
+                type: "array",
+                description: "Full desired state — environments omitted from this array will be deleted",
+                items: {
+                  type: "object",
+                  required: ["environment", "value"],
+                  properties: {
+                    environment: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"] },
+                    value: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Updated secret with decrypted values" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role or secret belongs to a different project" },
+      404: { description: "Secret not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `user:update:${sessionUser.id}`, 30, 60 * 60 * 1000)
+  await enforceRateLimit(event, `user:update:${sessionUser.id}`)
 
   const body = await readBody(event)
   const result = updateUserSchema.safeParse(body)
@@ -39,4 +39,32 @@ export default defineEventHandler(async (event) => {
   await deleteCached(CacheKeys.userData(sessionUser.id))
 
   return { updatedUser, ...(apiTokenToUpdate && { newApiToken: apiTokenToUpdate }) }
+})
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Update current user",
+    description: "Updates the user's name and/or regenerates their API token. Returns the new plaintext token only once when regenerated.",
+    tags: ["User"],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              regenerateApiToken: { type: "boolean" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Updated user, optionally with `newApiToken`" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
 })

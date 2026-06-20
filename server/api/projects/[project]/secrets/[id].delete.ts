@@ -48,3 +48,22 @@ export default defineEventHandler(async (event) => {
 
   return { success: true, message: `Secret deleted successfully` }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Delete secret",
+    description: "Permanently deletes a secret and all its environment values and history. Requires project OWNER or ADMIN.",
+    tags: ["Secrets"],
+    parameters: [
+      { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
+      { in: "path", name: "id", required: true, schema: { type: "string" }, description: "Secret ID" },
+    ],
+    responses: {
+      200: { description: "Secret deleted" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role or secret belongs to a different project" },
+      404: { description: "Secret not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

@@ -80,3 +80,37 @@ export default defineEventHandler(async (event) => {
 
   return { invitation, inviteUrl: `${getInviteBaseUrl(event)}/onboarding?token=${token}&org=${orgId}` }
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Create invitation",
+    description: "Sends an invitation to an email address. Re-inviting an existing pending invite resets its token and expiry. Expires in 12 hours. Requires OWNER or ADMIN.",
+    tags: ["Invitations"],
+    parameters: [
+      { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["email", "role"],
+            properties: {
+              email: { type: "string", format: "email" },
+              role: { type: "string", enum: ["ADMIN", "MEMBER"] },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Invitation created, returns invitation and `inviteUrl`" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient role" },
+      409: { description: "User is already a member" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

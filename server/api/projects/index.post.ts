@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = createProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid input" })
+    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
   await requireRole(sessionUser.id, { type: "org", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
@@ -59,4 +59,36 @@ export default defineEventHandler(async (event) => {
   await deleteCached(CacheKeys.userProjects(sessionUser.id, result.data.orgId))
 
   return { project: newProject }
+})
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Create project",
+    description: "Creates a new project in the given organization. Creator is set as OWNER. Requires OWNER or ADMIN org role.",
+    tags: ["Projects"],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["name", "orgId"],
+            properties: {
+              name: { type: "string" },
+              description: { type: "string" },
+              website: { type: "string" },
+              orgId: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Project created" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthenticated" },
+      403: { description: "Insufficient org role" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
 })
