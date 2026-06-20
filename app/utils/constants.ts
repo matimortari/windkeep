@@ -131,14 +131,6 @@ export const ENVIRONMENTS: { value: Environment, label: string }[] = [
   { value: "PRODUCTION", label: "Production" },
 ]
 
-// REST method label styles for API documentation display
-export const REST_METHOD_LABELS: Record<string, string> = {
-  GET: "text-xs font-semibold text-[#0ec187]",
-  POST: "text-xs font-semibold text-[#74a2e7]",
-  PUT: "text-xs font-semibold text-[#cef1a7]",
-  DELETE: "text-xs font-semibold text-[#e99795]",
-}
-
 // OAuth providers
 export const OAUTH_PROVIDERS: { name: string, label: string, icon: string }[] = [
   { name: "google", label: "Sign In With Google", icon: "simple-icons:google" },
