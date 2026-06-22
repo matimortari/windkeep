@@ -87,8 +87,7 @@ function handleViewHistory(secret: Secret) {
 }
 
 function handleDeleteSecret(key: string) {
-  const secret = displayedSecrets.value.find(s => s.key === key)
-  if (!secret) {
+  if (!displayedSecrets.value.some(s => s.key === key)) {
     return
   }
 

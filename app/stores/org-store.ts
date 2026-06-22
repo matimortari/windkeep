@@ -223,11 +223,11 @@ export const useOrgStore = defineStore("org", () => {
     try {
       const res = await $fetch<{ invitation: Invitation, inviteUrl: string }>(`/api/orgs/${orgId}/invitations`, { method: "POST", body: data, credentials: "include" })
       const idx = invitations.value.findIndex(i => i.id === res.invitation.id)
-      if (idx !== -1) {
-        invitations.value[idx] = res.invitation
+      if (idx === -1) {
+        invitations.value.push(res.invitation)
       }
       else {
-        invitations.value.push(res.invitation)
+        invitations.value[idx] = res.invitation
       }
 
       toast.success("Invitation created successfully")
@@ -291,7 +291,12 @@ export const useOrgStore = defineStore("org", () => {
       const queryParams = new URLSearchParams()
       for (const [key, value] of Object.entries(params || currentAuditFilters.value)) {
         if (value !== undefined && value !== null) {
-          queryParams.append(key, String(value))
+          if (Array.isArray(value)) {
+            value.forEach(item => queryParams.append(key, String(item)))
+          }
+          else {
+            queryParams.append(key, String(value))
+          }
         }
       }
 

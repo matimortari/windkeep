@@ -1,5 +1,8 @@
+import type { ComputedRef, Ref } from "vue"
+import { computed, readonly, ref } from "vue"
+
 export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | ComputedRef<T[]>) {
-  const sortKey = ref<keyof T | string | null>(null)
+  const sortKey = ref<string | null>(null)
   const sortDirection = ref<"asc" | "desc" | null>(null)
 
   const sortedData = computed(() => {
@@ -8,8 +11,8 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     }
 
     return data.value.toSorted((a, b) => {
-      const A = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], a)
-      const B = sortKey.value.toString().split(".").reduce((cur: any, k: string) => cur?.[k], b)
+      const A = sortKey.value?.split(".").reduce((cur: any, k: string) => cur?.[k], a)
+      const B = sortKey.value?.split(".").reduce((cur: any, k: string) => cur?.[k], b)
 
       if (A == null && B == null) {
         return 0
@@ -41,7 +44,7 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     })
   })
 
-  function toggleSort(key: keyof T | string) {
+  function toggleSort(key: string) {
     if (sortKey.value === key) {
       if (sortDirection.value === "asc") {
         sortDirection.value = "desc"
@@ -57,27 +60,24 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     }
   }
 
-  function setSort(key: keyof T | string, direction: "asc" | "desc" | null) {
+  function setSort(key: string, direction: "asc" | "desc" | null) {
     sortKey.value = key
     sortDirection.value = direction
   }
 
-  function isSorted(key: keyof T | string): "asc" | "desc" | null {
+  function isSorted(key: string): "asc" | "desc" | null {
     return sortKey.value === key ? sortDirection.value : null
   }
 
-  function getSortIcon(key: keyof T | string) {
-    return isSorted(key) // "asc" | "desc" | null
+  function getSortIcon(key: string) {
+    return isSorted(key)
   }
 
-  function getSortIconName(key: keyof T | string) {
-    const state = getSortIcon(key)
-
-    if (state === "asc") {
+  function getSortIconName(key: string) {
+    if (getSortIcon(key) === "asc") {
       return "ph:caret-up-bold"
     }
-
-    if (state === "desc") {
+    if (getSortIcon(key) === "desc") {
       return "ph:caret-down-bold"
     }
 

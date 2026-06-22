@@ -50,7 +50,7 @@ export function hashToken(token: string): string {
  * Generates a unique slug based on the provided base string.
  */
 export async function generateSlug(base: string, orgId: string): Promise<string> {
-  const cleaned = base.normalize("NFKD").replace(/[\u0300-\u036F]/g, "").toLowerCase().replace(/[^\w-]/g, "").replace(/[-\s]+/g, "-").replace(/^-+|-+$/g, "").substring(0, 50)
+  const cleaned = base.normalize("NFKD").replace(/[\u0300-\u036F]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+/, "").replace(/-+$/, "").substring(0, 50)
   for (let attempt = 0; attempt < 10; attempt++) {
     const slug = attempt === 0 ? cleaned : `${cleaned}-${crypto.randomUUID().slice(0, 6)}`
     const exists = await db.project.findUnique({ where: { slug_orgId: { slug, orgId } }, select: { id: true } })
@@ -59,7 +59,7 @@ export async function generateSlug(base: string, orgId: string): Promise<string>
     }
   }
 
-  return crypto.randomUUID().replace(/-/g, "").slice(0, 12)
+  return crypto.randomUUID().replaceAll("-", "").slice(0, 12)
 }
 
 /**
