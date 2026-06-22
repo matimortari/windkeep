@@ -42,18 +42,6 @@ export default defineEventHandler(async (event) => {
     await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
   }
 
-  // Only use cache for full session responses since token responses are environment-scoped
-  if (!allowedEnvironments) {
-    const cacheKey = CacheKeys.projectSecrets(projectId)
-    const cached = await getCached<any>(cacheKey)
-    if (cached) {
-      if (typeof cached === "string") {
-        return { decryptedSecrets: JSON.parse(await decrypt(project.orgId, cached)) }
-      }
-      await deleteCached(cacheKey)
-    }
-  }
-
   const secrets = await db.secret.findMany({
     where: { projectId },
     select: {
@@ -77,10 +65,6 @@ export default defineEventHandler(async (event) => {
     ...secret,
     values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))),
   })))
-  if (!allowedEnvironments) {
-    const cacheKey = CacheKeys.projectSecrets(projectId)
-    await setCached(cacheKey, await encrypt(project.orgId, JSON.stringify(decryptedSecrets)), CACHE_TTL.SHORT)
-  }
 
   return { decryptedSecrets }
 })

@@ -16,12 +16,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const invitation = await db.invitation.findUnique({ where: { token: result.data.token }, include: { org: { select: { id: true, name: true } } } })
+  const invitation = await db.invitation.findFirst({ where: { token: result.data.token, orgId }, include: { org: { select: { id: true, name: true } } } })
   if (!invitation || invitation.acceptedAt) {
     throw createError({ status: 404, statusText: "Invitation not found, expired, or already used" })
-  }
-  if (invitation.orgId !== orgId) {
-    throw createError({ status: 403, statusText: "Invitation does not belong to this organization" })
   }
   if (invitation.expiresAt < new Date()) {
     throw createError({ status: 410, statusText: "Invitation has expired" })

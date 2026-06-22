@@ -24,7 +24,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, statusText: "Project not found" })
   }
 
-  // Create audit log before deletion
+  await db.project.delete({ where: { id: projectId } })
+
   await createAuditLog({
     event,
     userId: sessionUser.id,
@@ -43,9 +44,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await db.project.delete({ where: { id: projectId } })
-
-  await deleteCached(CacheKeys.userProjects(sessionUser.id, projectData.orgId), CacheKeys.projectSecrets(projectId))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id, projectData.orgId))
 
   return { success: true, message: "Project deleted successfully" }
 })

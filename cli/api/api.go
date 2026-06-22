@@ -157,12 +157,12 @@ func (c *Client) Delete(endpoint string) error {
 
 func (c *Client) GetUser() (*User, error) {
 	var response struct {
-		UserData User `json:"userData"`
+		User User `json:"user"`
 	}
 	if err := c.Get("/api/user", &response); err != nil {
 		return nil, err
 	}
-	return &response.UserData, nil
+	return &response.User, nil
 }
 
 func (c *Client) GetOrganization(orgID string) (*Organization, error) {
@@ -240,19 +240,23 @@ func (c *Client) GetSecrets(projectID string) ([]Secret, error) {
 }
 
 func (c *Client) CreateSecret(projectID string, req CreateSecretRequest) (*Secret, error) {
-	var secret Secret
-	if err := c.Post("/api/projects/"+projectID+"/secrets", req, &secret); err != nil {
+	var response struct {
+		DecryptedSecret Secret `json:"decryptedSecret"`
+	}
+	if err := c.Post("/api/projects/"+projectID+"/secrets", req, &response); err != nil {
 		return nil, err
 	}
-	return &secret, nil
+	return &response.DecryptedSecret, nil
 }
 
 func (c *Client) UpdateSecret(projectID, secretID string, req UpdateSecretRequest) (*Secret, error) {
-	var secret Secret
-	if err := c.Put("/api/projects/"+projectID+"/secrets/"+secretID, req, &secret); err != nil {
+	var response struct {
+		DecryptedSecret Secret `json:"decryptedSecret"`
+	}
+	if err := c.Put("/api/projects/"+projectID+"/secrets/"+secretID, req, &response); err != nil {
 		return nil, err
 	}
-	return &secret, nil
+	return &response.DecryptedSecret, nil
 }
 
 func (c *Client) DeleteSecret(projectID, secretID string) error {
@@ -263,7 +267,7 @@ func (c *Client) GetSecretHistory(projectID, secretID string) ([]EnvironmentHist
 	var response struct {
 		History []EnvironmentHistory `json:"history"`
 	}
-	if err := c.Get("/api/projects/"+projectID+"/secrets/"+secretID+"/history", &response); err != nil {
+	if err := c.Get("/api/projects/"+projectID+"/secrets/history/"+secretID, &response); err != nil {
 		return nil, err
 	}
 	return response.History, nil

@@ -21,7 +21,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 403, statusText: "Secret does not belong to this project" })
   }
 
-  // Create audit log before deletion
+  await db.secret.delete({ where: { id: secretId } })
+
   await createAuditLog({
     event,
     userId: sessionUser.id,
@@ -41,9 +42,6 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await db.secret.delete({ where: { id: secretId } })
-
-  await deleteCached(CacheKeys.projectSecrets(projectId))
   await deleteCached(CacheKeys.userProjects(sessionUser.id, existingSecret.project.org.id))
 
   return { success: true, message: `Secret deleted successfully` }

@@ -7,7 +7,7 @@ const keyCacheTtlMs = 10 * 60 * 1000
 
 // Derive a stable 32-byte key from the master secret
 const wrappingKey = crypto.createHash("sha256").update(masterKeySecret).digest()
-const orgKeyCache = new Map<string, { key: Buffer, expiresAt: number }>()
+const orgKeyCache = new Map<string, { key: Buffer, version: number, expiresAt: number }>()
 
 function parseEncryptedData(encryptedData: string) {
   const [version, ivHex, authTagHex, encryptedHex] = encryptedData.split(":")
@@ -53,13 +53,14 @@ async function getOrgDataKey(orgId: string): Promise<Buffer> {
     return cached.key
   }
 
-  const org = await db.organization.findUnique({ where: { id: orgId }, select: { wrappedEncryptionKey: true } })
+  const org = await db.organization.findUnique({ where: { id: orgId }, select: { wrappedEncryptionKey: true, encryptionKeyVersion: true } })
   if (!org?.wrappedEncryptionKey) {
     throw new Error("Organization encryption key not found")
   }
 
   const key = unwrapOrgKey(org.wrappedEncryptionKey)
-  orgKeyCache.set(orgId, { key, expiresAt: now + keyCacheTtlMs })
+  orgKeyCache.set(orgId, { key, version: org.encryptionKeyVersion, expiresAt: now + keyCacheTtlMs })
+
   return key
 }
 
@@ -100,7 +101,7 @@ export async function rotateOrganizationKey(orgId: string, manualKey?: string) {
   ]
 
   await db.$transaction(updates)
-  orgKeyCache.set(orgId, { key: newKey, expiresAt: Date.now() + keyCacheTtlMs })
+  orgKeyCache.delete(orgId)
 }
 
 export async function encrypt(orgId: string, input: string): Promise<string> {
