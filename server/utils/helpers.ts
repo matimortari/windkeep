@@ -76,6 +76,16 @@ export async function requireRole(userId: string, scope: { type: "org", orgId: s
     membership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId, orgId: scope.orgId } } })
   }
   else {
+    const project = await db.project.findUnique({ where: { id: scope.projectId }, select: { orgId: true } })
+    if (!project) {
+      throw createError({ status: 404, statusText: "Project not found" })
+    }
+
+    const orgMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId, orgId: project.orgId } } })
+    if (!orgMembership) {
+      throw createError({ status: 403, statusText: "Forbidden: insufficient permissions" })
+    }
+
     membership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })
   }
   if (!membership || !roles.includes(membership.role)) {

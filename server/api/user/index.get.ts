@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
       createdAt: true,
       updatedAt: true,
       orgMemberships: {
-        select: { role: true, isActive: true, org: { select: { id: true, name: true } } },
+        select: { orgId: true, role: true, isActive: true, org: { select: { id: true, name: true } } },
       },
       projectMemberships: {
         select: {

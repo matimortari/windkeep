@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
 
   // Rate limit: 30 requests per hour per user
-  await enforceRateLimit(event, `user:update:${sessionUser.id}`)
+  await enforceRateLimit(event, `user:update:${sessionUser.id}`, 30)
 
   const body = await readBody(event)
   const result = updateUserSchema.safeParse(body)

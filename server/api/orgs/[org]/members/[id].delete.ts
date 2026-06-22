@@ -27,7 +27,10 @@ export default defineEventHandler(async (event) => {
     await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
   }
 
-  await db.orgMembership.delete({ where: { userId_orgId: { userId: memberId, orgId } } })
+  await db.$transaction([
+    db.projectMembership.deleteMany({ where: { userId: memberId, project: { orgId } } }),
+    db.orgMembership.delete({ where: { userId_orgId: { userId: memberId, orgId } } }),
+  ])
 
   await createAuditLog({
     event,
