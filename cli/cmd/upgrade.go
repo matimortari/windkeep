@@ -43,8 +43,12 @@ var upgradeCmd = &cobra.Command{
 			return fmt.Errorf("failed to get executable path: %w", err)
 		}
 
-		tempPath := exePath + ".tmp"
-		tempFile, err := os.Create(tempPath)
+		targetPath := exePath + ".new"
+		if runtime.GOOS != "windows" {
+			targetPath = exePath + ".tmp"
+		}
+
+		tempFile, err := os.Create(targetPath)
 		if err != nil {
 			return fmt.Errorf("failed to create temp file: %w", err)
 		}
@@ -52,7 +56,7 @@ var upgradeCmd = &cobra.Command{
 
 		_, err = io.Copy(tempFile, resp.Body)
 		if err != nil {
-			os.Remove(tempPath)
+			os.Remove(targetPath)
 			return fmt.Errorf("failed to write binary: %w", err)
 		}
 
@@ -60,21 +64,23 @@ var upgradeCmd = &cobra.Command{
 
 		// Make it executable on Unix systems
 		if runtime.GOOS != "windows" {
-			if err := os.Chmod(tempPath, 0755); err != nil {
-				os.Remove(tempPath)
+			if err := os.Chmod(targetPath, 0755); err != nil {
+				os.Remove(targetPath)
 				return fmt.Errorf("failed to make binary executable: %w", err)
 			}
+
+			if err := os.Rename(targetPath, exePath); err != nil {
+				os.Remove(targetPath)
+				return fmt.Errorf("failed to replace binary: %w", err)
+			}
+
+			ui.PrintSuccess("WindKeep CLI upgraded successfully!")
+			ui.PrintInfo("Run %s to verify", ui.Highlight("windkeep --version"))
+			return nil
 		}
 
-		// Replace the current binary with the new one
-		if err := os.Rename(tempPath, exePath); err != nil {
-			os.Remove(tempPath)
-			return fmt.Errorf("failed to replace binary: %w", err)
-		}
-
-		ui.PrintSuccess("WindKeep CLI upgraded successfully!")
-		ui.PrintInfo("Run %s to verify", ui.Highlight("windkeep --version"))
-
+		ui.PrintSuccess("Download complete.")
+		ui.PrintInfo("Run %s again to finish installing the upgrade on Windows.", ui.Highlight("windkeep --version"))
 		return nil
 	},
 }

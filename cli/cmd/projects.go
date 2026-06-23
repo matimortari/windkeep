@@ -67,11 +67,15 @@ var projectsListCmd = &cobra.Command{
 
 		table := ui.CreateTable([]string{"ID", "Name", "Slug", "Secrets"})
 		for _, proj := range orgProjects {
+			secretCount := 0
+			if proj.Count != nil {
+				secretCount = proj.Count.Secrets
+			}
 			table.Append([]string{
 				proj.ID,
 				proj.Name,
 				proj.Slug,
-				fmt.Sprintf("%d", len(proj.Secrets)),
+				fmt.Sprintf("%d", secretCount),
 			})
 		}
 		table.Render()

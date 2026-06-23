@@ -11,13 +11,17 @@ import (
 )
 
 func getActiveOrg(client *api.Client) (*api.OrgMembership, error) {
+	if cfg.ActiveOrgID == "" {
+		return nil, nil
+	}
+
 	user, err := client.GetUser()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
 	for _, membership := range user.OrgMemberships {
-		if membership.IsActive {
+		if membership.OrgID == cfg.ActiveOrgID {
 			return &membership, nil
 		}
 	}
@@ -88,6 +92,12 @@ var orgsCreateCmd = &cobra.Command{
 		ui.PrintSuccess("Organization '%s' created (ID: %s)", ui.Highlight(org.Name), ui.Info(org.ID))
 		ui.PrintSuccess("Set '%s' as active organization", org.Name)
 
+		cfg.ActiveOrgID = org.ID
+		cfg.ActiveOrgName = org.Name
+		if err := cfg.Save(); err != nil {
+			ui.PrintWarning("Failed to save active org to config: %v", err)
+		}
+
 		return nil
 	},
 }
@@ -153,11 +163,13 @@ var orgsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("failed to switch organization: %w", err)
 		}
 
-		// Clear active project since switching orgs
+		cfg.ActiveOrgID = org.ID
+		cfg.ActiveOrgName = org.Name
 		cfg.ActiveProjectSlug = ""
 		cfg.ActiveProjectName = ""
+		cfg.ActiveProjectID = ""
 		if err := cfg.Save(); err != nil {
-			ui.PrintWarning("Failed to clear active project: %v", err)
+			return fmt.Errorf("failed to save config: %w", err)
 		}
 
 		ui.PrintSuccess("Switched to organization '%s'", ui.Highlight(org.Name))
@@ -171,22 +183,23 @@ var orgsUpdateCmd = &cobra.Command{
 	Long:  `Update the name of the active organization.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		name := args[0]
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
-		activeOrg, err := getActiveOrg(client)
-		if err != nil {
-			return err
-		}
-		if activeOrg == nil {
+		if cfg.ActiveOrgID == "" {
 			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
 		}
 
-		org, err := client.UpdateOrganization(activeOrg.OrgID, api.UpdateOrgRequest{
+		name := args[0]
+		client := api.NewClient(config.APIURL, cfg.APIToken)
+
+		org, err := client.UpdateOrganization(cfg.ActiveOrgID, api.UpdateOrgRequest{
 			Name: name,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to update organization: %w", err)
+		}
+
+		cfg.ActiveOrgName = org.Name
+		if err := cfg.Save(); err != nil {
+			ui.PrintWarning("Failed to update config: %v", err)
 		}
 
 		ui.PrintSuccess("Organization updated to '%s'", ui.Highlight(org.Name))
