@@ -45,6 +45,10 @@ type Organization struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+type ProjectCount struct {
+	Secrets int `json:"secrets"`
+}
+
 type Project struct {
 	ID          string        `json:"id"`
 	Name        string        `json:"name"`
@@ -53,6 +57,7 @@ type Project struct {
 	OrgID       string        `json:"orgId"`
 	Org         *Organization `json:"org,omitempty"`
 	Secrets     []Secret      `json:"secrets,omitempty"`
+	Count       *ProjectCount `json:"_count,omitempty"`
 	CreatedAt   time.Time     `json:"createdAt"`
 	UpdatedAt   time.Time     `json:"updatedAt"`
 }

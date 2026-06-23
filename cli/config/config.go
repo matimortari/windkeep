@@ -13,6 +13,8 @@ const APIURL = "https://windkeep.up.railway.app"
 
 type Config struct {
 	APIToken          string `yaml:"api_token"`
+	ActiveOrgID       string `yaml:"active_org_id,omitempty"`
+	ActiveOrgName     string `yaml:"active_org_name,omitempty"`
 	ActiveProjectSlug string `yaml:"active_project_slug,omitempty"`
 	ActiveProjectID   string `yaml:"active_project_id,omitempty"`
 	ActiveProjectName string `yaml:"active_project_name,omitempty"`

@@ -37,6 +37,9 @@ func readVersionFromEnv(path string) (string, error) {
 			return strings.Trim(strings.TrimSpace(v), `"'`), nil
 		}
 	}
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
 	return "", fmt.Errorf("CLI_VERSION not found in .env")
 }
 

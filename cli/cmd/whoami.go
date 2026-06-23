@@ -25,19 +25,10 @@ var whoamiCmd = &cobra.Command{
 		fmt.Printf("Email: %s\n", ui.Info(user.Email))
 		fmt.Println()
 
-		var activeOrgName, activeOrgID string
-		for _, membership := range user.OrgMemberships {
-			if membership.IsActive {
-				activeOrgName = membership.Org.Name
-				activeOrgID = membership.OrgID
-				break
-			}
-		}
-
 		ui.PrintInfo("Active Context")
-		if activeOrgID != "" {
-			fmt.Printf("Organization: %s\n", ui.Highlight(activeOrgName))
-			fmt.Printf("ID:           %s\n", ui.Info(activeOrgID))
+		if cfg.ActiveOrgID != "" {
+			fmt.Printf("Organization: %s\n", ui.Highlight(cfg.ActiveOrgName))
+			fmt.Printf("ID:           %s\n", ui.Info(cfg.ActiveOrgID))
 		} else {
 			ui.PrintWarning("No active organization")
 		}
