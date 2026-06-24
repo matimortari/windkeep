@@ -246,6 +246,7 @@ export const useOrgStore = defineStore("org", () => {
 
   async function revokeInvite(orgId: string, inviteId: string) {
     loading.value = true
+
     try {
       await $fetch(`/api/orgs/${orgId}/invitations/${inviteId}`, { method: "DELETE", credentials: "include" })
       invitations.value = invitations.value.filter(i => i.id !== inviteId)

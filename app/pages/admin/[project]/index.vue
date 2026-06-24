@@ -239,12 +239,17 @@ onBeforeRouteLeave(() => {
 })
 
 // Get secrets and set page metadata when project changes
-watch(() => project.value?.id, async (id) => {
+watch(() => project.value?.id, async (id, prevId) => {
   if (!id) {
     return
   }
+  if (prevId && prevId !== id) {
+    pendingChanges.clear()
+    activeTagFilter.value = null
+    searchQuery.value = ""
+    allVisible.value = false
+  }
 
-  allVisible.value = false
   secrets.value = []
   await secretsStore.getProjectSecrets(id)
 
