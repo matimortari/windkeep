@@ -50,6 +50,7 @@ export const useSecretsStore = defineStore("secrets", () => {
 
   async function updateProjectSecret(projectId: string, secretId: string, data: UpdateSecretInput, silent = false) {
     loading.value = true
+
     try {
       const res = await $fetch<{ decryptedSecret: Secret }>(`/api/projects/${projectId}/secrets/${secretId}`, { method: "PUT", body: data, credentials: "include" })
       const index = secrets.value.findIndex(s => s.id === secretId)

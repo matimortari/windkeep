@@ -144,12 +144,18 @@ function handleSubmit() {
   const upserted = Object.entries(parsedEditorValues.value).filter(([key, value]) => {
     const current = currentEnvValues.value[key]
     return current === undefined || current !== value
-  }).map(([key, value]) => ({
-    key,
-    description: props.secrets.find(s => s.key === key)?.description ?? "",
-    projectId: props.projectId,
-    values: [{ environment: selectedEnv.value, value }],
-  }))
+  }).map(([key, value]) => {
+    const existingSecret = props.secrets.find(s => s.key === key)
+    const existingValues = existingSecret?.values ?? []
+    const mergedValues = [
+      ...existingValues
+        .filter(v => v.environment !== selectedEnv.value)
+        .map(v => ({ environment: v.environment, value: v.value })),
+      { environment: selectedEnv.value, value },
+    ]
+
+    return { key, description: existingSecret?.description ?? "", projectId: props.projectId, values: mergedValues }
+  })
 
   const removed = Object.keys(currentEnvValues.value).filter(key => !(key in parsedEditorValues.value)).map(key => ({ key, environment: selectedEnv.value }))
 
