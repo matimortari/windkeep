@@ -20,7 +20,12 @@ export default defineEventHandler(async (event) => {
       createdAt: true,
       updatedAt: true,
       orgMemberships: {
-        select: { orgId: true, role: true, isActive: true, org: { select: { id: true, name: true } } },
+        select: {
+          orgId: true,
+          role: true,
+          isActive: true,
+          org: { select: { id: true, name: true } },
+        },
       },
       projectMemberships: {
         select: {
@@ -43,10 +48,10 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Get current user",
-    description: "Returns the authenticated user's profile, org and project memberships.",
+    description: "Returns the authenticated user's profile, organization, and project memberships.",
     tags: ["User"],
     responses: {
-      200: { description: "User profile with memberships" },
+      200: { description: "User details, organization and project memberships" },
       401: { description: "Unauthenticated" },
       404: { description: "User not found" },
       429: { description: "Rate limit exceeded" },

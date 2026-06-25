@@ -45,14 +45,14 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Revoke service token",
-    description: "Permanently revokes a service token. Requires project OWNER or ADMIN.",
+    description: "Permanently revokes a service token. Requires project OWNER or ADMIN role.",
     tags: ["Service Tokens"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
       { in: "path", name: "id", required: true, schema: { type: "string" }, description: "Service token ID" },
     ],
     responses: {
-      200: { description: "Token revoked" },
+      200: { description: "Service token revoked" },
       401: { description: "Unauthenticated" },
       403: { description: "Insufficient role or token belongs to a different project" },
       404: { description: "Service token not found" },

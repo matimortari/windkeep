@@ -71,8 +71,8 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "Accept invitation",
-    description: "Accepts an invitation by token. The authenticated user's email must match the invitation. Sets the new org as active.",
+    summary: "Accept organization invitation",
+    description: "Accepts an invitation by token. The authenticated user's email must match the invitation. Sets the new organization membership as active.",
     tags: ["Invitations"],
     parameters: [
       { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
@@ -85,19 +85,19 @@ defineRouteMeta({
             type: "object",
             required: ["token"],
             properties: {
-              token: { type: "string" },
+              token: { type: "string", description: "Invitation token" },
             },
           },
         },
       },
     },
     responses: {
-      200: { description: "Joined organization, returns org and membership" },
+      200: { description: "Joined organization, returns organization and membership" },
       400: { description: "Validation error" },
       401: { description: "Unauthenticated" },
       403: { description: "Email mismatch or wrong organization" },
-      404: { description: "Invitation not found or already used" },
-      409: { description: "Already a member" },
+      404: { description: "Invitation not found in this organization or already used" },
+      409: { description: "Already a member of the organization" },
       410: { description: "Invitation expired" },
       429: { description: "Rate limit exceeded" },
     },

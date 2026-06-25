@@ -13,11 +13,11 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "Revoke API token",
+    summary: "Revoke user API token",
     description: "Permanently revokes the user's personal API token.",
     tags: ["User"],
     responses: {
-      200: { description: "Token revoked" },
+      200: { description: "Personal API token revoked" },
       401: { description: "Unauthenticated" },
       429: { description: "Rate limit exceeded" },
     },

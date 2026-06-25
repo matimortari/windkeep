@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Delete secret",
-    description: "Permanently deletes a secret and all its environment values and history. Requires project OWNER or ADMIN.",
+    description: "Permanently deletes a secret and all its environment values and history. Requires project OWNER or ADMIN role.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

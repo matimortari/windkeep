@@ -60,7 +60,7 @@ defineRouteMeta({
     responses: {
       200: { description: "Project deleted" },
       401: { description: "Unauthenticated" },
-      403: { description: "Insufficient role — requires project OWNER" },
+      403: { description: "Insufficient role" },
       404: { description: "Project not found" },
       429: { description: "Rate limit exceeded" },
     },

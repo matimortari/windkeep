@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Update project member role",
-    description: "Updates a member's role. Cannot change owner roles or your own role. Requires project OWNER or ADMIN.",
+    description: "Updates a project member's role. Cannot change owner roles or your own role. Requires project OWNER or ADMIN role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

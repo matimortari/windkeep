@@ -85,7 +85,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Create secret",
-    description: "Creates a new secret with optional per-environment values. Values are encrypted at rest. Seeds initial history for each value. Requires project OWNER or ADMIN.",
+    description: "Creates a new secret with optional per-environment values. Values are encrypted at rest. Seeds initial history for each value. Requires project OWNER or ADMIN role.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -98,17 +98,17 @@ defineRouteMeta({
             type: "object",
             required: ["key"],
             properties: {
-              key: { type: "string" },
-              description: { type: "string" },
-              tags: { type: "array", items: { type: "string" } },
+              key: { type: "string", description: "Secret key" },
+              description: { type: "string", description: "Secret description (optional)" },
+              tags: { type: "array", items: { type: "string" }, description: "Secret tags (optional)" },
               values: {
                 type: "array",
                 items: {
                   type: "object",
                   required: ["environment", "value"],
                   properties: {
-                    environment: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"] },
-                    value: { type: "string" },
+                    environment: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"], description: "Secret environment(s)" },
+                    value: { type: "string", description: "Secret value(s)" },
                   },
                 },
               },

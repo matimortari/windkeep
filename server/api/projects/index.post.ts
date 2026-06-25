@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Create project",
-    description: "Creates a new project in the given organization. Creator is set as OWNER. Requires OWNER or ADMIN org role.",
+    description: "Creates a new project in the given organization. Creator is set as OWNER. Requires OWNER or ADMIN organization role.",
     tags: ["Projects"],
     requestBody: {
       required: true,
@@ -74,10 +74,10 @@ defineRouteMeta({
             type: "object",
             required: ["name", "orgId"],
             properties: {
-              name: { type: "string" },
-              description: { type: "string" },
-              website: { type: "string" },
-              orgId: { type: "string" },
+              name: { type: "string", description: "Project name" },
+              description: { type: "string", description: "Project description (optional)" },
+              website: { type: "string", description: "Project website (optional)" },
+              orgId: { type: "string", description: "Organization ID" },
             },
           },
         },
@@ -87,7 +87,7 @@ defineRouteMeta({
       200: { description: "Project created" },
       400: { description: "Validation error" },
       401: { description: "Unauthenticated" },
-      403: { description: "Insufficient org role" },
+      403: { description: "Insufficient role" },
       429: { description: "Rate limit exceeded" },
     },
   },
