@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Create organization",
-    description: "Creates a new organization and sets the creator as OWNER. Deactivates all other org memberships for the user.",
+    description: "Creates a new organization and sets the creator as OWNER. Deactivates all other active organization memberships for the user.",
     tags: ["Organizations"],
     requestBody: {
       required: true,
@@ -63,11 +63,11 @@ defineRouteMeta({
             type: "object",
             required: ["name"],
             properties: {
-              name: { type: "string" },
-              description: { type: "string" },
-              website: { type: "string" },
-              encryptionMode: { type: "string", enum: ["AUTO", "MANUAL"] },
-              encryptionKey: { type: "string", description: "Required when encryptionMode is MANUAL" },
+              name: { type: "string", description: "Organization name" },
+              description: { type: "string", description: "Organization description (optional)" },
+              website: { type: "string", description: "Organization website (optional)" },
+              encryptionMode: { type: "string", enum: ["AUTO", "MANUAL"], description: "Encryption mode" },
+              encryptionKey: { type: "string", description: "Encryption key (required when encryptionMode is MANUAL)" },
             },
           },
         },

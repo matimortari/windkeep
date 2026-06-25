@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Update project",
-    description: "Updates project metadata. Name and slug must be unique within the org. Requires project OWNER role.",
+    description: "Updates project metadata. Name and slug must be unique within the organization. Requires project OWNER role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -116,20 +116,20 @@ defineRouteMeta({
           schema: {
             type: "object",
             properties: {
-              name: { type: "string" },
-              slug: { type: "string" },
-              description: { type: "string" },
-              website: { type: "string" },
+              name: { type: "string", description: "Project name" },
+              slug: { type: "string", description: "Project slug" },
+              description: { type: "string", description: "Project description (optional)" },
+              website: { type: "string", description: "Project website (optional)" },
             },
           },
         },
       },
     },
     responses: {
-      200: { description: "Updated project" },
+      200: { description: "Project updated" },
       400: { description: "Validation error" },
       401: { description: "Unauthenticated" },
-      403: { description: "Insufficient role — requires project OWNER" },
+      403: { description: "Insufficient role" },
       404: { description: "Project not found" },
       409: { description: "Name or slug already taken in the organization" },
       429: { description: "Rate limit exceeded" },

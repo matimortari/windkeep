@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Add project member",
-    description: "Adds an existing org member to the project. Requires project OWNER or ADMIN role.",
+    description: "Adds an existing organization member to the project. Requires project OWNER or ADMIN role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

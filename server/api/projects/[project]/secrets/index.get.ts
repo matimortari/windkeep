@@ -71,8 +71,8 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "List secrets",
-    description: "Returns all decrypted secrets for the project. Accepts either a session cookie (user auth) or a `Bearer st_*` service token. Service tokens only return values for their allowed environments.",
+    summary: "Get secrets",
+    description: "Returns all decrypted secrets for the project.Can be authenticated with a service token or session cookie. Service tokens only return values for their allowed environments.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Remove or leave project",
-    description: "Removes a member from the project. Members can remove themselves (leave). Owners cannot be removed — transfer ownership or delete the project first.",
+    description: "Removes a project member from the project. Members can remove themselves (leave). Owners cannot be removed, transfer ownership or delete the project first. Requires project OWNER or ADMIN role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -65,7 +65,7 @@ defineRouteMeta({
     ],
     responses: {
       200: { description: "Member removed" },
-      400: { description: "Cannot remove owner — transfer ownership or delete the project first" },
+      400: { description: "Cannot remove owner, transfer ownership or delete the project first" },
       401: { description: "Unauthenticated" },
       403: { description: "Insufficient role or attempting to remove an owner" },
       404: { description: "Member not found" },

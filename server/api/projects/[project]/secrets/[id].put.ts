@@ -121,7 +121,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Update secret",
-    description: "Updates a secret's metadata and/or per-environment values. Values are encrypted at rest and history is tracked per environment. Removing an environment from the values array deletes it. Requires project OWNER or ADMIN.",
+    description: "Updates a secret's metadata and/or per-environment values. Requires project OWNER or ADMIN role.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -134,17 +134,17 @@ defineRouteMeta({
           schema: {
             type: "object",
             properties: {
-              description: { type: "string" },
-              tags: { type: "array", items: { type: "string" } },
+              description: { type: "string", description: "Secret description (optional)" },
+              tags: { type: "array", items: { type: "string" }, description: "Secret tags (optional)" },
               values: {
                 type: "array",
-                description: "Full desired state — environments omitted from this array will be deleted",
+                description: "Full desired state. Environments omitted from this array will be deleted",
                 items: {
                   type: "object",
                   required: ["environment", "value"],
                   properties: {
-                    environment: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"] },
-                    value: { type: "string" },
+                    environment: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"], description: "Secret environment(s)" },
+                    value: { type: "string", description: "Secret value(s)" },
                   },
                 },
               },

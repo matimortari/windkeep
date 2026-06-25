@@ -83,8 +83,8 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "Create invitation",
-    description: "Sends an invitation to an email address. Re-inviting an existing pending invite resets its token and expiry. Expires in 12 hours. Requires OWNER or ADMIN.",
+    summary: "Create organization invitation",
+    description: "Sends an invitation to an email address. Re-inviting an existing pending invite resets its token and expiry. Expires in 12 hours. Requires organization OWNER or ADMIN role.",
     tags: ["Invitations"],
     parameters: [
       { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
@@ -97,19 +97,19 @@ defineRouteMeta({
             type: "object",
             required: ["email", "role"],
             properties: {
-              email: { type: "string", format: "email" },
-              role: { type: "string", enum: ["ADMIN", "MEMBER"] },
+              email: { type: "string", format: "email", description: "Invitee email address" },
+              role: { type: "string", enum: ["ADMIN", "MEMBER"], description: "Invitee role" },
             },
           },
         },
       },
     },
     responses: {
-      200: { description: "Invitation created, returns invitation and `inviteUrl`" },
+      200: { description: "Invitation created, returns invitation and invite URL" },
       400: { description: "Validation error" },
       401: { description: "Unauthenticated" },
       403: { description: "Insufficient role" },
-      409: { description: "User is already a member" },
+      409: { description: "Invitee is already a member of the organization" },
       429: { description: "Rate limit exceeded" },
     },
   },

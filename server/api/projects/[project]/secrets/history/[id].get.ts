@@ -46,8 +46,8 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "Get secret history",
-    description: "Returns the full value history for each environment of a secret, including who made each change. Values are decrypted. Requires any project role.",
+    summary: "Get secret value history",
+    description: "Returns the full value history for each environment of a secret, including who made each change.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

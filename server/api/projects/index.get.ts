@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "List projects",
+    summary: "Get projects",
     description: "Returns all projects the user is a member of within their active organization.",
     tags: ["Projects"],
     responses: {

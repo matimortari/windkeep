@@ -43,8 +43,8 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "Update current user",
-    description: "Updates the user's name and/or regenerates their API token. Returns the new plaintext token only once when regenerated.",
+    summary: "Update user details",
+    description: "Updates the user's details and/or regenerates their API token.",
     tags: ["User"],
     requestBody: {
       required: true,
@@ -53,15 +53,15 @@ defineRouteMeta({
           schema: {
             type: "object",
             properties: {
-              name: { type: "string" },
-              regenerateApiToken: { type: "boolean" },
+              name: { type: "string", description: "User name" },
+              regenerateApiToken: { type: "boolean", description: "Regenerate API token, returns the new plaintext token only once when regenerated" },
             },
           },
         },
       },
     },
     responses: {
-      200: { description: "Updated user, optionally with `newApiToken`" },
+      200: { description: "Updated user details" },
       400: { description: "Validation error" },
       401: { description: "Unauthenticated" },
       429: { description: "Rate limit exceeded" },

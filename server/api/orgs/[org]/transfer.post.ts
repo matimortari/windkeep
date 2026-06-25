@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Transfer ownership",
-    description: "Transfers OWNER role to another org member. Current owner is demoted to ADMIN. Requires OWNER role.",
+    description: "Transfers OWNER role to another organization member. Current owner is demoted to ADMIN. Requires organization OWNER role.",
     tags: ["Organizations"],
     parameters: [{ in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" }],
     requestBody: {
@@ -82,7 +82,7 @@ defineRouteMeta({
             type: "object",
             required: ["newOwnerId"],
             properties: {
-              newOwnerId: { type: "string" },
+              newOwnerId: { type: "string", description: "New owner user ID" },
             },
           },
         },
@@ -92,7 +92,7 @@ defineRouteMeta({
       200: { description: "Ownership transferred, returns new owner details" },
       400: { description: "Invalid input or cannot transfer to self" },
       401: { description: "Unauthenticated" },
-      403: { description: "Insufficient role — requires OWNER" },
+      403: { description: "Insufficient role" },
       404: { description: "New owner not found in organization" },
       429: { description: "Rate limit exceeded" },
     },
