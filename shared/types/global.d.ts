@@ -205,6 +205,22 @@ interface CalendarDay {
   isToday: boolean
 }
 
+type InlinePart = string | { code: string } | { strong: string } | { em: string } | { link: { href: string, text: string, external?: boolean } }
+
+interface CliSection {
+  title: string
+  paragraphs?: InlinePart[][]
+  note?: InlinePart[]
+  install?: { label: string, command: string }[]
+  examples?: { label?: string, command?: string, output?: string }[]
+  args?: { label: string, code: string, description: string }[]
+  flags?: { code: string, description: string }[]
+  list?: { label?: string, description?: string, commands?: string[] }[]
+  links?: { href: string, label: string, description: string }[]
+  downloads?: { href: string, label: string, description: string }[]
+  steps?: string[]
+}
+
 interface UIState {
   sidebar: boolean
   dialogs: {
@@ -216,13 +232,6 @@ interface UIState {
     history: boolean
     raw: boolean
   }
-}
-
-interface TocHeader {
-  id: string
-  text: string
-  method?: string
-  level: number
 }
 
 interface Toast {
