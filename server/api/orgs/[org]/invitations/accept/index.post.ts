@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ status: 400, statusText: "Organization ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
   // Rate limit: 20 requests per hour per user
@@ -13,23 +13,23 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = acceptInviteSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const invitation = await db.invitation.findFirst({ where: { token: result.data.token, orgId }, include: { org: { select: { id: true, name: true } } } })
   if (!invitation || invitation.acceptedAt) {
-    throw createError({ status: 404, statusText: "Invitation not found, expired, or already used" })
+    throw createError({ statusCode: 404, statusMessage: "Invitation not found, expired, or already used" })
   }
   if (invitation.expiresAt < new Date()) {
-    throw createError({ status: 410, statusText: "Invitation has expired" })
+    throw createError({ statusCode: 410, statusMessage: "Invitation has expired" })
   }
   if (invitation.email.toLowerCase() !== sessionUser.email.toLowerCase()) {
-    throw createError({ status: 403, statusText: "This invitation was sent to a different email address" })
+    throw createError({ statusCode: 403, statusMessage: "This invitation was sent to a different email address" })
   }
 
   const existingMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: sessionUser.id, orgId: invitation.orgId } } })
   if (existingMembership) {
-    throw createError({ status: 409, statusText: "You are already a member of this organization" })
+    throw createError({ statusCode: 409, statusMessage: "You are already a member of this organization" })
   }
 
   // Set the new membership as active and deactivate any existing active memberships
