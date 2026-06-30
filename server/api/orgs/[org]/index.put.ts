@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ status: 400, statusText: "Organization ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
   // Rate limit: 20 requests per hour per user
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateOrgSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
   const existingOrg = await db.organization.findUnique({
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     select: { name: true, description: true, website: true, encryptionKeyVersion: true, encryptionKeyUpdatedAt: true },
   })
   if (!existingOrg) {
-    throw createError({ status: 404, statusText: "Organization not found" })
+    throw createError({ statusCode: 404, statusMessage: "Organization not found" })
   }
 
   await db.organization.update({

@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ status: 400, statusText: "Project ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
   // Rate limit: 100 requests per hour per user
@@ -14,17 +14,17 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = createSecretSchema.safeParse({ ...body, projectId })
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   const existingSecret = await db.secret.findUnique({ where: { key_projectId: { key: result.data.key, projectId } } })
   if (existingSecret) {
-    throw createError({ status: 409, statusText: "A secret with this key already exists in the project" })
+    throw createError({ statusCode: 409, statusMessage: "A secret with this key already exists in the project" })
   }
 
   const project = await db.project.findUnique({ where: { id: projectId }, select: { orgId: true } })
   if (!project?.orgId) {
-    throw createError({ status: 404, statusText: "Project not found" })
+    throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
   const secretData: any = {

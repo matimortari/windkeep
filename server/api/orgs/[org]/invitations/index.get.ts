@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ status: 400, statusText: "Organization ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
   // Rate limit: 100 requests per hour per user

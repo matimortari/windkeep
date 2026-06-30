@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const orgId = getRouterParam(event, "org")
   const inviteId = getRouterParam(event, "id")
   if (!orgId || !inviteId) {
-    throw createError({ status: 400, statusText: "Organization ID and Invitation ID are required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID and Invitation ID are required" })
   }
 
   // Rate limit: 30 requests per hour per user
@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
 
   const invitation = await db.invitation.findUnique({ where: { id: inviteId }, include: { org: { select: { id: true, name: true } } } })
   if (!invitation || invitation.orgId !== orgId) {
-    throw createError({ status: 404, statusText: "Invitation not found in this organization" })
+    throw createError({ statusCode: 404, statusMessage: "Invitation not found in this organization" })
   }
 
   // Prevent deleting historical markers for members who accepted their invitations
   if (invitation.acceptedAt) {
-    throw createError({ status: 400, statusText: "Cannot revoke an invitation that has already been accepted" })
+    throw createError({ statusCode: 400, statusMessage: "Cannot revoke an invitation that has already been accepted" })
   }
 
   await db.invitation.delete({ where: { id: inviteId } })

@@ -3,12 +3,12 @@ import { createHash } from "node:crypto"
 export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ status: 400, statusText: "Project ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
   const project = await db.project.findUnique({ where: { id: projectId }, select: { orgId: true } })
   if (!project?.orgId) {
-    throw createError({ status: 404, statusText: "Project not found" })
+    throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
   // Determine auth method — service token (st_ prefix) or session user
@@ -24,10 +24,10 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!serviceToken || serviceToken.projectId !== projectId) {
-      throw createError({ status: 401, statusText: "Invalid service token" })
+      throw createError({ statusCode: 401, statusMessage: "Invalid service token" })
     }
     if (serviceToken.expiresAt && serviceToken.expiresAt < new Date()) {
-      throw createError({ status: 401, statusText: "Service token has expired" })
+      throw createError({ statusCode: 401, statusMessage: "Service token has expired" })
     }
 
     await db.serviceToken.update({ where: { id: serviceToken.id }, data: { lastUsedAt: new Date() } })

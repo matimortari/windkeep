@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ status: 400, statusText: "Organization ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
   // Rate limit: 100 requests per hour per user
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     endDate: query.endDate,
   })
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid query parameters" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid query parameters" })
   }
 
   const filterHash = JSON.stringify({ projectId: result.data.projectId, action: result.data.action, userId: result.data.userId, serviceTokenId: result.data.serviceTokenId, startDate: result.data.startDate, endDate: result.data.endDate })
