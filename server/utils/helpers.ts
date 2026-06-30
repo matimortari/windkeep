@@ -149,8 +149,6 @@ export function getInviteBaseUrl(_event: H3Event<EventHandlerRequest>): string {
 export async function getBinaryBlobUrl(binaryKey: string): Promise<string> {
   const baseUrl = requireEnv("R2_PUBLIC_URL")
   const BINARIES: Record<string, string> = {
-    "windkeep-darwin-amd64": `${baseUrl}/binaries/windkeep-darwin-amd64`,
-    "windkeep-darwin-arm64": `${baseUrl}/binaries/windkeep-darwin-arm64`,
     "windkeep-linux-amd64": `${baseUrl}/binaries/windkeep-linux-amd64`,
     "windkeep-windows-amd64.exe": `${baseUrl}/binaries/windkeep-windows-amd64.exe`,
     "checksums.txt": `${baseUrl}/binaries/checksums.txt`,

@@ -102,7 +102,7 @@ const INDEX_CONTENT: CliSection[] = [
   {
     title: "Quick Installation",
     install: [
-      { label: "Linux / macOS", command: "curl -sSL https://windkeep.up.railway.app/install/install.sh | bash" },
+      { label: "Linux", command: "curl -sSL https://windkeep.up.railway.app/install/install.sh | bash" },
       { label: "Windows (PowerShell)", command: "irm https://windkeep.up.railway.app/install/install.ps1 | iex" },
     ],
   },
@@ -110,13 +110,11 @@ const INDEX_CONTENT: CliSection[] = [
     title: "Manual Downloads",
     downloads: [
       { href: "https://windkeep.up.railway.app/api/downloads/windkeep-linux-amd64", label: "Linux (x64)", description: "Ubuntu, Debian, Fedora, and other Linux distros." },
-      { href: "https://windkeep.up.railway.app/api/downloads/windkeep-darwin-amd64", label: "macOS (Intel)", description: "Macs with Intel processors." },
-      { href: "https://windkeep.up.railway.app/api/downloads/windkeep-darwin-arm64", label: "macOS (Apple Silicon)", description: "M1, M2, M3, or M4 Macs." },
       { href: "https://windkeep.up.railway.app/api/downloads/windkeep-windows-amd64.exe", label: "Windows (x64)", description: "Windows 10/11." },
     ],
   },
   {
-    title: "Manual Setup: Linux & macOS",
+    title: "Manual Setup: Linux",
     paragraphs: [["After downloading the binary, run:"]],
     list: [
       { description: "Navigate to downloads:", commands: ["cd ~/Downloads"] },
