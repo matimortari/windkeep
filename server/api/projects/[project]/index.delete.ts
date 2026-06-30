@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ status: 400, statusText: "Project ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
   // Rate limit: 10 requests per hour per user
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!projectData) {
-    throw createError({ status: 404, statusText: "Project not found" })
+    throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
   await db.project.delete({ where: { id: projectId } })

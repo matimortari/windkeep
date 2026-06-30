@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const orgId = getRouterParam(event, "org")
   const memberId = getRouterParam(event, "id")
   if (!orgId || !memberId) {
-    throw createError({ status: 400, statusText: "Organization ID and Member ID are required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID and Member ID are required" })
   }
 
   // Rate limit: 30 requests per hour per user
@@ -18,10 +18,10 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!targetMembership) {
-    throw createError({ status: 404, statusText: "Member not found in organization" })
+    throw createError({ statusCode: 404, statusMessage: "Member not found in organization" })
   }
   if (targetMembership.role === "OWNER") {
-    throw createError({ status: memberId === sessionUser.id ? 400 : 403, statusText: memberId === sessionUser.id ? "Cannot leave organization as owner. Transfer ownership or delete the organization first." : "Cannot remove organization owners." })
+    throw createError({ statusCode: memberId === sessionUser.id ? 400 : 403, statusMessage: memberId === sessionUser.id ? "Cannot leave organization as owner. Transfer ownership or delete the organization first." : "Cannot remove organization owners." })
   }
   if (memberId !== sessionUser.id) {
     await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN"])

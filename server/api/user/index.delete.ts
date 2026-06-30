@@ -14,13 +14,13 @@ export default defineEventHandler(async (event) => {
   },
   )
   if (!accountData) {
-    throw createError({ status: 404, statusText: "User account not found" })
+    throw createError({ statusCode: 404, statusMessage: "User account not found" })
   }
 
   // Block deletion if user owns orgs with other members
   const orphanedOrgs = accountData.orgMemberships.filter(m => m.org._count.memberships > 1).map(m => m.org.name)
   if (orphanedOrgs.length > 0) {
-    throw createError({ status: 400, statusText: `Transfer ownership or delete these organizations first: ${orphanedOrgs.join(", ")}` })
+    throw createError({ statusCode: 400, statusMessage: `Transfer ownership or delete these organizations first: ${orphanedOrgs.join(", ")}` })
   }
 
   // Delete solo-owned orgs, which will cascade delete projects and memberships

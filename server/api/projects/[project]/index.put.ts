@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
-    throw createError({ status: 400, statusText: "Project ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Project ID is required" })
   }
 
   // Rate limit: 30 requests per hour per user
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
   const existingProject = await db.project.findUnique({
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     select: { name: true, slug: true, description: true, website: true, orgId: true },
   })
   if (!existingProject) {
-    throw createError({ status: 404, statusText: "Project not found" })
+    throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
   if (result.data.name || result.data.slug) {
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
     })
     if (conflictingProject) {
       const conflictField = conflictingProject.slug === result.data.slug ? "slug" : "name"
-      throw createError({ status: 409, statusText: `A project with this ${conflictField} already exists in the organization` })
+      throw createError({ statusCode: 409, statusMessage: `A project with this ${conflictField} already exists in the organization` })
     }
   }
 

@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   const tokenId = getRouterParam(event, "id")
   if (!projectId || !tokenId) {
-    throw createError({ status: 400, statusText: "Project ID and Token ID are required" })
+    throw createError({ statusCode: 400, statusMessage: "Project ID and Token ID are required" })
   }
 
   // Rate limit: 50 token deletions per hour per user
@@ -15,10 +15,10 @@ export default defineEventHandler(async (event) => {
     select: { id: true, name: true, projectId: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
   })
   if (!serviceToken) {
-    throw createError({ status: 404, statusText: "Service token not found" })
+    throw createError({ statusCode: 404, statusMessage: "Service token not found" })
   }
   if (serviceToken.projectId !== projectId) {
-    throw createError({ status: 403, statusText: "Service token does not belong to this project" })
+    throw createError({ statusCode: 403, statusMessage: "Service token does not belong to this project" })
   }
 
   await db.serviceToken.delete({ where: { id: tokenId } })

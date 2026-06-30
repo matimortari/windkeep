@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ status: 400, statusText: "Organization ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
   // Rate limit: 5 requests per hour per user
@@ -14,10 +14,10 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = transferOwnershipSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
   if (result.data.newOwnerId === sessionUser.id) {
-    throw createError({ status: 400, statusText: "Cannot transfer ownership to yourself" })
+    throw createError({ statusCode: 400, statusMessage: "Cannot transfer ownership to yourself" })
   }
 
   const newOwnerMembership = await db.orgMembership.findUnique({
@@ -25,10 +25,10 @@ export default defineEventHandler(async (event) => {
     include: { user: { select: { id: true, email: true, name: true } } },
   })
   if (!newOwnerMembership) {
-    throw createError({ status: 404, statusText: "New owner is not a member of this organization" })
+    throw createError({ statusCode: 404, statusMessage: "New owner is not a member of this organization" })
   }
   if (newOwnerMembership.role === "OWNER") {
-    throw createError({ status: 400, statusText: "User is already an owner of this organization" })
+    throw createError({ statusCode: 400, statusMessage: "User is already an owner of this organization" })
   }
 
   const currentOwner = await db.user.findUnique({ where: { id: sessionUser.id }, select: { name: true, email: true } })

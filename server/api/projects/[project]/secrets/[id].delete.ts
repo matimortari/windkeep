@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   const secretId = getRouterParam(event, "id")
   if (!projectId || !secretId) {
-    throw createError({ status: 400, statusText: "Project ID and Secret ID are required" })
+    throw createError({ statusCode: 400, statusMessage: "Project ID and Secret ID are required" })
   }
 
   // Rate limit: 100 requests per hour per user
@@ -15,10 +15,10 @@ export default defineEventHandler(async (event) => {
     select: { id: true, key: true, projectId: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } }, _count: { select: { values: true } } },
   })
   if (!existingSecret) {
-    throw createError({ status: 404, statusText: "Secret not found" })
+    throw createError({ statusCode: 404, statusMessage: "Secret not found" })
   }
   if (existingSecret.projectId !== projectId) {
-    throw createError({ status: 403, statusText: "Secret does not belong to this project" })
+    throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
   }
 
   await db.secret.delete({ where: { id: secretId } })

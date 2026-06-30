@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
   const orgId = getRouterParam(event, "org")
   if (!orgId) {
-    throw createError({ status: 400, statusText: "Organization ID is required" })
+    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
   }
 
   // Rate limit: 20 requests per hour per user
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = createInviteSchema.safeParse({ ...body, orgId })
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message || "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
   // Ensure the target email is not already a member of the organization
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   if (userExists) {
     const activeMember = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: userExists.id, orgId } } })
     if (activeMember) {
-      throw createError({ status: 409, statusText: "User is already a member of this organization" })
+      throw createError({ statusCode: 409, statusMessage: "User is already a member of this organization" })
     }
   }
 

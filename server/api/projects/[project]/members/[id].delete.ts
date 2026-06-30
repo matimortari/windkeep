@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   const memberId = getRouterParam(event, "id")
   if (!projectId || !memberId) {
-    throw createError({ status: 400, statusText: "Project ID and Member ID are required" })
+    throw createError({ statusCode: 400, statusMessage: "Project ID and Member ID are required" })
   }
 
   // Rate limit: 30 requests per hour per user
@@ -18,10 +18,10 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!targetMembership) {
-    throw createError({ status: 404, statusText: "Member not found in project" })
+    throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
   }
   if (targetMembership.role === "OWNER") {
-    throw createError({ status: memberId === sessionUser.id ? 400 : 403, statusText: memberId === sessionUser.id ? "Cannot leave project as owner. Transfer ownership or delete the project first." : "Cannot remove project owners." })
+    throw createError({ statusCode: memberId === sessionUser.id ? 400 : 403, statusMessage: memberId === sessionUser.id ? "Cannot leave project as owner. Transfer ownership or delete the project first." : "Cannot remove project owners." })
   }
   if (memberId !== sessionUser.id) {
     await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])

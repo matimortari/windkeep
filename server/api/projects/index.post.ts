@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = createProjectSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ status: 400, statusText: result.error.issues[0]?.message ?? "Invalid input" })
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
   await requireRole(sessionUser.id, { type: "org", orgId: result.data.orgId }, ["OWNER", "ADMIN"])
