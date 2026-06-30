@@ -11,11 +11,33 @@ esac
 
 BINARY="windkeep-$OS-$ARCH"
 URL="https://windkeep.up.railway.app/api/downloads/$BINARY"
+CHECKSUMS_URL="https://windkeep.up.railway.app/api/downloads/checksums.txt"
 
 INSTALL_DIR="${XDG_BIN_HOME:-$HOME/.local/bin}"
+TMP="$(mktemp)"
+
+cleanup() {
+  rm -f "$TMP"
+}
+trap cleanup EXIT
 
 mkdir -p "$INSTALL_DIR"
-curl -fsSL "$URL" -o "$INSTALL_DIR/windkeep"
+curl -fsSL "$URL" -o "$TMP"
+
+EXPECTED="$(curl -fsSL "$CHECKSUMS_URL" | awk -v bin="$BINARY" '$2 == bin { print $1; exit }')"
+if [ -z "$EXPECTED" ]; then
+  echo "error: checksum not found for $BINARY" >&2
+  exit 1
+fi
+
+ACTUAL="$(sha256sum "$TMP" | awk '{ print $1 }')"
+if [ "$EXPECTED" != "$ACTUAL" ]; then
+  echo "error: checksum mismatch for $BINARY" >&2
+  exit 1
+fi
+
+mv "$TMP" "$INSTALL_DIR/windkeep"
+trap - EXIT
 chmod +x "$INSTALL_DIR/windkeep"
 
 echo "WindKeep installed at $INSTALL_DIR/windkeep"
