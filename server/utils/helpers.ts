@@ -153,6 +153,7 @@ export async function getBinaryBlobUrl(binaryKey: string): Promise<string> {
     "windkeep-darwin-arm64": `${baseUrl}/binaries/windkeep-darwin-arm64`,
     "windkeep-linux-amd64": `${baseUrl}/binaries/windkeep-linux-amd64`,
     "windkeep-windows-amd64.exe": `${baseUrl}/binaries/windkeep-windows-amd64.exe`,
+    "checksums.txt": `${baseUrl}/binaries/checksums.txt`,
   }
 
   const url = BINARIES[binaryKey]

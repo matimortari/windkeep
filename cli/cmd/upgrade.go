@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
@@ -48,21 +51,54 @@ var upgradeCmd = &cobra.Command{
 			targetPath = exePath + ".tmp"
 		}
 
-		tempFile, err := os.Create(targetPath)
+		downloaded, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("failed to create temp file: %w", err)
+			return fmt.Errorf("failed to read download: %w", err)
 		}
-		defer tempFile.Close()
 
-		_, err = io.Copy(tempFile, resp.Body)
-		if err != nil {
-			os.Remove(targetPath)
+		if err := os.WriteFile(targetPath, downloaded, 0755); err != nil {
 			return fmt.Errorf("failed to write binary: %w", err)
 		}
 
-		tempFile.Close()
+		checksumsURL := fmt.Sprintf("%s/api/downloads/checksums.txt", config.APIURL)
+		checksumsResp, err := http.Get(checksumsURL)
+		if err != nil {
+			os.Remove(targetPath)
+			return fmt.Errorf("failed to fetch checksums: %w", err)
+		}
+		defer checksumsResp.Body.Close()
 
-		// Make it executable on Unix systems
+		if checksumsResp.StatusCode != http.StatusOK {
+			os.Remove(targetPath)
+			return fmt.Errorf("checksums fetch failed with status: %d", checksumsResp.StatusCode)
+		}
+
+		checksumsBody, err := io.ReadAll(checksumsResp.Body)
+		if err != nil {
+			os.Remove(targetPath)
+			return fmt.Errorf("failed to read checksums: %w", err)
+		}
+
+		expected := ""
+		for _, line := range strings.Split(string(checksumsBody), "\n") {
+			fields := strings.Fields(line)
+			if len(fields) >= 2 && fields[1] == binaryName {
+				expected = fields[0]
+				break
+			}
+		}
+		if expected == "" {
+			os.Remove(targetPath)
+			return fmt.Errorf("checksum not found for %s", binaryName)
+		}
+
+		sum := sha256.Sum256(downloaded)
+		actual := hex.EncodeToString(sum[:])
+		if actual != expected {
+			os.Remove(targetPath)
+			return fmt.Errorf("checksum mismatch for %s", binaryName)
+		}
+
 		if runtime.GOOS != "windows" {
 			if err := os.Chmod(targetPath, 0755); err != nil {
 				os.Remove(targetPath)
