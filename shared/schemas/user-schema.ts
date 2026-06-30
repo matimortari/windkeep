@@ -8,7 +8,6 @@ export const updateUserSchema = z.object({
     .transform(val => val.trim())
     .refine(val => val.length > 0, { message: "Name cannot be empty" })
     .optional(),
-  regenerateApiToken: z.boolean().optional(),
 })
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
