@@ -16,8 +16,6 @@ import (
 )
 
 var builds = [][3]string{
-	{"darwin", "amd64", "windkeep-darwin-amd64"},
-	{"darwin", "arm64", "windkeep-darwin-arm64"},
 	{"linux", "amd64", "windkeep-linux-amd64"},
 	{"windows", "amd64", "windkeep-windows-amd64.exe"},
 }

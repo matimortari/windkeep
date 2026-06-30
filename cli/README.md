@@ -6,7 +6,7 @@ Command-line interface for managing secrets, organizations, and projects in Wind
 
 ## Quick Install (Recommended)
 
-### Linux / macOS
+### Linux
 
 ```bash
 curl -sSL https://windkeep.up.railway.app/install/install.sh | bash
@@ -42,7 +42,7 @@ windkeep login YOUR_API_TOKEN
 Configuration is stored at:
 
 - Windows: `%APPDATA%\windkeep\config.yml`
-- Linux/macOS: `~/.config/windkeep/config.yml`
+- Linux: `~/.config/windkeep/config.yml`
 
 ```yml
 api_token: your-api-token

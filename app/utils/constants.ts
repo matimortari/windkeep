@@ -25,7 +25,7 @@ export const FEATURES: { title: string, description: string, icon: string }[] = 
   },
   {
     title: "Audit Logs",
-    description: "Every sensitive operation, from secret changes to role updates, is logged for full traceability and accountability.",
+    description: "Sensitive operations, from secret changes to role updates, are logged for full traceability and accountability.",
     icon: "ph:list-magnifying-glass-bold",
   },
   {
@@ -68,7 +68,7 @@ export const CLI_TABS: { key: string, label: string, description: string, code: 
       " # Windows (PowerShell)",
       "irm https://windkeep.up.railway.app/install/install.ps1 | iex",
       "",
-      " # macOS/Linux (Bash)",
+      " # Linux (Bash)",
       "curl -sSL https://windkeep.up.railway.app/install/install.sh | bash",
     ],
   },
