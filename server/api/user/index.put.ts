@@ -9,23 +9,12 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = updateUserSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
-  }
-
-  // Only regenerate when the boolean is explicitly sent and true
-  let apiTokenToUpdate: string | undefined
-  let apiTokenExpiresAt: Date | undefined
-  if (result.data.regenerateApiToken) {
-    apiTokenToUpdate = generateToken(32)
-    apiTokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+    throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid input" })
   }
 
   const updatedUser = await db.user.update({
     where: { id: sessionUser.id },
-    data: {
-      name: result.data.name,
-      ...(apiTokenToUpdate && { apiToken: hashToken(apiTokenToUpdate), apiTokenExpiresAt }),
-    },
+    data: { name: result.data.name },
     select: {
       id: true,
       email: true,
@@ -38,13 +27,13 @@ export default defineEventHandler(async (event) => {
 
   await deleteCached(CacheKeys.userData(sessionUser.id))
 
-  return { updatedUser, ...(apiTokenToUpdate && { newApiToken: apiTokenToUpdate }) }
+  return { updatedUser }
 })
 
 defineRouteMeta({
   openAPI: {
     summary: "Update user details",
-    description: "Updates the user's details and/or regenerates their API token.",
+    description: "Updates the user's details.",
     tags: ["User"],
     requestBody: {
       required: true,
@@ -54,7 +43,6 @@ defineRouteMeta({
             type: "object",
             properties: {
               name: { type: "string", description: "User name" },
-              regenerateApiToken: { type: "boolean", description: "Regenerate API token, returns the new plaintext token only once when regenerated" },
             },
           },
         },

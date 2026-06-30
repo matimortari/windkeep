@@ -3,11 +3,6 @@ import crypto from "node:crypto"
 
 const algorithm = "aes-256-gcm"
 const masterKeySecret = requireEnv("ENCRYPTION_KEY")
-const keyCacheTtlMs = 10 * 60 * 1000
-
-// Derive a stable 32-byte key from the master secret
-const wrappingKey = crypto.createHash("sha256").update(masterKeySecret).digest()
-const orgKeyCache = new Map<string, { key: Buffer, version: number, expiresAt: number }>()
 
 function parseEncryptedData(encryptedData: string) {
   const [version, ivHex, authTagHex, encryptedHex] = encryptedData.split(":")
@@ -35,38 +30,27 @@ function decryptWithKey(encryptedData: string, key: Buffer): string {
 }
 
 function wrapOrgKey(orgKey: Buffer): string {
-  return encryptWithKey(orgKey.toString("hex"), wrappingKey)
+  return encryptWithKey(orgKey.toString("hex"), crypto.createHash("sha256").update(masterKeySecret).digest())
 }
 
 function unwrapOrgKey(wrappedKey: string): Buffer {
-  return Buffer.from(decryptWithKey(wrappedKey, wrappingKey), "hex")
+  return Buffer.from(decryptWithKey(wrappedKey, crypto.createHash("sha256").update(masterKeySecret).digest()), "hex")
 }
 
 function normalizeManualKey(manualKey: string): Buffer {
-  return crypto.createHash("sha256").update(manualKey.trim(), "utf8").digest()
+  return crypto.pbkdf2Sync(manualKey.trim(), crypto.createHash("sha256").update(masterKeySecret).digest(), 310_000, 32, "sha256")
 }
 
 async function getOrgDataKey(orgId: string): Promise<Buffer> {
-  const now = Date.now()
-  const cached = orgKeyCache.get(orgId)
-  if (cached && cached.expiresAt > now) {
-    return cached.key
-  }
-
-  const org = await db.organization.findUnique({ where: { id: orgId }, select: { wrappedEncryptionKey: true, encryptionKeyVersion: true } })
+  const org = await db.organization.findUnique({ where: { id: orgId }, select: { wrappedEncryptionKey: true } })
   if (!org?.wrappedEncryptionKey) {
     throw new Error("Organization encryption key not found")
   }
-
-  const key = unwrapOrgKey(org.wrappedEncryptionKey)
-  orgKeyCache.set(orgId, { key, version: org.encryptionKeyVersion, expiresAt: now + keyCacheTtlMs })
-
-  return key
+  return unwrapOrgKey(org.wrappedEncryptionKey)
 }
 
 export function createWrappedOrganizationKey(manualKey?: string): string {
-  const orgKey = manualKey ? normalizeManualKey(manualKey) : crypto.randomBytes(32)
-  return wrapOrgKey(orgKey)
+  return wrapOrgKey(manualKey ? normalizeManualKey(manualKey) : crypto.randomBytes(32))
 }
 
 export async function rotateOrganizationKey(orgId: string, manualKey?: string) {
@@ -101,7 +85,6 @@ export async function rotateOrganizationKey(orgId: string, manualKey?: string) {
   ]
 
   await db.$transaction(updates)
-  orgKeyCache.delete(orgId)
 }
 
 export async function encrypt(orgId: string, input: string): Promise<string> {
