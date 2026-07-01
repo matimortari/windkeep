@@ -37,28 +37,15 @@
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
 const { closeDialog, openDialog } = useUIState()
-const userStore = useUserStore()
 const projectStore = useProjectStore()
 const { activeOrg, isOwner, isAdmin } = storeToRefs(useOrgStore())
-const { projects } = storeToRefs(projectStore)
 const searchQuery = ref("")
 const isDialogOpen = ref(false)
 const showAllProjects = ref(false)
 const layout = ref<"list" | "grid">((import.meta.client && localStorage.getItem("layoutMode") as "list" | "grid") || "grid")
+const { filteredProjects: scopedProjects } = useProjectFilters(showAllProjects)
 
-// All projects the user has access to, across all orgs
-const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))
-
-// Projects within the active org that the user has access to
-const activeOrgProjects = computed(() => {
-  if (!activeOrg.value?.id) {
-    return []
-  }
-
-  return projects.value.filter(project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id))
-})
-
-const { sortedData, sortDirection, sortKey, setSort } = useTableSort<Project>(computed(() => (showAllProjects.value ? allProjects.value : activeOrgProjects.value)))
+const { sortedData, sortDirection, sortKey, setSort } = useTableSort<Project>(scopedProjects)
 const filteredProjects = computed(() => sortedData.value.filter(p => p.name.toLowerCase().includes(searchQuery.value.toLowerCase())))
 
 function toggleSort() {
