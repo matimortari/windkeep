@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await deleteCached(CacheKeys.userProjects(sessionUser.id, existingProject.orgId))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id))
 
   const { org: _org, ...project } = updatedProject
 

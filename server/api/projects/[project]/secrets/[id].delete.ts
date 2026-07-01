@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await deleteCached(CacheKeys.userProjects(sessionUser.id, existingSecret.project.org.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id))
 
   return { success: true, message: `Secret deleted successfully` }
 })

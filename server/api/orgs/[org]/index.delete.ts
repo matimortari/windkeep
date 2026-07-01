@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   // Delete the organization (cascade will handle related records)
   await db.organization.delete({ where: { id: orgId } })
 
-  await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id, orgId))
+  await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id))
 
   return { success: true, message: "Organization deleted successfully" }
 })
