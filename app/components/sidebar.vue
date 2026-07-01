@@ -70,27 +70,12 @@ defineProps<{
 const emit = defineEmits<{ "update:isOpen": [value: boolean] }>()
 
 const route = useRoute()
-const userStore = useUserStore()
 const { activeOrg } = storeToRefs(useOrgStore())
 const projectStore = useProjectStore()
-const { projects } = storeToRefs(projectStore)
 const { openDialog, closeDialog } = useUIState()
 const showAllProjects = ref(false)
 const skeletonWidths = ["65%", "45%", "60%", "50%", "50%", "60%"]
-
-// All projects the user has access to, across all orgs
-const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))
-
-// Projects within the active org that the user has access to
-const activeOrgProjects = computed(() => {
-  if (!activeOrg.value?.id) {
-    return []
-  }
-
-  return projects.value.filter(project => project.orgId === activeOrg.value?.id && project.memberships?.some(m => m.userId === userStore.user?.id))
-})
-
-const filteredProjects = computed(() => showAllProjects.value ? allProjects.value : activeOrgProjects.value)
+const { filteredProjects } = useProjectFilters(showAllProjects)
 
 async function handleCreateProject(project: { name: string, description?: string }) {
   if (!activeOrg.value || !project.name) {
