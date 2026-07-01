@@ -56,7 +56,7 @@ async function getRedisClient() {
  */
 export const CacheKeys = {
   userData: (userId: string) => `user:data:${userId}`,
-  userProjects: (userId: string, orgId: string) => `user:projects:${userId}:${orgId}`,
+  userProjects: (userId: string) => `user:projects:${userId}`,
   orgAuditLogs: (orgId: string, page: number, filters: string) => `org:audit:${orgId}:p${page}:${filters}`,
   rateLimit: (identifier: string) => `ratelimit:${identifier}`,
 }

@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await deleteCached(CacheKeys.userData(memberId), CacheKeys.userProjects(memberId, orgId))
+  await deleteCached(CacheKeys.userData(memberId), CacheKeys.userProjects(memberId))
 
   return { success: true, message: "Member removed successfully" }
 })
