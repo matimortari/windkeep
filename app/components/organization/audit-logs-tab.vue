@@ -1,12 +1,8 @@
 <template>
-  <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <header class="flex flex-col items-start gap-4 border-b py-2 whitespace-nowrap md:flex-row md:items-center md:justify-between">
-      <h2>
-        Audit Logs
-      </h2>
-
-      <AuditActions v-if="hasPermission" />
-    </header>
+  <TabSection title="Audit Logs" description="Track member activity and changes across your organization.">
+    <template v-if="hasPermission" #actions>
+      <AuditActions />
+    </template>
 
     <Empty v-if="!hasPermission" message="You don't have permission to view audit logs for this organization." icon-name="ph:lock-bold" />
 
@@ -14,11 +10,10 @@
       <AuditTable />
       <AuditPagination />
     </div>
-  </div>
+  </TabSection>
 </template>
 
 <script setup lang="ts">
-const { public: { baseURL } } = useRuntimeConfig()
 const orgStore = useOrgStore()
 const { activeOrg, isOwner, isAdmin, currentAuditFilters } = storeToRefs(orgStore)
 const hasPermission = computed(() => isOwner.value || isAdmin.value)
@@ -32,12 +27,4 @@ watch(activeOrg, async (org) => {
     await orgStore.getAuditLogs(org.id, { ...defaultFilters })
   }
 }, { immediate: true })
-
-useHead({
-  title: "Audit Logs",
-  link: [{ rel: "canonical", href: `${baseURL}/admin/audit-logs` }],
-  meta: [{ name: "description", content: "WindKeep audit logs page." }],
-})
-
-definePageMeta({ layout: "admin", middleware: "auth" })
 </script>
