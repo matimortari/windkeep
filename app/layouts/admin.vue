@@ -26,31 +26,33 @@ async function goTo(path: string) {
   await navigateTo(path)
 }
 
-function runSafely(task: () => Promise<unknown>) {
-  return task().then(() => true, () => false)
+async function settled<T>(task: () => Promise<T>) {
+  const [result] = await Promise.allSettled([task()])
+  return result
 }
 
 onMounted(async () => {
-  if (!await runSafely(() => userStore.getUser())) {
+  const userResult = await settled(() => userStore.getUser())
+  if (userResult.status === "rejected" || !user.value) {
     await goTo("/sign-in")
     return
   }
 
-  const activeOrg = user.value?.orgMemberships?.find(m => m.isActive)
+  const activeOrg = user.value.orgMemberships?.find(m => m.isActive)
   const orgId = activeOrg?.orgId || activeOrg?.org?.id
   if (!activeOrg || !orgId) {
     await goTo("/onboarding")
     return
   }
 
-  if (!await runSafely(() => orgStore.getOrg(orgId))) {
+  const orgResult = await settled(() => orgStore.getOrg(orgId))
+  if (orgResult.status === "rejected") {
     await goTo("/sign-in")
     return
   }
 
-  orgStore.setActiveOrg(orgId)
-
-  if (!await runSafely(() => projectStore.getProjects())) {
+  const projectsResult = await settled(() => projectStore.getProjects())
+  if (projectsResult.status === "rejected") {
     await goTo("/sign-in")
     return
   }
