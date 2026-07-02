@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 
@@ -110,8 +111,18 @@ var upgradeCmd = &cobra.Command{
 				return fmt.Errorf("failed to replace binary: %w", err)
 			}
 
-			ui.PrintSuccess("WindKeep CLI upgraded successfully!")
-			ui.PrintInfo("Run %s to verify", ui.Highlight("windkeep --version"))
+			out, err := exec.Command(exePath, "--version").Output()
+			if err != nil {
+				ui.PrintSuccess("WindKeep CLI upgraded successfully!")
+				return nil
+			}
+
+			installedVersion := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(string(out)), "windkeep version "))
+			if installedVersion == Version {
+				ui.PrintInfo("Already on version %s.", ui.Highlight(Version))
+			} else {
+				ui.PrintSuccess("WindKeep CLI upgraded from %s to %s!", Version, installedVersion)
+			}
 			return nil
 		}
 

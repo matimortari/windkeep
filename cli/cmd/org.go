@@ -57,7 +57,7 @@ var orgsListCmd = &cobra.Command{
 		table := ui.CreateTable([]string{"ID", "Name", "Role", "Active"})
 		for _, membership := range user.OrgMemberships {
 			active := ""
-			if membership.IsActive {
+			if membership.OrgID == cfg.ActiveOrgID {
 				active = ui.Success("✓")
 			}
 			table.Append([]string{

@@ -54,6 +54,21 @@ func buildSecretValues(dev, staging, prod string) []api.SecretValueInput {
 	return values
 }
 
+func mergeSecretValues(existing []api.SecretValue, updates []api.SecretValueInput) []api.SecretValueInput {
+	merged := make(map[api.Environment]string, len(existing))
+	for _, v := range existing {
+		merged[v.Environment] = v.Value
+	}
+	for _, v := range updates {
+		merged[v.Environment] = v.Value
+	}
+	result := make([]api.SecretValueInput, 0, len(merged))
+	for env, val := range merged {
+		result = append(result, api.SecretValueInput{Environment: env, Value: val})
+	}
+	return result
+}
+
 func printProjectContext() {
 	if cfg.ActiveProjectName != "" {
 		ui.PrintInfo("Project: %s", ui.Highlight(cfg.ActiveProjectName))
@@ -228,7 +243,7 @@ var secretsSetCmd = &cobra.Command{
 	Use:   "set [KEY]",
 	Short: "Update a secret's values",
 	Long: `Update environment values for an existing secret.
-Only specified environments will be updated; others remain unchanged.
+Only the environments you specify are changed; all others retain their current values.
 
 Examples:
   windkeep secrets set API_KEY --prod "sk_live_new"
@@ -266,7 +281,7 @@ Examples:
 		}
 
 		req := api.UpdateSecretRequest{
-			Values: values,
+			Values: mergeSecretValues(found.Values, values),
 		}
 		if description != "" {
 			req.Description = &description

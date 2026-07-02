@@ -111,11 +111,10 @@ Examples:
 					continue
 				}
 
-				// Update the existing secret's value for this environment
 				req := api.UpdateSecretRequest{
-					Values: []api.SecretValueInput{
+					Values: mergeSecretValues(existingSecret.Values, []api.SecretValueInput{
 						{Environment: env, Value: entry.value},
-					},
+					}),
 				}
 				if _, err := client.UpdateSecret(projectID, existingSecret.ID, req); err != nil {
 					ui.PrintWarning("Failed to update '%s': %v", entry.key, err)
