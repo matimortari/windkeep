@@ -1,5 +1,14 @@
 <template>
   <TabSection title="Secrets" description="Manage secrets and environment values for this project.">
+    <template #context>
+      <h3 class="navigation-group max-w-lg truncate text-muted-foreground">
+        <span class="truncate">{{ project?.name }}</span>
+        <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
+          <icon name="ph:arrow-up-right-bold" size="14" class="hover:text-primary" />
+        </nuxt-link>
+      </h3>
+    </template>
+
     <template #actions>
       <SecretsProjectActions
         :has-permission="hasPermission" :has-pending-changes="hasPendingChanges"

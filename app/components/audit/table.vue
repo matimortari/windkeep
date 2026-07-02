@@ -5,7 +5,7 @@
         <tr>
           <th v-for="col in columns" :key="col.key" :class="col.class">
             <div class="navigation-group">
-              <icon :name="col.icon" size="20" />
+              <icon v-if="col.icon" :name="col.icon" size="15" aria-label="Expand rows" />
               <span>{{ col.label }}</span>
               <button v-if="col.sortable" class="flex items-center hover:text-secondary focus:outline-none" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
                 <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
@@ -24,16 +24,16 @@
 
         <template v-for="log in sortedLogs" v-else :key="log.id">
           <tr class="cursor-pointer hover:bg-muted/20" :aria-expanded="expandedRows.has(log.id)" @click="toggleRow(log.id)">
-            <td>
+            <td :class="columns[0]?.class">
               <icon name="ph:caret-right-bold" size="15" class="hover:text-secondary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />
             </td>
-            <td>
+            <td :class="columns[1]?.class">
               <div class="navigation-group max-w-xs truncate">
                 <icon :name="resourceMap[log.resource || ''] || ''" size="15" />
                 <span>{{ auditActions.find(a => a.value === log.action)?.label || log.action }}</span>
               </div>
             </td>
-            <td class="max-w-md overflow-visible!">
+            <td class="max-w-md overflow-visible!" :class="columns[2]?.class">
               <span class="group/tooltip relative inline-flex max-w-full">
                 <span class="truncate">{{ log.description || 'No description' }}</span>
                 <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
@@ -41,7 +41,7 @@
                 </span>
               </span>
             </td>
-            <td class="max-w-sm overflow-visible! md:max-w-32">
+            <td class="max-w-sm overflow-visible!" :class="columns[3]?.class">
               <span class="group/tooltip relative inline-flex max-w-full">
                 <span class="truncate">{{ log.user?.name || log.user?.email }}</span>
                 <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
@@ -49,7 +49,7 @@
                 </span>
               </span>
             </td>
-            <td class="max-w-sm overflow-visible! md:max-w-40">
+            <td class="max-w-sm overflow-visible!" :class="columns[4]?.class">
               <span class="group/tooltip relative inline-flex max-w-full">
                 <span class="truncate">{{ log.createdAt ? formatAuditDate(log.createdAt) : 'N/A' }}</span>
                 <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
@@ -100,10 +100,10 @@ const copyMetadataActions = computed(() => {
 
 const columns = [
   { key: "expand", label: "", icon: "ph:eye-bold", class: "w-10", sortable: false },
-  { key: "action", label: "Action", icon: "ph:lightning-bold", class: "w-28", sortable: true },
-  { key: "description", label: "Description", icon: "ph:text-align-left-bold", sortable: false },
-  { key: "user", label: "User", icon: "ph:user-bold", class: "w-28", sortable: true },
-  { key: "createdAt", label: "Date", icon: "ph:calendar-bold", class: "w-44", sortable: true },
+  { key: "action", label: "Action", class: "w-28", sortable: true },
+  { key: "description", label: "Description", sortable: false },
+  { key: "user", label: "User", class: "w-28", sortable: true },
+  { key: "createdAt", label: "Date", class: "w-44", sortable: true },
 ]
 
 const resourceMap: Record<string, string> = {

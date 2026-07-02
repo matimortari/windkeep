@@ -1,10 +1,22 @@
 <template>
   <section class="container mx-auto flex flex-col">
-    <header v-if="title" class="flex flex-col items-start gap-2 border-b py-4 md:flex-row md:items-center md:justify-between">
+    <header v-if="title" class="flex flex-col items-start gap-2 border-b p-2 md:flex-row md:items-center md:justify-between">
       <div class="flex flex-col gap-1">
-        <h3>
-          {{ title }}
-        </h3>
+        <div class="navigation-group">
+          <template v-if="$slots.context || context">
+            <slot name="context">
+              <h3 class="max-w-lg truncate text-muted-foreground">
+                {{ context }}
+              </h3>
+            </slot>
+            <icon name="ph:caret-right-bold" size="15" class="shrink-0 text-muted-foreground" />
+          </template>
+
+          <h>
+            {{ title }}
+          </h>
+        </div>
+
         <p v-if="description" class="text-caption">
           {{ description }}
         </p>
@@ -23,5 +35,6 @@
 defineProps<{
   title?: string
   description?: string
+  context?: string
 }>()
 </script>

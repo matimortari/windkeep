@@ -1,7 +1,7 @@
 <template>
-  <TabSection title="Settings" description="Manage organization details and settings.">
+  <TabSection context="Organization" title="Settings" description="Manage organization details and settings.">
     <div class="flex flex-col">
-      <div v-for="(field, index) in orgFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group">
+      <div v-for="(field, index) in orgFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 last:border-b-0 md:navigation-group">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h6>
             {{ field.label }}
@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <div v-if="isOwner" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Organization encryption settings">
+    <div v-if="isOwner" class="flex flex-col justify-between gap-4 border-t py-4 md:navigation-group" aria-label="Organization encryption settings">
       <header class="flex flex-col gap-1">
         <h6>
           Organization Encryption Key
@@ -152,11 +152,6 @@ const orgFields = [
     label: "Created At",
     description: "When your organization was created.",
     value: computed(() => formatDate(activeOrg.value?.createdAt)),
-  },
-  {
-    label: "Updated At",
-    description: "When your organization was last updated.",
-    value: computed(() => formatDate(activeOrg.value?.updatedAt)),
   },
 ]
 

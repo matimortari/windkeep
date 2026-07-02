@@ -58,11 +58,11 @@
           <div v-if="isActiveProject(project)" class="mt-1 ml-3 flex flex-col gap-0.5 border-l pl-2">
             <button
               v-for="tab in PROJECT_TABS" :key="tab.key"
-              type="button" class="navigation-group rounded-sm px-2 py-1 text-left text-xs transition-all hover:text-foreground"
+              type="button" class="navigation-group rounded-sm p-1 text-left text-sm text-muted-foreground transition-all hover:text-foreground"
               :class="uiState.adminTabs.project === tab.key ? 'font-semibold text-primary!' : ''"
               @click="selectProjectTab(project, tab.key)"
             >
-              <icon :name="tab.icon" size="14" />
+              <icon :name="tab.icon" size="15" />
               <span>{{ tab.label }}</span>
             </button>
           </div>

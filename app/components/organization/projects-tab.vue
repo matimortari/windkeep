@@ -1,5 +1,5 @@
 <template>
-  <TabSection title="Projects" description="Projects you have access to within this organization.">
+  <TabSection context="Organization" title="Projects" description="Projects you have access to within this organization.">
     <template #actions>
       <ProjectsActions
         :search="searchQuery" :layout="layout"

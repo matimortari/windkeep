@@ -1,8 +1,8 @@
 <template>
-  <TabSection title="Members" description="Manage who has access to this organization.">
+  <TabSection context="Organization" title="Members" description="Manage who has access to this organization.">
     <div class="p-2">
-      <ul class="scroll-area card flex max-h-96 flex-col items-start overflow-y-auto">
-        <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between border-y py-4 first:border-t-0 first:pt-0 last:pb-0">
+      <ul class="scroll-area card flex max-h-96 flex-col items-start divide-y overflow-y-auto">
+        <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between py-4 first:pt-0 last:pb-0">
           <div class="navigation-group items-start!">
             <img :src="orgUser.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
 
@@ -33,7 +33,7 @@
       </ul>
     </div>
 
-    <div v-if="isOwner || isAdmin" class="flex flex-col justify-between gap-4" aria-label="Invite Members">
+    <div v-if="isOwner || isAdmin" class="flex flex-col justify-between gap-4 border-t py-4 md:navigation-group" aria-label="Invite Members">
       <header class="flex flex-col gap-1">
         <h6>
           Invite Members
