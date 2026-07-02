@@ -1,5 +1,5 @@
 <template>
-  <TabSection title="Audit Logs" description="Track member activity and changes across your organization.">
+  <TabSection context="Organization" title="Audit Logs" description="Track member activity and changes across your organization.">
     <template v-if="hasPermission" #actions>
       <AuditActions />
     </template>

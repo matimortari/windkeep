@@ -1,8 +1,17 @@
 <template>
   <TabSection title="Members" description="Manage who has access to this project.">
+    <template #context>
+      <h3 class="navigation-group max-w-lg truncate text-muted-foreground">
+        <span class="truncate">{{ project?.name }}</span>
+        <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
+          <icon name="ph:arrow-up-right-bold" size="14" class="hover:text-primary" />
+        </nuxt-link>
+      </h3>
+    </template>
+
     <div class="p-2">
-      <ul class="scroll-area card flex max-h-96 flex-col items-start overflow-y-auto">
-        <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between border-y py-4 first:border-t-0 first:pt-0 last:pb-0">
+      <ul class="scroll-area card flex max-h-96 flex-col items-start divide-y overflow-y-auto">
+        <li v-for="member in project?.memberships" :key="member.userId" class="navigation-group w-full justify-between py-4 first:pt-0 last:pb-0">
           <div class="navigation-group items-start!">
             <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
             <div class="flex flex-col truncate">
@@ -28,7 +37,7 @@
       </ul>
     </div>
 
-    <div v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Add New Member">
+    <div v-if="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-t py-4 md:navigation-group" aria-label="Add New Member">
       <header class="flex flex-col gap-1">
         <h6>
           Add New Member

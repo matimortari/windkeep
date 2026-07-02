@@ -5,7 +5,7 @@
         <button
           v-for="env in ENVIRONMENTS" :key="env.value"
           class="flex-1 rounded-md px-2 py-1 text-sm font-medium transition-colors" :class="selectedEnv === env.value ? 'text-primary-foreground bg-primary' : 'text-muted-foreground hover:text-foreground'"
-          @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
+          type="button" @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
         >
           {{ env.label }}
         </button>

@@ -23,7 +23,7 @@
             </button>
           </header>
 
-          <section class="scroll-area" :class="isMobile ? 'overflow-y-auto' : ''">
+          <section class="scroll-area p-4" :class="isMobile ? 'overflow-y-auto' : ''">
             <slot />
           </section>
         </div>

@@ -2,9 +2,9 @@
   <nuxt-link :to="`/admin/${project.slug}`">
     <div class="card relative flex h-50 w-full flex-col justify-between overflow-hidden">
       <div class="flex flex-col gap-2">
-        <h3 class="truncate">
+        <h4 class="truncate">
           {{ project.name }}
-        </h3>
+        </h4>
         <p v-if="project.website" class="text-caption text-xs!">
           {{ project.website }}
         </p>
