@@ -1,27 +1,19 @@
 <template>
-  <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <h2 class="navigation-group border-b py-2">
+  <div
+    v-motion :initial="{ opacity: 0 }"
+    :enter="{ opacity: 1 }" :duration="800"
+    class="container mx-auto"
+  >
+    <h2 class="border-b py-2">
       Preferences
     </h2>
 
-    <section class="container mx-auto flex flex-col">
-      <div class="gap-2 border-b p-4 md:navigation-group">
-        <header class="flex flex-col gap-2">
-          <h3>
-            User Information
-          </h3>
-          <p class="text-caption">
-            Manage your account information.
-          </p>
-        </header>
-      </div>
-
-      <!-- User Details -->
-      <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10">
+    <TabSection title="Preferences" description="Manage your account information.">
+      <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group">
         <header class="flex flex-col items-start justify-center gap-1 text-start">
-          <h5>
+          <h6>
             {{ field.label }}
-          </h5>
+          </h6>
           <p v-if="field.description" class="text-caption">
             {{ field.description }}
           </p>
@@ -66,24 +58,14 @@
 
         <span v-else class="navigation-group justify-end">{{ field.value }}</span>
       </div>
-    </section>
+    </TabSection>
 
-    <!-- Danger Zone -->
-    <section class="container mx-auto flex flex-col">
-      <header class="flex flex-col items-start gap-2 border-b p-4 text-start">
-        <h3>
-          Danger Zone
-        </h3>
-        <p class="text-caption">
-          This section contains actions that can significantly affect your account. Please proceed with caution.
-        </p>
-      </header>
-
-      <nav class="flex flex-col justify-between gap-4 border-b p-4 md:navigation-group md:px-10" aria-label="Delete Account">
+    <TabSection title="Danger Zone">
+      <nav class="flex flex-col justify-between gap-4 py-4 md:navigation-group" aria-label="Delete Account">
         <header class="flex flex-col gap-1">
-          <h5>
+          <h6>
             Delete Account
-          </h5>
+          </h6>
           <p class="text-caption-danger">
             This action is irreversible. All your data will be permanently deleted.
           </p>
@@ -94,7 +76,7 @@
           <span>Confirm</span>
         </button>
       </nav>
-    </section>
+    </TabSection>
   </div>
 </template>
 

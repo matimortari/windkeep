@@ -41,9 +41,9 @@
           </td>
           <td>
             <div class="navigation-group">
-              <nuxt-link :to="`/admin/${project.slug}/settings`" aria-label="Project Settings" @click.stop>
+              <button type="button" aria-label="Project Settings" @click.stop="openProjectSettings(project)">
                 <icon name="ph:gear-bold" size="20" class="transition-colors hover:text-secondary" />
-              </nuxt-link>
+              </button>
               <nuxt-link :to="`/admin/${project.slug}`" aria-label="Open Project" @click.stop>
                 <icon name="ph:arrow-right-bold" size="20" class="transition-colors hover:text-secondary" />
               </nuxt-link>
@@ -60,7 +60,14 @@ const props = defineProps<{
   projects: Project[]
 }>()
 
+const { setTab, setActiveProject } = useUIState()
 const { sortedData: sortedProjects, toggleSort, getSortIconName } = useTableSort<Project>(toRef(props, "projects"))
+
+function openProjectSettings(project: Project) {
+  setActiveProject(project.slug)
+  setTab("project", "settings")
+  navigateTo(`/admin/${project.slug}`)
+}
 
 const columns = [
   { key: "name", label: "Name", class: "w-40", sortable: true },

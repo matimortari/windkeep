@@ -45,5 +45,5 @@ export async function handleOAuthUser(event: H3Event, userData: OAuthUserData) {
     lastActivityAt: now,
   })
 
-  return sendRedirect(event, activeMembership?.org ? "/admin/projects" : "/onboarding")
+  return sendRedirect(event, activeMembership?.org ? "/admin/organization" : "/onboarding")
 }

@@ -109,12 +109,19 @@ export const CLI_TABS: { key: string, label: string, description: string, code: 
   },
 ]
 
-// Admin dashboard data
-export const SIDEBAR_NAV_LINKS: { url: string, icon: string, label: string }[] = [
-  { url: "/admin/projects", icon: "ph:folder-open-bold", label: "Projects" },
-  { url: "/admin/organization", icon: "ph:building-office-bold", label: "Organization" },
-  { url: "/admin/audit-logs", icon: "ph:clipboard-text-bold", label: "Audit Logs" },
-  { url: "/admin/preferences", icon: "ph:user-gear-bold", label: "Preferences" },
+// Admin dashboard navigation tabs
+export const ORGANIZATION_TABS: { key: string, label: string, icon: string }[] = [
+  { key: "projects", label: "Projects", icon: "ph:folder-open-bold" },
+  { key: "members", label: "Members", icon: "ph:users-bold" },
+  { key: "audit-logs", label: "Audit Logs", icon: "ph:clipboard-text-bold" },
+  { key: "settings", label: "Settings", icon: "ph:gear-six-bold" },
+]
+
+export const PROJECT_TABS: { key: string, label: string, icon: string }[] = [
+  { key: "secrets", label: "Secrets", icon: "ph:stack-bold" },
+  { key: "members", label: "Members", icon: "ph:users-bold" },
+  { key: "service-tokens", label: "Service Tokens", icon: "ph:key-bold" },
+  { key: "settings", label: "Settings", icon: "ph:gear-six-bold" },
 ]
 
 // Organization and project roles
