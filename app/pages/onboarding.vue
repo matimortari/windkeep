@@ -101,13 +101,13 @@ async function handleCreateOrg() {
   }
 
   orgStore.setActiveOrg(org.id)
-  setTimeout(navigateTo, 2000, "/admin/projects")
+  setTimeout(navigateTo, 2000, "/admin/organization")
 }
 
 async function handleAcceptInvite() {
   const res = await orgStore.acceptInvite(orgId.value, { token: token.value })
   if (res) {
-    setTimeout(navigateTo, 2000, "/admin/projects")
+    setTimeout(navigateTo, 2000, "/admin/organization")
   }
 }
 

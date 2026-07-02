@@ -27,10 +27,10 @@
         </div>
 
         <div class="navigation-group">
-          <nuxt-link :to="`/admin/${project.slug}/settings`" class="group btn-ghost rounded-full!" @click.stop>
+          <button type="button" class="group btn-ghost rounded-full!" @click.stop.prevent="openProjectSettings">
             <icon name="ph:gear-bold" size="25" class="text-muted-foreground group-hover:text-secondary" />
             <span class="text-caption hidden whitespace-nowrap xl:block">Settings</span>
-          </nuxt-link>
+          </button>
 
           <div class="group btn-ghost rounded-full!">
             <icon name="ph:arrow-right-bold" size="25" class="text-muted-foreground group-hover:text-secondary" />
@@ -42,7 +42,15 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   project: Project
 }>()
+
+const { setTab, setActiveProject } = useUIState()
+
+function openProjectSettings() {
+  setActiveProject(props.project.slug)
+  setTab("project", "settings")
+  navigateTo(`/admin/${props.project.slug}`)
+}
 </script>

@@ -1,4 +1,17 @@
-const uiState = reactive<UIState>({ sidebar: false, dialogs: { projects: false, secrets: { isOpen: false, selectedSecret: null }, history: false, raw: false } })
+const uiState = reactive<UIState>({
+  sidebar: false,
+  dialogs: {
+    projects: false,
+    secrets: { isOpen: false, selectedSecret: null },
+    history: false,
+    raw: false,
+  },
+  adminTabs: {
+    organization: ORGANIZATION_TABS[0]!.key,
+    project: PROJECT_TABS[0]!.key,
+    projectSlug: null,
+  },
+})
 
 export function useUIState() {
   const openDialog = (type: "secrets" | "projects" | "history" | "raw") => {
@@ -35,6 +48,14 @@ export function useUIState() {
   const isRawEditorOpen = computed(() => uiState.dialogs.raw)
   const isSidebarOpen = computed(() => uiState.sidebar)
 
+  function setTab(section: "organization" | "project", tab: string) {
+    uiState.adminTabs[section] = tab
+  }
+
+  function setActiveProject(slug: string | null) {
+    uiState.adminTabs.projectSlug = slug
+  }
+
   return {
     uiState,
     isSecretsEditorOpen,
@@ -49,5 +70,7 @@ export function useUIState() {
     openSidebar,
     closeSidebar,
     toggleSidebar,
+    setTab,
+    setActiveProject,
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <nav class="navigation-group w-full flex-wrap justify-start gap-2 md:justify-end" aria-label="Audit Filters">
+  <nav class="navigation-group flex-wrap justify-start gap-2 md:justify-end" aria-label="Audit Filters">
     <AuditDatePicker v-model="dateFilter" @update:model-value="updateFilter('date', $event, false)" @apply="applyDateFilter" />
 
     <div ref="actionDropdownRef" class="relative">

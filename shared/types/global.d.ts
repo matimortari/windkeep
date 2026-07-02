@@ -232,6 +232,11 @@ interface UIState {
     history: boolean
     raw: boolean
   }
+  adminTabs: {
+    organization: string
+    project: string
+    projectSlug: string | null
+  }
 }
 
 interface Toast {

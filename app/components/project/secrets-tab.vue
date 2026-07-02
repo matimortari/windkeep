@@ -1,15 +1,16 @@
 <template>
-  <div v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }" :duration="800">
-    <SecretsProjectActions
-      :project="project" :has-permission="isOwner(project?.id ?? '') || isAdmin(project?.id ?? '')"
-      :has-pending-changes="hasPendingChanges" :all-visible="allVisible"
-      :available-tags="availableTags" :active-tag-filter="activeTagFilter"
-      @open-secrets-dialog="() => { selectSecret(null); openDialog('secrets') }"
-      @open-editor-dialog="openDialog('raw')" @export="exportToEnv"
-      @save="saveAllChanges" @toggle-all-visible="allVisible = !allVisible"
-      @discard="discardAllChanges" @filter-by-tag="activeTagFilter = $event"
-      @search="searchQuery = $event"
-    />
+  <TabSection title="Secrets" description="Manage secrets and environment values for this project.">
+    <template #actions>
+      <SecretsProjectActions
+        :has-permission="hasPermission" :has-pending-changes="hasPendingChanges"
+        :all-visible="allVisible" :available-tags="availableTags"
+        :active-tag-filter="activeTagFilter" @open-secrets-dialog="() => { selectSecret(null); openDialog('secrets') }"
+        @open-editor-dialog="openDialog('raw')" @export="exportToEnv"
+        @save="saveAllChanges" @toggle-all-visible="allVisible = !allVisible"
+        @discard="discardAllChanges" @filter-by-tag="activeTagFilter = $event"
+        @search="searchQuery = $event"
+      />
+    </template>
 
     <Empty v-if="!displayedSecrets.length" message="Add a new secret or import from an .env file to get started." icon-name="ph:stack-minus-bold" />
 
@@ -26,19 +27,18 @@
     <SecretsCreateDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="closeDialog('secrets')" @save="handleSecretChange" />
     <SecretsEditorDialog :project-id="project?.id ?? ''" :secrets="displayedSecrets" @close="closeDialog('raw')" @save="handleImportSecrets" />
     <SecretsHistoryDialog :secret-id="historySecretId" :secret-key="historySecretKey" :project-id="project?.id ?? ''" @close="() => { closeDialog('history'); historySecretId = ''; historySecretKey = '' }" />
-  </div>
+  </TabSection>
 </template>
 
 <script setup lang="ts">
-const { public: { baseURL } } = useRuntimeConfig()
-const route = useRoute()
-const slug = route.params.project
-const projectStore = useProjectStore()
+const props = defineProps<{
+  project: Project | undefined
+  hasPermission: boolean
+}>()
+
 const secretsStore = useSecretsStore()
 const { openDialog, closeDialog, selectSecret, selectedSecret } = useUIState()
-const { isOwner, isAdmin } = storeToRefs(projectStore)
 const { secrets } = storeToRefs(secretsStore)
-const project = computed(() => projectStore.projects.find(p => p.slug === slug))
 const activeTagFilter = ref<string | null>(null)
 const historySecretId = ref("")
 const historySecretKey = ref("")
@@ -194,11 +194,11 @@ function handleImportSecrets(importedSecrets: Secret[], removedKeys: { key: stri
 }
 
 async function saveAllChanges() {
-  if (!project.value?.id) {
+  if (!props.project?.id) {
     return
   }
 
-  const { succeeded } = await secretsStore.saveAllSecretChanges(project.value.id, pendingChanges)
+  const { succeeded } = await secretsStore.saveAllSecretChanges(props.project.id, pendingChanges)
   succeeded.forEach(key => pendingChanges.delete(key))
 }
 
@@ -210,11 +210,11 @@ function discardAllChanges() {
 }
 
 function exportToEnv(env: string | null | undefined) {
-  if (!env || !project.value?.id) {
+  if (!env || !props.project?.id) {
     return { success: false, error: "Environment or project not specified" }
   }
 
-  const filteredSecrets = secrets.value.filter((s: Secret) => s.projectId === project.value?.id).map((s: Secret) => {
+  const filteredSecrets = secrets.value.filter((s: Secret) => s.projectId === props.project?.id).map((s: Secret) => {
     const value = s.values?.find((v: SecretValue) => v.environment.toLowerCase() === env.toLowerCase())?.value
     return value ? `${s.key}="${value}"` : null
   }).filter(Boolean).join("\n")
@@ -222,10 +222,9 @@ function exportToEnv(env: string | null | undefined) {
     return { success: false, error: "No secrets found for this environment" }
   }
 
-  const blob = new Blob([filteredSecrets], { type: "text/plain" })
   const a = document.createElement("a")
-  a.href = URL.createObjectURL(blob)
-  a.download = `.env.${project.value?.slug}.${env.toLowerCase()}`
+  a.href = URL.createObjectURL(new Blob([filteredSecrets], { type: "text/plain" }))
+  a.download = `.env.${props.project?.slug}.${env.toLowerCase()}`
   a.click()
   return { success: true }
 }
@@ -238,8 +237,8 @@ onBeforeRouteLeave(() => {
   return true
 })
 
-// Get secrets and set page metadata when project changes
-watch(() => project.value?.id, async (id, prevId) => {
+// Get secrets when project changes
+watch(() => props.project?.id, async (id, prevId) => {
   if (!id) {
     return
   }
@@ -252,13 +251,7 @@ watch(() => project.value?.id, async (id, prevId) => {
 
   secrets.value = []
   await secretsStore.getProjectSecrets(id)
-
-  useHead({
-    title: `${project.value?.name}`,
-    link: [{ rel: "canonical", href: `${baseURL}/${id}` }],
-    meta: [{ name: "description", content: `${project.value?.name} project page.` }],
-  })
 }, { immediate: true })
 
-definePageMeta({ layout: "admin", middleware: "auth" })
+defineExpose({ hasPendingChanges })
 </script>
