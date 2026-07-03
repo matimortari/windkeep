@@ -62,8 +62,15 @@ export async function rotateOrganizationKey(orgId: string, manualKey?: string) {
   const oldKey = unwrapOrgKey(org.wrappedEncryptionKey)
   const newKey = manualKey ? normalizeManualKey(manualKey) : crypto.randomBytes(32)
 
-  const secretValues = await db.secretValue.findMany({ where: { secret: { project: { orgId } } }, select: { id: true, value: true } })
-  const historyValues = await db.secretValueHistory.findMany({ where: { secretValue: { secret: { project: { orgId } } } }, select: { id: true, value: true } })
+  const secretValues = await db.secretValue.findMany({
+    where: { secret: { project: { orgId } } },
+    select: { id: true, value: true },
+  })
+
+  const historyValues = await db.secretValueHistory.findMany({
+    where: { secretValue: { secret: { project: { orgId } } } },
+    select: { id: true, value: true },
+  })
 
   const updates = [
     ...secretValues.map(sv => db.secretValue.update({

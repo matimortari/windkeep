@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     orderBy: { createdAt: "desc" },
   })
 
-  await setCached(cacheKey, projects, CACHE_TTL.SHORT)
+  await setCached(cacheKey, projects, 60)
 
   return { projects }
 })

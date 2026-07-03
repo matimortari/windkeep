@@ -205,12 +205,10 @@ interface CalendarDay {
   isToday: boolean
 }
 
-type InlinePart = string | { code: string } | { strong: string } | { em: string } | { link: { href: string, text: string, external?: boolean } }
-
 interface CliSection {
   title: string
-  paragraphs?: InlinePart[][]
-  note?: InlinePart[]
+  paragraphs?: string | { code: string } | { strong: string } | { em: string } | { link: { href: string, text: string, external?: boolean } }[][]
+  note?: string | { code: string } | { strong: string } | { em: string } | { link: { href: string, text: string, external?: boolean } }[]
   install?: { label: string, command: string }[]
   examples?: { label?: string, command?: string, output?: string }[]
   args?: { label: string, code: string, description: string }[]

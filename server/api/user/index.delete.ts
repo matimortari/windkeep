@@ -4,15 +4,16 @@ export default defineEventHandler(async (event) => {
   // Rate limit: 5 requests per hour per user
   await enforceRateLimit(event, `user:delete:${sessionUser.id}`, 5)
 
-  // Gather identity metadata before dropping database records
   const accountData = await db.user.findUnique({
     where: { id: sessionUser.id },
-    select: { image: true, orgMemberships: {
-      where: { role: "OWNER" },
-      select: { org: { select: { id: true, name: true, _count: { select: { memberships: true } } } } },
-    } },
-  },
-  )
+    select: {
+      image: true,
+      orgMemberships: {
+        where: { role: "OWNER" },
+        select: { org: { select: { id: true, name: true, _count: { select: { memberships: true } } } } },
+      },
+    },
+  })
   if (!accountData) {
     throw createError({ statusCode: 404, statusMessage: "User account not found" })
   }
@@ -35,10 +36,9 @@ export default defineEventHandler(async (event) => {
   // Delete the user (cascade will handle related records) and clear session cookies
   await db.user.delete({ where: { id: sessionUser.id } })
   await clearUserSession(event)
-
   await deleteCached(CacheKeys.userData(sessionUser.id))
 
-  return { success: true, message: "Your account and all associated data have been permanently deleted." }
+  return { success: true, message: "Your account and all associated data have been deleted." }
 })
 
 defineRouteMeta({

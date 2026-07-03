@@ -12,3 +12,17 @@ export default defineEventHandler(async (event) => {
 
   return sendRedirect(event, blobUrl, 302)
 })
+
+defineRouteMeta({
+  openAPI: {
+    summary: "Download CLI binary",
+    description: "Redirects to the public binary URL for supported CLI download files.",
+    tags: ["Downloads"],
+    responses: {
+      302: { description: "Redirect to the binary URL" },
+      400: { description: "Missing file name parameter" },
+      404: { description: "Binary not found" },
+      429: { description: "Rate limit exceeded" },
+    },
+  },
+})

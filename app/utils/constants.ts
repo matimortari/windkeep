@@ -144,7 +144,7 @@ export const TOAST_ICONS: { danger: string, success: string, warning: string, in
   success: "ph:check-circle-bold",
   warning: "ph:warning-circle-bold",
   info: "ph:info-bold",
-} as const
+}
 
 // OAuth providers
 export const OAUTH_PROVIDERS: { name: string, label: string, icon: string }[] = [

@@ -1,9 +1,6 @@
 $ErrorActionPreference = "Stop"
 
 $binary = "windkeep-windows-amd64.exe"
-$url = "https://windkeep.up.railway.app/api/downloads/$binary"
-$checksumsUrl = "https://windkeep.up.railway.app/api/downloads/checksums.txt"
-
 $installDir = "$env:LOCALAPPDATA\Programs\windkeep"
 $target = "$installDir\windkeep.exe"
 $temp = "$installDir\windkeep.tmp.exe"
@@ -14,10 +11,10 @@ if (Test-Path $target) {
   attrib -h -s $target
 }
 
-Invoke-RestMethod $url -OutFile $temp
+Invoke-RestMethod "https://windkeep.up.railway.app/api/downloads/$binary" -OutFile $temp
 
 $expected = $null
-foreach ($line in (Invoke-RestMethod $checksumsUrl) -split "`n") {
+foreach ($line in (Invoke-RestMethod "https://windkeep.up.railway.app/api/downloads/checksums.txt") -split "`n") {
   if ($line -match '^\s*(\S+)\s+(\S+)\s*$') {
     if ($matches[2] -eq $binary) {
       $expected = $matches[1].ToLower()

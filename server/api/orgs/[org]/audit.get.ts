@@ -1,4 +1,4 @@
-import { getAuditLogsSchema } from "#shared/schemas/audit-schema"
+import { getAuditLogsSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
     pagination: { page: result.data.page, limit: result.data.limit, totalPages, totalItems, hasNext: result.data.page < totalPages, hasPrev: result.data.page > 1 },
   }
 
-  await setCached(cacheKey, data, CACHE_TTL.SHORT)
+  await setCached(cacheKey, data, 60)
 
   return { data }
 })

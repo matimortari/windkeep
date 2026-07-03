@@ -400,9 +400,7 @@ tbody tr:last-child {
   background-color: color-mix(in srgb, var(--muted) 60%, transparent);
 }
 
-/*
-  Utilities
-*/
+/* Utilities */
 .scroll-area {
   scrollbar-width: thin;
   scrollbar-color: var(--muted-foreground) transparent;

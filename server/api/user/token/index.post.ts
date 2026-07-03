@@ -11,7 +11,6 @@ export default defineEventHandler(async (event) => {
   expiresAt.setDate(expiresAt.getDate() + 90) // 90 days
 
   await db.user.update({ where: { id: sessionUser.id }, data: { apiToken: hashToken(rawToken), apiTokenExpiresAt: expiresAt } })
-
   await deleteCached(CacheKeys.userData(sessionUser.id))
 
   return { rawToken, expiresAt, message: "Make sure to copy your personal API token now. You will not be able to see it again." }
