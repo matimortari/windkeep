@@ -59,7 +59,7 @@
             <button
               v-for="tab in PROJECT_TABS" :key="tab.key"
               type="button" class="navigation-group rounded-sm p-1 text-left text-sm text-muted-foreground transition-all hover:text-foreground"
-              :class="uiState.adminTabs.project === tab.key ? 'font-semibold text-primary!' : ''"
+              :class="(route.query.t === tab.key || (!route.query.t && tab.key === 'secrets')) ? 'font-semibold text-primary!' : ''"
               @click="selectProjectTab(project, tab.key)"
             >
               <icon :name="tab.icon" size="15" />
@@ -87,8 +87,7 @@ const userStore = useUserStore()
 const { activeOrg } = storeToRefs(useOrgStore())
 const projectStore = useProjectStore()
 const { projects } = storeToRefs(projectStore)
-const { openDialog, closeDialog } = useUIState()
-const { uiState, setTab, setActiveProject } = useUIState()
+const { openDialog, closeDialog, setActiveProject } = useUIState()
 const showAllProjects = ref(false)
 const skeletonWidths = ["65%", "45%", "60%", "50%", "50%", "60%"]
 
@@ -111,29 +110,23 @@ function isActiveProject(project: Project) {
 }
 
 function isActiveOrgTab(tabKey: string) {
-  return route.path === "/admin/organization" && uiState.adminTabs.organization === tabKey
+  return route.path === "/admin/organization" && (route.query.t === tabKey || (!route.query.t && tabKey === "projects"))
 }
 
 function selectOrgTab(tabKey: string) {
-  setTab("organization", tabKey)
-  if (route.path !== "/admin/organization") {
-    navigateTo("/admin/organization")
-  }
+  navigateTo({ path: "/admin/organization", query: { t: tabKey } })
   emit("update:isOpen", false)
 }
 
 function handleProjectClick(project: Project) {
   setActiveProject(project.slug)
-  setTab("project", PROJECT_TABS[0]!.key)
+  navigateTo({ path: `/admin/${project.slug}`, query: { t: PROJECT_TABS[0]!.key } })
   emit("update:isOpen", false)
 }
 
 function selectProjectTab(project: Project, tabKey: string) {
   setActiveProject(project.slug)
-  setTab("project", tabKey)
-  if (route.path !== `/admin/${project.slug}`) {
-    navigateTo(`/admin/${project.slug}`)
-  }
+  navigateTo({ path: `/admin/${project.slug}`, query: { t: tabKey } })
   emit("update:isOpen", false)
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <nuxt-link :to="`/admin/${project.slug}`">
+  <nuxt-link :to="{ path: `/admin/${project.slug}`, query: { t: 'secrets' } }">
     <div class="card relative flex h-50 w-full flex-col justify-between overflow-hidden">
       <div class="flex flex-col gap-2">
         <h4 class="truncate">
@@ -51,6 +51,6 @@ const { setTab, setActiveProject } = useUIState()
 function openProjectSettings() {
   setActiveProject(props.project.slug)
   setTab("project", "settings")
-  navigateTo(`/admin/${props.project.slug}`)
+  navigateTo({ path: `/admin/${props.project.slug}`, query: { t: "settings" } })
 }
 </script>

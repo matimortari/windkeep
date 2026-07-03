@@ -4,10 +4,10 @@
     :enter="{ opacity: 1 }" :duration="800"
     class="container mx-auto"
   >
-    <ProjectSecretsTab v-show="uiState.adminTabs.project === 'secrets'" :project="project" :has-permission="hasPermission" />
-    <ProjectMembersTab v-if="uiState.adminTabs.project === 'members'" />
-    <ProjectServiceTokensTab v-else-if="uiState.adminTabs.project === 'service-tokens'" />
-    <ProjectSettingsTab v-else-if="uiState.adminTabs.project === 'settings'" />
+    <ProjectSecretsTab v-show="activeTab === 'secrets'" :project="project" :has-permission="hasPermission" />
+    <ProjectMembersTab v-if="activeTab === 'members'" />
+    <ProjectServiceTokensTab v-else-if="activeTab === 'service-tokens'" />
+    <ProjectSettingsTab v-else-if="activeTab === 'settings'" />
   </div>
 </template>
 
@@ -17,9 +17,14 @@ const route = useRoute()
 const slug = route.params.project
 const projectStore = useProjectStore()
 const { isOwner, isAdmin } = storeToRefs(projectStore)
-const { uiState } = useUIState()
 const project = computed(() => projectStore.projects.find(p => p.slug === slug))
 const hasPermission = computed(() => isOwner.value(project.value?.id ?? "") || isAdmin.value(project.value?.id ?? ""))
+
+const activeTab = computed(() => {
+  const tab = route.query.t as string
+  const valid = ["secrets", "members", "service-tokens", "settings"]
+  return valid.includes(tab) ? tab : "secrets"
+})
 
 // Set page metadata when project changes
 watch(() => project.value?.id, (id) => {

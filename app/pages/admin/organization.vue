@@ -4,16 +4,22 @@
     :enter="{ opacity: 1 }" :duration="800"
     class="container mx-auto"
   >
-    <OrganizationProjectsTab v-if="uiState.adminTabs.organization === 'projects'" />
-    <OrganizationMembersTab v-else-if="uiState.adminTabs.organization === 'members'" />
-    <OrganizationAuditLogsTab v-else-if="uiState.adminTabs.organization === 'audit-logs'" />
-    <OrganizationSettingsTab v-else-if="uiState.adminTabs.organization === 'settings'" />
+    <OrganizationProjectsTab v-if="activeTab === 'projects'" />
+    <OrganizationMembersTab v-else-if="activeTab === 'members'" />
+    <OrganizationAuditLogsTab v-else-if="activeTab === 'audit-logs'" />
+    <OrganizationSettingsTab v-else-if="activeTab === 'settings'" />
   </div>
 </template>
 
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
-const { uiState } = useUIState()
+const route = useRoute()
+
+const activeTab = computed(() => {
+  const tab = route.query.t as string
+  const valid = ["projects", "members", "audit-logs", "settings"]
+  return valid.includes(tab) ? tab : "projects"
+})
 
 useHead({
   title: "Organization",

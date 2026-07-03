@@ -15,7 +15,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted/20" @click="$router.push(`/admin/${project.slug}`)">
+          <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted/20" @click="$router.push({ path: `/admin/${project.slug}`, query: { t: 'secrets' } })">
           <td :class="columns[0]?.class">
             {{ project.name }}
           </td>
@@ -44,7 +44,7 @@
               <button type="button" aria-label="Project Settings" @click.stop="openProjectSettings(project)">
                 <icon name="ph:gear-bold" size="20" class="transition-colors hover:text-secondary" />
               </button>
-              <nuxt-link :to="`/admin/${project.slug}`" aria-label="Open Project" @click.stop>
+              <nuxt-link :to="{ path: `/admin/${project.slug}`, query: { t: 'secrets' } }" aria-label="Open Project" @click.stop>
                 <icon name="ph:arrow-right-bold" size="20" class="transition-colors hover:text-secondary" />
               </nuxt-link>
             </div>
@@ -66,7 +66,7 @@ const { sortedData: sortedProjects, toggleSort, getSortIconName } = useTableSort
 function openProjectSettings(project: Project) {
   setActiveProject(project.slug)
   setTab("project", "settings")
-  navigateTo(`/admin/${project.slug}`)
+  navigateTo({ path: `/admin/${project.slug}`, query: { t: "settings" } })
 }
 
 const columns = [
