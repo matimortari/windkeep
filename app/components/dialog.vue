@@ -2,7 +2,7 @@
   <teleport to="body">
     <transition :name="isMobile ? 'slide-up' : 'fade'">
       <div
-        v-if="isOpen" class="fixed inset-0 z-50 flex bg-black/70 backdrop-blur-xs"
+        v-if="isOpen" class="fixed inset-0 z-50 flex bg-black/50 backdrop-blur-xs"
         :class="isMobile ? 'items-end justify-center' : 'items-center justify-center'" @mousedown.self="emit('update:isOpen', false)"
       >
         <div
@@ -14,16 +14,16 @@
           <div v-if="isMobile" class="h-1 w-20 self-center rounded-full bg-current opacity-20" />
 
           <header class="flex flex-row items-center justify-between gap-4 border-b pb-2">
-            <h3 id="dialog-title">
+            <h4 id="dialog-title">
               {{ title }}
-            </h3>
+            </h4>
 
             <button aria-label="Close Dialog" class="btn-ghost" @mousedown="emit('update:isOpen', false)">
               <icon name="ph:x-bold" size="20" />
             </button>
           </header>
 
-          <section class="scroll-area" :class="isMobile ? 'overflow-y-auto' : ''">
+          <section class="scroll-area p-4" :class="isMobile ? 'overflow-y-auto' : ''">
             <slot />
           </section>
         </div>
@@ -50,14 +50,28 @@ function onEscape(e: KeyboardEvent) {
   }
 }
 
+function scrollLock(locked: boolean) {
+  const val = locked ? "hidden" : ""
+  document.documentElement.style.overflow = val
+  document.body.style.overflow = val
+}
+
+watch(() => props.isOpen, scrollLock)
+
 onMounted(() => {
   const mql = globalThis.matchMedia("(max-width: 767px)")
   isMobile.value = mql.matches
   mql.addEventListener("change", e => isMobile.value = e.matches)
   document.addEventListener("keydown", onEscape)
+  if (props.isOpen) {
+    scrollLock(true)
+  }
 })
 
-onBeforeUnmount(() => document.removeEventListener("keydown", onEscape))
+onBeforeUnmount(() => {
+  document.removeEventListener("keydown", onEscape)
+  scrollLock(false)
+})
 </script>
 
 <style scoped>

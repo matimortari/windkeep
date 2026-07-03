@@ -1,7 +1,7 @@
 <template>
-  <TabSection title="Settings" description="Manage organization details and settings.">
+  <TabSection context="Organization" title="Settings">
     <div class="flex flex-col">
-      <div v-for="(field, index) in orgFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group">
+      <div v-for="(field, index) in orgFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 last:border-b-0 md:navigation-group">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h6>
             {{ field.label }}
@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <div v-if="isOwner" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Organization encryption settings">
+    <div v-if="isOwner" class="flex flex-col justify-between gap-4 border-t py-4 md:navigation-group" aria-label="Organization encryption settings">
       <header class="flex flex-col gap-1">
         <h6>
           Organization Encryption Key
@@ -41,8 +41,8 @@
         </p>
       </header>
 
-      <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-end">
-        <select v-model="encryptionMode" class="md:max-w-64">
+      <div class="navigation-group justify-end" :class="encryptionMode === 'MANUAL' ? 'flex-wrap md:flex-nowrap' : ''">
+        <select v-model="encryptionMode" class="w-full md:max-w-52">
           <option value="AUTO">
             Auto-generate (recommended)
           </option>
@@ -51,16 +51,17 @@
           </option>
         </select>
 
-        <input
-          v-if="encryptionMode === 'MANUAL'" v-model="manualEncryptionKey"
-          type="password" autocomplete="new-password"
-          placeholder="New encryption password (min 12 chars)"
-        >
-
-        <button class="btn-primary" aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey" @click="handleRotateEncryptionKey">
-          <icon :name="rotateKeyIcon.icon.value || 'ph:key-bold'" size="18" />
-          <span>Rotate Key</span>
-        </button>
+        <div class="navigation-group">
+          <input
+            v-if="encryptionMode === 'MANUAL'" v-model="manualEncryptionKey"
+            type="password" autocomplete="new-password"
+            placeholder="New encryption password (min 12 chars)"
+          >
+          <button class="btn-warning" aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey" @click="handleRotateEncryptionKey">
+            <icon :name="rotateKeyIcon.icon.value || 'ph:key-bold'" size="20" />
+            <span>Rotate Key</span>
+          </button>
+        </div>
       </div>
     </div>
   </TabSection>
@@ -152,11 +153,6 @@ const orgFields = [
     label: "Created At",
     description: "When your organization was created.",
     value: computed(() => formatDate(activeOrg.value?.createdAt)),
-  },
-  {
-    label: "Updated At",
-    description: "When your organization was last updated.",
-    value: computed(() => formatDate(activeOrg.value?.updatedAt)),
   },
 ]
 

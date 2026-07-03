@@ -13,10 +13,10 @@
         <div v-else class="hidden h-4 w-24 animate-pulse rounded-sm bg-muted md:block" />
         <span class="hidden text-muted-foreground md:block">/</span>
 
-        <div ref="dropdownRef" class="relative">
-          <button class="navigation-group gap-1!" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
-            <span v-if="activeOrg?.name" class="text-caption">{{ activeOrg.name }}</span>
-            <span v-else class="inline-block h-4 w-20 animate-pulse rounded-sm bg-muted" />
+        <div ref="dropdownRef" class="relative min-w-0">
+          <button class="navigation-group max-w-32 min-w-0 gap-1! md:max-w-48" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
+            <span v-if="activeOrg?.name" class="text-caption truncate">{{ activeOrg.name }}</span>
+            <span v-else class="inline-block h-4 w-20 shrink-0 animate-pulse rounded-sm bg-muted" />
             <icon
               v-if="activeOrg" name="ph:caret-down-bold"
               size="15" class="transition-transform"
@@ -25,7 +25,7 @@
           </button>
 
           <transition name="dropdown">
-            <ul v-if="isDropdownOpen" class="dropdown-menu" role="menu">
+            <ul v-if="isDropdownOpen" class="dropdown-menu right-auto left-0 md:right-0 md:left-auto" role="menu">
               <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
                 <button
                   class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem"
@@ -53,7 +53,7 @@
       </nav>
 
       <nav class="navigation-group" aria-label="User Actions">
-        <nuxt-link to="/admin/preferences" aria-label="User Preferences" class="btn hidden! md:block!">
+        <nuxt-link to="/admin/preferences" aria-label="User Preferences" class="btn">
           <icon name="ph:user-circle-gear-bold" size="20" />
         </nuxt-link>
         <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
@@ -85,10 +85,7 @@ const { activeOrg, organizations } = storeToRefs(orgStore)
 const { user } = storeToRefs(useUserStore())
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
-
-useClickOutside(dropdownRef, () => {
-  isDropdownOpen.value = false
-}, { escapeKey: true })
+useClickOutside(dropdownRef, () => isDropdownOpen.value = false, { escapeKey: true })
 
 const currentPage = computed(() => {
   const segments = route.path.split("/").filter(Boolean)

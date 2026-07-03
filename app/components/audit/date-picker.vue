@@ -65,17 +65,14 @@ const emit = defineEmits<{ "update:modelValue": [{ start?: string, end?: string 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
 const datePickerRef = ref<HTMLElement | null>(null)
-const isDatePickerOpen = ref(false)
 const currentMonth = ref(new Date().getMonth())
 const currentYear = ref(new Date().getFullYear())
 const hoverDate = ref<Date | null>(null)
+const isDatePickerOpen = ref(false)
+useClickOutside(datePickerRef, () => isDatePickerOpen.value = false, { escapeKey: true })
 const startDate = computed(() => parseDate(props.modelValue?.start))
 const endDate = computed(() => parseDate(props.modelValue?.end))
 const years = computed(() => Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i))
-
-useClickOutside(datePickerRef, () => {
-  isDatePickerOpen.value = false
-}, { escapeKey: true })
 
 const displayLabel = computed(() => {
   const format = (date?: string) => date ? parseDate(date)!.toLocaleDateString("en-GB") : ""

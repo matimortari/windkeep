@@ -4,12 +4,8 @@
     :enter="{ opacity: 1 }" :duration="800"
     class="container mx-auto"
   >
-    <h2 class="border-b py-2">
-      Preferences
-    </h2>
-
-    <TabSection title="Preferences" description="Manage your account information.">
-      <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group">
+    <TabSection title="Preferences">
+      <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 last:border-b-0 md:navigation-group">
         <header class="flex flex-col items-start justify-center gap-1 text-start">
           <h6>
             {{ field.label }}
@@ -28,7 +24,10 @@
 
           <span :class="{ 'text-caption-success font-mono!': field.label === 'CLI Token' && generatedToken }">{{ field.value?.value }}</span>
 
-          <button class="btn" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
+          <button
+            v-if="field.label !== 'CLI Token' || generatedToken" class="btn"
+            :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
+          >
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
 

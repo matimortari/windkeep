@@ -5,7 +5,7 @@
         <button
           v-for="env in ENVIRONMENTS" :key="env.value"
           class="flex-1 rounded-md px-2 py-1 text-sm font-medium transition-colors" :class="selectedEnv === env.value ? 'text-primary-foreground bg-primary' : 'text-muted-foreground hover:text-foreground'"
-          @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
+          type="button" @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
         >
           {{ env.label }}
         </button>
@@ -30,7 +30,7 @@
             v-for="item in diffItems" :key="item.key"
             class="navigation-group rounded-sm px-1 py-0.5 font-mono text-xs" :class="item.class"
           >
-            <icon :name="item.icon" size="12" />
+            <icon :name="item.icon" size="15" />
             <span class="font-semibold">{{ item.key }}</span>
             <span v-if="item.type !== 'removed'" class="truncate text-muted-foreground">= {{ item.value }}</span>
           </li>

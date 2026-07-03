@@ -138,6 +138,14 @@ export const ENVIRONMENTS: { value: Environment, label: string }[] = [
   { value: "PRODUCTION", label: "Production" },
 ]
 
+// Toast icons
+export const TOAST_ICONS: { danger: string, success: string, warning: string, info: string } = {
+  danger: "ph:x-circle-bold",
+  success: "ph:check-circle-bold",
+  warning: "ph:warning-circle-bold",
+  info: "ph:info-bold",
+} as const
+
 // OAuth providers
 export const OAUTH_PROVIDERS: { name: string, label: string, icon: string }[] = [
   { name: "google", label: "Sign In With Google", icon: "simple-icons:google" },

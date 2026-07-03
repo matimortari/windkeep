@@ -1,12 +1,11 @@
 <template>
-  <TabSection title="Projects" description="Projects you have access to within this organization.">
+  <TabSection context="Organization" title="Projects">
     <template #actions>
       <ProjectsActions
         :search="searchQuery" :layout="layout"
-        :sort-direction="sortDirection || 'asc'"
-        :is-owner="isOwner" :is-admin="isAdmin"
-        @update:search="searchQuery = $event" @update:layout="layout = $event"
-        @toggle-sort="toggleSort"
+        :sort-direction="sortDirection || 'asc'" :is-owner="isOwner"
+        :is-admin="isAdmin" @update:search="searchQuery = $event"
+        @update:layout="layout = $event" @toggle-sort="toggleSort"
         @open-dialog="openDialog('projects')"
       />
     </template>

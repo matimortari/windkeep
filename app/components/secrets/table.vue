@@ -31,7 +31,7 @@
                 <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
               </span>
 
-              <div v-if="secret.tags?.length" class="hidden flex-wrap items-center gap-1 md:flex">
+              <div v-if="secret.tags?.length" class="flex flex-wrap items-center gap-1">
                 <button
                   v-for="tag in secret.tags" :key="tag"
                   class="rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors" :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"

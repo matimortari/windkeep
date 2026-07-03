@@ -1,7 +1,16 @@
 <template>
-  <TabSection title="Settings" description="Manage project details and settings.">
+  <TabSection title="Settings">
+    <template #context>
+      <h3 class="navigation-group max-w-lg truncate text-muted-foreground">
+        <span class="truncate">{{ project?.name }}</span>
+        <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
+          <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
+        </nuxt-link>
+      </h3>
+    </template>
+
     <div class="flex flex-col">
-      <div v-for="(field, index) in projectFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group">
+      <div v-for="(field, index) in projectFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 last:border-b-0 md:navigation-group">
         <div class="flex flex-col items-start justify-center gap-1 text-start">
           <h6>
             {{ field.label }}
@@ -136,11 +145,6 @@ const projectFields = [
     label: "Created At",
     description: "When your project was created.",
     value: computed(() => formatDate(project.value?.createdAt)),
-  },
-  {
-    label: "Updated At",
-    description: "When your project was last updated.",
-    value: computed(() => formatDate(project.value?.updatedAt)),
   },
 ]
 

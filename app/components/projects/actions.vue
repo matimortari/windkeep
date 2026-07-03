@@ -1,6 +1,6 @@
 <template>
-  <nav class="navigation-group flex-wrap justify-start md:w-auto md:justify-end">
-    <div class="relative hidden md:block">
+  <nav class="navigation-group w-full justify-end md:w-auto">
+    <div class="relative min-w-0 flex-1 md:flex-none">
       <input
         id="search" :value="search"
         type="text" placeholder="Search projects..."
@@ -11,15 +11,15 @@
       </span>
     </div>
 
-    <button class="btn" :aria-label="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="emit('toggleSort')">
+    <button class="btn shrink-0" :aria-label="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="emit('toggleSort')">
       <icon name="ph:arrow-down-bold" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
     </button>
 
-    <button aria-label="Toggle Layout" class="btn" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
+    <button aria-label="Toggle Layout" class="btn shrink-0" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
       <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
     </button>
 
-    <button v-if="isOwner || isAdmin" class="btn-primary" @click="emit('openDialog')">
+    <button v-if="isOwner || isAdmin" class="btn-primary shrink-0" @click="emit('openDialog')">
       <span class="hidden md:inline">New Project</span>
       <icon name="ph:plus-bold" size="20" />
     </button>

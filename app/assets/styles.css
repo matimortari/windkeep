@@ -217,7 +217,7 @@ h6 {
 .dropdown-menu {
   position: absolute;
   display: flex;
-  right: 0;
+  max-width: calc(100vw - 1rem);
   flex-direction: column;
   gap: 0.25rem;
   background-color: var(--card);
@@ -281,6 +281,7 @@ input::placeholder {
   padding: 0.5rem 0;
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
   scrollbar-width: thin;
   scrollbar-color: var(--muted-foreground) transparent;
 }

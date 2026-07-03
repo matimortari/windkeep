@@ -1,5 +1,5 @@
 <template>
-  <nav class="navigation-group flex-wrap justify-start gap-2 md:justify-end" aria-label="Audit Filters">
+  <nav class="navigation-group w-full justify-end md:w-auto" aria-label="Audit Filters">
     <AuditDatePicker v-model="dateFilter" @update:model-value="updateFilter('date', $event, false)" @apply="applyDateFilter" />
 
     <div ref="actionDropdownRef" class="relative">
@@ -9,7 +9,7 @@
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isActionDropdownOpen" class="dropdown-menu" role="menu">
+        <ul v-if="isActionDropdownOpen" class="dropdown-menu right-0! left-auto!" role="menu">
           <li>
             <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', '')">
               All Actions
@@ -31,7 +31,7 @@
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isUserDropdownOpen" class="dropdown-menu" role="menu">
+        <ul v-if="isUserDropdownOpen" class="dropdown-menu right-0! left-auto!" role="menu">
           <li>
             <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', '')">
               All Users
@@ -49,22 +49,16 @@
 </template>
 
 <script setup lang="ts">
-const auditStore = useOrgStore()
+const orgStore = useOrgStore()
 const { activeOrg, auditActions, auditFilters, currentAuditFilters } = storeToRefs(useOrgStore())
 const dateFilter = ref<{ start?: string, end?: string }>({})
 const isUserDropdownOpen = ref(false)
 const isActionDropdownOpen = ref(false)
 const userDropdownRef = ref<HTMLElement | null>(null)
 const actionDropdownRef = ref<HTMLElement | null>(null)
+useClickOutside(userDropdownRef, () => isUserDropdownOpen.value = false, { escapeKey: true })
+useClickOutside(actionDropdownRef, () => isActionDropdownOpen.value = false, { escapeKey: true })
 const availableUsers = computed(() => auditFilters.value?.users || [])
-
-useClickOutside(userDropdownRef, () => {
-  isUserDropdownOpen.value = false
-}, { escapeKey: true })
-
-useClickOutside(actionDropdownRef, () => {
-  isActionDropdownOpen.value = false
-}, { escapeKey: true })
 
 function getUserDisplayName(userId?: string) {
   if (!userId) {
@@ -105,12 +99,12 @@ function updateFilter(type: "date" | "user" | "action", value: any, shouldFetch 
     updated.action = value || undefined
     isActionDropdownOpen.value = false
   }
-  auditStore.updateFilters(updated)
+  orgStore.updateFilters(updated)
   if (!shouldFetch) {
     return
   }
 
-  auditStore.getAuditLogs(activeOrg.value!.id, updated)
+  orgStore.getAuditLogs(activeOrg.value!.id, updated)
 }
 
 function applyDateFilter() {
@@ -119,8 +113,8 @@ function applyDateFilter() {
   }
 
   const updated = { ...currentAuditFilters.value, page: 1 }
-  auditStore.updateFilters(updated)
-  auditStore.getAuditLogs(activeOrg.value.id, updated)
+  orgStore.updateFilters(updated)
+  orgStore.getAuditLogs(activeOrg.value.id, updated)
 }
 
 // Sync date filter inputs with current filters

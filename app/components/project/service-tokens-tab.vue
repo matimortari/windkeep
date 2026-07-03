@@ -1,11 +1,20 @@
 <template>
-  <TabSection title="Service Tokens" description="Manage programmatic access keys for CI/CD pipelines and backend deployments.">
+  <TabSection title="Service Tokens">
+    <template #context>
+      <h3 class="navigation-group max-w-lg truncate text-muted-foreground">
+        <span class="truncate">{{ project?.name }}</span>
+        <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
+          <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
+        </nuxt-link>
+      </h3>
+    </template>
+
     <div class="p-2">
-      <ul class="scroll-area card flex max-h-64 flex-col items-start overflow-y-auto">
+      <ul class="scroll-area card flex max-h-64 flex-col items-start divide-y overflow-y-auto">
         <li v-if="!serviceTokens.length" class="w-full py-4 text-center text-sm text-muted-foreground">
           No service tokens generated yet for this project.
         </li>
-        <li v-for="token in serviceTokens" :key="token.id" class="navigation-group w-full justify-between border-y py-4 first:border-t-0 first:pt-0 last:pb-0">
+        <li v-for="token in serviceTokens" :key="token.id" class="navigation-group w-full justify-between py-4 first:pt-0 last:pb-0">
           <div class="flex flex-col gap-1 truncate">
             <span class="font-semibold">{{ token.name }}</span>
             <div class="navigation-group flex-wrap">
@@ -21,7 +30,7 @@
           </div>
 
           <button class="btn shrink-0" aria-label="Revoke Token" @click="handleRevokeToken(token.id)">
-            <icon name="ph:trash-bold" size="16" class="text-muted-foreground hover:text-danger" />
+            <icon name="ph:trash-bold" size="15" class="text-muted-foreground hover:text-danger" />
           </button>
         </li>
       </ul>
@@ -30,7 +39,7 @@
     <!-- Accordion create form -->
     <div class="flex flex-col gap-2">
       <button class="btn-primary self-end" @click="toggleCreateForm">
-        <icon :name="showCreateForm ? 'ph:x-bold' : 'ph:key-bold'" size="18" />
+        <icon :name="showCreateForm ? 'ph:x-bold' : 'ph:key-bold'" size="20" />
         <span>{{ showCreateForm ? 'Cancel' : 'Generate Token' }}</span>
       </button>
 
@@ -48,7 +57,7 @@
               <div class="navigation-group rounded-sm border bg-muted p-3 font-mono text-xs break-all">
                 <span class="flex-1">{{ generatedRawToken }}</span>
                 <button class="btn ml-2 shrink-0" aria-label="Copy token" @click="copyToken">
-                  <icon :name="tokenCopyIcon.icon.value" size="18" />
+                  <icon :name="tokenCopyIcon.icon.value" size="20" />
                 </button>
               </div>
               <button class="btn self-end" @click="dismissToken">
@@ -91,7 +100,7 @@
 
             <div class="flex justify-end">
               <button class="btn-success" :disabled="!canSubmitToken" @click="handleCreateToken">
-                <icon name="ph:key-bold" size="18" />
+                <icon name="ph:key-bold" size="20" />
                 <span>Generate</span>
               </button>
             </div>

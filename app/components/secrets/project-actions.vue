@@ -1,6 +1,6 @@
 <template>
-  <nav class="navigation-group flex-wrap justify-start md:w-auto md:justify-end" aria-label="Project Actions">
-    <div class="relative hidden md:block">
+  <nav class="navigation-group w-full justify-end md:w-auto" aria-label="Project Actions">
+    <div class="relative min-w-0 flex-1 md:flex-none">
       <input
         id="search" :value="searchQuery"
         type="text" placeholder="Search secrets..."
@@ -24,7 +24,7 @@
           size="15" class="ml-0.5"
           @click.stop="emit('filterByTag', null)"
         />
-        <icon v-else name="ph:caret-down-bold" size="15" />
+        <icon v-else name="ph:caret-down-bold" size="15" class="hidden md:block" />
       </button>
 
       <transition name="dropdown">
@@ -77,10 +77,6 @@
       <icon name="ph:plus-bold" size="20" />
     </button>
 
-    <button type="button" :class="hasPendingChanges ? 'hidden' : 'btn'" aria-label="Project Settings" @click="setTab('project', 'settings')">
-      <icon name="ph:gear-bold" size="20" />
-    </button>
-
     <div v-if="hasPendingChanges" class="navigation-group">
       <button class="btn-success" aria-label="Save All Changes" @click="emit('save')">
         <icon name="ph:floppy-disk-bold" size="20" />
@@ -114,20 +110,13 @@ const emit = defineEmits<{
   search: [query: string]
 }>()
 
-const { setTab } = useUIState()
 const exportDropdownRef = ref<HTMLElement | null>(null)
 const tagDropdownRef = ref<HTMLElement | null>(null)
+const searchQuery = ref("")
 const isExportDropdownOpen = ref(false)
 const isTagDropdownOpen = ref(false)
-const searchQuery = ref("")
-
-useClickOutside(exportDropdownRef, () => {
-  isExportDropdownOpen.value = false
-}, { escapeKey: true })
-
-useClickOutside(tagDropdownRef, () => {
-  isTagDropdownOpen.value = false
-}, { escapeKey: true })
+useClickOutside(exportDropdownRef, () => isExportDropdownOpen.value = false, { escapeKey: true })
+useClickOutside(tagDropdownRef, () => isTagDropdownOpen.value = false, { escapeKey: true })
 
 function handleExport(env: string) {
   emit("export", env)

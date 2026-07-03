@@ -1,6 +1,6 @@
 <template>
   <!-- Mobile overlay -->
-  <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-40 bg-black/70 md:hidden" @click="emit('update:isOpen', false)" />
+  <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden" @click="emit('update:isOpen', false)" />
 
   <aside
     class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r bg-card px-4 py-20 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b md:py-8"
@@ -58,11 +58,11 @@
           <div v-if="isActiveProject(project)" class="mt-1 ml-3 flex flex-col gap-0.5 border-l pl-2">
             <button
               v-for="tab in PROJECT_TABS" :key="tab.key"
-              type="button" class="navigation-group rounded-sm px-2 py-1 text-left text-xs transition-all hover:text-foreground"
+              type="button" class="navigation-group rounded-sm p-1 text-left text-sm text-muted-foreground transition-all hover:text-foreground"
               :class="uiState.adminTabs.project === tab.key ? 'font-semibold text-primary!' : ''"
               @click="selectProjectTab(project, tab.key)"
             >
-              <icon :name="tab.icon" size="14" />
+              <icon :name="tab.icon" size="15" />
               <span>{{ tab.label }}</span>
             </button>
           </div>
