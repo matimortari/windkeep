@@ -1,136 +1,268 @@
 <template>
   <TabSection context="Organization" title="Members">
-    <div class="p-2">
-      <ul class="scroll-area card flex max-h-96 flex-col items-start divide-y overflow-y-auto">
-        <li v-for="orgUser in orgMembers" :key="orgUser.user.id" class="navigation-group w-full justify-between py-4 first:pt-0 last:pb-0">
-          <div class="navigation-group items-start!">
-            <img :src="orgUser.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
+    <template v-if="canManage" #actions>
+      <div class="navigation-group w-full justify-end md:w-auto">
+        <button class="btn-primary" @click="isInviteDialogOpen = true">
+          <icon name="ph:envelope-bold" size="20" />
+          <span>Invite Member</span>
+        </button>
+      </div>
+    </template>
 
-            <div class="flex flex-col truncate">
-              <span class="font-semibold">{{ orgUser.user.name }}</span>
-              <span class="text-caption">Role: {{ ROLES.find(role => role.value === orgUser.role)?.label }}</span>
-            </div>
-          </div>
-
-          <nav v-if="isOwner && orgUser.user.id !== user?.id" class="navigation-group" aria-label="Organization Member Actions">
-            <select v-model="orgUser.role">
-              <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
-                {{ role.label }}
-              </option>
-            </select>
-
-            <button class="btn" aria-label="Update Member Role" @click="orgUser.role !== 'OWNER' && handleUpdateMemberRole(orgUser.user.id || '', orgUser.role)">
-              <icon :name="memberRoleIcon.get(orgUser.user.id)?.icon || 'ph:floppy-disk-bold'" size="15" />
-            </button>
-            <button class="btn" aria-label="Transfer Organization Ownership" @click="handleTransferOwnership(orgUser.user.id || '')">
-              <icon :name="transferOwnershipIcon.get(orgUser.user.id)?.icon || 'ph:arrow-u-up-right-bold'" size="15" />
-            </button>
-            <button v-if="isOwner && orgUser.role !== 'OWNER'" class="btn" aria-label="Remove Member" @click="handleRemoveMember(orgUser.user.id || '')">
-              <icon name="ph:x-bold" size="15" />
-            </button>
-          </nav>
-        </li>
-      </ul>
-    </div>
-
-    <div v-if="isOwner || isAdmin" class="flex flex-col justify-between gap-4 border-t py-4 md:navigation-group" aria-label="Invite Members">
+    <div class="flex flex-col gap-4 py-2">
       <header class="flex flex-col gap-1">
         <h6>
-          Invite Members
+          Members
         </h6>
         <p class="text-caption">
-          Create an invite link to add new members to your organization.
+          Users with access to this organization and their roles.
         </p>
       </header>
 
-      <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-end">
-        <input v-model="inviteEmail" type="email" placeholder="colleague@example.com" class="w-full md:max-w-64">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th v-for="col in memberColumns" :key="col.key" :class="col.class">
+                <div class="navigation-group">
+                  <span>{{ col.label }}</span>
+                  <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleMemberSort(col.key)">
+                    <icon :name="getMemberSortIconName(col.key)" size="15" class="transition-transform" />
+                  </button>
+                </div>
+              </th>
+            </tr>
+          </thead>
 
-        <select v-model="inviteRole" class="md:max-w-32">
-          <option v-for="role in ROLES.filter(r => r.value !== 'OWNER')" :key="role.value" :value="role.value">
-            {{ role.label }}
-          </option>
-        </select>
+          <tbody>
+            <tr v-if="!sortedMembers.length">
+              <td :colspan="memberColumns.length" class="p-8 text-center">
+                <Empty message="No members found." icon-name="ph:users-three-bold" />
+              </td>
+            </tr>
 
-        <button class="btn-primary" :disabled="!inviteEmail.trim()" @click="handleCreateInvite">
-          <icon :name="inviteLinkIcon.icon.value" size="20" />
-          <span>Copy Invite Link</span>
-        </button>
+            <tr
+              v-for="orgUser in sortedMembers" :key="orgUser.user.id"
+              class="hover:bg-muted/20" :class="canManageMember(orgUser) ? 'cursor-pointer' : ''"
+              @click="canManageMember(orgUser) && openMemberDialog(orgUser)"
+            >
+              <td>
+                <div class="navigation-group items-start!">
+                  <img :src="orgUser.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
+                  <div class="flex flex-col truncate">
+                    <span class="font-semibold">{{ orgUser.user.name }}</span>
+                    <span class="text-caption">{{ orgUser.user.email }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="w-28">
+                {{ ROLES.find(role => role.value === orgUser.role)?.label }}
+              </td>
+              <td class="w-24">
+                <button v-if="canManageMember(orgUser)" class="btn" aria-label="Manage member" @click.stop="openMemberDialog(orgUser)">
+                  <icon name="ph:gear-bold" size="15" class="text-muted-foreground hover:text-secondary" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+      <section v-if="canManage" class="flex flex-col gap-2">
+        <header class="flex flex-col gap-1">
+          <h6>
+            Invitations
+          </h6>
+          <p class="text-caption">
+            Track pending, accepted, and expired invitations.
+          </p>
+        </header>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th v-for="col in inviteColumns" :key="col.key" :class="col.class">
+                  <div class="navigation-group">
+                    <span>{{ col.label }}</span>
+                    <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleInviteSort(col.key)">
+                      <icon :name="getInviteSortIconName(col.key)" size="15" class="transition-transform" />
+                    </button>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-if="!sortedInvitations.length">
+                <td :colspan="inviteColumns.length" class="p-8 text-center">
+                  <Empty message="No invitations yet." icon-name="ph:envelope-open-bold" />
+                </td>
+              </tr>
+
+              <tr v-for="invite in sortedInvitations" :key="invite.id" class="hover:bg-muted/20">
+                <td class="max-w-xs truncate">
+                  {{ invite.email }}
+                </td>
+                <td class="w-24">
+                  {{ ROLES.find(role => role.value === invite.role)?.label }}
+                </td>
+                <td class="w-28">
+                  <span class="rounded-sm px-1.5 py-0.5 text-xs font-semibold" :class="inviteStatusClass(getInviteStatus(invite))">
+                    {{ INVITE_STATUS[getInviteStatus(invite)] }}
+                  </span>
+                </td>
+                <td class="max-w-xs truncate">
+                  {{ invite.invitedBy?.name || invite.invitedBy?.email }}
+                </td>
+                <td class="w-40 whitespace-nowrap">
+                  {{ formatDate(invite.createdAt) }}
+                </td>
+                <td class="w-40 whitespace-nowrap">
+                  {{ getInviteStatus(invite) === "accepted" ? formatDate(invite.acceptedAt) : formatDate(invite.expiresAt) }}
+                </td>
+                <td class="w-28">
+                  <div class="navigation-group">
+                    <button v-if="getInviteStatus(invite) === 'pending'" class="btn" aria-label="Copy invite link" @click="handleCopyInviteLink(invite)">
+                      <icon :name="activeCopyInviteId === invite.id ? inviteLinkIcon.icon.value : 'ph:link-bold'" size="15" />
+                    </button>
+                    <button v-if="getInviteStatus(invite) === 'expired'" class="btn" aria-label="Re-invite" @click="openReinvite(invite.email)">
+                      <icon name="ph:arrow-clockwise-bold" size="15" />
+                    </button>
+                    <button v-if="getInviteStatus(invite) !== 'accepted'" class="btn" aria-label="Revoke invitation" @click="handleRevokeInvite(invite.id)">
+                      <icon name="ph:trash-bold" size="15" class="text-muted-foreground hover:text-danger" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
+
+    <OrganizationInviteDialog v-model:is-open="isInviteDialogOpen" :org-id="activeOrg?.id ?? ''" :initial-email="reinviteEmail" @created="refreshInvitations" />
+
+    <OrganizationMemberManageDialog
+      v-model:is-open="isMemberDialogOpen" :org-id="activeOrg?.id ?? ''"
+      :member="selectedMember" :is-owner="isOwner"
+      :current-user-id="user?.id" @updated="refreshMembers"
+    />
   </TabSection>
 </template>
 
 <script setup lang="ts">
-const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
-const { activeOrg, orgMembers, isOwner, isAdmin } = storeToRefs(orgStore)
-const inviteEmail = ref("")
-const inviteRole = ref<"ADMIN" | "MEMBER">("MEMBER")
-const memberRoleIcon = ref(new Map())
-const transferOwnershipIcon = ref(new Map())
+const { activeOrg, orgMembers, invitations, isOwner, isAdmin } = storeToRefs(orgStore)
+const { createActionHandler } = useActionIcon()
+const canManage = computed(() => isOwner.value || isAdmin.value)
+const isInviteDialogOpen = ref(false)
+const isMemberDialogOpen = ref(false)
+const selectedMember = ref<OrgMembership | null>(null)
+const reinviteEmail = ref<string | undefined>()
+const activeCopyInviteId = ref<string | null>(null)
 const inviteLinkIcon = createActionHandler("ph:link-bold")
 
-async function handleCreateInvite() {
-  if (!activeOrg.value?.id || !inviteEmail.value.trim()) {
-    return
-  }
+const memberColumns = [
+  { key: "user.name", label: "Member", class: "", sortable: true },
+  { key: "role", label: "Role", class: "w-28", sortable: true },
+  { key: "actions", label: "Actions", class: "w-24", sortable: false },
+]
 
-  const result = await orgStore.createInvite(activeOrg.value.id, { orgId: activeOrg.value.id, email: inviteEmail.value.trim(), role: inviteRole.value })
-  if (result?.inviteUrl) {
-    await inviteLinkIcon.triggerCopy(result.inviteUrl)
-    inviteEmail.value = ""
+const inviteColumns = [
+  { key: "email", label: "Email", class: "", sortable: true },
+  { key: "role", label: "Role", class: "w-24", sortable: true },
+  { key: "status", label: "Status", class: "w-28", sortable: false },
+  { key: "invitedBy.name", label: "Invited by", class: "", sortable: true },
+  { key: "createdAt", label: "Created", class: "w-40", sortable: true },
+  { key: "expiresAt", label: "Expires / Accepted", class: "w-40", sortable: true },
+  { key: "actions", label: "Actions", class: "w-28", sortable: false },
+]
+
+const invitationsWithStatus = computed(() => invitations.value.map(invite => ({ ...invite, status: getInviteStatus(invite) })))
+const { sortedData: sortedMembers, toggleSort: toggleMemberSort, getSortIconName: getMemberSortIconName } = useTableSort(orgMembers)
+const { sortedData: sortedInvitations, toggleSort: toggleInviteSort, getSortIconName: getInviteSortIconName } = useTableSort(invitationsWithStatus)
+
+function getInviteStatus(invitation: Pick<Invitation, "acceptedAt" | "expiresAt">): InviteStatus {
+  if (invitation.acceptedAt) {
+    return "accepted"
+  }
+  if (new Date(invitation.expiresAt) < new Date()) {
+    return "expired"
+  }
+  return "pending"
+}
+
+function canManageMember(member: OrgMembership) {
+  return isOwner.value && member.user.id !== user.value?.id && member.role !== "OWNER"
+}
+
+function openMemberDialog(member: OrgMembership) {
+  selectedMember.value = member
+  isMemberDialogOpen.value = true
+}
+
+function openReinvite(email: string) {
+  reinviteEmail.value = email
+  isInviteDialogOpen.value = true
+}
+
+function inviteStatusClass(status: InviteStatus) {
+  if (status === "accepted") {
+    return "bg-success/10 text-success"
+  }
+  if (status === "pending") {
+    return "bg-secondary/10 text-secondary"
+  }
+  return "bg-muted/50 text-muted-foreground"
+}
+
+async function refreshMembers() {
+  if (activeOrg.value?.id) {
+    await orgStore.getOrg(activeOrg.value.id)
   }
 }
 
-async function handleUpdateMemberRole(memberId: string, newRole: "ADMIN" | "MEMBER") {
+async function refreshInvitations() {
+  if (activeOrg.value?.id) {
+    await orgStore.getInvitations(activeOrg.value.id)
+  }
+  reinviteEmail.value = undefined
+}
+
+async function handleCopyInviteLink(invite: Invitation) {
   if (!activeOrg.value?.id) {
     return
   }
 
-  await orgStore.updateOrgMember(activeOrg.value.id, memberId, { role: newRole })
-  await userStore.getUser()
-  memberRoleIcon.value.get(memberId)?.triggerSuccess()
-}
-
-async function handleRemoveMember(memberId: string) {
-  if (!activeOrg.value?.id) {
-    return
-  }
-  if (!confirm("Are you sure you want to remove this member?")) {
-    return
-  }
-
-  await orgStore.removeOrgMember(activeOrg.value.id, memberId)
-  await userStore.getUser()
-  await orgStore.getOrg(activeOrg.value.id)
-}
-
-async function handleTransferOwnership(newOwnerId: string) {
-  if (!activeOrg.value?.id) {
-    return
-  }
-  if (!confirm("Are you sure you want to transfer ownership to this member? You will be demoted to admin.")) {
-    return
-  }
-
-  await orgStore.transferOrgOwnership(activeOrg.value.id, { newOwnerId })
-  await userStore.getUser()
-  await orgStore.getOrg(activeOrg.value.id)
-  transferOwnershipIcon.value.get(newOwnerId)?.triggerSuccess()
-}
-
-// Initialize action handlers for members
-watch(orgMembers, (members) => {
-  members.forEach((member) => {
-    if (!memberRoleIcon.value.has(member.user.id)) {
-      memberRoleIcon.value.set(member.user.id, createActionHandler("ph:floppy-disk-bold"))
-    }
-    if (!transferOwnershipIcon.value.has(member.user.id)) {
-      transferOwnershipIcon.value.set(member.user.id, createActionHandler("ph:arrow-u-up-right-bold"))
-    }
+  const result = await orgStore.createInvite(activeOrg.value.id, {
+    orgId: activeOrg.value.id,
+    email: invite.email,
+    role: invite.role as "ADMIN" | "MEMBER",
   })
-}, { immediate: true, deep: true })
+
+  if (result?.inviteUrl) {
+    activeCopyInviteId.value = invite.id
+    await inviteLinkIcon.triggerCopy(result.inviteUrl)
+    await refreshInvitations()
+  }
+}
+
+async function handleRevokeInvite(inviteId: string) {
+  if (!activeOrg.value?.id) {
+    return
+  }
+  if (!confirm("Are you sure you want to revoke this invitation?")) {
+    return
+  }
+  await orgStore.revokeInvite(activeOrg.value.id, inviteId)
+}
+
+watch(activeOrg, async (org) => {
+  if (org?.id && canManage.value) {
+    await refreshInvitations()
+  }
+}, { immediate: true })
 </script>

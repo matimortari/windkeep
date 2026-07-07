@@ -10,12 +10,13 @@ export default defineEventHandler(async (event) => {
   await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN"])
 
   const invitations = await db.invitation.findMany({
-    where: { orgId, acceptedAt: null },
+    where: { orgId },
     select: {
       id: true,
       email: true,
       role: true,
       expiresAt: true,
+      acceptedAt: true,
       createdAt: true,
       invitedBy: { select: { id: true, name: true, email: true } },
     },
@@ -27,14 +28,14 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "List pending organization invitations",
-    description: "Returns all pending (unaccepted) invitations for the organization. Requires organization OWNER or ADMIN role.",
+    summary: "List organization invitations",
+    description: "Returns all invitations for the organization, including pending, accepted, and expired. Requires organization OWNER or ADMIN role.",
     tags: ["Invitations"],
     parameters: [
       { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
     ],
     responses: {
-      200: { description: "List of pending organization invitations" },
+      200: { description: "List of organization invitations" },
       401: { description: "Unauthenticated" },
       403: { description: "Insufficient role" },
       429: { description: "Rate limit exceeded" },

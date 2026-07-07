@@ -5,8 +5,7 @@
     class="container mx-auto"
   >
     <ProjectSecretsTab v-show="activeTab === 'secrets'" :project="project" :has-permission="hasPermission" />
-    <ProjectMembersTab v-if="activeTab === 'members'" />
-    <ProjectServiceTokensTab v-else-if="activeTab === 'service-tokens'" />
+    <ProjectAccessControlTab v-if="activeTab === 'access-control'" />
     <ProjectSettingsTab v-else-if="activeTab === 'settings'" />
   </div>
 </template>
@@ -22,7 +21,7 @@ const hasPermission = computed(() => isOwner.value(project.value?.id ?? "") || i
 
 const activeTab = computed(() => {
   const tab = route.query.t as string
-  return ["secrets", "members", "service-tokens", "settings"].includes(tab) ? tab : "secrets"
+  return ["secrets", "access-control", "settings"].includes(tab) ? tab : "secrets"
 })
 
 // Set page metadata when project changes

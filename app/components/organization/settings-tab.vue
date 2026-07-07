@@ -34,10 +34,10 @@
     <div v-if="isOwner" class="flex flex-col justify-between gap-4 border-t py-4 md:navigation-group" aria-label="Organization encryption settings">
       <header class="flex flex-col gap-1">
         <h6>
-          Organization Encryption Key
+          Rotate Organization Encryption Key
         </h6>
         <p class="text-caption">
-          Rotate your organization key to isolate future access. Existing secrets are re-encrypted automatically.
+          Existing secrets are re-encrypted automatically.
         </p>
       </header>
 
@@ -145,14 +145,14 @@ const orgFields = [
     copyable: true,
   },
   {
-    label: "Encryption Key Updated At",
-    description: "When your organization encryption key was last rotated.",
-    value: computed(() => formatDate(activeOrg.value?.encryptionKeyUpdatedAt)),
-  },
-  {
     label: "Created At",
     description: "When your organization was created.",
     value: computed(() => formatDate(activeOrg.value?.createdAt)),
+  },
+  {
+    label: "Encryption Key Updated At",
+    description: "When your organization encryption key was last rotated.",
+    value: computed(() => formatDate(activeOrg.value?.encryptionKeyUpdatedAt)),
   },
 ]
 

@@ -1,5 +1,7 @@
 type Environment = "DEVELOPMENT" | "STAGING" | "PRODUCTION"
+type InviteStatus = "pending" | "accepted" | "expired"
 type Role = "OWNER" | "ADMIN" | "MEMBER"
+type InlineTextPart = string | { code: string } | { strong: string } | { em: string } | { link: { href: string, text: string, external?: boolean } }
 
 interface User {
   id: string
@@ -204,8 +206,6 @@ interface CalendarDay {
   isSelected: boolean
   isToday: boolean
 }
-
-type InlineTextPart = string | { code: string } | { strong: string } | { em: string } | { link: { href: string, text: string, external?: boolean } }
 
 interface CliSection {
   title: string

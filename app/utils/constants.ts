@@ -119,10 +119,16 @@ export const ORGANIZATION_TABS: { key: string, label: string, icon: string }[] =
 
 export const PROJECT_TABS: { key: string, label: string, icon: string }[] = [
   { key: "secrets", label: "Secrets", icon: "ph:stack-bold" },
-  { key: "members", label: "Members", icon: "ph:users-bold" },
-  { key: "service-tokens", label: "Service Tokens", icon: "ph:key-bold" },
+  { key: "access-control", label: "Access Control", icon: "ph:shield-check-bold" },
   { key: "settings", label: "Settings", icon: "ph:gear-six-bold" },
 ]
+
+// Organization and project invitation status
+export const INVITE_STATUS: { pending: string, accepted: string, expired: string } = {
+  pending: "Pending",
+  accepted: "Accepted",
+  expired: "Expired",
+}
 
 // Organization and project roles
 export const ROLES: { value: Role, label: string }[] = [
