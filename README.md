@@ -8,33 +8,30 @@
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=matimortari_windkeep&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=matimortari_windkeep)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat&colorA=0d1117)](https://opensource.org/licenses/MIT)
 
-[**WindKeep**](https://windkeep.up.railway.app) is a secrets management platform that allows for teams and developers to securely store, manage, and share sensitive information. It features role-based access control, audit logging mechanisms, encrypted secret storage, and a command line interface. Check out the [**CLI documentation**](./cli/README.md) for instructions.
+[**WindKeep**](https://windkeep.up.railway.app) is a secrets management platform that helps teams and developers to securely store, manage, and share sensitive information. It features role-based access control, audit routines, encrypted secret storage, and an integrated [**Command-Line Interface**](./cli/README.md).
 
 </div>
 
 ## Features
 
-- **Authentication:** OAuth via Google, GitHub, or GitLab providers.
-- **Multi-Tenant Architecture:** Each organization operates within its own environment, with dedicated members and projects, providing full access control and governance.
-- **Project-Based Secret Management:** Organize secrets into projects for better structure and granular access control.
-- **Role-Based Access Control:** Control access at both organization and project levels for maximum flexibility and security.
+- **Authentication:** OAuth sign-in via Google, GitHub, or GitLab.
+- **Role-Based Access Control:** Control user access to resources at both organization and project levels.
+- **Secret Management:** Create, edit, and delete secrets within projects. Secrets are scoped to a specific environment and encrypted at rest using AES-256-GCM.
+- **Audit Trail:** Sensitive operations are logged and can be inspected to ensure transparency and accountability. Each secret keeps its own history of changes.
 - **Service Tokens:** Generate service tokens for programmatic access to secrets, with environment and expiration date control.
-- **Audit Logging:** Monitor your organization's activities with detailed audit logs tracking sensitive operations, such as secret changes and role updates.
-- **Encrypted Secrets:** Secrets are encrypted both at rest and in transit using modern encryption standards.
-- **CLI Integration:** The integrated command line allows direct interaction with the platform from the terminal, providing commands for organization and project management, pull/push operations, and automatic secret injection into local development and CI/CD pipelines.
+- **Command-Line Interface:** Interact with the platform directly from the terminal. Provides commands for organization and project management, pull/push operations, and automatic secret injection into local development and CI/CD pipelines.
 
 ## Stack
 
 - **Nuxt.js** with **Vue** composition API and **Nitro** server engine.
 - **OAuth** authentication with Google, GitHub, or GitLab.
 - **Prisma** for **PostgreSQL** database management.
-- **Redis** for caching.
+- **Redis** for caching and rate limiting.
 - **Pinia** for state management.
 - **Zod** for schema validation.
 - **TypeScript**.
 - **ESLint**.
 - **Tailwind CSS**.
-- **Framer Motion**.
 - **Go** for CLI development using **Cobra**.
 
 ## Contact
