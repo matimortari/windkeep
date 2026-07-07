@@ -39,10 +39,7 @@ export default defineEventHandler(async (event) => {
     action: "CREATE.ORG",
     resource: "organization",
     description: `Created organization "${organization.name}"`,
-    metadata: {
-      orgId: organization.id,
-      orgName: organization.name,
-    },
+    metadata: { orgName: organization.name },
   })
 
   await deleteCached(CacheKeys.userData(sessionUser.id))

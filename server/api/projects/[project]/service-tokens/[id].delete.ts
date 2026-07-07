@@ -34,8 +34,6 @@ export default defineEventHandler(async (event) => {
     metadata: {
       serviceTokenId: serviceToken.id,
       tokenName: serviceToken.name,
-      projectId: serviceToken.project.id,
-      projectName: serviceToken.project.name,
     },
   })
 

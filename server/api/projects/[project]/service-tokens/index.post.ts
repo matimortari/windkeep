@@ -50,13 +50,12 @@ export default defineEventHandler(async (event) => {
     projectId: project.id,
     action: "CREATE.SERVICE_TOKEN",
     resource: "service_token",
-    description: `Created service token "${serviceToken.name}" for environment(s): ${serviceToken.environment.join(", ")}`,
+    description: `Created service token "${serviceToken.name}" in project "${project.name}" for environment(s): ${serviceToken.environment.join(", ")}`,
     metadata: {
       serviceTokenId: serviceToken.id,
       tokenName: serviceToken.name,
       environments: serviceToken.environment,
-      projectId: project.id,
-      projectName: project.name,
+      ...(serviceToken.expiresAt && { expiresAt: serviceToken.expiresAt.toISOString() }),
     },
   })
 

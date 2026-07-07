@@ -33,8 +33,6 @@ export default defineEventHandler(async (event) => {
       inviteId: invitation.id,
       inviteeEmail: invitation.email,
       inviteeRole: invitation.role,
-      orgId: invitation.org.id,
-      orgName: invitation.org.name,
     },
   })
 

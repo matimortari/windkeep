@@ -48,12 +48,7 @@ export default defineEventHandler(async (event) => {
     action: "CREATE.PROJECT",
     resource: "project",
     description: `Created project "${newProject.name}" in organization "${newProject.org.name}"`,
-    metadata: {
-      projectId: newProject.id,
-      projectName: newProject.name,
-      orgId: newProject.org.id,
-      orgName: newProject.org.name,
-    },
+    metadata: { projectName: newProject.name },
   })
 
   await deleteCached(CacheKeys.userProjects(sessionUser.id))

@@ -53,10 +53,6 @@ export default defineEventHandler(async (event) => {
       memberEmail: updatedMembership.user.email,
       oldRole: targetMembership.role,
       newRole: updatedMembership.role,
-      projectId: updatedMembership.project.id,
-      projectName: updatedMembership.project.name,
-      orgId: updatedMembership.project.org.id,
-      orgName: updatedMembership.project.org.name,
     },
   })
 

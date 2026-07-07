@@ -42,10 +42,6 @@ export default defineEventHandler(async (event) => {
       memberName: targetMembership.user.name,
       memberEmail: targetMembership.user.email,
       memberRole: targetMembership.role,
-      projectId: targetMembership.project.id,
-      projectName: targetMembership.project.name,
-      orgId: targetMembership.project.org.id,
-      orgName: targetMembership.project.org.name,
     },
   })
 

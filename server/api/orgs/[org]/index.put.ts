@@ -47,27 +47,44 @@ export default defineEventHandler(async (event) => {
     },
   })
 
+  const metadata: Record<string, unknown> = {}
+  const changes: string[] = []
+  if (existingOrg.name !== updatedOrg.name) {
+    metadata.oldName = existingOrg.name
+    metadata.newName = updatedOrg.name
+    changes.push(`name to "${updatedOrg.name}"`)
+  }
+  if (existingOrg.description !== updatedOrg.description) {
+    metadata.oldDescription = existingOrg.description
+    metadata.newDescription = updatedOrg.description
+    changes.push("description")
+  }
+  if (existingOrg.website !== updatedOrg.website) {
+    metadata.oldWebsite = existingOrg.website
+    metadata.newWebsite = updatedOrg.website
+    changes.push("website")
+  }
+  if (result.data.rotateEncryptionKey) {
+    metadata.rotatedEncryptionKey = true
+    if (existingOrg.encryptionKeyVersion !== updatedOrg.encryptionKeyVersion) {
+      metadata.oldEncryptionKeyVersion = existingOrg.encryptionKeyVersion
+      metadata.newEncryptionKeyVersion = updatedOrg.encryptionKeyVersion
+    }
+    if (existingOrg.encryptionKeyUpdatedAt?.getTime() !== updatedOrg.encryptionKeyUpdatedAt?.getTime()) {
+      metadata.oldEncryptionKeyUpdatedAt = existingOrg.encryptionKeyUpdatedAt
+      metadata.newEncryptionKeyUpdatedAt = updatedOrg.encryptionKeyUpdatedAt
+    }
+    changes.push("encryption key rotated")
+  }
+
   await createAuditLog({
     event,
     userId: sessionUser.id,
     orgId,
     action: "UPDATE.ORG",
     resource: "organization",
-    description: `Updated organization "${updatedOrg.name}"`,
-    metadata: {
-      orgId,
-      oldName: existingOrg.name,
-      newName: updatedOrg.name,
-      oldDescription: existingOrg.description,
-      newDescription: updatedOrg.description,
-      oldWebsite: existingOrg.website,
-      newWebsite: updatedOrg.website,
-      rotatedEncryptionKey: Boolean(result.data.rotateEncryptionKey),
-      oldEncryptionKeyVersion: existingOrg.encryptionKeyVersion,
-      newEncryptionKeyVersion: updatedOrg.encryptionKeyVersion,
-      oldEncryptionKeyUpdatedAt: existingOrg.encryptionKeyUpdatedAt,
-      newEncryptionKeyUpdatedAt: updatedOrg.encryptionKeyUpdatedAt,
-    },
+    description: `Updated organization "${updatedOrg.name}"${changes.length ? ` (${changes.join(", ")})` : ""}`,
+    metadata,
   })
 
   await deleteCached(CacheKeys.userData(sessionUser.id))

@@ -72,8 +72,6 @@ export default defineEventHandler(async (event) => {
       inviteId: invitation.id,
       inviteeEmail: result.data.email,
       inviteeRole: result.data.role,
-      orgId: invitation.org.id,
-      orgName: invitation.org.name,
       expiresAt: invitation.expiresAt.toISOString(),
     },
   })

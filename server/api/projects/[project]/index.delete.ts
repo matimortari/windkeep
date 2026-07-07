@@ -35,10 +35,7 @@ export default defineEventHandler(async (event) => {
     resource: "project",
     description: `Deleted project "${projectData.name}" from organization "${projectData.org.name}" (${projectData._count.secrets} secret(s), ${projectData._count.memberships} member(s))`,
     metadata: {
-      projectId: projectData.id,
       projectName: projectData.name,
-      orgId: projectData.orgId,
-      orgName: projectData.org.name,
       secretsDeleted: projectData._count.secrets,
       membersRemoved: projectData._count.memberships,
     },

@@ -60,18 +60,27 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  const changes = []
-  if (result.data.name && result.data.name !== existingProject.name) {
-    changes.push(`name to "${result.data.name}"`)
+  const metadata: Record<string, unknown> = {}
+  const changes: string[] = []
+  if (existingProject.name !== updatedProject.name) {
+    metadata.oldName = existingProject.name
+    metadata.newName = updatedProject.name
+    changes.push(`name to "${updatedProject.name}"`)
   }
-  if (result.data.slug && result.data.slug !== existingProject.slug) {
-    changes.push(`slug to "${result.data.slug}"`)
+  if (existingProject.slug !== updatedProject.slug) {
+    metadata.oldSlug = existingProject.slug
+    metadata.newSlug = updatedProject.slug
+    changes.push(`slug to "${updatedProject.slug}"`)
   }
-  if (result.data.description !== undefined && result.data.description !== existingProject.description) {
-    changes.push(`description`)
+  if (existingProject.description !== updatedProject.description) {
+    metadata.oldDescription = existingProject.description
+    metadata.newDescription = updatedProject.description
+    changes.push("description")
   }
-  if (result.data.website !== undefined && result.data.website !== existingProject.website) {
-    changes.push(`website`)
+  if (existingProject.website !== updatedProject.website) {
+    metadata.oldWebsite = existingProject.website
+    metadata.newWebsite = updatedProject.website
+    changes.push("website")
   }
 
   await createAuditLog({
@@ -82,16 +91,7 @@ export default defineEventHandler(async (event) => {
     action: "UPDATE.PROJECT",
     resource: "project",
     description: `Updated project "${updatedProject.name}"${changes.length ? ` (${changes.join(", ")})` : ""}`,
-    metadata: {
-      projectId,
-      projectName: updatedProject.name,
-      oldName: existingProject.name === updatedProject.name ? undefined : existingProject.name,
-      oldSlug: existingProject.slug === updatedProject.slug ? undefined : existingProject.slug,
-      oldWebsite: existingProject.website === updatedProject.website ? undefined : existingProject.website,
-      newWebsite: updatedProject.website,
-      orgId: updatedProject.org.id,
-      orgName: updatedProject.org.name,
-    },
+    metadata,
   })
 
   await deleteCached(CacheKeys.userProjects(sessionUser.id))

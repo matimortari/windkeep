@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const existingSecret = await db.secret.findUnique({ where: { id: secretId }, select: { projectId: true, key: true, description: true, project: { select: { orgId: true } } } })
+  const existingSecret = await db.secret.findUnique({ where: { id: secretId }, select: { projectId: true, key: true, description: true, tags: true, project: { select: { orgId: true } } } })
   if (!existingSecret) {
     throw createError({ statusCode: 404, statusMessage: "Secret not found" })
   }
@@ -35,12 +35,15 @@ export default defineEventHandler(async (event) => {
     updateData.tags = result.data.tags
   }
 
+  const valueChanges: string[] = []
+
   // Update secret values within a transaction to ensure atomicity and proper history tracking
   const updatedSecret = await db.$transaction(async (tx) => {
     if (result.data.values && Array.isArray(result.data.values)) {
       const incomingEnvironments = result.data.values.map(val => val.environment)
       const valuesToDelete = await tx.secretValue.findMany({ where: { secretId, environment: { notIn: incomingEnvironments } } })
       for (const valToDelete of valuesToDelete) {
+        valueChanges.push(valToDelete.environment)
         await tx.secretValueHistory.deleteMany({ where: { secretValueId: valToDelete.id } })
         await tx.secretValue.delete({ where: { id: valToDelete.id } })
       }
@@ -57,10 +60,12 @@ export default defineEventHandler(async (event) => {
             continue
           }
 
+          valueChanges.push(val.environment)
           await tx.secretValueHistory.create({ data: { secretValueId: existingValue.id, value: existingValue.value, changedBy: sessionUser.id } })
           await tx.secretValue.update({ where: { id: existingValue.id }, data: { value: encryptedNewValue } })
         }
         else {
+          valueChanges.push(val.environment)
           await tx.secretValue.create({
             data: {
               secretId,
@@ -80,13 +85,21 @@ export default defineEventHandler(async (event) => {
     })
   })
 
-  const updatedEnvironments = result.data.values?.map(v => v.environment) || []
-  const changes = []
-  if (updatedEnvironments.length > 0) {
-    changes.push(`${updatedEnvironments.length} environment value(s)`)
+  const metadata: Record<string, unknown> = { secretId: updatedSecret.id, secretKey: updatedSecret.key }
+  const changes: string[] = []
+  if (valueChanges.length) {
+    metadata.environments = valueChanges
+    changes.push(`${valueChanges.length} environment value(s)`)
   }
-  if (result.data.tags !== undefined) {
-    changes.push(`tags updated`)
+  if (existingSecret.description !== updatedSecret.description) {
+    metadata.oldDescription = existingSecret.description
+    metadata.newDescription = updatedSecret.description
+    changes.push("description")
+  }
+  if (result.data.tags !== undefined && JSON.stringify(existingSecret.tags) !== JSON.stringify(updatedSecret.tags)) {
+    metadata.oldTags = existingSecret.tags
+    metadata.newTags = updatedSecret.tags
+    changes.push("tags")
   }
 
   await createAuditLog({
@@ -96,16 +109,8 @@ export default defineEventHandler(async (event) => {
     projectId,
     action: "UPDATE.SECRET",
     resource: "secret",
-    description: `Updated secret "${updatedSecret.key}" in project "${updatedSecret.project.name}" (${changes.join(", ") || "no-op metadata changes"})`,
-    metadata: {
-      secretId: updatedSecret.id,
-      secretKey: updatedSecret.key,
-      projectId: updatedSecret.project.id,
-      projectName: updatedSecret.project.name,
-      orgId: updatedSecret.project.org.id,
-      orgName: updatedSecret.project.org.name,
-      environments: updatedEnvironments,
-    },
+    description: `Updated secret "${updatedSecret.key}" in project "${updatedSecret.project.name}"${changes.length ? ` (${changes.join(", ")})` : ""}`,
+    metadata,
   })
 
   await deleteCached(CacheKeys.userProjects(sessionUser.id))

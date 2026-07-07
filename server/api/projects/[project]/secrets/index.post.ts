@@ -64,10 +64,6 @@ export default defineEventHandler(async (event) => {
     metadata: {
       secretId: secret.id,
       secretKey: secret.key,
-      projectId: secret.project.id,
-      projectName: secret.project.name,
-      orgId: secret.project.org.id,
-      orgName: secret.project.org.name,
       environments: secret.values.map(v => v.environment),
     },
   })

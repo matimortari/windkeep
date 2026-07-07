@@ -54,8 +54,6 @@ export default defineEventHandler(async (event) => {
       toUserId: result.data.newOwnerId,
       toUserName: newOwnerMembership.user.name,
       toUserEmail: newOwnerMembership.user.email,
-      orgId,
-      orgName: org?.name,
     },
   })
 

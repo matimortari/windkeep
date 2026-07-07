@@ -34,10 +34,6 @@ export default defineEventHandler(async (event) => {
     metadata: {
       secretId: existingSecret.id,
       secretKey: existingSecret.key,
-      projectId: existingSecret.project.id,
-      projectName: existingSecret.project.name,
-      orgId: existingSecret.project.org.id,
-      orgName: existingSecret.project.org.name,
       valuesDeleted: existingSecret._count.values,
     },
   })
