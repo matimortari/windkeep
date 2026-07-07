@@ -1,5 +1,4 @@
-import type { GetAuditLogsInput } from "#shared/schemas/audit-schema"
-import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/schemas/org-schema"
+import type { AcceptInviteInput, CreateInviteInput, CreateOrgInput, GetAuditLogsInput, UpdateOrgInput, UpdateOrgMemberInput } from "#shared/schemas/org-schema"
 
 export const useOrgStore = defineStore("org", () => {
   const toast = useToast()

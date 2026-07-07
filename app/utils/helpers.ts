@@ -37,21 +37,3 @@ export function getErrorMessage(err: unknown, fallback: string): string {
 
   return fallback
 }
-
-/**
- * Signs in the user by redirecting to the provider's authentication endpoint.
- */
-export function signIn(provider: string) {
-  navigateTo(`/api/auth/${provider}`, { external: true })
-}
-
-/**
-  Signs out the current user by calling the logout endpoint and clearing the session.
- */
-export async function signOut() {
-  const { clear } = useUserSession()
-
-  await $fetch("/api/auth/logout", { method: "POST", credentials: "include" })
-  await clear()
-  await navigateTo("/")
-}

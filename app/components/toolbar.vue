@@ -78,6 +78,7 @@ defineProps<{
 const emit = defineEmits<{ toggleSidebar: [] }>()
 
 const { toggleTheme, themeIcon } = useTheme()
+const { signOut } = useSession()
 const route = useRoute()
 const router = useRouter()
 const orgStore = useOrgStore()
@@ -101,7 +102,7 @@ async function handleSetActiveOrg(orgId: string) {
   }
 
   isDropdownOpen.value = false
-  if (!organizations.value.some(o => o.id === orgId)) {
+  if (!organizations.value.some((o: Organization) => o.id === orgId)) {
     await orgStore.getOrg(orgId)
   }
 

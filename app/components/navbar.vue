@@ -33,6 +33,7 @@
 <script setup lang="ts">
 const { toggleTheme, themeIcon } = useTheme()
 const { loggedIn } = useUserSession()
+const { signOut } = useSession()
 const scrolled = ref(false)
 
 const NAVBAR_LINKS = [
@@ -42,6 +43,7 @@ const NAVBAR_LINKS = [
 ]
 
 const handleScroll = () => scrolled.value = window.scrollY > 50
+
 onMounted(() => window.addEventListener("scroll", handleScroll, { passive: true }))
 onBeforeUnmount(() => window.removeEventListener("scroll", handleScroll))
 </script>

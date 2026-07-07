@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
+const { signIn } = useSession()
 const route = useRoute()
 
 const errorMessage = computed(() => {

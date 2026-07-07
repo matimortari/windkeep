@@ -4,17 +4,14 @@ import logoLight from "~/assets/wordmark-light.png"
 export function useTheme() {
   const colorMode = useState<"dark" | "light">("theme", () => "dark")
   const storageKey = "nuxt-color-mode"
-
-  const updateHtmlClass = () => {
-    const html = globalThis.document.documentElement
-    html.classList.remove("dark", "light")
-    html.classList.add(colorMode.value)
-  }
+  const themeIcon = computed(() => colorMode.value === "light" ? "ph:moon-stars-bold" : "ph:sun-horizon-bold")
+  const themeTitle = computed(() => colorMode.value === "light" ? logoDark : logoLight)
 
   const toggleTheme = () => {
     colorMode.value = colorMode.value === "light" ? "dark" : "light"
     globalThis.localStorage.setItem(storageKey, colorMode.value)
-    updateHtmlClass()
+    globalThis.document.documentElement.classList.remove("dark", "light")
+    globalThis.document.documentElement.classList.add(colorMode.value)
   }
 
   onMounted(() => {
@@ -23,20 +20,17 @@ export function useTheme() {
       colorMode.value = saved
     }
     else {
-      const prefersLight = globalThis.matchMedia("(prefers-color-scheme: light)").matches
-      colorMode.value = prefersLight ? "light" : "dark"
+      colorMode.value = globalThis.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
     }
 
-    updateHtmlClass()
+    globalThis.document.documentElement.classList.remove("dark", "light")
+    globalThis.document.documentElement.classList.add(colorMode.value)
   })
-
-  const themeIcon = computed(() => colorMode.value === "light" ? "ph:moon-stars-bold" : "ph:sun-horizon-bold")
-  const themeTitle = computed(() => colorMode.value === "light" ? logoDark : logoLight)
 
   return {
     colorMode,
-    toggleTheme,
     themeIcon,
     themeTitle,
+    toggleTheme,
   }
 }
