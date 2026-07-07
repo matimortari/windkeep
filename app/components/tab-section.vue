@@ -12,7 +12,7 @@
             <icon name="ph:caret-right-bold" size="15" class="shrink-0 text-muted-foreground" />
           </template>
 
-          <h3>
+          <h3 class="truncate">
             {{ title }}
           </h3>
         </div>

@@ -17,8 +17,7 @@ const route = useRoute()
 
 const activeTab = computed(() => {
   const tab = route.query.t as string
-  const valid = ["projects", "members", "audit-logs", "settings"]
-  return valid.includes(tab) ? tab : "projects"
+  return ["projects", "members", "audit-logs", "settings"].includes(tab) ? tab : "projects"
 })
 
 useHead({

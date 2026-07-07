@@ -1,6 +1,6 @@
 <template>
   <nav class="navigation-group w-full justify-end md:w-auto" aria-label="Project Actions">
-    <div class="relative min-w-0 flex-1 md:flex-none">
+    <div class="hidden min-w-0 flex-1 md:relative md:flex-none">
       <input
         id="search" :value="searchQuery"
         type="text" placeholder="Search secrets..."
@@ -18,13 +18,9 @@
         @click="isTagDropdownOpen = !isTagDropdownOpen"
       >
         <icon name="ph:tag-bold" size="20" />
-        <span class="hidden md:inline">{{ activeTagFilter ? activeTagFilter : 'Tags' }}</span>
-        <icon
-          v-if="activeTagFilter" name="ph:x-bold"
-          size="15" class="ml-0.5"
-          @click.stop="emit('filterByTag', null)"
-        />
-        <icon v-else name="ph:caret-down-bold" size="15" class="hidden md:block" />
+        <span>{{ activeTagFilter ? activeTagFilter : 'Tags' }}</span>
+        <icon v-if="activeTagFilter" name="ph:x-bold" size="15" @click.stop="emit('filterByTag', null)" />
+        <icon v-else name="ph:caret-down-bold" size="15" />
       </button>
 
       <transition name="dropdown">

@@ -22,8 +22,7 @@ const hasPermission = computed(() => isOwner.value(project.value?.id ?? "") || i
 
 const activeTab = computed(() => {
   const tab = route.query.t as string
-  const valid = ["secrets", "members", "service-tokens", "settings"]
-  return valid.includes(tab) ? tab : "secrets"
+  return ["secrets", "members", "service-tokens", "settings"].includes(tab) ? tab : "secrets"
 })
 
 // Set page metadata when project changes

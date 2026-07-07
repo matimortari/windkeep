@@ -9,7 +9,7 @@
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isActionDropdownOpen" class="dropdown-menu right-0! left-auto!" role="menu">
+        <ul v-if="isActionDropdownOpen" class="dropdown-menu" role="menu">
           <li>
             <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.action ? 'bg-muted' : ''" @click="updateFilter('action', '')">
               All Actions
@@ -31,7 +31,7 @@
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isUserDropdownOpen" class="dropdown-menu right-0! left-auto!" role="menu">
+        <ul v-if="isUserDropdownOpen" class="dropdown-menu" role="menu">
           <li>
             <button class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', '')">
               All Users

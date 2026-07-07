@@ -19,6 +19,13 @@ export function normalizeKey(key: string): string {
 }
 
 /**
+ * Converts a string to a slug. Used for headings in content pages.
+ */
+export function slugify(text: string): string {
+  return text.toString().toLowerCase().trim().replace(/\W+/g, "-")
+}
+
+/**
  * Extracts the error message from various error formats (Nuxt/H3/Zod).
  */
 export function getErrorMessage(err: unknown, fallback: string): string {

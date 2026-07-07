@@ -25,7 +25,7 @@
           </button>
 
           <transition name="dropdown">
-            <ul v-if="isDropdownOpen" class="dropdown-menu right-auto left-0 md:right-0 md:left-auto" role="menu">
+            <ul v-if="isDropdownOpen" class="dropdown-menu" role="menu">
               <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
                 <button
                   class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem"
