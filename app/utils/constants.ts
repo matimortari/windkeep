@@ -166,8 +166,8 @@ export const WORDMARKS: { name: string, image: any, bgClass: string }[] = [
 ]
 
 export const NEUTRAL_SCALE: { name: string, var: string, value: string }[] = [
-  { name: "Neutral/100", var: "--neutral-100", value: "#fafafa" },
-  { name: "Neutral/200", var: "--neutral-200", value: "#f5f5f5" },
+  { name: "Neutral/100", var: "--neutral-100", value: "#f5f5f5" },
+  { name: "Neutral/200", var: "--neutral-200", value: "#e5e5e5" },
   { name: "Neutral/300", var: "--neutral-300", value: "#d4d4d4" },
   { name: "Neutral/400", var: "--neutral-400", value: "#a3a3a3" },
   { name: "Neutral/500", var: "--neutral-500", value: "#737373" },
@@ -178,8 +178,8 @@ export const NEUTRAL_SCALE: { name: string, var: string, value: string }[] = [
 ]
 
 export const BRAND_COLORS: { name: string, var: string, value: string }[] = [
-  { name: "Primary", var: "--brand-primary", value: "#3d536d" },
-  { name: "Secondary", var: "--brand-secondary", value: "#597c8b" },
+  { name: "Primary", var: "--brand-primary", value: "#244664" },
+  { name: "Secondary", var: "--brand-secondary", value: "#5a89a8" },
 ]
 
 export const STATUS_COLORS: { name: string, darkVar: string, darkVal: string, lightVar: string, lightVal: string }[] = [

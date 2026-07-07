@@ -2,8 +2,8 @@
 
 /* Color palette and core design primitives */
 :root {
-  --neutral-100: #fafafa;
-  --neutral-200: #f5f5f5;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
   --neutral-300: #d4d4d4;
   --neutral-400: #a3a3a3;
   --neutral-500: #737373;
@@ -11,8 +11,8 @@
   --neutral-700: #404040;
   --neutral-800: #171717;
   --neutral-900: #0a0a0a;
-  --brand-primary: #3d536d;
-  --brand-secondary: #597c8b;
+  --brand-primary: #244664;
+  --brand-secondary: #5a89a8;
   --red-dark: #811919;
   --red-light: #c12525;
   --green-dark: #005e3b;

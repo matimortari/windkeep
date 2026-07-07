@@ -24,21 +24,15 @@ export default defineNuxtConfig({
     },
   },
   devServer: { host: "0.0.0.0" },
-  nitro: {
-    experimental: {
-      openAPI: true,
-    },
-    openAPI: {
-      production: "prerender",
-    },
-  },
   vite: {
-    server: process.env.NUXT_PUBLIC_BASE_URL
-      ? {
-          allowedHosts: [new URL(process.env.NUXT_PUBLIC_BASE_URL).hostname],
-          hmr: { protocol: "wss", host: new URL(process.env.NUXT_PUBLIC_BASE_URL).hostname, port: Number(new URL(process.env.NUXT_PUBLIC_BASE_URL).port) || 3000 },
-        }
-      : {},
+    server: {
+      allowedHosts: [new URL(process.env.NUXT_PUBLIC_BASE_URL!).hostname],
+      hmr: {
+        protocol: "wss",
+        host: new URL(process.env.NUXT_PUBLIC_BASE_URL!).hostname,
+        port: Number(new URL(process.env.NUXT_PUBLIC_BASE_URL!).port),
+      },
+    },
     plugins: [tailwindcss() as any],
   },
   app: {
@@ -66,11 +60,18 @@ export default defineNuxtConfig({
     serverBundle: "remote",
     clientBundle: { scan: true },
   },
-  ogImage: { enabled: false },
-  robots: { disallow: ["/admin", "/onboarding"] },
-  site: { url: process.env.NUXT_PUBLIC_BASE_URL, name: "WindKeep" },
+  ogImage: {
+    enabled: false,
+  },
+  robots: {
+    disallow: ["/admin", "/onboarding"],
+  },
+  site: {
+    url: process.env.NUXT_PUBLIC_BASE_URL,
+    name: "WindKeep",
+  },
   shiki: {
-    bundledLangs: ["bash", "go", "html", "javascript", "json", "markdown", "typescript", "vue"],
+    bundledLangs: ["bash", "go", "html", "javascript", "json", "yml", "markdown", "typescript", "vue"],
     bundledThemes: ["poimandres"],
     highlightOptions: { theme: "poimandres" },
   },
