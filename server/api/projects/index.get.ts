@@ -31,7 +31,13 @@ export default defineEventHandler(async (event) => {
       updatedAt: true,
       org: { select: { id: true, name: true } },
       _count: { select: { secrets: true } },
-      memberships: { select: { userId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
+      memberships: {
+        select: {
+          userId: true,
+          role: true,
+          user: { select: { id: true, name: true, email: true, image: true } },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   })

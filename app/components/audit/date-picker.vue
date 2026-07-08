@@ -6,7 +6,7 @@
     </button>
 
     <transition name="dropdown">
-      <div v-if="isDatePickerOpen" class="dropdown-menu max-h-none! min-w-72 space-y-2" role="dialog" aria-label="Select date range">
+      <div v-if="isDatePickerOpen" class="dropdown-menu right-auto! left-0! max-h-none! w-72 max-w-[calc(100vw-1rem)] space-y-2" role="dialog" aria-label="Select date range">
         <div class="navigation-group justify-between">
           <select v-model="currentMonth" aria-label="Month">
             <option v-for="(month, idx) in months" :key="idx" :value="idx">

@@ -14,8 +14,7 @@
       <button
         v-for="tab in ORGANIZATION_TABS" :key="tab.key"
         type="button" class="group navigation-group border-l-2 border-transparent p-2 text-left text-sm transition-all hover:border-primary hover:text-foreground 2xl:text-base"
-        :class="{ 'textgnd border-primary!': isActiveOrgTab(tab.key) }"
-        @click="selectOrgTab(tab.key)"
+        :class="{ 'border-primary! text-foreground!': isActiveOrgTab(tab.key) }" @click="selectOrgTab(tab.key)"
       >
         <icon :name="tab.icon" size="20" />
         <span>{{ tab.label }}</span>
@@ -49,7 +48,7 @@
       <nav v-else aria-label="Projects Navigation" class="flex flex-col gap-2">
         <div v-for="project in filteredProjects" :key="project.id">
           <nuxt-link
-            :to="`/admin/${project.slug}`" class="text-caption truncate border-l-2 border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
+            :to="{ path: `/admin/${project.slug}`, query: { t: 'secrets' } }" class="text-caption truncate border-l-2 border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
             :class="{ 'border-primary! text-primary!': isActiveProject(project) }" @click="handleProjectClick(project)"
           >
             {{ project.name }}
@@ -58,8 +57,8 @@
           <div v-if="isActiveProject(project)" class="mt-1 ml-3 flex flex-col gap-0.5 border-l pl-2">
             <button
               v-for="tab in PROJECT_TABS" :key="tab.key"
-              type="button" class="navigation-group rounded-sm p-1 text-left text-sm text-muted-foreground transition-all hover:text-foreground"
-              :class="(route.query.t === tab.key || (!route.query.t && tab.key === 'secrets')) ? 'font-semibold text-primary!' : ''"
+              type="button" class="navigation-group border-l-2 border-transparent p-1 text-left text-sm text-muted-foreground transition-all hover:border-primary hover:text-foreground"
+              :class="{ 'border-primary! font-semibold text-foreground!': isActiveProject(project) && isActiveProjectTab(tab.key) }"
               @click="selectProjectTab(project, tab.key)"
             >
               <icon :name="tab.icon" size="15" />
@@ -105,12 +104,22 @@ const activeOrgProjects = computed(() => {
 
 const filteredProjects = computed(() => showAllProjects.value ? allProjects.value : activeOrgProjects.value)
 
+const activeQueryTab = computed(() => {
+  const tab = route.query.t
+  return Array.isArray(tab) ? tab[0] : tab
+})
+
 function isActiveProject(project: Project) {
   return route.path === `/admin/${project.slug}`
 }
 
 function isActiveOrgTab(tabKey: string) {
-  return route.path === "/admin/organization" && (route.query.t === tabKey || (!route.query.t && tabKey === "projects"))
+  return route.path === "/admin/organization"
+    && (activeQueryTab.value === tabKey || (!activeQueryTab.value && tabKey === "projects"))
+}
+
+function isActiveProjectTab(tabKey: string) {
+  return activeQueryTab.value === tabKey || (!activeQueryTab.value && tabKey === "secrets")
 }
 
 function selectOrgTab(tabKey: string) {

@@ -50,8 +50,8 @@
                 <div class="navigation-group items-start!">
                   <img :src="orgUser.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
                   <div class="flex flex-col truncate">
-                    <span class="font-semibold">{{ orgUser.user.name }}</span>
-                    <span class="text-caption">{{ orgUser.user.email }}</span>
+                    <span>{{ orgUser.user.name }}</span>
+                    <span>{{ orgUser.user.email }}</span>
                   </div>
                 </div>
               </td>
@@ -59,8 +59,8 @@
                 {{ ROLES.find(role => role.value === orgUser.role)?.label }}
               </td>
               <td class="w-24">
-                <button v-if="canManageMember(orgUser)" class="btn" aria-label="Manage member" @click.stop="openMemberDialog(orgUser)">
-                  <icon name="ph:gear-bold" size="15" class="text-muted-foreground hover:text-secondary" />
+                <button v-if="canManageMember(orgUser)" aria-label="Manage member" @click.stop="openMemberDialog(orgUser)">
+                  <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                 </button>
               </td>
             </tr>
@@ -123,14 +123,14 @@
                 </td>
                 <td class="w-28">
                   <div class="navigation-group">
-                    <button v-if="getInviteStatus(invite) === 'pending'" class="btn" aria-label="Copy invite link" @click="handleCopyInviteLink(invite)">
-                      <icon :name="activeCopyInviteId === invite.id ? inviteLinkIcon.icon.value : 'ph:link-bold'" size="15" />
+                    <button v-if="getInviteStatus(invite) === 'pending'" aria-label="Copy invite link" @click="handleCopyInviteLink(invite)">
+                      <icon :name="activeCopyInviteId === invite.id ? inviteLinkIcon.icon.value : 'ph:link-bold'" size="20" class="text-muted-foreground hover:text-secondary" />
                     </button>
-                    <button v-if="getInviteStatus(invite) === 'expired'" class="btn" aria-label="Re-invite" @click="openReinvite(invite.email)">
-                      <icon name="ph:arrow-clockwise-bold" size="15" />
+                    <button v-if="getInviteStatus(invite) === 'expired'" aria-label="Re-invite" @click="openReinvite(invite.email)">
+                      <icon name="ph:arrow-clockwise-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                     </button>
-                    <button v-if="getInviteStatus(invite) !== 'accepted'" class="btn" aria-label="Revoke invitation" @click="handleRevokeInvite(invite.id)">
-                      <icon name="ph:trash-bold" size="15" class="text-muted-foreground hover:text-danger" />
+                    <button v-if="getInviteStatus(invite) !== 'accepted'" aria-label="Revoke invitation" @click="handleRevokeInvite(invite.id)">
+                      <icon name="ph:x-bold" size="20" class="text-muted-foreground hover:text-danger" />
                     </button>
                   </div>
                 </td>

@@ -1,7 +1,7 @@
 <template>
   <TabSection title="Access Control">
     <template #context>
-      <h3 class="navigation-group max-w-lg truncate text-muted-foreground">
+      <h3 class="flex max-w-lg flex-row items-center gap-1 truncate text-muted-foreground">
         <span class="truncate">{{ project?.name }}</span>
         <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
           <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
@@ -11,13 +11,13 @@
 
     <template #actions>
       <nav v-if="canManage" class="navigation-group w-full justify-end md:w-auto">
+        <button class="btn-secondary" @click="isTokenDialogOpen = true">
+          <icon name="ph:key-bold" size="20" />
+          <span>Generate Token</span>
+        </button>
         <button class="btn-primary" :disabled="!availableOrgMembers.length" @click="isAddDialogOpen = true">
           <icon name="ph:plus-circle-bold" size="20" />
           <span>Add Member</span>
-        </button>
-        <button class="btn-primary" @click="isTokenDialogOpen = true">
-          <icon name="ph:key-bold" size="20" />
-          <span>Generate Token</span>
         </button>
       </nav>
     </template>
@@ -64,8 +64,8 @@
                   <div class="navigation-group items-start!">
                     <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
                     <div class="flex flex-col truncate">
-                      <span class="font-semibold">{{ member.user?.name }}</span>
-                      <span class="text-caption">{{ member.user?.email }}</span>
+                      <span>{{ member.user?.name }}</span>
+                      <span>{{ member.user?.email }}</span>
                     </div>
                   </div>
                 </td>
@@ -73,8 +73,8 @@
                   {{ ROLES.find(role => role.value === member.role)?.label }}
                 </td>
                 <td class="w-24">
-                  <button v-if="canManageMember(member)" class="btn" aria-label="Manage member" @click.stop="openMemberDialog(member)">
-                    <icon name="ph:gear-bold" size="15" class="text-muted-foreground hover:text-secondary" />
+                  <button v-if="canManageMember(member)" aria-label="Manage member" @click.stop="openMemberDialog(member)">
+                    <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                   </button>
                 </td>
               </tr>
@@ -117,7 +117,7 @@
 
               <tr v-for="token in sortedTokens" :key="token.id" class="hover:bg-muted/20">
                 <td>
-                  <div class="navigation-group font-semibold">
+                  <div class="navigation-group">
                     <span class="truncate">{{ token.name }}</span>
                     <div v-if="token.environment?.length" class="flex flex-wrap items-center gap-1">
                       <span v-for="env in token.environment" :key="env" class="rounded-full border border-muted/40 bg-muted/20 px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
@@ -136,8 +136,8 @@
                   {{ token.user?.name }}
                 </td>
                 <td class="w-24">
-                  <button class="btn" aria-label="Revoke token" @click="handleRevokeToken(token.id)">
-                    <icon name="ph:trash-bold" size="15" class="text-muted-foreground hover:text-danger" />
+                  <button aria-label="Revoke token" @click="handleRevokeToken(token.id)">
+                    <icon name="ph:x-bold" size="20" class="text-muted-foreground hover:text-danger" />
                   </button>
                 </td>
               </tr>

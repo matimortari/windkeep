@@ -18,24 +18,14 @@
         </select>
       </div>
 
-      <footer class="flex flex-col gap-2 border-t pt-4">
-        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" class="btn-success w-full" @click="handleUpdateRole">
+      <footer class="flex flex-row items-center justify-end">
+        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" class="btn-success" @click="handleUpdateRole">
           <icon :name="saveIcon.icon.value" size="20" />
           <span>Save Role</span>
         </button>
-
-        <button v-if="isOwner && member.user.id !== currentUserId && member.role !== 'OWNER'" class="btn w-full" @click="handleTransferOwnership">
-          <icon :name="transferIcon.icon.value" size="20" />
-          <span>Transfer Ownership</span>
-        </button>
-
-        <button v-if="isOwner && member.role !== 'OWNER'" class="btn w-full text-danger" @click="handleRemove">
+        <button v-if="isOwner && member.role !== 'OWNER'" class="btn-danger" @click="handleRemove">
           <icon name="ph:user-minus-bold" size="20" />
           <span>Remove Member</span>
-        </button>
-
-        <button class="btn-ghost w-full" @click="emit('update:isOpen', false)">
-          Close
         </button>
       </footer>
     </div>
@@ -60,7 +50,6 @@ const orgStore = useOrgStore()
 const userStore = useUserStore()
 const { createActionHandler } = useActionIcon()
 const saveIcon = createActionHandler("ph:floppy-disk-bold")
-const transferIcon = createActionHandler("ph:arrow-u-up-right-bold")
 const selectedRole = ref<"ADMIN" | "MEMBER">("MEMBER")
 
 async function handleUpdateRole() {
@@ -72,22 +61,6 @@ async function handleUpdateRole() {
   await userStore.getUser()
   await orgStore.getOrg(props.orgId)
   saveIcon.triggerSuccess()
-  emit("updated")
-  emit("update:isOpen", false)
-}
-
-async function handleTransferOwnership() {
-  if (!props.orgId || !props.member?.user.id) {
-    return
-  }
-  if (!confirm("Are you sure you want to transfer ownership to this member? You will be demoted to admin.")) {
-    return
-  }
-
-  await orgStore.transferOrgOwnership(props.orgId, { newOwnerId: props.member.user.id })
-  await userStore.getUser()
-  await orgStore.getOrg(props.orgId)
-  transferIcon.triggerSuccess()
   emit("updated")
   emit("update:isOpen", false)
 }

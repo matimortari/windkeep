@@ -211,13 +211,9 @@ interface CliSection {
   title: string
   paragraphs?: InlineTextPart[][]
   note?: InlineTextPart[]
-  install?: { label: string, command: string }[]
-  examples?: { label?: string, command?: string, output?: string }[]
-  args?: { label: string, code: string, description: string }[]
-  flags?: { code: string, description: string }[]
-  list?: { label?: string, description?: string, commands?: string[] }[]
+  code?: { label?: string, command?: string, output?: string }[]
+  commands?: { label?: string, code?: string, description?: string }[]
   links?: { href: string, label: string, description: string }[]
-  downloads?: { href: string, label: string, description: string }[]
   steps?: string[]
 }
 

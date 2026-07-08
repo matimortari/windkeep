@@ -15,7 +15,7 @@
       </thead>
 
       <tbody>
-          <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted/20" @click="$router.push({ path: `/admin/${project.slug}`, query: { t: 'secrets' } })">
+        <tr v-for="project in sortedProjects" :key="project.id" class="cursor-pointer hover:bg-muted/20" @click="$router.push({ path: `/admin/${project.slug}`, query: { t: 'secrets' } })">
           <td :class="columns[0]?.class">
             {{ project.name }}
           </td>
@@ -42,10 +42,10 @@
           <td :class="columns[4]?.class">
             <div class="navigation-group">
               <button type="button" aria-label="Project Settings" @click.stop="openProjectSettings(project)">
-                <icon name="ph:gear-bold" size="20" class="transition-colors hover:text-secondary" />
+                <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
               </button>
               <nuxt-link :to="{ path: `/admin/${project.slug}`, query: { t: 'secrets' } }" aria-label="Open Project" @click.stop>
-                <icon name="ph:arrow-right-bold" size="20" class="transition-colors hover:text-secondary" />
+                <icon name="ph:arrow-right-bold" size="20" class="text-muted-foreground hover:text-secondary" />
               </nuxt-link>
             </div>
           </td>

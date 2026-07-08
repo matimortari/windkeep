@@ -6,56 +6,56 @@ import WordmarkLight from "~/assets/wordmark-light.png"
 
 // Landing page data
 export const HIGHLIGHTS: { title: string, icon: string }[] = [
-  { title: "Encrypted & Safe", icon: "ph:lock-key-bold" },
   { title: "Rapid Onboarding", icon: "ph:users-three-bold" },
   { title: "Free & Open Source", icon: "ph:code-bold" },
+  { title: "Encrypted & Safe", icon: "ph:lock-key-bold" },
 ]
 
 export const CLI_BULLETS: { description: string }[] = [
-  { description: "Scriptable Workflows" },
-  { description: "No Hardcoded .env Files" },
-  { description: "Lightweight & Fast" },
+  { description: "Runtime Variable Injection" },
+  { description: "Secret Pull/Push Operations" },
+  { description: "Organization & Project Management" },
 ]
 
 export const FEATURES: { title: string, description: string, icon: string }[] = [
   {
-    title: "Controlled Access",
-    description: "Role-based permissions allow you to control who can manage secrets at both the organization and project levels.",
+    title: "Role-Based Access Control",
+    description: "Manage who can view, edit, or manage secrets with granular permissions at the organization and project level.",
     icon: "ph:user-check-bold",
   },
   {
-    title: "Audit Logs",
-    description: "Sensitive operations, from secret changes to role updates, are logged for full traceability and accountability.",
-    icon: "ph:list-magnifying-glass-bold",
-  },
-  {
-    title: "Secure Encryption",
-    description: "Secrets are encrypted from end to end using AES-256-GCM, keeping your data safe and private.",
+    title: "Encrypted Secret Storage",
+    description: "Every secret is encrypted at rest with AES-256-GCM and scoped to a specific environment, keeping sensitive data isolated and protected.",
     icon: "ph:shield-star-bold",
   },
   {
-    title: "Command-Line Tool",
-    description: "Securely access and manage secrets programmatically, integrating seamlessly into scripts or pipelines.",
+    title: "Audit Logs",
+    description: "Keep track of sensitive operations, like secret and role changes, so you always know what happened and when.",
+    icon: "ph:list-magnifying-glass-bold",
+  },
+  {
+    title: "Scriptable Workflows",
+    description: "Manage secrets directly from the terminal and inject them automatically into your local dev setup or CI/CD pipeline.",
     icon: "ph:terminal-bold",
   },
 ]
 
 export const FAQS: { question: string, answer: string }[] = [
   {
-    question: "How does role-based access control work for organizations?",
-    answer: "Each organization has a single Owner, who can manage its projects and members, and configure org-wide settings. Admins can invite and manage members, but they don't have full control over organization settings. Members can access the data for the organization and the projects they belong to, but they cannot modify settings or manage other users. This structure keeps sensitive operations secure while allowing teams to collaborate effectively.",
+    question: "How does role-based access control work?",
+    answer: "The project and organization owner has full control, including managing settings, members, and (for projects) secrets. Admins can invite and manage members and, at the project level, manage secrets, but they can't change organization settings. Members can access data for the organization and its projects, but can't modify settings, secrets, or manage other users. This structure keeps sensitive operations secure while allowing teams to collaborate effectively.",
   },
   {
-    question: "How does role-based access control work for projects?",
-    answer: "Projects follow a similar structure to organizations. The Project Owner has full control over the project, its secrets and members. Admins can add or remove members, update roles, and manage secrets, but they cannot change project ownership. Members can view secrets, but cannot modify them or adjust project settings. This ensures that project-level operations are handled securely.",
+    question: "What are service tokens and how do they work?",
+    answer: "Service tokens let you access secrets programmatically, without a user session. This allows you to automate secret management in your applications and CI/CD pipelines. Each token is scoped to one or more environments (Development, Staging, or Production) and can optionally be set to expire after a chosen number of days.",
   },
   {
-    question: "What is audit logging and why is it important?",
-    answer: "Audit logs record actions performed within the workspace – such as updating secrets, changing roles, or modifying projects. Each log entry captures who performed the action, timestamps, and additional metadata. Audit logs help teams stay transparent, investigate issues, and maintain accountability. All members in the organization can view the logs, and the Owner can clear them if desired.",
+    question: "How are audit logs used and who can see them?",
+    answer: "Audit logs record sensitive actions across your organization, like secret changes, role updates, and service token creation, capturing who did it, when, and relevant metadata. They're visible to the organization Owner and Admins, providing a clear operational history for security and compliance purposes.",
   },
   {
-    question: "What is the WindKeep CLI and how can i use it?",
-    answer: "The WindKeep CLI allows you to interact with secrets and projects directly from your terminal, eliminating the need for hardcoded .env files and making it easy to integrate secrets into scripts and automated workflows. Whether you're retrieving secrets, updating them, or managing project settings, the CLI makes these tasks faster, more consistent, and scriptable.",
+    question: "What is the WindKeep CLI and how can I use it?",
+    answer: "The WindKeep CLI allows you to interact with secrets and projects directly from your terminal, eliminating the need for hardcoded .env files and making it easy to integrate secrets into scripts and automated workflows. Whether you're retrieving secrets, updating them, or managing project/organizations, the CLI provides a secure and developer-friendly experience.",
   },
 ]
 
@@ -77,17 +77,17 @@ export const CLI_TABS: { key: string, label: string, description: string, code: 
     label: "Getting Started",
     description: "Authenticate and set up your workspace:",
     code: [
-      "# authenticate with your API token",
+      "# Authenticate with your API token",
       "windkeep login <your-api-token>",
       "",
-      "# verify your session and active context",
+      "# Verify your session and active context",
       "windkeep whoami",
       "",
-      "# list and switch to an organization",
+      "# List and switch to an organization",
       "windkeep orgs list",
       "windkeep orgs switch <org-id>",
       "",
-      "# list and switch to a project",
+      "# List and switch to a project",
       "windkeep projects list",
       "windkeep projects switch <project-slug>",
     ],
@@ -95,15 +95,15 @@ export const CLI_TABS: { key: string, label: string, description: string, code: 
   {
     key: "run",
     label: "Run",
-    description: "Inject secrets as env vars and run any command:",
+    description: "Inject secrets as environment variables and run any command:",
     code: [
-      "# inject dev secrets and run",
+      "# Inject dev secrets and run",
       "windkeep run npm run dev",
       "",
-      "# use a specific environment",
+      "# Use a specific environment",
       "windkeep run --env prod node server.js",
       "",
-      "# show injected keys (not values)",
+      "# Show injected keys (not values)",
       "windkeep run -v npm start",
     ],
   },

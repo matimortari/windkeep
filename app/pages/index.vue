@@ -15,13 +15,13 @@
       </h1>
 
       <p class="max-w-2xl leading-6 font-semibold text-muted-foreground md:text-lg">
-        No more .env headaches — WindKeep is a secrets management platform
-        that helps organizations securely store, manage, and share sensitive information.
+        No more .env headaches — WindKeep is a secrets management platform that helps
+        teams and developers to securely store, manage, and share sensitive information.
       </p>
 
       <div class="flex flex-row items-center gap-4 md:items-start">
         <nuxt-link to="/sign-in" class="btn-primary rounded-full! shadow-none">
-          <span class="font-semibold">Get Started</span>
+          <span class="font-semibold">Sign In</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
         <nuxt-link to="/cli-guide" class="btn-ghost rounded-full!">
@@ -44,9 +44,9 @@
     </header>
   </section>
 
-  <div class="container mx-auto flex w-full flex-col gap-12 px-8 py-24 md:max-w-7xl md:gap-20 2xl:gap-32">
+  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-24 md:max-w-6xl md:gap-20 2xl:gap-32">
     <section id="cli" class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
-      <header class="flex flex-col gap-4 md:border-r md:pr-12">
+      <header class="flex flex-col gap-4 md:border-r md:pr-8">
         <div class="flex items-end justify-between border-b pb-4">
           <h2>
             WindKeep CLI
@@ -121,7 +121,7 @@
                 {{ feature.title }}
               </h3>
             </div>
-            <p class="text-caption">
+            <p class="text-caption max-w-md">
               {{ feature.description }}
             </p>
           </div>
@@ -170,11 +170,11 @@
         <h2>
           Ready to ditch the .env file?
         </h2>
-        <p class="max-w-md text-center font-medium text-muted-foreground">
-          WindKeep is free to use and open source. Get your team set up in minutes.
+        <p class="max-w-sm text-center font-medium text-muted-foreground">
+          WindKeep is completely free to use, open-source software. Get your team set up in minutes.
         </p>
         <nuxt-link to="/sign-in" class="btn-secondary rounded-full!">
-          <span class="font-semibold">Get Started for Free</span>
+          <span class="font-semibold">Get Started Now</span>
           <icon name="ph:arrow-right-bold" size="20" />
         </nuxt-link>
       </div>
