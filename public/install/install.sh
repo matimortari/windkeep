@@ -2,14 +2,12 @@
 set -e
 
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-ARCH="$(uname -m)"
+if [ "$OS" != "linux" ]; then
+  echo "error: this installer only supports Linux" >&2
+  exit 1
+fi
 
-case "$ARCH" in
-  x86_64) ARCH="amd64" ;;
-  arm64|aarch64) ARCH="arm64" ;;
-esac
-
-BINARY="windkeep-$OS-$ARCH"
+BINARY="windkeep-linux-amd64"
 INSTALL_DIR="${XDG_BIN_HOME:-$HOME/.local/bin}"
 TMP="$(mktemp)"
 
@@ -36,14 +34,28 @@ fi
 mv "$TMP" "$INSTALL_DIR/windkeep"
 trap - EXIT
 chmod +x "$INSTALL_DIR/windkeep"
+ln -sf "$INSTALL_DIR/windkeep" "$INSTALL_DIR/wk"
 
-echo "WindKeep installed at $INSTALL_DIR/windkeep"
-echo ""
-echo "Add the following directory to your PATH:"
-echo "  $INSTALL_DIR"
-echo ""
-echo "For bash/zsh, you can run:"
-echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
-echo ""
-echo "Then restart your terminal and run:"
-echo "  windkeep --version"
+on_path=0
+case ":$PATH:" in *":$INSTALL_DIR:"*) on_path=1 ;; esac
+
+path_updated=0
+if [ "$on_path" -eq 0 ]; then
+  export PATH="$INSTALL_DIR:$PATH"
+  case "${SHELL:-}" in
+    */zsh) rc="$HOME/.zshrc" ;;
+    *) rc="$HOME/.bashrc" ;;
+  esac
+  if [ -f "$rc" ] && ! grep -qF "$INSTALL_DIR" "$rc" 2>/dev/null; then
+    printf '\n# WindKeep CLI\nexport PATH="%s:$PATH"\n' "$INSTALL_DIR" >> "$rc"
+    path_updated=1
+  fi
+fi
+
+echo "WindKeep installed."
+if [ "$path_updated" -eq 1 ]; then
+  echo "Restart your terminal or run: source $rc"
+elif [ "$on_path" -eq 0 ]; then
+  echo "Add $INSTALL_DIR to your PATH, then restart your terminal."
+fi
+echo "Run windkeep --version to verify."

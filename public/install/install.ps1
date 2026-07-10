@@ -3,23 +3,18 @@ $ErrorActionPreference = "Stop"
 $binary = "windkeep-windows-amd64.exe"
 $installDir = "$env:LOCALAPPDATA\Programs\windkeep"
 $target = "$installDir\windkeep.exe"
+$wkTarget = "$installDir\wk.exe"
 $temp = "$installDir\windkeep.tmp.exe"
 
 New-Item -ItemType Directory -Force -Path $installDir | Out-Null
-
-if (Test-Path $target) {
-  attrib -h -s $target
-}
 
 Invoke-RestMethod "https://windkeep.up.railway.app/api/downloads/$binary" -OutFile $temp
 
 $expected = $null
 foreach ($line in (Invoke-RestMethod "https://windkeep.up.railway.app/api/downloads/checksums.txt") -split "`n") {
-  if ($line -match '^\s*(\S+)\s+(\S+)\s*$') {
-    if ($matches[2] -eq $binary) {
-      $expected = $matches[1].ToLower()
-      break
-    }
+  if ($line -match '^\s*(\S+)\s+(\S+)\s*$' -and $matches[2] -eq $binary) {
+    $expected = $matches[1].ToLower()
+    break
   }
 }
 
@@ -36,10 +31,24 @@ if ($expected -ne $actual) {
 
 Move-Item -Force $temp $target
 
-Write-Host "WindKeep installed at $target"
-Write-Host ""
-Write-Host "Add the following directory to your PATH:"
-Write-Host "  $installDir"
-Write-Host ""
-Write-Host "Then restart your terminal and run:"
-Write-Host "  windkeep --version"
+if (Test-Path $wkTarget) {
+  Remove-Item -Force $wkTarget
+}
+New-Item -ItemType HardLink -Path $wkTarget -Target $target -Force | Out-Null
+
+$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+$pathUpdated = $false
+if ($userPath -notlike "*$installDir*") {
+  $newPath = if ($userPath) { "$userPath;$installDir" } else { $installDir }
+  [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+  $pathUpdated = $true
+}
+if ($env:Path -notlike "*$installDir*") {
+  $env:Path = "$env:Path;$installDir"
+}
+
+Write-Host "WindKeep installed."
+if ($pathUpdated) {
+  Write-Host "Restart your terminal for PATH changes to take effect."
+}
+Write-Host "Run windkeep --version to verify."
