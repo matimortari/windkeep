@@ -1,6 +1,6 @@
 <template>
   <div class="table-wrapper">
-    <table>
+    <table class="min-w-4xl table-fixed! md:min-w-full">
       <thead>
         <tr>
           <th v-for="col in columns" :key="col.key" :class="col.class">
@@ -31,10 +31,10 @@
                 <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
               </span>
 
-              <div v-if="secret.tags?.length" class="flex flex-wrap items-center gap-1">
+              <div v-if="secret.tags?.length" class="flex flex-nowrap items-center gap-1 overflow-hidden">
                 <button
                   v-for="tag in secret.tags" :key="tag"
-                  class="rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors" :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
+                  class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors" :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
                   :aria-label="`Filter by tag ${tag}`" @click="emit('filterByTag', activeTagFilter === tag ? null : tag)"
                 >
                   {{ tag }}
@@ -42,13 +42,16 @@
               </div>
             </div>
 
-            <div v-else-if="col.type === 'env'" class="flex items-center justify-between gap-4 overflow-hidden font-mono text-sm">
-              <span class="max-w-[80%] truncate tracking-wide select-none" aria-label="Hidden value" :class="getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env))">{{ renderValue(secret.key, col.env) }}</span>
-              <button v-if="secretValuesByKey.get(secret.key)?.get(col.env)" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, secretValuesByKey.get(secret.key)!.get(col.env)!)">
+            <div v-else-if="col.type === 'env'" class="flex h-5 min-w-0 items-center justify-between gap-2 overflow-hidden font-mono text-sm">
+              <span
+                v-if="!(visibleKeys[secret.key] ?? props.allVisible) && secretValuesByKey.get(secret.key)?.get(col.env)" class="h-4 min-w-0 flex-1 shrink-0 self-center rounded-full"
+                :class="getSecretValueClass(secret.key, true)" aria-label="Hidden value"
+              />
+              <span v-else class="min-w-0 flex-1 truncate tracking-wide select-none" :class="getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env))">{{ renderValue(secret.key, col.env) }}</span>
+              <button v-if="secretValuesByKey.get(secret.key)?.get(col.env)" class="shrink-0" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, secretValuesByKey.get(secret.key)!.get(col.env)!)">
                 <icon :name="copyStates[`${secret.key}-${col.env}`] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
             </div>
-
             <div v-else-if="col.key === 'actions'" class="navigation-group">
               <button aria-label="View history" @click="emit('history', secret)">
                 <icon name="ph:clock-counter-clockwise-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
@@ -87,10 +90,10 @@ const emit = defineEmits<{
   filterByTag: [tag: string | null]
 }>()
 
-const visibleKeys = ref<Record<string, boolean>>({})
+const visibleKeys = ref<Record<string, boolean>>((import.meta.client && JSON.parse(localStorage.getItem("secretsVisibleKeys") || "{}")) || {})
 const copyStates = ref<Record<string, boolean>>({})
 const { isOwner, isAdmin } = storeToRefs(useProjectStore())
-const environments = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
+const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
 const changeTypeConfig = {
   create: {
@@ -113,29 +116,19 @@ const changeTypeConfig = {
   },
 }
 
-const secretValuesByKey = computed(() => {
-  const map = new Map<string, Map<string, string>>()
-  for (const secret of props.secrets) {
-    const valuesByEnv = new Map<string, string>()
-    for (const value of secret.values ?? []) {
-      valuesByEnv.set(value.environment, value.value)
-    }
-    map.set(secret.key, valuesByEnv)
-  }
-
-  return map
-})
+const secretValuesByKey = computed(() => new Map(props.secrets.map(secret => [secret.key, new Map((secret.values ?? []).map(v => [v.environment, v.value]))])))
 
 const columns = computed<Record<string, any>[]>(() => {
-  const base = [{ key: "key", label: "Key", class: "w-2/4", type: "base", sortable: true }]
+  const base = [{ key: "key", label: "Key", class: "w-64 md:w-[50%]", type: "base", sortable: true }]
   const envCols = environments.map(env => ({
     key: env.toLowerCase(),
     label: env.charAt(0) + env.slice(1).toLowerCase(),
     env,
     type: "env",
+    class: "w-40 md:w-[20%]",
     sortable: false,
   }))
-  const actions = [{ key: "actions", label: "Actions", class: "w-32 text-right", type: "actions", sortable: false }]
+  const actions = [{ key: "actions", label: "Actions", class: "w-32 shrink-0", type: "actions", sortable: false }]
   return [...base, ...envCols, ...actions]
 })
 
@@ -175,7 +168,7 @@ async function handleCopy(secretKey: string, env: string, value: string) {
   setTimeout(() => copyStates.value[`${secretKey}-${env}`] = false, 1500)
 }
 
-function renderValue(key: string, env: string) {
+function renderValue(key: string, env: Environment) {
   const val = secretValuesByKey.value.get(key)?.get(env)
   if (!val) {
     return "—"
@@ -183,6 +176,13 @@ function renderValue(key: string, env: string) {
 
   return (visibleKeys.value[key] ?? props.allVisible) ? val : "••••••••"
 }
+
+// Persist per-key visibility toggles in localStorage
+watch(visibleKeys, (value) => {
+  if (import.meta.client) {
+    localStorage.setItem("secretsVisibleKeys", JSON.stringify(value))
+  }
+}, { deep: true })
 </script>
 
 <style scoped>

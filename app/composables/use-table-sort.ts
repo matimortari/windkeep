@@ -1,5 +1,25 @@
-import type { ComputedRef, Ref } from "vue"
-import { computed, readonly, ref } from "vue"
+function getByPath(obj: Record<string, any>, path: string) {
+  return path.split(".").reduce((cur: any, key) => cur?.[key], obj)
+}
+
+function compareValues(a: unknown, b: unknown): number {
+  if (a == null && b == null) {
+    return 0
+  }
+  if (a == null) {
+    return 1
+  }
+  if (b == null) {
+    return -1
+  }
+  if (typeof a === "string" && typeof b === "string") {
+    return a.toLowerCase().localeCompare(b.toLowerCase())
+  }
+  if (a instanceof Date && b instanceof Date) {
+    return a.getTime() - b.getTime()
+  }
+  return a < (b as any) ? -1 : a > (b as any) ? 1 : 0
+}
 
 export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | ComputedRef<T[]>) {
   const sortKey = ref<string | null>(null)
@@ -10,54 +30,24 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
       return data.value
     }
 
-    return data.value.toSorted((a, b) => {
-      const A = sortKey.value?.split(".").reduce((cur: any, k: string) => cur?.[k], a)
-      const B = sortKey.value?.split(".").reduce((cur: any, k: string) => cur?.[k], b)
+    const key = sortKey.value
+    const dir = sortDirection.value === "asc" ? 1 : -1
 
-      if (A == null && B == null) {
-        return 0
-      }
-      if (A == null) {
-        return sortDirection.value === "asc" ? 1 : -1
-      }
-      if (B == null) {
-        return sortDirection.value === "asc" ? -1 : 1
-      }
-
-      if (typeof A === "string" && typeof B === "string") {
-        const cmp = A.toLowerCase().localeCompare(B.toLowerCase())
-        return sortDirection.value === "asc" ? cmp : -cmp
-      }
-
-      if (A instanceof Date && B instanceof Date) {
-        const cmp = A.getTime() - B.getTime()
-        return sortDirection.value === "asc" ? cmp : -cmp
-      }
-
-      if (A < B) {
-        return sortDirection.value === "asc" ? -1 : 1
-      }
-      if (A > B) {
-        return sortDirection.value === "asc" ? 1 : -1
-      }
-      return 0
-    })
+    return data.value.toSorted((a, b) => dir * compareValues(getByPath(a, key), getByPath(b, key)))
   })
 
   function toggleSort(key: string) {
-    if (sortKey.value === key) {
-      if (sortDirection.value === "asc") {
-        sortDirection.value = "desc"
-      }
-      else if (sortDirection.value === "desc") {
-        sortDirection.value = null
-        sortKey.value = null
-      }
-    }
-    else {
+    if (sortKey.value !== key) {
       sortKey.value = key
       sortDirection.value = "asc"
+      return
     }
+    if (sortDirection.value === "asc") {
+      sortDirection.value = "desc"
+      return
+    }
+    sortKey.value = null
+    sortDirection.value = null
   }
 
   function setSort(key: string, direction: "asc" | "desc" | null) {
@@ -65,23 +55,11 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     sortDirection.value = direction
   }
 
-  function isSorted(key: string): "asc" | "desc" | null {
-    return sortKey.value === key ? sortDirection.value : null
-  }
-
-  function getSortIcon(key: string) {
-    return isSorted(key)
-  }
-
   function getSortIconName(key: string) {
-    if (getSortIcon(key) === "asc") {
-      return "ph:caret-up-bold"
+    if (sortKey.value !== key || !sortDirection.value) {
+      return "ph:caret-up-down-bold"
     }
-    if (getSortIcon(key) === "desc") {
-      return "ph:caret-down-bold"
-    }
-
-    return "ph:caret-up-down-bold"
+    return sortDirection.value === "asc" ? "ph:caret-up-bold" : "ph:caret-down-bold"
   }
 
   return {
@@ -90,8 +68,6 @@ export function useTableSort<T extends Record<string, any>>(data: Ref<T[]> | Com
     sortedData,
     toggleSort,
     setSort,
-    isSorted,
-    getSortIcon,
     getSortIconName,
   }
 }

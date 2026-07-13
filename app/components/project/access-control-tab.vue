@@ -22,7 +22,7 @@
       </nav>
     </template>
 
-    <div class="flex flex-col gap-4 py-2">
+    <div class="flex flex-col gap-2 py-2">
       <section class="flex flex-col gap-2">
         <header class="flex flex-col gap-1">
           <h6>

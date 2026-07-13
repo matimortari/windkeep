@@ -1,6 +1,6 @@
 <template>
   <Dialog :is-open="isRawEditorOpen" title="Raw .env Editor" @update:is-open="closeDialog('raw')">
-    <div class="flex flex-col gap-3">
+    <div class="flex w-full max-w-xl flex-col gap-3 overflow-hidden">
       <div class="flex flex-row gap-1 rounded-lg border p-1">
         <button
           v-for="env in ENVIRONMENTS" :key="env.value"
@@ -11,7 +11,7 @@
         </button>
       </div>
 
-      <div class="flex flex-col gap-1">
+      <div class="flex min-w-0 flex-col gap-1">
         <div class="flex items-center justify-between">
           <label for="env-content" class="text-sm font-semibold">.env content</label>
           <span class="text-xs text-muted-foreground">{{ environments.find(env => env.value === selectedEnv)?.label }} environment</span>
@@ -19,20 +19,21 @@
         <textarea
           id="env-content" v-model="editorContent"
           name="env-content" placeholder="KEY=value&#10;ANOTHER_KEY=another_value"
-          class="scroll-area h-80 resize-none font-mono text-sm" spellcheck="false"
+          class="scroll-area h-80 w-full min-w-0 resize-none overflow-x-auto font-mono text-sm" spellcheck="false"
         />
       </div>
 
-      <div v-if="hasDiff" class="flex flex-col gap-1 rounded-lg border p-2">
+      <div v-if="hasDiff" class="flex min-w-0 flex-col gap-1 overflow-hidden rounded-lg border p-2">
         <span class="text-xs font-semibold text-muted-foreground">Preview</span>
-        <ul class="flex flex-col gap-0.5">
+        <ul class="flex max-h-40 flex-col gap-0.5 overflow-y-auto">
           <li
             v-for="item in diffItems" :key="item.key"
-            class="navigation-group rounded-sm px-1 py-0.5 font-mono text-xs" :class="item.class"
+            class="navigation-group min-w-0 rounded-sm px-1.5 py-0.5 font-mono text-xs" :class="item.class"
           >
-            <icon :name="item.icon" size="15" />
-            <span class="font-semibold">{{ item.key }}</span>
-            <span v-if="item.type !== 'removed'" class="truncate text-muted-foreground">= {{ item.value }}</span>
+            <icon :name="item.icon" size="15" class="shrink-0" />
+            <span class="min-w-0 truncate">
+              <span class="font-semibold">{{ item.key }}</span><span v-if="item.type !== 'removed'">= {{ item.value }}</span>
+            </span>
           </li>
         </ul>
       </div>
@@ -123,15 +124,15 @@ const diffItems = computed<DiffItem[]>(() => {
 
   for (const [key, value] of Object.entries(parsedEditorValues.value)) {
     if (!(key in currentEnvValues.value)) {
-      items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success" })
+      items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success/10 text-success" })
     }
     else if (currentEnvValues.value[key] !== value) {
-      items.push({ key, value, type: "updated", icon: "ph:pencil-bold", class: "bg-info" })
+      items.push({ key, value, type: "updated", icon: "ph:pencil-bold", class: "bg-warning/10 text-warning" })
     }
   }
   for (const key of Object.keys(currentEnvValues.value)) {
     if (!(key in parsedEditorValues.value)) {
-      items.push({ key, type: "removed", icon: "ph:minus-bold", class: "bg-danger" })
+      items.push({ key, type: "removed", icon: "ph:minus-bold", class: "bg-danger/10 text-danger" })
     }
   }
 
