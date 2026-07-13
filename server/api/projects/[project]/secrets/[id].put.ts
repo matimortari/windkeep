@@ -53,18 +53,20 @@ export default defineEventHandler(async (event) => {
           continue
         }
 
-        const encryptedNewValue = await encrypt(orgId, val.value)
         const existingValue = await tx.secretValue.findUnique({ where: { secretId_environment: { secretId, environment: val.environment } } })
         if (existingValue) {
-          if (existingValue.value === encryptedNewValue) {
+          const currentPlaintext = await decrypt(orgId, existingValue.value)
+          if (currentPlaintext === val.value) {
             continue
           }
 
+          const encryptedNewValue = await encrypt(orgId, val.value)
           valueChanges.push(val.environment)
           await tx.secretValueHistory.create({ data: { secretValueId: existingValue.id, value: existingValue.value, changedBy: sessionUser.id } })
           await tx.secretValue.update({ where: { id: existingValue.id }, data: { value: encryptedNewValue } })
         }
         else {
+          const encryptedNewValue = await encrypt(orgId, val.value)
           valueChanges.push(val.environment)
           await tx.secretValue.create({
             data: {

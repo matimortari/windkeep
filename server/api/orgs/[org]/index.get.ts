@@ -9,44 +9,47 @@ export default defineEventHandler(async (event) => {
   await enforceRateLimit(event, `org:switch:${sessionUser.id}`, 200)
   await requireRole(sessionUser.id, { type: "org", orgId }, ["OWNER", "ADMIN", "MEMBER"])
 
-  // Set this org as active and deactivate others
-  await db.$transaction([
-    db.orgMembership.updateMany({ where: { userId: sessionUser.id, isActive: true }, data: { isActive: false } }),
-    db.orgMembership.update({ where: { userId_orgId: { userId: sessionUser.id, orgId } }, data: { isActive: true } }),
-  ])
-
-  const membership = await db.orgMembership.findUnique({
-    where: { userId_orgId: { userId: sessionUser.id, orgId } },
-    select: {
-      role: true,
-      isActive: true,
-      org: {
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          website: true,
-          encryptionKeyVersion: true,
-          encryptionKeyUpdatedAt: true,
-          createdAt: true,
-          updatedAt: true,
-          memberships: {
-            select: {
-              userId: true,
-              role: true,
-              isActive: true,
-              user: { select: { id: true, name: true, email: true, image: true } },
-            },
+  const membershipSelect = {
+    role: true,
+    isActive: true,
+    org: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        website: true,
+        encryptionKeyVersion: true,
+        encryptionKeyUpdatedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        memberships: {
+          select: {
+            userId: true,
+            role: true,
+            isActive: true,
+            user: { select: { id: true, name: true, email: true, image: true } },
           },
         },
       },
     },
-  })
+  } as const
+
+  let membership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: sessionUser.id, orgId } }, select: membershipSelect })
   if (!membership) {
     throw createError({ statusCode: 404, statusMessage: "Organization not found" })
   }
 
-  await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id))
+  // Only write when switching to a new org or refreshing the current org
+  if (!membership.isActive) {
+    await db.$transaction(async (tx) => {
+      await tx.orgMembership.updateMany({ where: { userId: sessionUser.id, isActive: true }, data: { isActive: false } })
+      await tx.orgMembership.update({ where: { userId_orgId: { userId: sessionUser.id, orgId } }, data: { isActive: true } })
+    })
+
+    await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id))
+
+    membership = await db.orgMembership.findUniqueOrThrow({ where: { userId_orgId: { userId: sessionUser.id, orgId } }, select: membershipSelect })
+  }
 
   return { organization: { ...membership.org, role: membership.role, isActive: membership.isActive } }
 })
