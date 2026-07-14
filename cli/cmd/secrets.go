@@ -7,75 +7,9 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
-	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
-
-func getActiveProjectID(client *api.Client) (string, error) {
-	if cfg.ActiveProjectSlug == "" {
-		return "", fmt.Errorf("no active project. Use 'windkeep projects switch' first")
-	}
-
-	projects, err := client.GetProjects()
-	if err != nil {
-		return "", fmt.Errorf("failed to get projects: %w", err)
-	}
-
-	for _, proj := range projects {
-		if proj.Slug == cfg.ActiveProjectSlug {
-			return proj.ID, nil
-		}
-	}
-
-	return "", fmt.Errorf("active project '%s' not found. Use 'windkeep projects switch' to select a valid project", cfg.ActiveProjectSlug)
-}
-
-func findSecretByKey(secrets []api.Secret, key string) *api.Secret {
-	for i := range secrets {
-		if secrets[i].Key == key {
-			return &secrets[i]
-		}
-	}
-	return nil
-}
-
-func buildSecretValues(dev, staging, prod string) []api.SecretValueInput {
-	var values []api.SecretValueInput
-	if dev != "" {
-		values = append(values, api.SecretValueInput{Environment: api.EnvDevelopment, Value: dev})
-	}
-	if staging != "" {
-		values = append(values, api.SecretValueInput{Environment: api.EnvStaging, Value: staging})
-	}
-	if prod != "" {
-		values = append(values, api.SecretValueInput{Environment: api.EnvProduction, Value: prod})
-	}
-	return values
-}
-
-func mergeSecretValues(existing []api.SecretValue, updates []api.SecretValueInput) []api.SecretValueInput {
-	merged := make(map[api.Environment]string, len(existing))
-	for _, v := range existing {
-		merged[v.Environment] = v.Value
-	}
-	for _, v := range updates {
-		merged[v.Environment] = v.Value
-	}
-	result := make([]api.SecretValueInput, 0, len(merged))
-	for env, val := range merged {
-		result = append(result, api.SecretValueInput{Environment: env, Value: val})
-	}
-	return result
-}
-
-func printProjectContext() {
-	if cfg.ActiveProjectName != "" {
-		ui.PrintInfo("Project: %s", ui.Highlight(cfg.ActiveProjectName))
-	} else if cfg.ActiveProjectSlug != "" {
-		ui.PrintInfo("Project: %s", ui.Highlight(cfg.ActiveProjectSlug))
-	}
-}
 
 func formatRelativeTime(t time.Time) string {
 	d := time.Since(t)
@@ -105,16 +39,15 @@ var secretsListCmd = &cobra.Command{
 	Short: "List secrets in the active project",
 	Long:  `List all secrets in your active project.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
-		projectID, err := getActiveProjectID(client)
+		client := newClient()
+		project, err := resolveProject(client, "")
 		if err != nil {
 			return err
 		}
 
 		printProjectContext()
 
-		secrets, err := client.GetSecrets(projectID)
+		secrets, err := client.GetSecrets(project.ID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
@@ -154,22 +87,15 @@ var secretsGetCmd = &cobra.Command{
 	Long:  `Retrieve all environment values for a specific secret.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		key := args[0]
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
-		projectID, err := getActiveProjectID(client)
+		client := newClient()
+		project, err := resolveProject(client, "")
 		if err != nil {
 			return err
 		}
 
-		secrets, err := client.GetSecrets(projectID)
+		found, err := getSecretByKey(client, project.ID, args[0])
 		if err != nil {
-			return fmt.Errorf("failed to get secrets: %w", err)
-		}
-
-		found := findSecretByKey(secrets, key)
-		if found == nil {
-			return fmt.Errorf("secret '%s' not found", key)
+			return err
 		}
 
 		ui.CyanBold.Printf("Key:     %s\n", found.Key)
@@ -203,37 +129,34 @@ Examples:
   windkeep secrets create PLACEHOLDER -d "To be filled later"`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		key := args[0]
 		description, _ := cmd.Flags().GetString("description")
 		dev, _ := cmd.Flags().GetString("dev")
 		staging, _ := cmd.Flags().GetString("staging")
 		prod, _ := cmd.Flags().GetString("prod")
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-		projectID, err := getActiveProjectID(client)
+		client := newClient()
+		project, err := resolveProject(client, "")
 		if err != nil {
 			return err
 		}
 
 		req := api.CreateSecretRequest{
-			Key:       key,
-			ProjectID: projectID,
+			Key:       args[0],
+			ProjectID: project.ID,
 			Values:    buildSecretValues(dev, staging, prod),
 		}
 		if description != "" {
 			req.Description = &description
 		}
 
-		secret, err := client.CreateSecret(projectID, req)
+		secret, err := client.CreateSecret(project.ID, req)
 		if err != nil {
 			return fmt.Errorf("failed to create secret: %w", err)
 		}
 
 		ui.PrintSuccess("Created '%s'", ui.Highlight(secret.Key))
-		if len(secret.Values) > 0 {
-			for _, val := range secret.Values {
-				ui.PrintInfo("Set value for %s", string(val.Environment))
-			}
+		for _, val := range secret.Values {
+			ui.PrintInfo("Set value for %s", string(val.Environment))
 		}
 		return nil
 	},
@@ -258,26 +181,19 @@ Examples:
 		prod, _ := cmd.Flags().GetString("prod")
 
 		values := buildSecretValues(dev, staging, prod)
-
 		if len(values) == 0 && description == "" {
 			return fmt.Errorf("nothing to update — provide at least one of: --dev, --staging, --prod, or -d/--description")
 		}
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-		projectID, err := getActiveProjectID(client)
+		client := newClient()
+		project, err := resolveProject(client, "")
 		if err != nil {
 			return err
 		}
 
-		// Fetch existing secrets to find the secret ID
-		secrets, err := client.GetSecrets(projectID)
+		found, err := getSecretByKey(client, project.ID, key)
 		if err != nil {
-			return fmt.Errorf("failed to get secrets: %w", err)
-		}
-
-		found := findSecretByKey(secrets, key)
-		if found == nil {
-			return fmt.Errorf("secret '%s' not found. Use 'windkeep secrets create' to create it", key)
+			return fmt.Errorf("%w. Use 'windkeep secrets create' to create it", err)
 		}
 
 		req := api.UpdateSecretRequest{
@@ -287,7 +203,7 @@ Examples:
 			req.Description = &description
 		}
 
-		if _, err := client.UpdateSecret(projectID, found.ID, req); err != nil {
+		if _, err := client.UpdateSecret(project.ID, found.ID, req); err != nil {
 			return fmt.Errorf("failed to update secret: %w", err)
 		}
 
@@ -315,26 +231,20 @@ Examples:
 		key := args[0]
 		envFilter, _ := cmd.Flags().GetString("env")
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-		projectID, err := getActiveProjectID(client)
+		client := newClient()
+		project, err := resolveProject(client, "")
 		if err != nil {
 			return err
 		}
 
 		printProjectContext()
 
-		// Find the secret ID
-		secrets, err := client.GetSecrets(projectID)
+		found, err := getSecretByKey(client, project.ID, key)
 		if err != nil {
-			return fmt.Errorf("failed to get secrets: %w", err)
+			return err
 		}
 
-		found := findSecretByKey(secrets, key)
-		if found == nil {
-			return fmt.Errorf("secret '%s' not found", key)
-		}
-
-		history, err := client.GetSecretHistory(projectID, found.ID)
+		history, err := client.GetSecretHistory(project.ID, found.ID)
 		if err != nil {
 			return fmt.Errorf("failed to get history: %w", err)
 		}
@@ -346,10 +256,12 @@ Examples:
 
 		ui.CyanBold.Printf("History for: %s\n\n", key)
 
-		// Optionally filter by environment
 		var filterEnv api.Environment
 		if envFilter != "" {
-			filterEnv = api.ParseEnvironment(envFilter)
+			filterEnv, err = api.ParseEnvironment(envFilter)
+			if err != nil {
+				return err
+			}
 		}
 
 		for _, envHistory := range history {
@@ -393,31 +305,24 @@ var secretsDeleteCmd = &cobra.Command{
 				Label:     fmt.Sprintf("Delete '%s' and all its values", key),
 				IsConfirm: true,
 			}
-			_, err := prompt.Run()
-			if err != nil {
+			if _, err := prompt.Run(); err != nil {
 				ui.PrintInfo("Deletion cancelled")
 				return nil
 			}
 		}
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
-		projectID, err := getActiveProjectID(client)
+		client := newClient()
+		project, err := resolveProject(client, "")
 		if err != nil {
 			return err
 		}
 
-		secrets, err := client.GetSecrets(projectID)
+		found, err := getSecretByKey(client, project.ID, key)
 		if err != nil {
-			return fmt.Errorf("failed to get secrets: %w", err)
+			return err
 		}
 
-		found := findSecretByKey(secrets, key)
-		if found == nil {
-			return fmt.Errorf("secret '%s' not found", key)
-		}
-
-		if err := client.DeleteSecret(projectID, found.ID); err != nil {
+		if err := client.DeleteSecret(project.ID, found.ID); err != nil {
 			return fmt.Errorf("failed to delete secret: %w", err)
 		}
 

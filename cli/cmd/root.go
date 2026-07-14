@@ -13,17 +13,22 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "windkeep",
-	Aliases: []string{"wk"},
-	Short:   "WindKeep CLI – Manage your secrets from the terminal",
+	Use:           "windkeep",
+	Aliases:       []string{"wk"},
+	Short:         "WindKeep CLI – Manage your secrets from the terminal",
+	SilenceUsage:  true,
+	SilenceErrors: true,
 	Long: `WindKeep CLI is a command-line interface for managing secrets,
 organizations, and projects in your WindKeep instance.
 
 Securely store, retrieve, and manage sensitive information across
 multiple environments with ease.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// Skip auth check for auth commands
-		if cmd.Name() == "login" || cmd.Name() == "logout" || cmd.Name() == "init" {
+		// Skip auth check for auth/upgrade commands and --version flag
+		if cmd.Name() == "login" || cmd.Name() == "logout" || cmd.Name() == "init" || cmd.Name() == "upgrade" {
+			return nil
+		}
+		if v, err := cmd.Flags().GetBool("version"); err == nil && v {
 			return nil
 		}
 

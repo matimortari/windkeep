@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -53,6 +54,39 @@ func fatalf(format string, args ...any) {
 	os.Exit(1)
 }
 
+func hostBinary() string {
+	for _, b := range builds {
+		if b[0] == runtime.GOOS && b[1] == runtime.GOARCH {
+			return filepath.Join("../.data/bin", b[2])
+		}
+	}
+	return ""
+}
+
+func binaryVersion(path string) (string, bool) {
+	out, err := exec.Command(path, "--version").Output()
+	if err != nil {
+		return "", false
+	}
+	v := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(string(out)), "windkeep version "))
+	return v, v != ""
+}
+
+func confirmOverwrite(version string) bool {
+	bin := hostBinary()
+	if bin == "" {
+		return true
+	}
+	prev, ok := binaryVersion(bin)
+	if !ok || prev != version {
+		return true
+	}
+	fmt.Printf("Version %s already built. Continue? (y/N): ", version)
+	var input string
+	fmt.Scanln(&input)
+	return strings.ToLower(strings.TrimSpace(input)) == "y"
+}
+
 func main() {
 	version, err := configValue("CLI_VERSION")
 	if err != nil {
@@ -60,16 +94,9 @@ func main() {
 	}
 
 	fmt.Printf("Building WindKeep CLI — version %s\n", version)
-
-	prev, _ := os.ReadFile("../.data/meta/.last-built-version")
-	if strings.TrimSpace(string(prev)) == version {
-		fmt.Printf("Version %s already built. Continue? (y/N): ", version)
-		var input string
-		fmt.Scanln(&input)
-		if strings.ToLower(strings.TrimSpace(input)) != "y" {
-			fmt.Println("Build cancelled.")
-			return
-		}
+	if !confirmOverwrite(version) {
+		fmt.Println("Build cancelled.")
+		return
 	}
 
 	ldflags := fmt.Sprintf("-s -w -X github.com/matimortari/windkeep/cli/cmd.Version=%s", version)
@@ -78,7 +105,6 @@ func main() {
 		fatalf("failed to remove bin dir: %v", err)
 	}
 	os.MkdirAll("../.data/bin", 0755)
-	os.MkdirAll("../.data/meta", 0755)
 
 	checksumsPath := filepath.Join("../.data/bin", "checksums.txt")
 
@@ -119,6 +145,4 @@ func main() {
 			fmt.Printf("✓ %s\n", name)
 		}
 	}
-
-	os.WriteFile("../.data/meta/.last-built-version", []byte(version), 0644)
 }

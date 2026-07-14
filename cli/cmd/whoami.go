@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
@@ -14,8 +13,7 @@ var whoamiCmd = &cobra.Command{
 	Short: "Display current user and configuration",
 	Long:  `Show information about the currently authenticated user and active configuration.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-		user, err := client.GetUser()
+		user, err := newClient().GetUser()
 		if err != nil {
 			return fmt.Errorf("failed to get user information: %w", err)
 		}

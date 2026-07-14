@@ -5,7 +5,6 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
-	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +40,7 @@ var orgsListCmd = &cobra.Command{
 	Short: "List your organizations",
 	Long:  `List all organizations you are a member of.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(config.APIURL, cfg.APIToken)
+		client := newClient()
 
 		user, err := client.GetUser()
 		if err != nil {
@@ -80,7 +79,7 @@ var orgsCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		client := api.NewClient(config.APIURL, cfg.APIToken)
+		client := newClient()
 
 		org, err := client.CreateOrganization(api.CreateOrgRequest{
 			Name: name,
@@ -108,7 +107,7 @@ var orgsSwitchCmd = &cobra.Command{
 	Long:  `Set the active organization for future commands. If no ID is provided, shows an interactive selector.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(config.APIURL, cfg.APIToken)
+		client := newClient()
 
 		user, err := client.GetUser()
 		if err != nil {
@@ -188,7 +187,7 @@ var orgsUpdateCmd = &cobra.Command{
 		}
 
 		name := args[0]
-		client := api.NewClient(config.APIURL, cfg.APIToken)
+		client := newClient()
 
 		org, err := client.UpdateOrganization(cfg.ActiveOrgID, api.UpdateOrgRequest{
 			Name: name,

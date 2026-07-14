@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/matimortari/windkeep/cli/api"
-	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
@@ -35,8 +34,6 @@ Flags:
 	// --version or --inspect in the child command are never intercepted by Cobra.
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// Manually parse windkeep flags from the front of args.
-		// Stop at the first arg that is not a recognised windkeep flag.
 		environment := "development"
 		projectSlug := ""
 		verbose := false
@@ -44,9 +41,8 @@ Flags:
 		i := 0
 		for i < len(args) {
 			arg := args[i]
-
 			if arg == "--" {
-				i++ // skip separator, everything after is child args
+				i++
 				break
 			}
 
@@ -79,7 +75,7 @@ Flags:
 			}
 
 			if !consumed {
-				break // first non-windkeep arg is the start of the child command
+				break
 			}
 			i++
 		}
@@ -89,60 +85,22 @@ Flags:
 			return fmt.Errorf("no command specified\nUsage: windkeep run [flags] [command] [args...]")
 		}
 
-		// Validate environment
-		var env api.Environment
-		switch strings.ToUpper(environment) {
-		case "DEV", "DEVELOPMENT":
-			env = api.EnvDevelopment
-		case "STAGING":
-			env = api.EnvStaging
-		case "PROD", "PRODUCTION":
-			env = api.EnvProduction
-		default:
-			return fmt.Errorf("invalid environment '%s' — use: dev, staging, or prod", environment)
+		env, err := api.ParseEnvironment(environment)
+		if err != nil {
+			return err
 		}
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
-		// Resolve project
-		var projectID string
-		var projectName string
-		var err error
-
-		if projectSlug != "" {
-			projects, err := client.GetProjects()
-			if err != nil {
-				return fmt.Errorf("failed to get projects: %w", err)
-			}
-			found := false
-			for _, proj := range projects {
-				if proj.Slug == projectSlug {
-					projectID = proj.ID
-					projectName = proj.Name
-					found = true
-					break
-				}
-			}
-			if !found {
-				return fmt.Errorf("project '%s' not found", projectSlug)
-			}
-		} else {
-			projectID, err = getActiveProjectID(client)
-			if err != nil {
-				return err
-			}
-			projectName = cfg.ActiveProjectName
-			if projectName == "" {
-				projectName = cfg.ActiveProjectSlug
-			}
+		client := newClient()
+		project, err := resolveProject(client, projectSlug)
+		if err != nil {
+			return err
 		}
 
-		secrets, err := client.GetSecrets(projectID)
+		secrets, err := client.GetSecrets(project.ID)
 		if err != nil {
 			return fmt.Errorf("failed to fetch secrets: %w", err)
 		}
 
-		// Build env vars map
 		envVars := make(map[string]string)
 		for _, secret := range secrets {
 			for _, val := range secret.Values {
@@ -153,20 +111,17 @@ Flags:
 			}
 		}
 
-		injected := len(envVars)
-
-		if injected == 0 {
-			ui.PrintWarning("No secrets found for %s environment in project '%s'", string(env), projectName)
+		if len(envVars) == 0 {
+			ui.PrintWarning("No secrets found for %s environment in project '%s'", string(env), project.Name)
 		} else if verbose {
 			ui.PrintInfo("Project: %s  •  Env: %s  •  Injecting %d secret(s)",
-				ui.Highlight(projectName), ui.Info(string(env)), injected)
+				ui.Highlight(project.Name), ui.Info(string(env)), len(envVars))
 			for key := range envVars {
 				fmt.Printf("  %s %s\n", ui.Info("→"), key)
 			}
 			fmt.Println()
 		}
 
-		// Run the child command
 		execCmd := exec.Command(childArgs[0], childArgs[1:]...)
 		execCmd.Env = os.Environ()
 		for key, value := range envVars {
@@ -182,13 +137,6 @@ Flags:
 			}
 			return fmt.Errorf("command failed: %w", err)
 		}
-
 		return nil
 	},
-}
-
-func init() {
-	// Flags are parsed manually (DisableFlagParsing: true) so that child command
-	// flags like --version, --inspect, etc. are never intercepted by Cobra.
-	// Supported windkeep flags: -e/--env, -p/--project, -v/--verbose
 }

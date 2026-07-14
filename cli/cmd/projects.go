@@ -7,7 +7,6 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
-	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +35,7 @@ var projectsListCmd = &cobra.Command{
 	Short: "List projects in the active organization",
 	Long:  `List all projects in your active organization.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(config.APIURL, cfg.APIToken)
+		client := newClient()
 
 		activeOrg, err := getActiveOrg(client)
 		if err != nil {
@@ -46,27 +45,19 @@ var projectsListCmd = &cobra.Command{
 			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
 		}
 
-		projects, err := client.GetProjects()
+		projects, err := projectsInOrg(client, activeOrg.OrgID)
 		if err != nil {
-			return fmt.Errorf("failed to get projects: %w", err)
+			return err
 		}
 
-		// Filter by active org
-		var orgProjects []api.Project
-		for _, proj := range projects {
-			if proj.OrgID == activeOrg.OrgID {
-				orgProjects = append(orgProjects, proj)
-			}
-		}
-
-		if len(orgProjects) == 0 {
+		if len(projects) == 0 {
 			ui.PrintWarning("No projects found in '%s'.", activeOrg.Org.Name)
 			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep projects create"))
 			return nil
 		}
 
 		table := ui.CreateTable([]string{"ID", "Name", "Slug", "Secrets"})
-		for _, proj := range orgProjects {
+		for _, proj := range projects {
 			secretCount := 0
 			if proj.Count != nil {
 				secretCount = proj.Count.Secrets
@@ -90,7 +81,7 @@ var projectsCreateCmd = &cobra.Command{
 	Long:  `Create a new project in your active organization. The slug will be auto-generated from the name.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(config.APIURL, cfg.APIToken)
+		client := newClient()
 
 		activeOrg, err := getActiveOrg(client)
 		if err != nil {
@@ -137,7 +128,7 @@ var projectsSwitchCmd = &cobra.Command{
 	Long:  `Set the active project for future commands. Only shows projects from the active organization.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := api.NewClient(config.APIURL, cfg.APIToken)
+		client := newClient()
 
 		// Require an active org — projects are org-scoped
 		activeOrg, err := getActiveOrg(client)
@@ -148,17 +139,9 @@ var projectsSwitchCmd = &cobra.Command{
 			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
 		}
 
-		allProjects, err := client.GetProjects()
+		projects, err := projectsInOrg(client, activeOrg.OrgID)
 		if err != nil {
-			return fmt.Errorf("failed to get projects: %w", err)
-		}
-
-		// Filter to active org only
-		var projects []api.Project
-		for _, proj := range allProjects {
-			if proj.OrgID == activeOrg.OrgID {
-				projects = append(projects, proj)
-			}
+			return err
 		}
 
 		if len(projects) == 0 {
@@ -169,7 +152,6 @@ var projectsSwitchCmd = &cobra.Command{
 
 		var selectedProject *api.Project
 
-		// Interactive mode if no arg provided
 		if len(args) == 0 {
 			templates := &promptui.SelectTemplates{
 				Label:    "{{ . }}?",
@@ -197,7 +179,6 @@ var projectsSwitchCmd = &cobra.Command{
 					break
 				}
 			}
-
 			if selectedProject == nil {
 				return fmt.Errorf("project '%s' not found in organization '%s'", slug, activeOrg.Org.Name)
 			}
@@ -231,24 +212,10 @@ var projectsUpdateCmd = &cobra.Command{
 			return fmt.Errorf("at least one field must be provided (--name, --slug, or --description)")
 		}
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
-		// Get project by slug first
-		projects, err := client.GetProjects()
+		client := newClient()
+		existing, err := findProjectBySlug(client, projectSlug)
 		if err != nil {
-			return fmt.Errorf("failed to get projects: %w", err)
-		}
-
-		var projectID string
-		for _, proj := range projects {
-			if proj.Slug == projectSlug {
-				projectID = proj.ID
-				break
-			}
-		}
-
-		if projectID == "" {
-			return fmt.Errorf("project '%s' not found", projectSlug)
+			return err
 		}
 
 		req := api.UpdateProjectRequest{}
@@ -262,14 +229,13 @@ var projectsUpdateCmd = &cobra.Command{
 			req.Description = &description
 		}
 
-		project, err := client.UpdateProject(projectID, req)
+		project, err := client.UpdateProject(existing.ID, req)
 		if err != nil {
 			return fmt.Errorf("failed to update project: %w", err)
 		}
 
 		ui.PrintSuccess("Project '%s' updated", ui.Highlight(project.Name))
 
-		// Update config if it's the active project
 		if cfg.ActiveProjectSlug == projectSlug {
 			cfg.ActiveProjectID = project.ID
 			cfg.ActiveProjectSlug = project.Slug
@@ -304,33 +270,18 @@ var projectsDeleteCmd = &cobra.Command{
 			}
 		}
 
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-
-		// Get project by slug first
-		projects, err := client.GetProjects()
+		client := newClient()
+		existing, err := findProjectBySlug(client, projectSlug)
 		if err != nil {
-			return fmt.Errorf("failed to get projects: %w", err)
+			return err
 		}
 
-		var projectID string
-		for _, proj := range projects {
-			if proj.Slug == projectSlug {
-				projectID = proj.ID
-				break
-			}
-		}
-
-		if projectID == "" {
-			return fmt.Errorf("project '%s' not found", projectSlug)
-		}
-
-		if err := client.DeleteProject(projectID); err != nil {
+		if err := client.DeleteProject(existing.ID); err != nil {
 			return fmt.Errorf("failed to delete project: %w", err)
 		}
 
 		ui.PrintSuccess("Project deleted")
 
-		// Clear from config if it was active
 		if cfg.ActiveProjectSlug == projectSlug {
 			cfg.ActiveProjectID = ""
 			cfg.ActiveProjectSlug = ""

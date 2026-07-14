@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/matimortari/windkeep/cli/api"
-	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
@@ -27,53 +26,30 @@ Examples:
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		projectSlug, _ := cmd.Flags().GetString("project")
-		client := api.NewClient(config.APIURL, cfg.APIToken)
 
-		var projectID string
-		var projectName string
-		if projectSlug != "" {
-			projects, err := client.GetProjects()
-			if err != nil {
-				return fmt.Errorf("failed to get projects: %w", err)
-			}
-			found := false
-			for _, proj := range projects {
-				if proj.Slug == projectSlug {
-					projectID = proj.ID
-					projectName = proj.Name
-					found = true
-					break
-				}
-			}
-			if !found {
-				return fmt.Errorf("project '%s' not found", projectSlug)
-			}
-		} else {
-			var err error
-			projectID, err = getActiveProjectID(client)
-			if err != nil {
-				return err
-			}
-			projectSlug = cfg.ActiveProjectSlug
-			projectName = cfg.ActiveProjectName
-			if projectName == "" {
-				projectName = projectSlug
-			}
+		env, err := api.ParseEnvironment(pullEnv)
+		if err != nil {
+			return err
 		}
 
-		outputFile := fmt.Sprintf(".env.%s.%s", projectSlug, strings.ToLower(pullEnv))
+		client := newClient()
+		project, err := resolveProject(client, projectSlug)
+		if err != nil {
+			return err
+		}
+
+		outputFile := fmt.Sprintf(".env.%s.%s", project.Slug, strings.ToLower(pullEnv))
 		if len(args) > 0 {
 			outputFile = args[0]
 		}
 
-		ui.PrintInfo("Project: %s  •  Env: %s", ui.Highlight(projectName), ui.Info(pullEnv))
+		ui.PrintInfo("Project: %s  •  Env: %s", ui.Highlight(project.Name), ui.Info(pullEnv))
 
-		secrets, err := client.GetSecrets(projectID)
+		secrets, err := client.GetSecrets(project.ID)
 		if err != nil {
 			return fmt.Errorf("failed to get secrets: %w", err)
 		}
 
-		env := api.ParseEnvironment(pullEnv)
 		var lines []string
 		for _, secret := range secrets {
 			for _, val := range secret.Values {
@@ -88,8 +64,7 @@ Examples:
 			return nil
 		}
 
-		content := strings.Join(lines, "\n") + "\n"
-		if err := os.WriteFile(outputFile, []byte(content), 0600); err != nil {
+		if err := os.WriteFile(outputFile, []byte(strings.Join(lines, "\n")+"\n"), 0600); err != nil {
 			return fmt.Errorf("failed to write '%s': %w", outputFile, err)
 		}
 

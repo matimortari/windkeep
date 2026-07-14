@@ -22,25 +22,28 @@ type APIError struct {
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("API error %d: %s", e.Status, e.Message)
+	if e.Message != "" {
+		return e.Message
+	}
+	return fmt.Sprintf("request failed with status %d", e.Status)
 }
 
 type ErrorResponse struct {
-	Error   string `json:"error"`
-	Message string `json:"message"`
-	Status  int    `json:"status"`
+	Message       string `json:"message"`
+	StatusMessage string `json:"statusMessage"`
+	StatusCode    int    `json:"statusCode"`
 }
 
-func ParseEnvironment(environment string) Environment {
+func ParseEnvironment(environment string) (Environment, error) {
 	switch strings.ToUpper(environment) {
 	case "DEV", "DEVELOPMENT":
-		return EnvDevelopment
+		return EnvDevelopment, nil
 	case "STAGING":
-		return EnvStaging
+		return EnvStaging, nil
 	case "PROD", "PRODUCTION":
-		return EnvProduction
+		return EnvProduction, nil
 	default:
-		return EnvDevelopment
+		return "", fmt.Errorf("invalid environment '%s' — use: dev, staging, or prod", environment)
 	}
 }
 
@@ -85,13 +88,14 @@ func (c *Client) doRequest(method, endpoint string, body any) (*http.Response, e
 		bodyBytes, _ := io.ReadAll(resp.Body)
 
 		var errResp ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &errResp); err != nil {
-			return nil, &APIError{Status: resp.StatusCode, Message: string(bodyBytes)}
-		}
+		_ = json.Unmarshal(bodyBytes, &errResp)
 
 		msg := errResp.Message
 		if msg == "" {
-			msg = errResp.Error
+			msg = errResp.StatusMessage
+		}
+		if msg == "" {
+			msg = http.StatusText(resp.StatusCode)
 		}
 		return nil, &APIError{Status: resp.StatusCode, Message: msg}
 	}

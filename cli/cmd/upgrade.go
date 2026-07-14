@@ -100,36 +100,64 @@ var upgradeCmd = &cobra.Command{
 			return fmt.Errorf("checksum mismatch for %s", binaryName)
 		}
 
-		if runtime.GOOS != "windows" {
+		installedVersion, versionErr := binaryVersion(targetPath)
+		if versionErr == nil && installedVersion == Version {
+			os.Remove(targetPath)
+			ui.PrintInfo("Already on version %s.", ui.Highlight(Version))
+			return nil
+		}
+
+		if runtime.GOOS == "windows" {
+			// Rename works while the process is running; in-place overwrite does not.
+			if err := installWindowsUpgrade(exePath, targetPath); err != nil {
+				// Leave *.new for the next process start (compat / rare permission failures).
+				ui.PrintSuccess("Download complete.")
+				ui.PrintInfo("Could not replace the running binary. Run any windkeep command to finish installing.")
+				return nil
+			}
+		} else {
 			if err := os.Chmod(targetPath, 0755); err != nil {
 				os.Remove(targetPath)
 				return fmt.Errorf("failed to make binary executable: %w", err)
 			}
-
 			if err := os.Rename(targetPath, exePath); err != nil {
 				os.Remove(targetPath)
 				return fmt.Errorf("failed to replace binary: %w", err)
 			}
-
-			out, err := exec.Command(exePath, "--version").Output()
-			if err != nil {
-				ui.PrintSuccess("WindKeep CLI upgraded successfully!")
-				return nil
-			}
-
-			installedVersion := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(string(out)), "windkeep version "))
-			if installedVersion == Version {
-				ui.PrintInfo("Already on version %s.", ui.Highlight(Version))
-			} else {
-				ui.PrintSuccess("WindKeep CLI upgraded from %s to %s!", Version, installedVersion)
-			}
-			return nil
 		}
 
-		ui.PrintSuccess("Download complete.")
-		ui.PrintInfo("Run %s again to finish installing the upgrade on Windows.", ui.Highlight("windkeep --version"))
+		if versionErr != nil {
+			ui.PrintSuccess("WindKeep CLI upgraded successfully!")
+			return nil
+		}
+		ui.PrintSuccess("WindKeep CLI upgraded from %s to %s!", Version, installedVersion)
 		return nil
 	},
+}
+
+func binaryVersion(path string) (string, error) {
+	out, err := exec.Command(path, "--version").Output()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(string(out)), "windkeep version ")), nil
+}
+
+// installWindowsUpgrade replaces the running Windows executable via rename
+// (overwrite-in-place is blocked while the process is alive).
+func installWindowsUpgrade(exePath, newPath string) error {
+	oldPath := exePath + ".old"
+	_ = os.Remove(oldPath)
+
+	if err := os.Rename(exePath, oldPath); err != nil {
+		return err
+	}
+	if err := os.Rename(newPath, exePath); err != nil {
+		_ = os.Rename(oldPath, exePath)
+		return err
+	}
+	_ = os.Remove(oldPath)
+	return nil
 }
 
 func init() {

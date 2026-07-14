@@ -20,19 +20,16 @@ var loginCmd = &cobra.Command{
 		var apiToken string
 
 		if len(args) == 0 {
-			// Interactive mode
 			ui.PrintInfo("Login to the WindKeep CLI")
 			fmt.Println()
 			ui.PrintInfo("Get your API token from: %s", ui.Highlight(config.APIURL+"/admin/preferences"))
 			fmt.Println()
 
-			// Prompt for token with hidden input
 			token, err := speakeasy.Ask("Enter your API token: ")
 			if err != nil {
 				return fmt.Errorf("failed to read token: %w", err)
 			}
-			apiToken = strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(token, "\n", ""), "\r", ""))
-
+			apiToken = strings.TrimSpace(token)
 			if apiToken == "" {
 				ui.PrintWarning("No token provided. Authentication cancelled.")
 				return nil
@@ -41,26 +38,23 @@ var loginCmd = &cobra.Command{
 			apiToken = args[0]
 		}
 
-		// Validate token by making a test request
 		ui.PrintInfo("Validating token...")
-		client := api.NewClient(config.APIURL, apiToken)
-		user, err := client.GetUser()
+		user, err := api.NewClient(config.APIURL, apiToken).GetUser()
 		if err != nil {
 			ui.PrintError("Authentication failed")
-			return fmt.Errorf("%w", err)
+			return err
 		}
 
-		// Save configuration
-		cfg := &config.Config{
-			APIToken: apiToken,
+		saved, err := config.Load()
+		if err != nil {
+			saved = &config.Config{}
 		}
-
-		if err := cfg.Save(); err != nil {
+		saved.APIToken = apiToken
+		if err := saved.Save(); err != nil {
 			return fmt.Errorf("failed to save config: %w", err)
 		}
 
 		ui.PrintSuccess("Successfully authenticated as %s (%s)", ui.Highlight(user.Name), ui.Info(user.Email))
-
 		return nil
 	},
 }

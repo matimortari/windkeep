@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/matimortari/windkeep/cli/api"
-	"github.com/matimortari/windkeep/cli/config"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
 )
@@ -35,23 +34,26 @@ Examples:
 		}
 
 		overwrite, _ := cmd.Flags().GetBool("overwrite")
-		client := api.NewClient(config.APIURL, cfg.APIToken)
-		projectID, err := getActiveProjectID(client)
+		env, err := api.ParseEnvironment(pushEnv)
 		if err != nil {
 			return err
 		}
 
-		ui.PrintInfo("Project: %s  •  Env: %s", ui.Highlight(cfg.ActiveProjectName), ui.Info(pushEnv))
+		client := newClient()
+		project, err := resolveProject(client, "")
+		if err != nil {
+			return err
+		}
+
+		ui.PrintInfo("Project: %s  •  Env: %s", ui.Highlight(project.Name), ui.Info(pushEnv))
 
 		data, err := os.ReadFile(inputFile)
 		if err != nil {
 			return fmt.Errorf("failed to read '%s': %w", inputFile, err)
 		}
 
-		// Parse .env file
 		type parsedEntry struct {
-			key   string
-			value string
+			key, value string
 		}
 		var entries []parsedEntry
 
@@ -75,34 +77,28 @@ Examples:
 			if key == "" {
 				continue
 			}
-
 			entries = append(entries, parsedEntry{key, value})
 		}
 
 		if err := scanner.Err(); err != nil {
 			return fmt.Errorf("failed to read file: %w", err)
 		}
-
 		if len(entries) == 0 {
 			ui.PrintWarning("No secrets found in '%s'", inputFile)
 			return nil
 		}
 
-		// Fetch existing secrets to detect conflicts
-		existing, err := client.GetSecrets(projectID)
+		existing, err := client.GetSecrets(project.ID)
 		if err != nil {
 			return fmt.Errorf("failed to fetch existing secrets: %w", err)
 		}
 
-		existingMap := make(map[string]*api.Secret)
+		existingMap := make(map[string]*api.Secret, len(existing))
 		for i := range existing {
 			existingMap[existing[i].Key] = &existing[i]
 		}
 
-		env := api.ParseEnvironment(pushEnv)
-
 		created, updated, skipped := 0, 0, 0
-
 		for _, entry := range entries {
 			if existingSecret, exists := existingMap[entry.key]; exists {
 				if !overwrite {
@@ -116,27 +112,28 @@ Examples:
 						{Environment: env, Value: entry.value},
 					}),
 				}
-				if _, err := client.UpdateSecret(projectID, existingSecret.ID, req); err != nil {
+				if _, err := client.UpdateSecret(project.ID, existingSecret.ID, req); err != nil {
 					ui.PrintWarning("Failed to update '%s': %v", entry.key, err)
 					skipped++
 					continue
 				}
 				updated++
-			} else {
-				req := api.CreateSecretRequest{
-					Key:       entry.key,
-					ProjectID: projectID,
-					Values: []api.SecretValueInput{
-						{Environment: env, Value: entry.value},
-					},
-				}
-				if _, err := client.CreateSecret(projectID, req); err != nil {
-					ui.PrintWarning("Failed to create '%s': %v", entry.key, err)
-					skipped++
-					continue
-				}
-				created++
+				continue
 			}
+
+			req := api.CreateSecretRequest{
+				Key:       entry.key,
+				ProjectID: project.ID,
+				Values: []api.SecretValueInput{
+					{Environment: env, Value: entry.value},
+				},
+			}
+			if _, err := client.CreateSecret(project.ID, req); err != nil {
+				ui.PrintWarning("Failed to create '%s': %v", entry.key, err)
+				skipped++
+				continue
+			}
+			created++
 		}
 
 		fmt.Println()
@@ -149,7 +146,6 @@ Examples:
 		if skipped > 0 {
 			ui.PrintWarning("Skipped %d secret(s)", skipped)
 		}
-
 		return nil
 	},
 }

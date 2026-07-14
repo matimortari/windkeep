@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"runtime"
 
 	"github.com/matimortari/windkeep/cli/cmd"
+	"github.com/matimortari/windkeep/cli/ui"
 )
 
 func main() {
@@ -13,15 +15,18 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Warning: pending upgrade failed: %v\n", err)
 	} else if applied {
 		fmt.Println("WindKeep CLI upgraded successfully.")
+		// Finish leftover two-step upgrades from older CLI builds.
+		reexec()
+		return
 	}
 
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		ui.PrintError("%v", err)
 		os.Exit(1)
 	}
 }
 
-// applyPendingUpgrade installs a downloaded binary on Windows, where the running executable cannot be replaced in-place. Returns true when an upgrade was applied.
+// applyPendingUpgrade installs a leftover windkeep.exe.new from older upgrade flows.
 func applyPendingUpgrade() (bool, error) {
 	if runtime.GOOS != "windows" {
 		return false, nil
@@ -39,7 +44,6 @@ func applyPendingUpgrade() (bool, error) {
 
 	oldPath := exePath + ".old"
 	_ = os.Remove(oldPath)
-
 	if err := os.Rename(exePath, oldPath); err != nil {
 		return false, fmt.Errorf("failed to stage current binary: %w", err)
 	}
@@ -48,6 +52,30 @@ func applyPendingUpgrade() (bool, error) {
 		return false, fmt.Errorf("failed to install pending upgrade: %w", err)
 	}
 	_ = os.Remove(oldPath)
-
 	return true, nil
+}
+
+func reexec() {
+	exePath, err := os.Executable()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: could not restart upgraded binary: %v\n", err)
+		if err := cmd.Execute(); err != nil {
+			ui.PrintError("%v", err)
+			os.Exit(1)
+		}
+		return
+	}
+
+	c := exec.Command(exePath, os.Args[1:]...)
+	c.Stdin = os.Stdin
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	if err := c.Run(); err != nil {
+		if ee, ok := err.(*exec.ExitError); ok {
+			os.Exit(ee.ExitCode())
+		}
+		fmt.Fprintf(os.Stderr, "Warning: upgraded binary failed: %v\n", err)
+		os.Exit(1)
+	}
+	os.Exit(0)
 }
