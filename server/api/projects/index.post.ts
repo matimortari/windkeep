@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     metadata: { projectName: newProject.name },
   })
 
-  await deleteCached(CacheKeys.userProjects(sessionUser.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id, newProject.orgId))
 
   return { project: newProject }
 })

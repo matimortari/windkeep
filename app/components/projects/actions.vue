@@ -11,10 +11,6 @@
       </span>
     </div>
 
-    <button class="btn shrink-0" :aria-label="`Sort by Name ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`" @click="emit('toggleSort')">
-      <icon name="ph:arrow-down-bold" size="20" class="transition-transform" :class="sortDirection === 'asc' ? 'rotate-180' : 'rotate-0'" />
-    </button>
-
     <button aria-label="Toggle Layout" class="btn shrink-0" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
       <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
     </button>
@@ -30,7 +26,6 @@
 defineProps<{
   search: string
   layout: "grid" | "list"
-  sortDirection: "asc" | "desc"
   isOwner: boolean
   isAdmin: boolean
 }>()
@@ -38,7 +33,6 @@ defineProps<{
 const emit = defineEmits<{
   "update:search": [value: string]
   "update:layout": [value: "grid" | "list"]
-  "toggleSort": []
   "openDialog": []
 }>()
 </script>

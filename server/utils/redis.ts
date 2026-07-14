@@ -15,7 +15,7 @@ async function getRedisClient() {
   if (connecting) {
     return null
   }
-  if (!process.env.REDIS_URL) {
+  if (!requireEnv("REDIS_URL")) {
     return null
   }
 
@@ -55,7 +55,7 @@ async function getRedisClient() {
  */
 export const CacheKeys = {
   userData: (userId: string) => `user:data:${userId}`,
-  userProjects: (userId: string) => `user:projects:${userId}`,
+  userProjects: (userId: string, orgId: string) => `user:projects:${userId}:${orgId}`,
   orgAuditLogs: (orgId: string, page: number, filters: string) => `org:audit:${orgId}:p${page}:${filters}`,
   rateLimit: (identifier: string) => `ratelimit:${identifier}`,
 }

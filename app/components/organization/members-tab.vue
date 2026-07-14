@@ -1,74 +1,85 @@
 <template>
-  <TabSection context="Organization" title="Members">
-    <template v-if="canManage" #actions>
-      <div class="navigation-group w-full justify-end md:w-auto">
+  <TabSection title="Members">
+    <template #context>
+      <h3 class="flex max-w-lg flex-row items-center gap-1 truncate text-muted-foreground">
+        <span class="truncate">{{ activeOrg?.name }}</span>
+        <nuxt-link v-if="activeOrg?.website" :href="activeOrg.website" target="_blank" aria-label="Visit organization website">
+          <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
+        </nuxt-link>
+      </h3>
+    </template>
+
+    <template #actions>
+      <nav v-if="canManage" class="navigation-group w-full justify-end md:w-auto">
         <button class="btn-primary" @click="isInviteDialogOpen = true">
           <icon name="ph:envelope-bold" size="20" />
           <span>Invite Member</span>
         </button>
-      </div>
+      </nav>
     </template>
 
     <div class="flex flex-col gap-2 py-2">
-      <header class="flex flex-col gap-1">
-        <h6>
-          Members
-        </h6>
-        <p class="text-caption">
-          Users with access to this organization and their roles.
-        </p>
-      </header>
+      <section class="flex flex-col gap-2">
+        <header class="flex flex-col gap-1">
+          <h6>
+            Members
+          </h6>
+          <p class="text-caption">
+            Users with access to this organization and their roles.
+          </p>
+        </header>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th v-for="col in memberColumns" :key="col.key" :class="col.class">
-                <div class="navigation-group">
-                  <span>{{ col.label }}</span>
-                  <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleMemberSort(col.key)">
-                    <icon :name="getMemberSortIconName(col.key)" size="15" class="transition-transform" />
-                  </button>
-                </div>
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr v-if="!sortedMembers.length">
-              <td :colspan="memberColumns.length" class="p-8 text-center">
-                <Empty message="No members found." icon-name="ph:users-three-bold" />
-              </td>
-            </tr>
-
-            <tr
-              v-for="orgUser in sortedMembers" :key="orgUser.user.id"
-              class="hover:bg-muted/20" :class="canManageMember(orgUser) ? 'cursor-pointer' : ''"
-              @click="canManageMember(orgUser) && openMemberDialog(orgUser)"
-            >
-              <td>
-                <div class="navigation-group items-start!">
-                  <img :src="orgUser.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
-                  <div class="flex flex-col truncate">
-                    <span>{{ orgUser.user.name }}</span>
-                    <span>{{ orgUser.user.email }}</span>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th v-for="col in memberColumns" :key="col.key" :class="col.class">
+                  <div class="navigation-group">
+                    <span>{{ col.label }}</span>
+                    <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleMemberSort(col.key)">
+                      <icon :name="getMemberSortIconName(col.key)" size="15" class="transition-transform" />
+                    </button>
                   </div>
-                </div>
-              </td>
-              <td class="w-28">
-                {{ ROLES.find(role => role.value === orgUser.role)?.label }}
-              </td>
-              <td class="w-24">
-                <button v-if="canManageMember(orgUser)" aria-label="Manage member" @click.stop="openMemberDialog(orgUser)">
-                  <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                </th>
+              </tr>
+            </thead>
 
-      <section v-if="canManage" class="flex flex-col gap-2">
+            <tbody>
+              <tr v-if="!sortedMembers.length">
+                <td :colspan="memberColumns.length" class="p-8 text-center">
+                  <Empty message="No members found." icon-name="ph:users-three-bold" />
+                </td>
+              </tr>
+
+              <tr
+                v-for="member in sortedMembers" :key="member.user.id"
+                class="hover:bg-muted/20" :class="canManageMember(member) ? 'cursor-pointer' : ''"
+                @click="canManageMember(member) && openMemberDialog(member)"
+              >
+                <td>
+                  <div class="navigation-group">
+                    <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
+                    <span class="truncate">{{ member.user.name }}</span>
+                  </div>
+                </td>
+                <td class="max-w-xs truncate">
+                  {{ member.user.email }}
+                </td>
+                <td class="w-28">
+                  {{ ROLES.find(role => role.value === member.role)?.label }}
+                </td>
+                <td class="w-24">
+                  <button v-if="canManageMember(member)" aria-label="Manage member" @click.stop="openMemberDialog(member)">
+                    <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section v-if="canManage" class="flex flex-col gap-2 border-t pt-4">
         <header class="flex flex-col gap-1">
           <h6>
             Invitations
@@ -167,6 +178,7 @@ const inviteLinkIcon = createActionHandler("ph:link-bold")
 
 const memberColumns = [
   { key: "user.name", label: "Member", class: "", sortable: true },
+  { key: "user.email", label: "Email", class: "", sortable: true },
   { key: "role", label: "Role", class: "w-28", sortable: true },
   { key: "actions", label: "Actions", class: "w-24", sortable: false },
 ]

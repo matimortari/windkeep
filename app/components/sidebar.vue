@@ -26,27 +26,22 @@
         Projects
       </p>
 
-      <div class="navigation-group">
-        <button :aria-label="showAllProjects ? 'Show Projects Inside Organization' : 'Show All My Projects'" class="btn-ghost p-0!" @click="showAllProjects = !showAllProjects">
-          <icon :name="showAllProjects ? 'ph:users-four-bold' : 'ph:user-bold'" size="20" />
-        </button>
-        <button aria-label="Create New Project" class="btn-ghost p-0!" @click="openDialog('projects')">
-          <icon name="ph:plus-bold" size="20" />
-        </button>
-      </div>
+      <button aria-label="Create New Project" class="btn-ghost p-0!" @click="openDialog('projects')">
+        <icon name="ph:plus-bold" size="20" />
+      </button>
     </div>
 
     <div class="scroll-area flex-1 overflow-y-auto">
       <div v-if="loading" class="flex flex-col gap-2" aria-hidden="true">
-        <div v-for="i in 6" :key="i" class="h-3 animate-pulse rounded-sm bg-muted" :style="{ width: skeletonWidths[i - 1] }" />
+        <div v-for="i in 6" :key="i" class="h-3 animate-pulse rounded-sm bg-muted" :style="{ width: ['65%', '45%', '60%', '50%', '50%', '60%'][i - 1] }" />
       </div>
 
-      <p v-else-if="!filteredProjects.length" class="text-caption">
+      <p v-else-if="!orgProjects.length" class="text-caption">
         No projects yet.
       </p>
 
       <nav v-else aria-label="Projects Navigation" class="flex flex-col gap-2">
-        <div v-for="project in filteredProjects" :key="project.id">
+        <div v-for="project in orgProjects" :key="project.id">
           <nuxt-link
             :to="{ path: `/admin/${project.slug}`, query: { t: 'secrets' } }" class="text-caption truncate border-l-2 border-transparent px-2 transition-all hover:border-primary hover:text-foreground"
             :class="{ 'border-primary! text-primary!': isActiveProject(project) }" @click="handleProjectClick(project)"
@@ -82,27 +77,9 @@ defineProps<{
 const emit = defineEmits<{ "update:isOpen": [value: boolean] }>()
 
 const route = useRoute()
-const userStore = useUserStore()
-const { activeOrg } = storeToRefs(useOrgStore())
+const { activeOrg, orgProjects } = storeToRefs(useOrgStore())
 const projectStore = useProjectStore()
-const { projects } = storeToRefs(projectStore)
 const { openDialog, closeDialog, setActiveProject } = useUIState()
-const showAllProjects = ref(false)
-const skeletonWidths = ["65%", "45%", "60%", "50%", "50%", "60%"]
-
-// All projects the user has access to, across all orgs
-const allProjects = computed(() => projects.value.filter(project => project.memberships?.some(m => m.userId === userStore.user?.id)))
-
-// Projects within the active org that the user has access to
-const activeOrgProjects = computed(() => {
-  if (!activeOrg.value?.id) {
-    return []
-  }
-
-  return allProjects.value.filter(project => project.orgId === activeOrg.value?.id)
-})
-
-const filteredProjects = computed(() => showAllProjects.value ? allProjects.value : activeOrgProjects.value)
 
 const activeQueryTab = computed(() => {
   const tab = route.query.t
@@ -114,8 +91,7 @@ function isActiveProject(project: Project) {
 }
 
 function isActiveOrgTab(tabKey: string) {
-  return route.path === "/admin/organization"
-    && (activeQueryTab.value === tabKey || (!activeQueryTab.value && tabKey === "projects"))
+  return route.path === "/admin/organization" && (activeQueryTab.value === tabKey || (!activeQueryTab.value && tabKey === "projects"))
 }
 
 function isActiveProjectTab(tabKey: string) {

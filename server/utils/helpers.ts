@@ -82,8 +82,8 @@ export async function requireRole(userId: string, scope: { type: "org", orgId: s
     }
 
     const orgMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId, orgId: project.orgId } } })
-    if (!orgMembership) {
-      throw createError({ statusCode: 403, statusMessage: "Forbidden: insufficient permissions" })
+    if (!orgMembership?.isActive) {
+      throw createError({ statusCode: 403, statusMessage: "Forbidden: project is not in the active organization" })
     }
 
     membership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })

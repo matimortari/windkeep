@@ -1,12 +1,20 @@
 <template>
-  <TabSection context="Organization" title="Projects">
+  <TabSection title="Projects">
+    <template #context>
+      <h3 class="flex max-w-lg flex-row items-center gap-1 truncate text-muted-foreground">
+        <span class="truncate">{{ activeOrg?.name }}</span>
+        <nuxt-link v-if="activeOrg?.website" :href="activeOrg.website" target="_blank" aria-label="Visit organization website">
+          <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
+        </nuxt-link>
+      </h3>
+    </template>
+
     <template #actions>
       <ProjectsActions
         :search="searchQuery" :layout="layout"
-        :sort-direction="sortDirection || 'asc'" :is-owner="isOwner"
-        :is-admin="isAdmin" @update:search="searchQuery = $event"
-        @update:layout="layout = $event" @toggle-sort="toggleSort"
-        @open-dialog="openDialog('projects')"
+        :is-owner="isOwner" :is-admin="isAdmin"
+        @update:search="searchQuery = $event" @update:layout="layout = $event"
+        @toggle-sort="toggleSort" @open-dialog="openDialog('projects')"
       />
     </template>
 

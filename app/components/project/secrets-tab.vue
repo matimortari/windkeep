@@ -52,7 +52,7 @@ const activeTagFilter = ref<string | null>(null)
 const historySecretId = ref("")
 const historySecretKey = ref("")
 const searchQuery = ref("")
-const allVisible = ref(false)
+const allVisible = ref((import.meta.client && localStorage.getItem("secretsAllVisible") === "true") || false)
 const pendingChanges = reactive<Map<string, PendingChange>>(new Map())
 const hasPendingChanges = computed(() => pendingChanges.size > 0)
 
@@ -233,7 +233,7 @@ function exportToEnv(env: string | null | undefined) {
 
   const a = document.createElement("a")
   a.href = URL.createObjectURL(new Blob([filteredSecrets], { type: "text/plain" }))
-  a.download = `.env.${props.project?.slug}.${env.toLowerCase()}`
+  a.download = `.env.${env.toLowerCase()}`
   a.click()
   return { success: true }
 }
@@ -246,6 +246,13 @@ onBeforeRouteLeave(() => {
   return true
 })
 
+// Store all visible state in localStorage
+watch(allVisible, (value) => {
+  if (import.meta.client) {
+    localStorage.setItem("secretsAllVisible", String(value))
+  }
+})
+
 // Get secrets when project changes
 watch(() => props.project?.id, async (id, prevId) => {
   if (!id) {
@@ -255,7 +262,6 @@ watch(() => props.project?.id, async (id, prevId) => {
     pendingChanges.clear()
     activeTagFilter.value = null
     searchQuery.value = ""
-    allVisible.value = false
   }
 
   secrets.value = []

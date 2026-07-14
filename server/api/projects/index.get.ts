@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     return { projects: [] }
   }
 
-  const cacheKey = CacheKeys.userProjects(sessionUser.id)
+  const cacheKey = CacheKeys.userProjects(sessionUser.id, activeMembership.orgId)
   const cached = await getCached<Project[]>(cacheKey)
   if (cached) {
     return { projects: cached }
@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
 
   const projects = await db.project.findMany({
     where: {
+      orgId: activeMembership.orgId,
       memberships: { some: { userId: sessionUser.id } },
-      org: { memberships: { some: { userId: sessionUser.id } } },
     },
     select: {
       id: true,
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
         },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { updatedAt: "desc" },
   })
 
   await setCached(cacheKey, projects, 60)
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Get projects",
-    description: "Returns all projects the user is a member of across every organization they belong to.",
+    description: "Returns projects the user is a member of within their currently active organization.",
     tags: ["Projects"],
     responses: {
       200: { description: "List of projects with members and secret counts" },

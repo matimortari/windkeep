@@ -19,7 +19,7 @@ function validateManualEncryptionKey(data: { encryptionMode?: "AUTO" | "MANUAL" 
 export const createOrgSchema = z.object({
   name: z.string().trim().min(3, "Organization name must be at least 3 characters").max(50, "Organization name must be at most 50 characters"),
   description: z.string().trim().max(255, "Description must be at most 255 characters").optional(),
-  website: z.string().trim().transform(v => v || undefined).pipe(z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional()),
+  website: z.string().trim().optional().transform(v => v || undefined).pipe(z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional()),
   encryptionMode: z.enum(["AUTO", "MANUAL"]).default("AUTO").optional(),
   encryptionKey: z.string().trim().optional(),
 }).superRefine(validateManualEncryptionKey)

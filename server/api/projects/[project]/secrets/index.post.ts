@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await deleteCached(CacheKeys.userProjects(sessionUser.id))
+  await deleteCached(CacheKeys.userProjects(sessionUser.id, secret.project.org.id))
 
   const decryptedSecret = {
     ...secret,

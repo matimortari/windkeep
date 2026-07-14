@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await deleteCached(CacheKeys.userData(memberId), CacheKeys.userProjects(memberId))
+  await deleteCached(CacheKeys.userData(memberId), CacheKeys.userProjects(memberId, updatedMembership.project.orgId))
 
   return { membership: updatedMembership }
 })

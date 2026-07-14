@@ -48,16 +48,18 @@
                 :class="getSecretValueClass(secret.key, true)" aria-label="Hidden value"
               />
               <span v-else class="min-w-0 flex-1 truncate tracking-wide select-none" :class="getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env))">{{ renderValue(secret.key, col.env) }}</span>
-              <button v-if="secretValuesByKey.get(secret.key)?.get(col.env)" class="shrink-0" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, secretValuesByKey.get(secret.key)!.get(col.env)!)">
-                <icon :name="copyStates[`${secret.key}-${col.env}`] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
-              </button>
+              <div v-if="secretValuesByKey.get(secret.key)?.get(col.env)" class="flex shrink-0 items-center gap-1">
+                <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !(visibleKeys[secret.key] ?? props.allVisible)">
+                  <icon :name="(visibleKeys[secret.key] ?? props.allVisible) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
+                </button>
+                <button :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, secretValuesByKey.get(secret.key)!.get(col.env)!)">
+                  <icon :name="copyStates[`${secret.key}-${col.env}`] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
+                </button>
+              </div>
             </div>
             <div v-else-if="col.key === 'actions'" class="navigation-group">
               <button aria-label="View history" @click="emit('history', secret)">
                 <icon name="ph:clock-counter-clockwise-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
-              </button>
-              <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !(visibleKeys[secret.key] ?? props.allVisible)">
-                <icon :name="(visibleKeys[secret.key] ?? props.allVisible) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
               <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Edit Secret" @click="emit('edit', secret)">
                 <icon name="ph:note-pencil-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
@@ -183,6 +185,9 @@ watch(visibleKeys, (value) => {
     localStorage.setItem("secretsVisibleKeys", JSON.stringify(value))
   }
 }, { deep: true })
+
+// Global reveal/hide resets per-key overrides so every row stays in sync
+watch(() => props.allVisible, () => visibleKeys.value = {})
 </script>
 
 <style scoped>

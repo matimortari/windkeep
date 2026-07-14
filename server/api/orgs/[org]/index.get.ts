@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       await tx.orgMembership.update({ where: { userId_orgId: { userId: sessionUser.id, orgId } }, data: { isActive: true } })
     })
 
-    await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id))
+    await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userProjects(sessionUser.id, orgId))
 
     membership = await db.orgMembership.findUniqueOrThrow({ where: { userId_orgId: { userId: sessionUser.id, orgId } }, select: membershipSelect })
   }

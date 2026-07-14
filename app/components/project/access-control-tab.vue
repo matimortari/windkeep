@@ -61,13 +61,13 @@
                 @click="canManageMember(member) && openMemberDialog(member)"
               >
                 <td>
-                  <div class="navigation-group items-start!">
+                  <div class="navigation-group">
                     <img :src="member.user.image" alt="Avatar" class="hidden size-8 rounded-full border md:block">
-                    <div class="flex flex-col truncate">
-                      <span>{{ member.user?.name }}</span>
-                      <span>{{ member.user?.email }}</span>
-                    </div>
+                    <span class="truncate">{{ member.user?.name }}</span>
                   </div>
+                </td>
+                <td class="max-w-xs truncate">
+                  {{ member.user?.email }}
                 </td>
                 <td class="w-28">
                   {{ ROLES.find(role => role.value === member.role)?.label }}
@@ -176,6 +176,7 @@ const selectedMember = ref<ProjectMembership | null>(null)
 
 const memberColumns = [
   { key: "user.name", label: "Member", class: "", sortable: true },
+  { key: "user.email", label: "Email", class: "", sortable: true },
   { key: "role", label: "Role", class: "w-28", sortable: true },
   { key: "actions", label: "Actions", class: "w-24", sortable: false },
 ]
