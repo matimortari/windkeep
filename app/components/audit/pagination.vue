@@ -6,7 +6,7 @@
 
     <div class="text-caption flex flex-col items-center justify-center gap-1 whitespace-nowrap md:mx-4">
       <span>{{ auditPagination.page }} / {{ auditPagination.totalPages }}</span>
-      <span v-if="auditLogs.length" class="text-xs italic">{{ `Showing ${auditLogs.length} ${auditLogs.length === 1 ? "log" : "logs"}` }}</span>
+      <span v-if="auditPagination.totalItems" class="text-xs italic">{{ summary }}</span>
     </div>
 
     <button class="btn-info" :disabled="!auditPagination.hasNext" aria-label="Next Page" @click="orgStore.nextPage(activeOrg!.id)">
@@ -17,5 +17,13 @@
 
 <script setup lang="ts">
 const orgStore = useOrgStore()
-const { activeOrg, auditLogs, auditPagination } = storeToRefs(orgStore)
+const { activeOrg, auditPagination } = storeToRefs(orgStore)
+
+const summary = computed(() => {
+  const { page, limit, totalItems } = auditPagination.value!
+  const start = (page - 1) * limit + 1
+  const end = Math.min(page * limit, totalItems)
+  const label = totalItems === 1 ? "log" : "logs"
+  return `Showing ${start}–${end} of ${totalItems} ${label}`
+})
 </script>

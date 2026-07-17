@@ -304,6 +304,14 @@ export const useOrgStore = defineStore("org", () => {
       auditLogs.value = res.data.auditLogs
       auditFilters.value = res.data.filters
       auditPagination.value = res.data.pagination
+      if (params) {
+        currentAuditFilters.value = {
+          ...currentAuditFilters.value,
+          ...params,
+          page: res.data.pagination.page,
+          limit: res.data.pagination.limit,
+        }
+      }
       return res.data
     }
     catch (err: unknown) {
