@@ -6,7 +6,6 @@
           <img src="/assets/symbol.png" alt="Logo" width="35">
         </nuxt-link>
 
-        <span class="hidden text-muted-foreground md:block">/</span>
         <p v-if="user?.name" class="text-caption hidden md:block">
           {{ user.name }}
         </p>
@@ -25,7 +24,7 @@
           </button>
 
           <transition name="dropdown">
-            <ul v-if="isDropdownOpen" class="dropdown-menu left-0! right-auto!" role="menu">
+            <ul v-if="isDropdownOpen" class="dropdown-menu right-auto! left-0!" role="menu">
               <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
                 <button
                   class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem"

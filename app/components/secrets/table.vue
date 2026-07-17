@@ -42,12 +42,8 @@
               </div>
             </div>
 
-            <div v-else-if="col.type === 'env'" class="flex h-5 min-w-0 items-center justify-between gap-2 overflow-hidden font-mono text-sm">
-              <span
-                v-if="!(visibleKeys[secret.key] ?? props.allVisible) && secretValuesByKey.get(secret.key)?.get(col.env)" class="h-4 min-w-0 flex-1 shrink-0 self-center rounded-full"
-                :class="getSecretValueClass(secret.key, true)" aria-label="Hidden value"
-              />
-              <span v-else class="min-w-0 flex-1 truncate tracking-wide select-none" :class="getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env))">{{ renderValue(secret.key, col.env) }}</span>
+            <div v-else-if="col.type === 'env'" class="flex h-5 min-w-0 items-center justify-between gap-4 overflow-hidden font-mono text-sm">
+              <span class="min-w-0 flex-1 truncate tracking-wide select-none" :class="getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env))" :aria-label="(visibleKeys[secret.key] ?? props.allVisible) ? undefined : 'Hidden value'">{{ renderValue(secret.key, col.env) }}</span>
               <div v-if="secretValuesByKey.get(secret.key)?.get(col.env)" class="flex shrink-0 items-center gap-1">
                 <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !(visibleKeys[secret.key] ?? props.allVisible)">
                   <icon :name="(visibleKeys[secret.key] ?? props.allVisible) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
@@ -92,7 +88,7 @@ const emit = defineEmits<{
   filterByTag: [tag: string | null]
 }>()
 
-const visibleKeys = ref<Record<string, boolean>>((import.meta.client && JSON.parse(localStorage.getItem("secretsVisibleKeys") || "{}")) || {})
+const visibleKeys = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
 const { isOwner, isAdmin } = storeToRefs(useProjectStore())
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
@@ -146,10 +142,10 @@ function getChangeConfig(key: string) {
 function getSecretValueClass(key: string, hasValue: boolean) {
   const config = getChangeConfig(key)
   if (!config) {
-    return hasValue ? "rounded-full px-1.5 py-0.5 bg-muted/30 font-medium" : "text-muted-foreground/40"
+    return hasValue ? "font-medium" : "text-muted-foreground/40"
   }
 
-  return config.valueClass
+  return config.keyTextClass
 }
 
 function getActionIconClass(key: string, defaultTone: "primary" | "danger" = "primary") {
@@ -176,15 +172,12 @@ function renderValue(key: string, env: Environment) {
     return "—"
   }
 
-  return (visibleKeys.value[key] ?? props.allVisible) ? val : "••••••••"
-}
-
-// Persist per-key visibility toggles in localStorage
-watch(visibleKeys, (value) => {
-  if (import.meta.client) {
-    localStorage.setItem("secretsVisibleKeys", JSON.stringify(value))
+  if (visibleKeys.value[key] ?? props.allVisible) {
+    return val
   }
-}, { deep: true })
+
+  return "•".repeat(Math.min(Math.max(val.length, 6), 32))
+}
 
 // Global reveal/hide resets per-key overrides so every row stays in sync
 watch(() => props.allVisible, () => visibleKeys.value = {})

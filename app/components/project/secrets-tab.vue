@@ -52,7 +52,7 @@ const activeTagFilter = ref<string | null>(null)
 const historySecretId = ref("")
 const historySecretKey = ref("")
 const searchQuery = ref("")
-const allVisible = ref((import.meta.client && localStorage.getItem("secretsAllVisible") === "true") || false)
+const allVisible = ref(false)
 const pendingChanges = reactive<Map<string, PendingChange>>(new Map())
 const hasPendingChanges = computed(() => pendingChanges.size > 0)
 
@@ -244,13 +244,6 @@ onBeforeRouteLeave(() => {
   }
 
   return true
-})
-
-// Store all visible state in localStorage
-watch(allVisible, (value) => {
-  if (import.meta.client) {
-    localStorage.setItem("secretsAllVisible", String(value))
-  }
 })
 
 // Get secrets when project changes

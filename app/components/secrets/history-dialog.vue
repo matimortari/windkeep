@@ -8,16 +8,26 @@
       <Empty v-if="!history || history.length === 0" message="No history available for this secret." icon-name="ph:clock-counter-clockwise-bold" />
 
       <template v-else>
-        <button class="btn self-end" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" @click="allVisible = !allVisible">
-          <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
-          <span>{{ allVisible ? 'Hide all' : 'Reveal all' }}</span>
-        </button>
+        <div class="card p-0!">
+          <div class="flex flex-row items-center justify-between border-b">
+            <div class="flex flex-row overflow-x-auto">
+              <button
+                v-for="env in mergedHistory" :key="env.environment"
+                class="history-tab" :class="activeEnv === env.environment ? 'history-tab--active' : ''"
+                @click="activeEnv = env.environment"
+              >
+                {{ env.environment }}
+              </button>
+            </div>
 
-        <div class="scroll-area max-h-[70vh] space-y-3 overflow-y-auto pt-2 pr-2">
-          <div v-for="env in mergedHistory" :key="env.environment" class="space-y-2 rounded-lg border p-3">
-            <span class="section-label">{{ env.environment }}</span>
+            <button class="btn shrink-0 rounded-none!" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" @click="allVisible = !allVisible">
+              <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
+              <span class="hidden md:inline">{{ allVisible ? 'Hide all' : 'Reveal all' }}</span>
+            </button>
+          </div>
 
-            <div v-for="row in env.rows" :key="row.id" class="space-y-1 rounded-lg p-2">
+          <div v-if="activeHistory" class="scroll-area max-h-[70vh] space-y-2 overflow-y-auto p-2">
+            <div v-for="row in activeHistory.rows" :key="row.id" class="space-y-1 rounded-lg p-2">
               <div v-if="!row.isCurrent" class="flex items-center justify-between text-muted-foreground">
                 <div class="navigation-group">
                   <img :src="row.changedBy?.image || ''" :alt="row.changedBy?.name || 'Unknown'" class="size-4 rounded-full border">
@@ -28,13 +38,13 @@
 
               <div class="navigation-group justify-between text-sm">
                 <p class="flex flex-row items-center gap-1">
-                  <span class="truncate font-mono text-muted-foreground select-none">
-                    {{ visibleMap[row.id] || allVisible ? row.value : "•".repeat(row.value?.length || 0) }}
+                  <span class="truncate font-mono text-muted-foreground select-none" :aria-label="visibleMap[row.id] || allVisible ? undefined : 'Hidden value'">
+                    {{ visibleMap[row.id] || allVisible ? row.value : "•".repeat(Math.min(Math.max(row.value?.length || 0, 6), 32)) }}
                   </span>
-                  <span v-if="row.isCurrent" class="text-caption-success shrink-0 text-xs">Current Value</span>
+                  <span v-if="row.isCurrent" class="shrink-0 rounded-full bg-info/10 px-1.5 py-0.5 text-xs font-medium text-info">Current Value</span>
                 </p>
 
-                <div class="navigation-group text-muted-foreground">
+                <div class="flex flex-row items-center gap-1 text-muted-foreground">
                   <button :aria-label="`Toggle visibility for ${row.id}`" @click="visibleMap[row.id] = !visibleMap[row.id]">
                     <icon :name="visibleMap[row.id] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
                   </button>
@@ -66,6 +76,7 @@ const history = ref<EnvironmentHistory[]>([])
 const visibleMap = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
 const allVisible = ref(false)
+const activeEnv = ref<Environment | null>(null)
 
 const mergedHistory = computed(() => history.value.map(env => ({
   environment: env.environment,
@@ -75,6 +86,8 @@ const mergedHistory = computed(() => history.value.map(env => ({
     ...env.history.map(h => ({ id: h.id, value: h.value, isCurrent: false, changedBy: h.changedBy, changedAt: h.changedAt })),
   ],
 })))
+
+const activeHistory = computed(() => mergedHistory.value.find(env => env.environment === activeEnv.value) ?? mergedHistory.value[0] ?? null)
 
 async function handleCopy(key: string, value: string) {
   if (!value) {
@@ -116,6 +129,7 @@ watch(isHistoryEditorOpen, async (newVal) => {
     if (props.secretId) {
       const data = await secretsStore.getSecretHistory(props.projectId, props.secretId)
       history.value = data || []
+      activeEnv.value = history.value[0]?.environment ?? null
     }
   }
   else {
@@ -123,6 +137,33 @@ watch(isHistoryEditorOpen, async (newVal) => {
     visibleMap.value = {}
     copyStates.value = {}
     allVisible.value = false
+    activeEnv.value = null
   }
 })
 </script>
+
+<style scoped>
+.history-tab {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  background: transparent;
+  color: var(--muted-foreground);
+  border: none;
+  border-right: var(--border-style);
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.history-tab:last-child {
+  border-right: none;
+}
+.history-tab--active {
+  background-color: color-mix(in srgb, var(--muted) 30%, transparent);
+  color: var(--foreground);
+  border-bottom: 2px solid var(--primary);
+}
+.history-tab:not(.history-tab--active):hover {
+  background-color: color-mix(in srgb, var(--muted) 20%, transparent);
+}
+</style>
