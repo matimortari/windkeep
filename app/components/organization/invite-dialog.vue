@@ -62,8 +62,7 @@ const emit = defineEmits<{
 }>()
 
 const orgStore = useOrgStore()
-const { createActionHandler } = useActionIcon()
-const inviteLinkIcon = createActionHandler("ph:copy-bold")
+const inviteLinkIcon = useActionIcon("ph:copy-bold")
 const email = ref("")
 const role = ref<"ADMIN" | "MEMBER">("MEMBER")
 const generatedInviteUrl = ref("")

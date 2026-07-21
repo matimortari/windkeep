@@ -75,7 +75,6 @@
 <script setup lang="ts">
 const route = useRoute()
 const slug = route.params.project
-const { createActionHandler } = useActionIcon()
 const { user } = storeToRefs(useUserStore())
 const projectStore = useProjectStore()
 const { projects, isOwner } = storeToRefs(projectStore)
@@ -148,8 +147,8 @@ const projectFields = [
   },
 ]
 
-const copyIcon = projectFields.map(() => createActionHandler("ph:copy-bold"))
-const saveIcon = projectFields.map(() => createActionHandler("ph:floppy-disk-bold"))
+const copyIcon = projectFields.map(() => useActionIcon("ph:copy-bold"))
+const saveIcon = projectFields.map(() => useActionIcon("ph:floppy-disk-bold"))
 
 async function handleSubmit(index: number) {
   if (!project.value?.id) {

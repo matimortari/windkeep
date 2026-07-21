@@ -22,7 +22,10 @@
         >
           <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
             <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold" :class="getChangeConfig(secret.key)?.keyTextClass">
-              <icon v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon" size="20" class="shrink-0" />
+              <icon
+                v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon"
+                size="20" :class="getChangeConfig(secret.key)?.keyTextClass"
+              />
 
               <span class="truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
 
@@ -149,8 +152,9 @@ function getSecretValueClass(key: string, hasValue: boolean) {
 }
 
 function getActionIconClass(key: string, defaultTone: "primary" | "danger" = "primary") {
-  if (getChangeConfig(key)) {
-    return "text-current opacity-80 hover:opacity-100"
+  const config = getChangeConfig(key)
+  if (config) {
+    return `${config.keyTextClass} opacity-80 hover:opacity-100`
   }
 
   return defaultTone === "danger" ? "hover:text-danger text-muted-foreground" : "hover:text-secondary text-muted-foreground"

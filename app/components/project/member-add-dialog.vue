@@ -5,18 +5,23 @@
 
       <template v-else>
         <div class="flex flex-col items-start gap-1">
-          <label class="text-sm font-semibold">Member</label>
+          <label id="project-member-label" class="text-sm font-semibold">Member</label>
           <div ref="dropdownRef" class="relative w-full">
-            <button type="button" class="btn w-full justify-between" @click="isDropdownOpen = !isDropdownOpen">
+            <button
+              type="button" class="btn w-full justify-between"
+              aria-haspopup="listbox" :aria-expanded="isDropdownOpen"
+              aria-labelledby="project-member-label" @click="isDropdownOpen = !isDropdownOpen"
+            >
               <span class="truncate">{{ selectedMember ? selectedMember.user.name : "Select a member..." }}</span>
               <icon name="ph:caret-down-bold" size="20" :class="isDropdownOpen ? 'rotate-180' : 'rotate-0'" />
             </button>
 
             <transition name="dropdown">
-              <ul v-if="isDropdownOpen" class="dropdown-menu max-h-60 w-full" role="menu">
-                <li v-for="member in availableMembers" :key="member.user.id">
+              <ul v-if="isDropdownOpen" class="dropdown-menu max-h-60 w-full" role="listbox" aria-labelledby="project-member-label">
+                <li v-for="member in availableMembers" :key="member.user.id" role="presentation">
                   <button
-                    type="button" class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60"
+                    type="button" role="option"
+                    :aria-selected="selectedUserId === member.user.id" class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60"
                     :class="selectedUserId === member.user.id ? 'bg-muted' : ''" @click="selectedUserId = member.user.id; isDropdownOpen = false"
                   >
                     <img :src="member.user.image" alt="Avatar" class="size-6 rounded-full border">

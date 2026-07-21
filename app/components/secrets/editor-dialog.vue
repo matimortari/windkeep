@@ -25,13 +25,13 @@
 
       <div v-if="hasDiff" class="flex min-w-0 flex-col gap-1 overflow-hidden rounded-lg border p-2">
         <span class="text-xs font-semibold text-muted-foreground">Preview</span>
-        <ul class="flex max-h-40 flex-col gap-0.5 overflow-y-auto">
+        <ul class="scroll-area flex max-h-40 min-w-0 flex-col gap-0.5 overflow-x-hidden overflow-y-auto">
           <li
             v-for="item in diffItems" :key="item.key"
-            class="navigation-group min-w-0 rounded-sm px-1.5 py-0.5 font-mono text-xs" :class="item.class"
+            class="navigation-group min-w-0 items-start rounded-sm px-1.5 py-0.5 font-mono text-xs" :class="item.class"
           >
-            <icon :name="item.icon" size="15" class="shrink-0" />
-            <span class="min-w-0 truncate">
+            <icon :name="item.icon" size="15" class="mt-0.5 shrink-0" />
+            <span class="min-w-0 break-all whitespace-pre-wrap">
               <span class="font-semibold">{{ item.key }}</span><span v-if="item.type !== 'removed'">= {{ item.value }}</span>
             </span>
           </li>
@@ -123,6 +123,10 @@ const diffItems = computed<DiffItem[]>(() => {
   const items: DiffItem[] = []
 
   for (const [key, value] of Object.entries(parsedEditorValues.value)) {
+    if (!value) {
+      continue
+    }
+
     if (!(key in currentEnvValues.value)) {
       items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success/10 text-success" })
     }
@@ -143,6 +147,10 @@ const hasDiff = computed(() => diffItems.value.length > 0)
 
 function handleSubmit() {
   const upserted = Object.entries(parsedEditorValues.value).filter(([key, value]) => {
+    if (!value) {
+      return false
+    }
+
     const current = currentEnvValues.value[key]
     return current === undefined || current !== value
   }).map(([key, value]) => {

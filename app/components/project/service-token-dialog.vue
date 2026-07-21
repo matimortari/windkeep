@@ -85,8 +85,7 @@ const emit = defineEmits<{
 }>()
 
 const projectStore = useProjectStore()
-const { createActionHandler } = useActionIcon()
-const tokenCopyIcon = createActionHandler("ph:copy-bold")
+const tokenCopyIcon = useActionIcon("ph:copy-bold")
 const generatedRawToken = ref("")
 const form = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({
   name: "",

@@ -31,7 +31,7 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>): P
       where: { apiToken: hashToken(authHeader.substring(7)) },
       select: { id: true, email: true, name: true, image: true, apiTokenExpiresAt: true },
     })
-    if (user && user.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
+    if (user?.apiTokenExpiresAt && user.apiTokenExpiresAt > new Date()) {
       return { id: user.id, email: user.email, name: user.name, image: user.image ?? "" }
     }
   }
@@ -50,7 +50,17 @@ export function hashToken(token: string): string {
  * Generates a unique slug based on the provided base string.
  */
 export async function generateSlug(base: string, orgId: string): Promise<string> {
-  const cleaned = base.normalize("NFKD").replace(/[\u0300-\u036F]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+/, "").replace(/-+$/, "").substring(0, 50)
+  let cleaned = base.normalize("NFKD").replace(/[\u0300-\u036F]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+  let start = 0
+  let end = cleaned.length
+  while (start < end && cleaned[start] === "-") {
+    start++
+  }
+  while (end > start && cleaned[end - 1] === "-") {
+    end--
+  }
+
+  cleaned = cleaned.slice(start, end).substring(0, 50)
   for (let attempt = 0; attempt < 10; attempt++) {
     const slug = attempt === 0 ? cleaned : `${cleaned}-${crypto.randomUUID().slice(0, 6)}`
     const exists = await db.project.findUnique({ where: { slug_orgId: { slug, orgId } }, select: { id: true } })
@@ -139,7 +149,12 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
  * Returns the base URL used for invite links.
  */
 export function getInviteBaseUrl(_event: H3Event<EventHandlerRequest>): string {
-  return requireEnv("NUXT_PUBLIC_BASE_URL").trim().replace(/\/+$/, "")
+  const base = requireEnv("NUXT_PUBLIC_BASE_URL").trim()
+  let end = base.length
+  while (end > 0 && base[end - 1] === "/") {
+    end--
+  }
+  return base.slice(0, end)
 }
 
 /**

@@ -82,7 +82,6 @@
 <script setup lang="ts">
 const { public: { baseURL } } = useRuntimeConfig()
 const { clear } = useUserSession()
-const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
 const { user, tokenMetadata } = storeToRefs(userStore)
 const { activeOrg } = storeToRefs(useOrgStore())
@@ -146,9 +145,9 @@ const userFields = [
   },
 ]
 
-const copyIcon = userFields.map(() => createActionHandler("ph:copy-bold"))
-const saveIcon = userFields.map(() => createActionHandler("ph:floppy-disk-bold"))
-const regenerateIcon = userFields.map(() => createActionHandler("ph:arrows-clockwise-bold"))
+const copyIcon = userFields.map(() => useActionIcon("ph:copy-bold"))
+const saveIcon = userFields.map(() => useActionIcon("ph:floppy-disk-bold"))
+const regenerateIcon = userFields.map(() => useActionIcon("ph:arrows-clockwise-bold"))
 
 function isTokenExpired(expiresAt: string | Date | null | undefined): boolean {
   if (!expiresAt) {

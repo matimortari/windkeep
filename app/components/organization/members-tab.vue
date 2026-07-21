@@ -167,14 +167,13 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, orgMembers, invitations, isOwner, isAdmin } = storeToRefs(orgStore)
-const { createActionHandler } = useActionIcon()
 const canManage = computed(() => isOwner.value || isAdmin.value)
 const isInviteDialogOpen = ref(false)
 const isMemberDialogOpen = ref(false)
 const selectedMember = ref<OrgMembership | null>(null)
 const reinviteEmail = ref<string | undefined>()
 const activeCopyInviteId = ref<string | null>(null)
-const inviteLinkIcon = createActionHandler("ph:link-bold")
+const inviteLinkIcon = useActionIcon("ph:link-bold")
 
 const memberColumns = [
   { key: "user.name", label: "Member", class: "", sortable: true },
