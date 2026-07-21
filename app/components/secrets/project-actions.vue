@@ -4,7 +4,7 @@
       <input
         id="search" :value="searchQuery"
         type="text" placeholder="Search secrets..."
-        @input="searchQuery = ($event.target as HTMLInputElement).value; emit('search', searchQuery)"
+        aria-label="Search secrets" @input="searchQuery = ($event.target as HTMLInputElement).value; emit('search', searchQuery)"
       >
       <span class="absolute inset-y-0 right-0 flex flex-row items-center pr-4 text-muted-foreground">
         <icon name="ph:magnifying-glass-bold" size="20" />

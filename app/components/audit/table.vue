@@ -73,8 +73,8 @@
               </div>
 
               <div v-if="(log.metadata || {})" class="relative">
-                <button class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="copyMetadataActions.get(log.id)?.triggerCopy(formatMetadata(log.metadata))">
-                  <icon :name="copyMetadataActions.get(log.id)?.icon.value || 'ph:copy-bold'" size="20" />
+                <button class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="getCopyAction(log.id).triggerCopy(formatMetadata(log.metadata))">
+                  <icon :name="getCopyAction(log.id).icon.value" size="20" />
                 </button>
                 <Shiki lang="json" :code="formatMetadata(log.metadata)" class="code-block" />
               </div>
@@ -91,12 +91,7 @@ const orgStore = useOrgStore()
 const { auditLogs, auditActions, loading } = storeToRefs(orgStore)
 const expandedRows = ref<Set<string>>(new Set())
 const { sortedData: sortedLogs, toggleSort, getSortIconName } = useTableSort(auditLogs)
-const { createActionHandler } = useActionIcon()
-const copyMetadataActions = computed(() => {
-  const actions = new Map()
-  auditLogs.value.forEach(log => actions.set(log.id, createActionHandler("ph:copy")))
-  return actions
-})
+const copyMetadataActions = new Map<string, ReturnType<typeof useActionIcon>>()
 
 const columns = [
   { key: "expand", label: "", icon: "ph:eye-bold", class: "w-10", sortable: false },
@@ -114,6 +109,13 @@ const resourceMap: Record<string, string> = {
   project_member: "ph:user-plus-bold",
   service_token: "ph:terminal-bold",
   secret: "ph:key-bold",
+}
+
+function getCopyAction(logId: string) {
+  if (!copyMetadataActions.has(logId)) {
+    copyMetadataActions.set(logId, useActionIcon("ph:copy"))
+  }
+  return copyMetadataActions.get(logId)!
 }
 
 function toggleRow(id: string) {

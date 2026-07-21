@@ -3,7 +3,7 @@ import { z } from "zod"
 const encryptionKeySchema = z.string().trim().min(12, "Encryption password must be at least 12 characters").max(255, "Encryption password must be at most 255 characters")
 
 // Reusable helper for manual encryption key validation
-function validateManualEncryptionKey(data: { encryptionMode?: "AUTO" | "MANUAL" | undefined, encryptionKey?: string | undefined }, ctx: z.RefinementCtx) {
+function validateManualEncryptionKey(data: { encryptionMode?: "AUTO" | "MANUAL", encryptionKey?: string }, ctx: z.RefinementCtx) {
   if (data.encryptionMode === "MANUAL") {
     const parsed = encryptionKeySchema.safeParse(data.encryptionKey)
     if (!parsed.success) {

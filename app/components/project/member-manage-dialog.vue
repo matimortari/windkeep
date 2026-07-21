@@ -51,8 +51,7 @@ const emit = defineEmits<{
 }>()
 
 const projectStore = useProjectStore()
-const { createActionHandler } = useActionIcon()
-const saveIcon = createActionHandler("ph:floppy-disk-bold")
+const saveIcon = useActionIcon("ph:floppy-disk-bold")
 const selectedRole = ref<"ADMIN" | "MEMBER">("MEMBER")
 
 async function handleUpdateRole() {

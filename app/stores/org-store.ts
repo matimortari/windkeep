@@ -289,7 +289,7 @@ export const useOrgStore = defineStore("org", () => {
 
     try {
       const queryParams = new URLSearchParams()
-      for (const [key, value] of Object.entries(params || currentAuditFilters.value)) {
+      for (const [key, value] of Object.entries(params || currentAuditFilters.value) as [string, string | number | undefined][]) {
         if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {
             value.forEach(item => queryParams.append(key, String(item)))

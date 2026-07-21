@@ -155,51 +155,51 @@ function handleSecretChange(secret: Secret) {
   closeDialog("secrets")
 }
 
+function mergeSecretValues(baseValues: SecretValue[] | undefined, newValues: SecretValue[] | undefined): SecretValue[] {
+  const mergedValues = [...(baseValues || [])]
+  for (const newValue of newValues || []) {
+    const idx = mergedValues.findIndex(v => v.environment === newValue.environment)
+    if (idx >= 0) {
+      mergedValues[idx] = newValue as SecretValue
+    }
+    else {
+      mergedValues.push(newValue as SecretValue)
+    }
+  }
+  return mergedValues
+}
+
+function applyImportedSecret(importedSecret: Secret) {
+  const existingSecret = secrets.value.find(s => s.key === importedSecret.key)
+  const pendingChange = pendingChanges.get(importedSecret.key)
+
+  if (!existingSecret && !pendingChange) {
+    pendingChanges.set(importedSecret.key, { type: "create", secret: importedSecret as unknown as Secret })
+    return
+  }
+
+  const baseSecret = pendingChange?.secret || existingSecret!
+  const mergedSecret: Secret = { ...baseSecret, values: mergeSecretValues(baseSecret.values, importedSecret.values) }
+
+  pendingChanges.set(importedSecret.key, existingSecret ? { type: "update", secret: mergedSecret, originalSecret: existingSecret } : { type: "create", secret: mergedSecret })
+}
+
+function applyRemovedKey(key: string, environment: Environment) {
+  const existingSecret = secrets.value.find(s => s.key === key)
+  if (!existingSecret) {
+    return
+  }
+
+  const baseSecret = pendingChanges.get(key)?.secret || existingSecret
+  const updatedValues = (baseSecret.values || []).filter(v => v.environment !== environment)
+
+  pendingChanges.set(key, updatedValues.length === 0 ? { type: "delete", secret: existingSecret, originalSecret: existingSecret } : { type: "update", secret: { ...baseSecret, values: updatedValues }, originalSecret: existingSecret })
+}
+
 function handleImportSecrets(importedSecrets: Secret[], removedKeys: { key: string, environment: Environment }[]) {
   closeDialog("raw")
-
-  for (const importedSecret of importedSecrets) {
-    const existingSecret = secrets.value.find(s => s.key === importedSecret.key)
-    const pendingChange = pendingChanges.get(importedSecret.key)
-    if (!existingSecret && !pendingChange) {
-      pendingChanges.set(importedSecret.key, { type: "create", secret: importedSecret as unknown as Secret })
-    }
-    else {
-      const baseSecret = pendingChange?.secret || existingSecret!
-      const mergedValues = [...(baseSecret.values || [])]
-      for (const newValue of importedSecret.values || []) {
-        const idx = mergedValues.findIndex(v => v.environment === newValue.environment)
-        if (idx >= 0) {
-          mergedValues[idx] = newValue as SecretValue
-        }
-        else {
-          mergedValues.push(newValue as SecretValue)
-        }
-      }
-      const mergedSecret: Secret = { ...baseSecret, values: mergedValues }
-      if (!existingSecret) {
-        pendingChanges.set(importedSecret.key, { type: "create", secret: mergedSecret })
-      }
-      else {
-        pendingChanges.set(importedSecret.key, { type: "update", secret: mergedSecret, originalSecret: existingSecret })
-      }
-    }
-  }
-  for (const { key, environment } of removedKeys) {
-    const existingSecret = secrets.value.find(s => s.key === key)
-    if (!existingSecret) {
-      continue
-    }
-
-    const baseSecret = pendingChanges.get(key)?.secret || existingSecret
-    const updatedValues = (baseSecret.values || []).filter(v => v.environment !== environment)
-    if (updatedValues.length === 0) {
-      pendingChanges.set(key, { type: "delete", secret: existingSecret, originalSecret: existingSecret })
-    }
-    else {
-      pendingChanges.set(key, { type: "update", secret: { ...baseSecret, values: updatedValues }, originalSecret: existingSecret })
-    }
-  }
+  importedSecrets.forEach(applyImportedSecret)
+  removedKeys.forEach(({ key, environment }) => applyRemovedKey(key, environment))
 }
 
 async function saveAllChanges() {

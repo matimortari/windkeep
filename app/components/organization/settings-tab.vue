@@ -111,7 +111,6 @@
 </template>
 
 <script setup lang="ts">
-const { createActionHandler } = useActionIcon()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
@@ -165,9 +164,9 @@ const orgFields = [
   },
 ]
 
-const copyIcon = orgFields.map(() => createActionHandler("ph:copy-bold"))
-const saveIcon = orgFields.map(() => createActionHandler("ph:floppy-disk-bold"))
-const rotateKeyIcon = createActionHandler("ph:key-bold")
+const copyIcon = orgFields.map(() => useActionIcon("ph:copy-bold"))
+const saveIcon = orgFields.map(() => useActionIcon("ph:floppy-disk-bold"))
+const rotateKeyIcon = useActionIcon("ph:key-bold")
 const canRotateEncryptionKey = computed(() => encryptionMode.value === "AUTO" || manualEncryptionKey.value.trim().length >= 12)
 
 async function handleSubmit(index: number) {
