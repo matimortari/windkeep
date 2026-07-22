@@ -13,6 +13,7 @@
 
     <div v-if="availableTags.length" ref="tagDropdownRef" class="relative">
       <button
+        type="button"
         class="btn" :class="activeTagFilter ? 'border-secondary! text-secondary!' : ''"
         :disabled="hasPendingChanges" aria-label="Filter by Tag"
         @click="isTagDropdownOpen = !isTagDropdownOpen"
@@ -26,7 +27,11 @@
       <transition name="dropdown">
         <ul v-if="isTagDropdownOpen" class="dropdown-menu" role="menu">
           <li v-for="tag in availableTags" :key="tag">
-            <button class="w-full rounded-lg p-2 text-left text-sm hover:bg-muted/60" :class="tag === activeTagFilter ? 'bg-muted font-medium' : ''" role="menuitem" @click="selectTag(tag)">
+            <button
+              type="button" class="w-full rounded-lg p-2 text-left text-sm hover:bg-muted/60"
+              :class="tag === activeTagFilter ? 'bg-muted font-medium' : ''" role="menuitem"
+              @click="selectTag(tag)"
+            >
               {{ tag }}
             </button>
           </li>
@@ -34,12 +39,13 @@
       </transition>
     </div>
 
-    <button :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" class="btn" @click="emit('toggleAllVisible')">
+    <button type="button" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" class="btn" @click="emit('toggleAllVisible')">
       <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
     </button>
 
     <button
-      v-if="hasPermission" class="btn-secondary"
+      v-if="hasPermission" type="button"
+      class="btn-secondary"
       aria-label="Bulk Edit" :disabled="hasPendingChanges"
       @click="emit('openEditorDialog')"
     >
@@ -48,7 +54,7 @@
     </button>
 
     <div ref="exportDropdownRef" class="relative">
-      <button class="btn-secondary" :disabled="hasPendingChanges" @click="isExportDropdownOpen = !isExportDropdownOpen">
+      <button type="button" class="btn-secondary" :disabled="hasPendingChanges" @click="isExportDropdownOpen = !isExportDropdownOpen">
         <span class="hidden md:inline">Export</span>
         <icon name="ph:download-bold" size="20" />
       </button>
@@ -56,7 +62,7 @@
       <transition name="dropdown">
         <ul v-if="isExportDropdownOpen" class="dropdown-menu" role="menu">
           <li v-for="env in ENVIRONMENTS" :key="env.value">
-            <button role="menuitem" class="w-full rounded-lg p-2 text-left capitalize hover:bg-muted/60" @click="handleExport(env.value)">
+            <button type="button" role="menuitem" class="w-full rounded-lg p-2 text-left capitalize hover:bg-muted/60" @click="handleExport(env.value)">
               {{ env.label }}
             </button>
           </li>
@@ -65,7 +71,8 @@
     </div>
 
     <button
-      v-if="hasPermission" class="btn-primary"
+      v-if="hasPermission" type="button"
+      class="btn-primary"
       :disabled="hasPendingChanges" aria-label="Add New Secret"
       @click="emit('openSecretsDialog')"
     >
@@ -74,11 +81,11 @@
     </button>
 
     <div v-if="hasPendingChanges" class="navigation-group">
-      <button class="btn-success" aria-label="Save All Changes" @click="emit('save')">
+      <button type="button" class="btn-success" aria-label="Save All Changes" @click="emit('save')">
         <icon name="ph:floppy-disk-bold" size="20" />
         <span class="hidden md:inline">Save Changes</span>
       </button>
-      <button class="btn-warning" aria-label="Discard Changes" @click="emit('discard')">
+      <button type="button" class="btn-warning" aria-label="Discard Changes" @click="emit('discard')">
         <icon name="ph:x-bold" size="20" />
         <span class="hidden md:inline">Discard</span>
       </button>

@@ -7,7 +7,11 @@
             <div class="navigation-group">
               <icon v-if="col.icon" :name="col.icon" size="15" aria-label="Expand rows" />
               <span>{{ col.label }}</span>
-              <button v-if="col.sortable" class="flex items-center hover:text-secondary focus:outline-none" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+              <button
+                v-if="col.sortable" type="button"
+                class="flex items-center hover:text-secondary focus:outline-none" :aria-label="`Sort by ${col.label}`"
+                @click="toggleSort(col.key)"
+              >
                 <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
               </button>
             </div>
@@ -73,7 +77,7 @@
               </div>
 
               <div v-if="(log.metadata || {})" class="relative">
-                <button class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="getCopyAction(log.id).triggerCopy(formatMetadata(log.metadata))">
+                <button type="button" class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="getCopyAction(log.id).triggerCopy(formatMetadata(log.metadata))">
                   <icon :name="getCopyAction(log.id).icon.value" size="20" />
                 </button>
                 <Shiki lang="json" :code="formatMetadata(log.metadata)" class="code-block" />

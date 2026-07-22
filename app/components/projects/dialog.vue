@@ -15,10 +15,10 @@
 
       <footer class="flex flex-row items-center justify-end">
         <nav class="navigation-group">
-          <button class="btn-ghost" @click="emit('close')">
+          <button type="button" class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
-          <button class="btn-success" type="submit">
+          <button type="submit" class="btn-success">
             Save
           </button>
         </nav>

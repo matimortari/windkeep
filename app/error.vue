@@ -9,7 +9,7 @@
       <span class="font-mono text-sm">{{ error.message }}</span>
     </p>
 
-    <button class="navigation-group" @click="() => clearError({ redirect: '/' })">
+    <button type="button" class="navigation-group" @click="() => clearError({ redirect: '/' })">
       <icon name="ph:arrow-left-bold" size="25" />
       <span class="font-semibold">Go Back</span>
     </button>

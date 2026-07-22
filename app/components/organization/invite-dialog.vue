@@ -39,7 +39,7 @@
           <button type="button" class="btn-ghost" @click="emit('update:isOpen', false)">
             {{ generatedInviteUrl ? "Close" : "Cancel" }}
           </button>
-          <button v-if="!generatedInviteUrl" class="btn-success" type="submit" :disabled="!email.trim()">
+          <button v-if="!generatedInviteUrl" type="submit" class="btn-success" :disabled="!email.trim()">
             <icon name="ph:link-bold" size="20" />
             <span>Create & Copy Link</span>
           </button>

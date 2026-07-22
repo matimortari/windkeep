@@ -26,7 +26,7 @@
         Projects
       </p>
 
-      <button aria-label="Create New Project" class="btn-ghost p-0!" @click="openDialog('projects')">
+      <button type="button" aria-label="Create New Project" class="btn-ghost p-0!" @click="openDialog('projects')">
         <icon name="ph:plus-bold" size="20" />
       </button>
     </div>

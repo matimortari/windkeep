@@ -13,7 +13,7 @@
         <span class="hidden text-muted-foreground md:block">/</span>
 
         <div ref="dropdownRef" class="relative min-w-0">
-          <button class="navigation-group max-w-32 min-w-0 gap-1! md:max-w-48" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
+          <button type="button" class="navigation-group max-w-32 min-w-0 gap-1! md:max-w-48" aria-label="Select Organization" @click="isDropdownOpen = !isDropdownOpen">
             <span v-if="activeOrg?.name" class="text-caption truncate">{{ activeOrg.name }}</span>
             <span v-else class="inline-block h-4 w-20 shrink-0 animate-pulse rounded-sm bg-muted" />
             <icon
@@ -27,6 +27,7 @@
             <ul v-if="isDropdownOpen" class="dropdown-menu right-auto! left-0!" role="menu">
               <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
                 <button
+                  type="button"
                   class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem"
                   :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)"
                 >
@@ -55,13 +56,13 @@
         <nuxt-link to="/admin/preferences" aria-label="User Preferences" class="btn">
           <icon name="ph:user-circle-gear-bold" size="20" />
         </nuxt-link>
-        <button aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
+        <button type="button" aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
           <icon :name="themeIcon" size="20" />
         </button>
-        <button class="btn md:hidden!" aria-label="Toggle Sidebar" @click="emit('toggleSidebar')">
+        <button type="button" class="btn md:hidden!" aria-label="Toggle Sidebar" @click="emit('toggleSidebar')">
           <icon name="ph:list-bold" size="20" />
         </button>
-        <button class="btn" aria-label="Sign Out" @click="signOut">
+        <button type="button" class="btn" aria-label="Sign Out" @click="signOut">
           <icon name="ph:sign-out-bold" size="20" />
         </button>
       </nav>

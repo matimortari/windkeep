@@ -4,7 +4,7 @@
   <div class="flex min-h-screen overflow-hidden py-12">
     <Sidebar :is-open="isSidebarOpen" :loading="isLoading" @update:is-open="value => value ? openSidebar() : closeSidebar()" />
 
-    <main class="flex flex-1 flex-col overflow-x-hidden p-4">
+    <main class="container mx-auto flex flex-1 flex-col overflow-x-hidden p-4">
       <Loading v-if="isLoading" />
       <slot v-else />
     </main>

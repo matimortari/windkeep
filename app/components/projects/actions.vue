@@ -11,11 +11,11 @@
       </span>
     </div>
 
-    <button aria-label="Toggle Layout" class="btn shrink-0" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
+    <button type="button" aria-label="Toggle Layout" class="btn shrink-0" @click="emit('update:layout', layout === 'grid' ? 'list' : 'grid')">
       <icon :name="layout === 'grid' ? 'ph:list-bullets-bold' : 'ph:squares-four-bold'" size="20" />
     </button>
 
-    <button v-if="isOwner || isAdmin" class="btn-primary shrink-0" @click="emit('openDialog')">
+    <button v-if="isOwner || isAdmin" type="button" class="btn-primary shrink-0" @click="emit('openDialog')">
       <span class="hidden md:inline">New Project</span>
       <icon name="ph:plus-bold" size="20" />
     </button>

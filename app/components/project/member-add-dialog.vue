@@ -51,7 +51,7 @@
           <button type="button" class="btn-ghost" @click="emit('update:isOpen', false)">
             Cancel
           </button>
-          <button v-if="availableMembers.length" class="btn-success" type="submit" :disabled="!selectedUserId">
+          <button v-if="availableMembers.length" type="submit" class="btn-success" :disabled="!selectedUserId">
             <icon name="ph:plus-circle-bold" size="20" />
             <span>Add Member</span>
           </button>

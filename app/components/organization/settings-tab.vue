@@ -22,14 +22,14 @@
 
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
-          <button class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
+          <button type="button" class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
-          <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
+          <button type="button" class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
@@ -66,7 +66,11 @@
             type="password" autocomplete="new-password"
             placeholder="New encryption password (min 12 chars)"
           >
-          <button class="btn-warning" aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey" @click="handleRotateEncryptionKey">
+          <button
+            type="button" class="btn-warning"
+            aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey"
+            @click="handleRotateEncryptionKey"
+          >
             <icon :name="rotateKeyIcon.icon.value || 'ph:key-bold'" size="20" />
             <span>Rotate Key</span>
           </button>
@@ -86,7 +90,7 @@
         </p>
       </header>
 
-      <button class="btn-danger self-end" aria-label="Leave Organization" @click="handleLeaveOrg">
+      <button type="button" class="btn-danger self-end" aria-label="Leave Organization" @click="handleLeaveOrg">
         <icon name="ph:sign-out-bold" size="20" />
         <span>Confirm</span>
       </button>
@@ -102,7 +106,7 @@
         </p>
       </header>
 
-      <button class="btn-danger self-end" aria-label="Delete Organization" @click="handleDeleteOrg">
+      <button type="button" class="btn-danger self-end" aria-label="Delete Organization" @click="handleDeleteOrg">
         <icon name="ph:network-x-bold" size="20" />
         <span>Confirm</span>
       </button>

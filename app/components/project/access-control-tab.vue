@@ -11,11 +11,11 @@
 
     <template #actions>
       <nav v-if="canManage" class="navigation-group w-full justify-end md:w-auto">
-        <button class="btn-secondary" @click="isTokenDialogOpen = true">
+        <button type="button" class="btn-secondary" @click="isTokenDialogOpen = true">
           <icon name="ph:key-bold" size="20" />
           <span>Generate Token</span>
         </button>
-        <button class="btn-primary" :disabled="!availableOrgMembers.length" @click="isAddDialogOpen = true">
+        <button type="button" class="btn-primary" :disabled="!availableOrgMembers.length" @click="isAddDialogOpen = true">
           <icon name="ph:plus-circle-bold" size="20" />
           <span>Add Member</span>
         </button>
@@ -40,7 +40,11 @@
                 <th v-for="col in memberColumns" :key="col.key" :class="col.class">
                   <div class="navigation-group">
                     <span>{{ col.label }}</span>
-                    <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleMemberSort(col.key)">
+                    <button
+                      v-if="col.sortable" type="button"
+                      class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`"
+                      @click="toggleMemberSort(col.key)"
+                    >
                       <icon :name="getMemberSortIconName(col.key)" size="15" class="transition-transform" />
                     </button>
                   </div>
@@ -73,7 +77,7 @@
                   {{ ROLES.find(role => role.value === member.role)?.label }}
                 </td>
                 <td class="w-24">
-                  <button v-if="canManageMember(member)" aria-label="Manage member" @click.stop="openMemberDialog(member)">
+                  <button v-if="canManageMember(member)" type="button" aria-label="Manage member" @click.stop="openMemberDialog(member)">
                     <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                   </button>
                 </td>
@@ -100,7 +104,11 @@
                 <th v-for="col in tokenColumns" :key="col.key" :class="col.class">
                   <div class="navigation-group">
                     <span>{{ col.label }}</span>
-                    <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleTokenSort(col.key)">
+                    <button
+                      v-if="col.sortable" type="button"
+                      class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`"
+                      @click="toggleTokenSort(col.key)"
+                    >
                       <icon :name="getTokenSortIconName(col.key)" size="15" class="transition-transform" />
                     </button>
                   </div>
@@ -136,7 +144,7 @@
                   {{ token.user?.name }}
                 </td>
                 <td class="w-24">
-                  <button aria-label="Revoke token" @click="handleRevokeToken(token.id)">
+                  <button type="button" aria-label="Revoke token" @click="handleRevokeToken(token.id)">
                     <icon name="ph:x-bold" size="20" class="text-muted-foreground hover:text-danger" />
                   </button>
                 </td>

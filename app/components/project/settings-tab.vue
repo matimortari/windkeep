@@ -22,14 +22,14 @@
 
         <div v-if="field.copyable" class="navigation-group justify-end">
           <span>{{ field.value }}</span>
-          <button class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
+          <button type="button" class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
-          <button class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
+          <button type="button" class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
@@ -49,7 +49,7 @@
           This action is irreversible. You will no longer have access to this project.
         </p>
       </header>
-      <button class="btn-danger self-end" aria-label="Leave Project" @click="handleLeaveProject">
+      <button type="button" class="btn-danger self-end" aria-label="Leave Project" @click="handleLeaveProject">
         <icon name="ph:sign-out-bold" size="20" />
         <span>Confirm</span>
       </button>
@@ -64,7 +64,7 @@
           This action is irreversible. All data associated with this project will be permanently deleted.
         </p>
       </header>
-      <button class="btn-danger self-end" aria-label="Delete Project" @click="handleDeleteProject">
+      <button type="button" class="btn-danger self-end" aria-label="Delete Project" @click="handleDeleteProject">
         <icon name="ph:trash-bold" size="20" />
         <span>Confirm</span>
       </button>

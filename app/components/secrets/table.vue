@@ -6,7 +6,11 @@
           <th v-for="col in columns" :key="col.key" :class="col.class">
             <div class="navigation-group">
               <span>{{ col.label }}</span>
-              <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+              <button
+                v-if="col.sortable" type="button"
+                class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`"
+                @click="toggleSort(col.key)"
+              >
                 <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
               </button>
             </div>
@@ -37,6 +41,7 @@
               <div v-if="secret.tags?.length" class="flex flex-nowrap items-center gap-1 overflow-hidden">
                 <button
                   v-for="tag in secret.tags" :key="tag"
+                  type="button"
                   class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors" :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
                   :aria-label="`Filter by tag ${tag}`" @click="emit('filterByTag', activeTagFilter === tag ? null : tag)"
                 >
@@ -48,22 +53,22 @@
             <div v-else-if="col.type === 'env'" class="flex h-5 min-w-0 items-center justify-between gap-4 overflow-hidden font-mono text-sm">
               <span class="min-w-0 flex-1 truncate tracking-wide select-none" :class="getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env))" :aria-label="(visibleKeys[secret.key] ?? props.allVisible) ? undefined : 'Hidden value'">{{ renderValue(secret.key, col.env) }}</span>
               <div v-if="secretValuesByKey.get(secret.key)?.get(col.env)" class="flex shrink-0 items-center gap-1">
-                <button :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !(visibleKeys[secret.key] ?? props.allVisible)">
+                <button type="button" :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !(visibleKeys[secret.key] ?? props.allVisible)">
                   <icon :name="(visibleKeys[secret.key] ?? props.allVisible) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
                 </button>
-                <button :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, secretValuesByKey.get(secret.key)!.get(col.env)!)">
+                <button type="button" :aria-label="`Copy ${secret.key} value for ${col.env}`" @click="handleCopy(secret.key, col.env, secretValuesByKey.get(secret.key)!.get(col.env)!)">
                   <icon :name="copyStates[`${secret.key}-${col.env}`] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />
                 </button>
               </div>
             </div>
             <div v-else-if="col.key === 'actions'" class="navigation-group">
-              <button aria-label="View history" @click="emit('history', secret)">
+              <button type="button" aria-label="View history" @click="emit('history', secret)">
                 <icon name="ph:clock-counter-clockwise-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
-              <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Edit Secret" @click="emit('edit', secret)">
+              <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" type="button" aria-label="Edit Secret" @click="emit('edit', secret)">
                 <icon name="ph:note-pencil-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
-              <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" aria-label="Delete Secret" @click="emit('delete', secret.key)">
+              <button v-if="isOwner(props.projectId) || isAdmin(props.projectId)" type="button" aria-label="Delete Secret" @click="emit('delete', secret.key)">
                 <icon name="ph:x-bold" size="20" :class="getActionIconClass(secret.key, 'danger')" />
               </button>
             </div>

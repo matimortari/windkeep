@@ -77,6 +77,7 @@
         <div class="flex flex-row border-b">
           <button
             v-for="tab in CLI_TABS" :key="tab.key"
+            type="button"
             class="cli-tab" :class="activeTab === tab.key ? 'cli-tab--active' : ''"
             @click="activeTab = tab.key"
           >
@@ -145,7 +146,7 @@
 
       <div class="flex flex-col divide-y">
         <div v-for="(item, index) in FAQS" :key="index" class="py-4">
-          <button class="group flex w-full items-start justify-between gap-4 text-start font-semibold transition-colors hover:text-primary" @click="openIndex = openIndex === index ? null : index">
+          <button type="button" class="group flex w-full items-start justify-between gap-4 text-start font-semibold transition-colors hover:text-primary" @click="openIndex = openIndex === index ? null : index">
             <span class="text-sm md:text-base">{{ item.question }}</span>
             <icon name="ph:plus-bold" size="20" class="mt-0.5 shrink-0 transition-transform" :class="openIndex === index ? 'rotate-45 text-primary' : 'text-muted-foreground'" />
           </button>

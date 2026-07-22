@@ -15,7 +15,7 @@
       </header>
 
       <div class="border-y">
-        <button class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary" @click="activeSection = activeSection === 'create' ? null : 'create'">
+        <button type="button" class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary" @click="activeSection = activeSection === 'create' ? null : 'create'">
           <h5>
             New Organization
           </h5>
@@ -52,7 +52,7 @@
               >
             </div>
 
-            <button class="btn-primary w-full" type="submit" :disabled="!localOrg.name">
+            <button type="submit" class="btn-primary w-full" :disabled="!localOrg.name">
               Create Organization
             </button>
           </form>
@@ -60,7 +60,7 @@
       </div>
 
       <div class="border-b">
-        <button class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary" @click="activeSection = activeSection === 'invite' ? null : 'invite'">
+        <button type="button" class="group flex w-full items-center justify-between p-4 font-semibold transition-colors hover:text-primary" @click="activeSection = activeSection === 'invite' ? null : 'invite'">
           <h5>
             Accept Invitation
           </h5>
@@ -70,7 +70,7 @@
         <transition name="accordion">
           <form v-if="activeSection === 'invite'" class="flex flex-col gap-2 p-4 pt-0" @submit.prevent="handleAcceptInvite">
             <input v-model="token" placeholder="Invite Token" type="text">
-            <button class="btn-secondary w-full" type="submit" :disabled="!token">
+            <button type="submit" class="btn-secondary w-full" :disabled="!token">
               Accept Invite
             </button>
           </form>

@@ -6,7 +6,11 @@
           <th v-for="col in columns" :key="col.key" :class="col.class">
             <div class="navigation-group">
               <span>{{ col.label }}</span>
-              <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleSort(col.key)">
+              <button
+                v-if="col.sortable" type="button"
+                class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`"
+                @click="toggleSort(col.key)"
+              >
                 <icon :name="getSortIconName(col.key)" size="15" class="transition-transform" />
               </button>
             </div>

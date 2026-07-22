@@ -63,7 +63,7 @@
           <button type="button" class="btn-ghost" @click="emit('update:isOpen', false)">
             Cancel
           </button>
-          <button class="btn-success" type="submit" :disabled="!canSubmit">
+          <button type="submit" class="btn-success" :disabled="!canSubmit">
             <icon name="ph:key-bold" size="20" />
             <span>Generate</span>
           </button>

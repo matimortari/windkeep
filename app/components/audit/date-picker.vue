@@ -1,6 +1,6 @@
 <template>
   <div ref="datePickerRef" class="relative">
-    <button class="btn" @click="isDatePickerOpen = !isDatePickerOpen">
+    <button type="button" class="btn" @click="isDatePickerOpen = !isDatePickerOpen">
       <span>{{ displayLabel }}</span>
       <icon name="ph:caret-down-bold" size="15" />
     </button>
@@ -26,10 +26,10 @@
           <span v-else>Date range selected</span>
 
           <div class="navigation-group gap-1">
-            <button v-if="modelValue?.start" class="btn-warning p-1! text-xs!" @click="emit('update:modelValue', {})">
+            <button v-if="modelValue?.start" type="button" class="btn-warning p-1! text-xs!" @click="emit('update:modelValue', {})">
               Clear range
             </button>
-            <button class="btn-info p-1! text-xs!" @click="handleApply">
+            <button type="button" class="btn-info p-1! text-xs!" @click="handleApply">
               Apply
             </button>
           </div>
@@ -42,6 +42,7 @@
         <div class="grid grid-cols-7 gap-1">
           <button
             v-for="day in calendarDays" :key="`${day.date}-${day.isCurrentMonth}`"
+            type="button"
             :aria-label="`${day.isStart ? 'Start: ' : day.isEnd ? 'End: ' : ''}${day.date.toLocaleDateString('en-GB')}`"
             class="aspect-square rounded-lg text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-info': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
             :disabled="!day.isCurrentMonth" @mouseenter="hoverDate = day.date"

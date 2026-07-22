@@ -4,8 +4,9 @@
       <div class="flex flex-row gap-1 rounded-lg border p-1">
         <button
           v-for="env in ENVIRONMENTS" :key="env.value"
-          class="flex-1 rounded-md px-2 py-1 text-sm font-medium transition-colors" :class="selectedEnv === env.value ? 'text-primary-foreground bg-primary' : 'text-muted-foreground hover:text-foreground'"
-          type="button" @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
+          type="button" class="flex-1 rounded-md px-2 py-1 text-sm font-medium transition-colors"
+          :class="selectedEnv === env.value ? 'text-primary-foreground bg-primary' : 'text-muted-foreground hover:text-foreground'"
+          @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
         >
           {{ env.label }}
         </button>
@@ -44,10 +45,10 @@
 
       <footer class="flex flex-row items-center justify-end">
         <div class="navigation-group">
-          <button class="btn-ghost" @click="emit('close')">
+          <button type="button" class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
-          <button class="btn-success" :disabled="!hasDiff" @click="handleSubmit">
+          <button type="button" class="btn-success" :disabled="!hasDiff" @click="handleSubmit">
             Apply Changes
           </button>
         </div>
@@ -156,12 +157,7 @@ function handleSubmit() {
   }).map(([key, value]) => {
     const existingSecret = props.secrets.find(s => s.key === key)
     const existingValues = existingSecret?.values ?? []
-    const mergedValues = [
-      ...existingValues
-        .filter(v => v.environment !== selectedEnv.value)
-        .map(v => ({ environment: v.environment, value: v.value })),
-      { environment: selectedEnv.value, value },
-    ]
+    const mergedValues = [...existingValues.filter(v => v.environment !== selectedEnv.value).map(v => ({ environment: v.environment, value: v.value })), { environment: selectedEnv.value, value }]
 
     return { key, description: existingSecret?.description ?? "", projectId: props.projectId, values: mergedValues }
   })

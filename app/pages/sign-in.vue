@@ -16,7 +16,11 @@
       </header>
 
       <div class="flex flex-col justify-center gap-4 border-y p-4">
-        <button v-for="provider in OAUTH_PROVIDERS" :key="provider.name" class="btn" @click="signIn(provider.name)">
+        <button
+          v-for="provider in OAUTH_PROVIDERS" :key="provider.name"
+          type="button" class="btn"
+          @click="signIn(provider.name)"
+        >
           <icon :name="provider.icon" size="25" />
           <span>{{ provider.label }}</span>
         </button>

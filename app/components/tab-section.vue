@@ -23,7 +23,7 @@
       </div>
     </header>
 
-    <div class="md:px-4">
+    <div class="md:px-4 2xl:px-8">
       <slot />
     </div>
   </section>

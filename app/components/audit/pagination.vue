@@ -1,6 +1,10 @@
 <template>
   <nav v-if="auditPagination && auditPagination.totalPages > 0" class="navigation-group w-full flex-1 justify-between" aria-label="auditPagination">
-    <button class="btn-info" :disabled="!auditPagination.hasPrev" aria-label="Previous Page" @click="orgStore.prevPage(activeOrg!.id)">
+    <button
+      type="button" class="btn-info"
+      :disabled="!auditPagination.hasPrev" aria-label="Previous Page"
+      @click="orgStore.prevPage(activeOrg!.id)"
+    >
       <icon name="ph:arrow-left-bold" size="20" />
     </button>
 
@@ -9,7 +13,11 @@
       <span v-if="auditPagination.totalItems" class="text-xs italic">{{ summary }}</span>
     </div>
 
-    <button class="btn-info" :disabled="!auditPagination.hasNext" aria-label="Next Page" @click="orgStore.nextPage(activeOrg!.id)">
+    <button
+      type="button" class="btn-info"
+      :disabled="!auditPagination.hasNext" aria-label="Next Page"
+      @click="orgStore.nextPage(activeOrg!.id)"
+    >
       <icon name="ph:arrow-right-bold" size="20" />
     </button>
   </nav>

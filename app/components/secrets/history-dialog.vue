@@ -13,6 +13,7 @@
             <div class="flex flex-row overflow-x-auto">
               <button
                 v-for="env in mergedHistory" :key="env.environment"
+                type="button"
                 class="history-tab" :class="activeEnv === env.environment ? 'history-tab--active' : ''"
                 @click="activeEnv = env.environment"
               >
@@ -20,7 +21,7 @@
               </button>
             </div>
 
-            <button class="btn shrink-0 rounded-none!" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" @click="allVisible = !allVisible">
+            <button type="button" class="btn shrink-0 rounded-none!" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" @click="allVisible = !allVisible">
               <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
               <span class="hidden md:inline">{{ allVisible ? 'Hide all' : 'Reveal all' }}</span>
             </button>
@@ -45,10 +46,10 @@
                 </p>
 
                 <div class="flex flex-row items-center gap-1 text-muted-foreground">
-                  <button :aria-label="`Toggle visibility for ${row.id}`" @click="visibleMap[row.id] = !visibleMap[row.id]">
+                  <button type="button" :aria-label="`Toggle visibility for ${row.id}`" @click="visibleMap[row.id] = !visibleMap[row.id]">
                     <icon :name="visibleMap[row.id] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
                   </button>
-                  <button :aria-label="`Copy value for ${row.id}`" @click="handleCopy(row.id, row.value)">
+                  <button type="button" :aria-label="`Copy value for ${row.id}`" @click="handleCopy(row.id, row.value)">
                     <icon :name="copyStates[row.id] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" />
                   </button>
                 </div>

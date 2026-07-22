@@ -25,20 +25,25 @@
           <span :class="{ 'text-caption-success font-mono!': field.label === 'CLI Token' && generatedToken }">{{ field.value?.value }}</span>
 
           <button
-            v-if="field.label !== 'CLI Token' || generatedToken" class="btn"
+            v-if="field.label !== 'CLI Token' || generatedToken" type="button"
+            class="btn"
             :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
 
-          <button v-if="field.onRegenerate" class="btn" aria-label="Regenerate API Token" @click="field.onRegenerate()">
+          <button
+            v-if="field.onRegenerate" type="button"
+            class="btn" aria-label="Regenerate API Token"
+            @click="field.onRegenerate()"
+          >
             <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
           </button>
         </div>
 
         <div v-else-if="field.type === 'input'" class="navigation-group justify-end">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
-          <button class="btn" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
+          <button type="button" class="btn" aria-label="Save Changes" @click="field.onSave && field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
@@ -70,7 +75,7 @@
           </p>
         </header>
 
-        <button class="btn-danger self-end" aria-label="Delete Account" @click="handleDeleteUser">
+        <button type="button" class="btn-danger self-end" aria-label="Delete Account" @click="handleDeleteUser">
           <icon name="ph:user-minus-bold" size="20" />
           <span>Confirm</span>
         </button>

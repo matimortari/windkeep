@@ -19,17 +19,17 @@
       </div>
 
       <footer class="flex flex-col gap-2 border-t pt-4">
-        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" class="btn-success w-full" @click="handleUpdateRole">
+        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" type="button" class="btn-success w-full" @click="handleUpdateRole">
           <icon :name="saveIcon.icon.value" size="20" />
           <span>Save Role</span>
         </button>
 
-        <button v-if="canRemove && member.role !== 'OWNER'" class="btn w-full text-danger" @click="handleRemove">
+        <button v-if="canRemove && member.role !== 'OWNER'" type="button" class="btn w-full text-danger" @click="handleRemove">
           <icon name="ph:user-minus-bold" size="20" />
           <span>Remove Member</span>
         </button>
 
-        <button class="btn-ghost w-full" @click="emit('update:isOpen', false)">
+        <button type="button" class="btn-ghost w-full" @click="emit('update:isOpen', false)">
           Close
         </button>
       </footer>

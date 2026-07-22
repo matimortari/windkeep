@@ -19,11 +19,11 @@
       </div>
 
       <footer class="flex flex-row items-center justify-end">
-        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" class="btn-success" @click="handleUpdateRole">
+        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" type="button" class="btn-success" @click="handleUpdateRole">
           <icon :name="saveIcon.icon.value" size="20" />
           <span>Save Role</span>
         </button>
-        <button v-if="isOwner && member.role !== 'OWNER'" class="btn-danger" @click="handleRemove">
+        <button v-if="isOwner && member.role !== 'OWNER'" type="button" class="btn-danger" @click="handleRemove">
           <icon name="ph:user-minus-bold" size="20" />
           <span>Remove Member</span>
         </button>

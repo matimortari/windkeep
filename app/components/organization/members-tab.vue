@@ -11,7 +11,7 @@
 
     <template #actions>
       <nav v-if="canManage" class="navigation-group w-full justify-end md:w-auto">
-        <button class="btn-primary" @click="isInviteDialogOpen = true">
+        <button type="button" class="btn-primary" @click="isInviteDialogOpen = true">
           <icon name="ph:envelope-bold" size="20" />
           <span>Invite Member</span>
         </button>
@@ -36,7 +36,11 @@
                 <th v-for="col in memberColumns" :key="col.key" :class="col.class">
                   <div class="navigation-group">
                     <span>{{ col.label }}</span>
-                    <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleMemberSort(col.key)">
+                    <button
+                      v-if="col.sortable" type="button"
+                      class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`"
+                      @click="toggleMemberSort(col.key)"
+                    >
                       <icon :name="getMemberSortIconName(col.key)" size="15" class="transition-transform" />
                     </button>
                   </div>
@@ -69,7 +73,7 @@
                   {{ ROLES.find(role => role.value === member.role)?.label }}
                 </td>
                 <td class="w-24">
-                  <button v-if="canManageMember(member)" aria-label="Manage member" @click.stop="openMemberDialog(member)">
+                  <button v-if="canManageMember(member)" type="button" aria-label="Manage member" @click.stop="openMemberDialog(member)">
                     <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                   </button>
                 </td>
@@ -96,7 +100,11 @@
                 <th v-for="col in inviteColumns" :key="col.key" :class="col.class">
                   <div class="navigation-group">
                     <span>{{ col.label }}</span>
-                    <button v-if="col.sortable" class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`" @click="toggleInviteSort(col.key)">
+                    <button
+                      v-if="col.sortable" type="button"
+                      class="flex items-center hover:text-secondary" :aria-label="`Sort by ${col.label}`"
+                      @click="toggleInviteSort(col.key)"
+                    >
                       <icon :name="getInviteSortIconName(col.key)" size="15" class="transition-transform" />
                     </button>
                   </div>
@@ -134,13 +142,13 @@
                 </td>
                 <td class="w-28">
                   <div class="navigation-group">
-                    <button v-if="getInviteStatus(invite) === 'pending'" aria-label="Copy invite link" @click="handleCopyInviteLink(invite)">
+                    <button v-if="getInviteStatus(invite) === 'pending'" type="button" aria-label="Copy invite link" @click="handleCopyInviteLink(invite)">
                       <icon :name="activeCopyInviteId === invite.id ? inviteLinkIcon.icon.value : 'ph:link-bold'" size="20" class="text-muted-foreground hover:text-secondary" />
                     </button>
-                    <button v-if="getInviteStatus(invite) === 'expired'" aria-label="Re-invite" @click="openReinvite(invite.email)">
+                    <button v-if="getInviteStatus(invite) === 'expired'" type="button" aria-label="Re-invite" @click="openReinvite(invite.email)">
                       <icon name="ph:arrow-clockwise-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                     </button>
-                    <button v-if="getInviteStatus(invite) !== 'accepted'" aria-label="Revoke invitation" @click="handleRevokeInvite(invite.id)">
+                    <button v-if="getInviteStatus(invite) !== 'accepted'" type="button" aria-label="Revoke invitation" @click="handleRevokeInvite(invite.id)">
                       <icon name="ph:x-bold" size="20" class="text-muted-foreground hover:text-danger" />
                     </button>
                   </div>

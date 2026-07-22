@@ -16,10 +16,14 @@
       </nav>
 
       <nav class="navigation-group" aria-label="User Actions">
-        <button class="btn rounded-full!" aria-label="Toggle Theme" @click="toggleTheme">
+        <button type="button" class="btn rounded-full!" aria-label="Toggle Theme" @click="toggleTheme">
           <icon :name="themeIcon" size="20" />
         </button>
-        <button v-if="loggedIn" class="btn rounded-full!" aria-label="Sign Out" @click="signOut">
+        <button
+          v-if="loggedIn" type="button"
+          class="btn rounded-full!" aria-label="Sign Out"
+          @click="signOut"
+        >
           <icon name="ph:sign-out-bold" size="20" />
         </button>
         <nuxt-link v-else to="/sign-in" class="btn rounded-full!" aria-label="Sign In">
