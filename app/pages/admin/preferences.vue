@@ -1,7 +1,7 @@
 <template>
   <div
     v-motion :initial="{ opacity: 0 }"
-    :enter="{ opacity: 1 }" :duration="800"
+    :enter="{ opacity: 1 }" :duration="1000"
     class="container mx-auto"
   >
     <TabSection title="Preferences">

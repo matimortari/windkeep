@@ -1,8 +1,8 @@
 <template>
   <div class="flex min-h-screen w-full items-center justify-center">
     <div
-      v-motion :initial="{ opacity: 0 }"
-      :visible-once="{ opacity: 1 }" :duration="800"
+      v-motion :initial="{ opacity: 0, y: 20 }"
+      :visible-once="{ opacity: 1, y: 0 }" :duration="1000"
       class="w-full max-w-xl border-none bg-transparent py-32"
     >
       <header class="flex flex-col items-center gap-2 py-4 text-center">
@@ -129,8 +129,8 @@ definePageMeta({ middleware: "auth" })
 .accordion-enter-active,
 .accordion-leave-active {
   transition:
-    max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.25s ease;
+    max-height var(--duration-base) var(--ease-standard),
+    opacity var(--duration-fast) var(--ease-standard);
   overflow: hidden;
 }
 .accordion-enter-from,

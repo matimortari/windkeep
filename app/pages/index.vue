@@ -1,14 +1,18 @@
 <template>
   <section
     id="hero" v-motion
-    :initial="{ opacity: 0 }" :visible-once="{ opacity: 1 }"
-    :duration="800" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-8 md:min-h-[90vh]"
+    :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
+    :duration="1000" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-8 md:min-h-[90vh]"
   >
     <div class="hero-backdrop" />
     <div class="dot-overlay" />
 
     <header class="z-20 flex w-full max-w-4xl flex-col items-center gap-4 text-center md:items-start md:text-start">
-      <div class="h-1 w-15 bg-secondary" />
+      <div
+        v-motion :initial="{ opacity: 0, scaleX: 0 }"
+        :visible-once="{ opacity: 1, scaleX: 1 }" :duration="1000"
+        :delay="100" class="h-1 w-15 origin-left bg-secondary"
+      />
 
       <h1 class="hero-heading">
         Your Secrets, Secured.
@@ -19,7 +23,11 @@
         teams and developers to securely store, manage, and share sensitive information.
       </p>
 
-      <div class="flex flex-row items-center gap-4 md:items-start">
+      <div
+        v-motion :initial="{ opacity: 0, y: 10 }"
+        :visible-once="{ opacity: 1, y: 0 }" :duration="1000"
+        :delay="200" class="flex flex-row items-center gap-4 md:items-start"
+      >
         <nuxt-link to="/sign-in" class="btn-primary rounded-full! shadow-none">
           <span class="font-semibold">Sign In</span>
           <icon name="ph:arrow-right-bold" size="20" />
@@ -33,9 +41,9 @@
       <div class="flex w-full max-w-md flex-col items-center gap-4 py-8 whitespace-nowrap md:flex-row md:items-start">
         <div
           v-for="(highlight, index) in HIGHLIGHTS" :key="index"
-          v-motion :initial="{ opacity: 0 }"
-          :visible-once="{ opacity: 1 }" :duration="600"
-          :delay="150 * index" class="navigation-group text-sm font-semibold text-muted-foreground"
+          v-motion :initial="{ opacity: 0, y: 10 }"
+          :visible-once="{ opacity: 1, y: 0 }" :duration="1000"
+          :delay="300 + 120 * index" class="navigation-group text-sm font-semibold text-muted-foreground"
         >
           <icon :name="highlight.icon" class="text-primary" size="20" />
           <span>{{ highlight.title }}</span>
@@ -85,19 +93,21 @@
           </button>
         </div>
 
-        <div v-if="currentTab" class="space-y-2 p-4">
-          <p class="text-caption">
-            > {{ currentTab.description }}
-          </p>
-          <Shiki lang="bash" :code="currentTab.code.join('\n')" class="code-block" />
-        </div>
+        <transition name="fade-swap" mode="out-in">
+          <div v-if="currentTab" :key="currentTab.key" class="space-y-2 p-4">
+            <p class="text-caption">
+              > {{ currentTab.description }}
+            </p>
+            <Shiki lang="bash" :code="currentTab.code.join('\n')" class="code-block" />
+          </div>
+        </transition>
       </div>
     </section>
 
     <section
       id="features" v-motion
       :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
-      :duration="800"
+      :duration="1000"
     >
       <div class="flex items-end justify-between border-b pb-4">
         <h2>
@@ -112,7 +122,7 @@
         <div
           v-for="(feature, index) in FEATURES" :key="index"
           v-motion :initial="{ opacity: 0 }"
-          :visible-once="{ opacity: 1 }" :duration="600"
+          :visible-once="{ opacity: 1 }" :duration="1000"
           :delay="100 * index" class="feature-item"
         >
           <div class="flex flex-col gap-2">
@@ -133,7 +143,7 @@
     <section
       id="faq" v-motion
       :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
-      :duration="800"
+      :duration="1000"
     >
       <div class="flex items-end justify-between border-b pb-4">
         <h2>
@@ -151,19 +161,19 @@
             <icon name="ph:plus-bold" size="20" class="mt-0.5 shrink-0 transition-transform" :class="openIndex === index ? 'rotate-45 text-primary' : 'text-muted-foreground'" />
           </button>
 
-          <transition name="accordion">
-            <p v-if="openIndex === index" class="text-caption max-w-4xl p-2">
+          <div class="accordion" :class="{ 'accordion--open': openIndex === index }">
+            <p class="text-caption max-w-4xl p-2">
               {{ item.answer }}
             </p>
-          </transition>
+          </div>
         </div>
       </div>
     </section>
 
     <section
       id="cta" v-motion
-      :initial="{ opacity: 0, y: 16 }" :visible-once="{ opacity: 1, y: 0 }"
-      :duration="700" class="cta-banner"
+      :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
+      :duration="1000" class="cta-banner"
     >
       <div class="cta-accent" />
       <div class="relative z-10 flex flex-col items-center gap-4">
@@ -325,21 +335,29 @@ html.light .hero-backdrop {
   );
 }
 
-.accordion-enter-active,
-.accordion-leave-active {
-  transition:
-    max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.25s ease;
+.accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-standard);
+}
+.accordion--open {
+  grid-template-rows: 1fr;
+}
+.accordion > p {
   overflow: hidden;
-}
-.accordion-enter-from,
-.accordion-leave-to {
-  max-height: 0;
   opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-standard);
 }
-.accordion-enter-to,
-.accordion-leave-from {
-  max-height: 500px;
+.accordion--open > p {
   opacity: 1;
+}
+
+.fade-swap-enter-active,
+.fade-swap-leave-active {
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+.fade-swap-enter-from,
+.fade-swap-leave-to {
+  opacity: 0;
 }
 </style>

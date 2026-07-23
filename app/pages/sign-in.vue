@@ -1,10 +1,6 @@
 <template>
   <div class="flex min-h-screen w-full items-center justify-center p-4">
-    <div
-      v-motion :initial="{ opacity: 0 }"
-      :visible-once="{ opacity: 1 }" :duration="800"
-      class="w-full max-w-md border-none bg-transparent py-32"
-    >
+    <div class="sign-in-panel w-full max-w-md border-none bg-transparent py-32">
       <header class="flex flex-col items-center gap-2 py-4 text-center">
         <h1 class="font-display">
           Sign In
@@ -17,9 +13,9 @@
 
       <div class="flex flex-col justify-center gap-4 border-y p-4">
         <button
-          v-for="provider in OAUTH_PROVIDERS" :key="provider.name"
-          type="button" class="btn"
-          @click="signIn(provider.name)"
+          v-for="(provider, index) in OAUTH_PROVIDERS" :key="provider.name"
+          type="button" class="btn sign-in-provider"
+          :style="{ animationDelay: `${80 + index * 60}ms` }" @click="signIn(provider.name)"
         >
           <icon :name="provider.icon" size="25" />
           <span>{{ provider.label }}</span>
@@ -68,3 +64,23 @@ useHead({
   meta: [{ name: "description", content: "Sign in to your WindKeep account" }],
 })
 </script>
+
+<style scoped>
+.sign-in-panel {
+  animation: sign-in-enter var(--duration-slow) var(--ease-emphasized) both;
+}
+.sign-in-provider {
+  animation: sign-in-enter var(--duration-base) var(--ease-emphasized) both;
+}
+
+@keyframes sign-in-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

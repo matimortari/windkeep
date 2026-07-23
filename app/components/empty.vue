@@ -1,5 +1,9 @@
 <template>
-  <div class="flex flex-col items-center justify-center gap-4 py-12 text-center text-muted-foreground">
+  <div
+    v-motion :initial="{ opacity: 0, y: 10 }"
+    :enter="{ opacity: 1, y: 0 }" :duration="500"
+    class="flex flex-col items-center justify-center gap-4 py-12 text-center text-muted-foreground"
+  >
     <div class="rounded-lg bg-muted p-4">
       <icon :name="iconName || 'ph:empty-bold'" size="30" />
     </div>

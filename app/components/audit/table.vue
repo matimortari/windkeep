@@ -197,10 +197,10 @@ function formatMetadata(metadata: Record<string, any> | string | null | undefine
 
 <style scoped>
 .metadata-container {
-  animation: slideDown 0.2s ease-out;
+  animation: slideDown var(--duration-fast) var(--ease-standard);
 }
 .metadata-content {
-  animation: fadeIn 0.25s ease-out;
+  animation: fadeIn var(--duration-base) var(--ease-standard);
 }
 
 @keyframes slideDown {

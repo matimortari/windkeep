@@ -49,7 +49,7 @@
             {{ project.name }}
           </nuxt-link>
 
-          <div v-if="isActiveProject(project)" class="mt-1 ml-3 flex flex-col gap-0.5 border-l pl-2">
+          <div v-if="isActiveProject(project)" class="mt-1 ml-4 flex flex-col gap-1">
             <button
               v-for="tab in PROJECT_TABS" :key="tab.key"
               type="button" class="navigation-group border-l-2 border-transparent p-1 text-left text-sm text-muted-foreground transition-all hover:border-primary hover:text-foreground"
@@ -126,7 +126,5 @@ async function handleCreateProject(project: { name: string, description?: string
 }
 
 // Keep the shared "current project" field in sync with the route
-watch(() => route.params.project, (slug) => {
-  setActiveProject(typeof slug === "string" ? slug : null)
-}, { immediate: true })
+watch(() => route.params.project, slug => setActiveProject(typeof slug === "string" ? slug : null), { immediate: true })
 </script>

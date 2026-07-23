@@ -24,12 +24,13 @@
       <ProjectsTable :projects="filteredProjects" />
     </div>
 
-    <ul
-      v-else v-motion
-      :initial="{ opacity: 0 }" :enter="{ opacity: 1 }"
-      :duration="600" class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3 2xl:grid-cols-4"
-    >
-      <li v-for="project in filteredProjects" :key="project.id">
+    <ul v-else class="scroll-area grid max-h-screen gap-2 overflow-y-auto p-2 md:grid-cols-3 2xl:grid-cols-4">
+      <li
+        v-for="(project, index) in filteredProjects" :key="project.id"
+        v-motion :initial="{ opacity: 0, x: -10 }"
+        :enter="{ opacity: 1, x: 0 }" :duration="500"
+        :delay="Math.min(index * 50, 300)"
+      >
         <ProjectsCard :project="project" />
       </li>
 
