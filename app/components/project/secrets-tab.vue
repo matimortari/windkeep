@@ -125,7 +125,8 @@ function handleDeleteSecret(key: string) {
 
 function hasSecretChanges(secret: Secret, originalSecret: Secret): boolean {
   const normalizeValues = (values: SecretValue[] | undefined) => Array.from(values ?? [], v => `${v.environment}:${v.value}`).sort()
-  return secret.description !== originalSecret.description || JSON.stringify(normalizeValues(secret.values)) !== JSON.stringify(normalizeValues(originalSecret.values))
+  const normalizeTags = (tags: string[] | undefined) => [...(tags ?? [])].sort()
+  return (secret.description ?? "") !== (originalSecret.description ?? "") || JSON.stringify(normalizeTags(secret.tags)) !== JSON.stringify(normalizeTags(originalSecret.tags)) || JSON.stringify(normalizeValues(secret.values)) !== JSON.stringify(normalizeValues(originalSecret.values))
 }
 
 function handleSecretChange(secret: Secret) {
@@ -148,8 +149,11 @@ function handleSecretChange(secret: Secret) {
   if (!existingSecret || existingChange?.type === "create") {
     pendingChanges.set(secret.key, { type: "create", secret })
   }
-  else {
+  else if (hasSecretChanges(secret, existingSecret)) {
     pendingChanges.set(secret.key, { type: "update", secret, originalSecret: existingSecret })
+  }
+  else {
+    pendingChanges.delete(secret.key)
   }
 
   closeDialog("secrets")

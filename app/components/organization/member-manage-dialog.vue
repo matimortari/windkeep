@@ -19,14 +19,19 @@
       </div>
 
       <footer class="flex flex-row items-center justify-end">
-        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" type="button" class="btn-success" @click="handleUpdateRole">
-          <icon :name="saveIcon.icon.value" size="20" />
-          <span>Save Role</span>
-        </button>
-        <button v-if="isOwner && member.role !== 'OWNER'" type="button" class="btn-danger" @click="handleRemove">
-          <icon name="ph:user-minus-bold" size="20" />
-          <span>Remove Member</span>
-        </button>
+        <nav class="navigation-group">
+          <button type="button" class="btn-ghost" @click="emit('update:isOpen', false)">
+            Close
+          </button>
+          <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" type="button" class="btn-success" @click="handleUpdateRole">
+            <icon :name="saveIcon.icon.value" size="20" />
+            <span>Save Role</span>
+          </button>
+          <button v-if="isOwner && member.role !== 'OWNER'" type="button" class="btn-danger" @click="handleRemove">
+            <icon name="ph:user-minus-bold" size="20" />
+            <span>Remove Member</span>
+          </button>
+        </nav>
       </footer>
     </div>
   </Dialog>

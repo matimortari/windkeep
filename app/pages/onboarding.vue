@@ -1,10 +1,6 @@
 <template>
   <div class="flex min-h-screen w-full items-center justify-center">
-    <div
-      v-motion :initial="{ opacity: 0, y: 20 }"
-      :visible-once="{ opacity: 1, y: 0 }" :duration="1000"
-      class="w-full max-w-xl border-none bg-transparent py-32"
-    >
+    <div class="onboarding-panel w-full max-w-xl border-none bg-transparent py-32">
       <header class="flex flex-col items-center gap-2 py-4 text-center">
         <h1 class="font-display">
           Welcome to WindKeep
@@ -19,44 +15,42 @@
           <h5>
             New Organization
           </h5>
-          <icon
-            name="ph:caret-down-bold" size="20"
-            class="shrink-0 text-muted-foreground transition-transform group-hover:text-primary"
-            :class="activeSection === 'create' ? 'rotate-180' : 'rotate-0'"
-          />
+          <icon name="ph:caret-down-bold" size="20" class="shrink-0 text-muted-foreground transition-transform group-hover:text-primary" :class="activeSection === 'create' ? 'rotate-180' : 'rotate-0'" />
         </button>
 
-        <transition name="accordion">
-          <form v-if="activeSection === 'create'" class="flex flex-col gap-2 p-4 pt-0" @submit.prevent="handleCreateOrg">
-            <input v-model="localOrg.name" placeholder="Organization Name" type="text">
-            <div class="flex gap-2">
-              <input v-model="localOrg.description" placeholder="Description (optional)" type="text" class="flex-1">
-              <input v-model="localOrg.website" placeholder="Website (optional)" type="url" class="flex-1">
-            </div>
+        <div class="accordion" :class="{ 'accordion--open': activeSection === 'create' }">
+          <div class="accordion-panel">
+            <form class="flex flex-col gap-2 p-2" @submit.prevent="handleCreateOrg">
+              <input v-model="localOrg.name" placeholder="Organization Name" type="text">
+              <div class="flex gap-2">
+                <input v-model="localOrg.description" placeholder="Description (optional)" type="text" class="flex-1">
+                <input v-model="localOrg.website" placeholder="Website (optional)" type="url" class="flex-1">
+              </div>
 
-            <div class="card flex flex-col gap-2 p-3">
-              <label for="encryption-mode" class="text-caption">Organization secrets key setup</label>
-              <select id="encryption-mode" v-model="localOrg.encryptionMode">
-                <option value="AUTO">
-                  Auto-generate (recommended)
-                </option>
-                <option value="MANUAL">
-                  Enter my own password
-                </option>
-              </select>
+              <div class="card flex flex-col gap-2">
+                <label for="encryption-mode" class="text-caption">Organization secrets key setup</label>
+                <select id="encryption-mode" v-model="localOrg.encryptionMode">
+                  <option value="AUTO">
+                    Auto-generate (recommended)
+                  </option>
+                  <option value="MANUAL">
+                    Enter my own password
+                  </option>
+                </select>
 
-              <input
-                v-if="localOrg.encryptionMode === 'MANUAL'" v-model="localOrg.encryptionKey"
-                placeholder="Organization encryption password (min 12 chars)" type="password"
-                autocomplete="new-password"
-              >
-            </div>
+                <input
+                  v-if="localOrg.encryptionMode === 'MANUAL'" v-model="localOrg.encryptionKey"
+                  placeholder="Organization encryption password (min 12 chars)" type="password"
+                  autocomplete="new-password"
+                >
+              </div>
 
-            <button type="submit" class="btn-primary w-full" :disabled="!localOrg.name">
-              Create Organization
-            </button>
-          </form>
-        </transition>
+              <button type="submit" class="btn-primary w-full" :disabled="!localOrg.name">
+                Create Organization
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
 
       <div class="border-b">
@@ -67,14 +61,16 @@
           <icon name="ph:caret-down-bold" size="20" class="shrink-0 text-muted-foreground transition-transform group-hover:text-primary" :class="activeSection === 'invite' ? 'rotate-180' : 'rotate-0'" />
         </button>
 
-        <transition name="accordion">
-          <form v-if="activeSection === 'invite'" class="flex flex-col gap-2 p-4 pt-0" @submit.prevent="handleAcceptInvite">
-            <input v-model="token" placeholder="Invite Token" type="text">
-            <button type="submit" class="btn-secondary w-full" :disabled="!token">
-              Accept Invite
-            </button>
-          </form>
-        </transition>
+        <div class="accordion" :class="{ 'accordion--open': activeSection === 'invite' }">
+          <div class="accordion-panel">
+            <form class="flex flex-col gap-2 p-2" @submit.prevent="handleAcceptInvite">
+              <input v-model="token" placeholder="Invite Token" type="text">
+              <button type="submit" class="btn-primary w-full" :disabled="!token">
+                Accept Invite
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -113,7 +109,7 @@ async function handleAcceptInvite() {
 
 onMounted(async () => {
   await userStore.getUser()
-  localOrg.value.name = `${userStore.user?.name || userStore.user?.email || "My"}'s Team`
+  localOrg.value.name = userStore.user?.name ? `${userStore.user.name}'s Team` : "My Team"
 })
 
 useHead({
@@ -126,21 +122,29 @@ definePageMeta({ middleware: "auth" })
 </script>
 
 <style scoped>
-.accordion-enter-active,
-.accordion-leave-active {
-  transition:
-    max-height var(--duration-base) var(--ease-standard),
-    opacity var(--duration-fast) var(--ease-standard);
+.onboarding-panel {
+  animation: onboarding-enter var(--duration-slow) var(--ease-emphasized) both;
+}
+
+@keyframes onboarding-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-standard);
+}
+.accordion--open {
+  grid-template-rows: 1fr;
+}
+.accordion-panel {
+  min-height: 0;
   overflow: hidden;
-}
-.accordion-enter-from,
-.accordion-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-.accordion-enter-to,
-.accordion-leave-from {
-  max-height: 300px;
-  opacity: 1;
 }
 </style>

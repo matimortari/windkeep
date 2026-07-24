@@ -34,10 +34,16 @@
         <ProjectsCard :project="project" />
       </li>
 
-      <button v-if="isOwner || isAdmin" type="button" class="card group flex h-50 flex-col items-center justify-center gap-4 border-2! border-dashed! bg-transparent! text-muted-foreground" @click="openDialog('projects')">
-        <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105 group-hover:text-secondary" />
-        <span class="font-semibold transition-transform group-hover:scale-105">New Project</span>
-      </button>
+      <li
+        v-if="isOwner || isAdmin" v-motion
+        :initial="{ opacity: 0, x: -10 }" :enter="{ opacity: 1, x: 0 }"
+        :duration="500" :delay="Math.min(filteredProjects.length * 50, 300) + 50"
+      >
+        <button type="button" class="card group flex h-50 w-full flex-col items-center justify-center gap-4 border-2! border-dashed! bg-transparent! text-muted-foreground" @click="openDialog('projects')">
+          <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105 group-hover:text-secondary" />
+          <span class="font-semibold transition-transform group-hover:scale-105">New Project</span>
+        </button>
+      </li>
     </ul>
 
     <ProjectsDialog @close="closeDialog('projects')" @save="handleCreateProject" />

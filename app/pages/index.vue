@@ -344,6 +344,7 @@ html.light .hero-backdrop {
   grid-template-rows: 1fr;
 }
 .accordion > p {
+  min-height: 0;
   overflow: hidden;
   opacity: 0;
   transition: opacity var(--duration-fast) var(--ease-standard);

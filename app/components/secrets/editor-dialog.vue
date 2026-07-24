@@ -1,6 +1,6 @@
 <template>
   <Dialog :is-open="isRawEditorOpen" title="Raw .env Editor" @update:is-open="closeDialog('raw')">
-    <div class="flex w-full max-w-xl flex-col gap-3 overflow-hidden">
+    <div class="flex w-full max-w-xl flex-col gap-2 overflow-hidden">
       <div class="flex flex-row gap-1 rounded-lg border p-1">
         <button
           v-for="env in ENVIRONMENTS" :key="env.value"

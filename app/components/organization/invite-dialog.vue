@@ -25,7 +25,7 @@
           <p class="text-xs text-muted-foreground">
             Share this link with the invitee. It expires in 12 hours.
           </p>
-          <div class="navigation-group rounded-sm border bg-muted p-3 font-mono text-xs break-all">
+          <div class="navigation-group rounded-sm border bg-muted p-4 font-mono text-xs break-all">
             <span class="flex-1">{{ generatedInviteUrl }}</span>
             <button type="button" class="btn shrink-0" aria-label="Copy invite link" @click="copyInviteLink">
               <icon :name="inviteLinkIcon.icon.value" size="20" />

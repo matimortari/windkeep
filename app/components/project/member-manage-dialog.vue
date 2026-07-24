@@ -18,20 +18,20 @@
         </select>
       </div>
 
-      <footer class="flex flex-col gap-2 border-t pt-4">
-        <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" type="button" class="btn-success w-full" @click="handleUpdateRole">
-          <icon :name="saveIcon.icon.value" size="20" />
-          <span>Save Role</span>
-        </button>
-
-        <button v-if="canRemove && member.role !== 'OWNER'" type="button" class="btn w-full text-danger" @click="handleRemove">
-          <icon name="ph:user-minus-bold" size="20" />
-          <span>Remove Member</span>
-        </button>
-
-        <button type="button" class="btn-ghost w-full" @click="emit('update:isOpen', false)">
-          Close
-        </button>
+      <footer class="flex flex-row items-center justify-end">
+        <nav class="navigation-group">
+          <button type="button" class="btn-ghost" @click="emit('update:isOpen', false)">
+            Close
+          </button>
+          <button v-if="member.role !== 'OWNER' && selectedRole !== member.role" type="button" class="btn-success" @click="handleUpdateRole">
+            <icon :name="saveIcon.icon.value" size="20" />
+            <span>Save Role</span>
+          </button>
+          <button v-if="canRemove && member.role !== 'OWNER'" type="button" class="btn-danger" @click="handleRemove">
+            <icon name="ph:user-minus-bold" size="20" />
+            <span>Remove Member</span>
+          </button>
+        </nav>
       </footer>
     </div>
   </Dialog>

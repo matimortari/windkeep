@@ -1,8 +1,8 @@
 <template>
   <div
-    v-motion :initial="{ opacity: 0 }"
-    :enter="{ opacity: 1 }" :duration="1000"
-    class="container mx-auto"
+    :key="String(slug)" v-motion
+    :initial="{ opacity: 0, x: -20 }" :visible="{ opacity: 1, x: 0 }"
+    :duration="1000" class="container mx-auto"
   >
     <ProjectSecretsTab v-show="activeTab === 'secrets'" :project="project" :has-permission="hasPermission" />
     <ProjectAccessControlTab v-if="activeTab === 'access-control'" />
