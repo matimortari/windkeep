@@ -58,6 +58,7 @@ export default defineEventHandler(async (event) => {
   })
 
   await deleteCached(CacheKeys.userData(sessionUser.id), CacheKeys.userData(result.data.newOwnerId))
+  await invalidateOrgProjectCaches(orgId, sessionUser.id, result.data.newOwnerId)
 
   return {
     success: true,
@@ -68,7 +69,7 @@ export default defineEventHandler(async (event) => {
 
 defineRouteMeta({
   openAPI: {
-    summary: "Transfer ownership",
+    summary: "Transfer organization ownership",
     description: "Transfers OWNER role to another organization member. Current owner is demoted to ADMIN. Requires organization OWNER role.",
     tags: ["Organizations"],
     parameters: [{ in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" }],

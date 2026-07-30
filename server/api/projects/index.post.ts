@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     metadata: { projectName: newProject.name },
   })
 
-  await deleteCached(CacheKeys.userProjects(sessionUser.id, newProject.orgId))
+  await invalidateOrgProjectCaches(newProject.orgId, sessionUser.id)
 
   return { project: newProject }
 })
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Create project",
-    description: "Creates a new project in the given organization. Creator is set as OWNER. Requires OWNER or ADMIN organization role.",
+    description: "Creates a new project in the given organization. Creator is set as project OWNER. Requires OWNER or ADMIN organization role.",
     tags: ["Projects"],
     requestBody: {
       required: true,

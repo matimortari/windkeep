@@ -89,8 +89,8 @@ const ORGS_PROJECTS_CONTENT: CliSection[] = [
       ["Each organization member has one of these roles:"],
     ],
     commands: [
-      { label: "OWNER", description: "Full control over the org, its projects, and members." },
-      { label: "ADMIN", description: "Manage projects and secrets; cannot delete the organization." },
+      { label: "OWNER", description: "Full org control, plus implicit owner access to every project in the org." },
+      { label: "ADMIN", description: "Create projects and manage members; cannot delete the organization." },
       { label: "MEMBER", description: "View and use secrets in assigned projects." },
     ],
   },
@@ -139,7 +139,7 @@ const ORGS_PROJECTS_CONTENT: CliSection[] = [
   },
   {
     title: "Projects: List",
-    paragraphs: [["List all projects in your active organization, including secret counts."]],
+    paragraphs: [["List all projects in your active organization, including secret counts. Organization owners see every project; other roles only see projects they belong to."]],
     code: [{
       label: "Example & Output:",
       command: "windkeep projects list",
@@ -605,7 +605,7 @@ const GUIDES_CONTENT: CliSection[] = [
     paragraphs: [["A few practices that keep secrets safe across teams:"]],
     commands: [
       { label: "Never log decrypted values", description: "Keep secrets out of logs, error reports, and metrics." },
-      { label: "Least privilege", description: "Assign OWNER, ADMIN, and MEMBER roles based on what each person actually needs." },
+      { label: "Least privilege", description: "Assign OWNER, ADMIN, and MEMBER roles based on what each person actually needs. Org owners retain break-glass access to all projects." },
       { label: "Verify safely", description: "Use -v/--verbose to confirm which keys are injected — values are never printed." },
     ],
   },

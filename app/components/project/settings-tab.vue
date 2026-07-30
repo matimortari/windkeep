@@ -40,7 +40,37 @@
   </TabSection>
 
   <TabSection title="Danger Zone">
-    <nav v-if="!isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Leave Project">
+    <nav v-if="isOwner(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Transfer Project Ownership">
+      <header class="flex flex-col gap-1">
+        <h6>
+          Transfer Ownership
+        </h6>
+        <p class="text-caption-danger">
+          The selected member becomes the project owner. The current owner is demoted to admin.
+        </p>
+      </header>
+
+      <div class="navigation-group justify-end">
+        <select v-model="transferTargetId" class="w-full md:max-w-64" :disabled="!transferCandidates.length">
+          <option disabled value="">
+            {{ transferCandidates.length ? "Select new owner" : "No eligible members" }}
+          </option>
+          <option v-for="member in transferCandidates" :key="member.userId" :value="member.userId">
+            {{ member.user.name }} ({{ member.user.email }})
+          </option>
+        </select>
+        <button
+          type="button" class="btn-warning self-end"
+          aria-label="Transfer Project Ownership" :disabled="!transferTargetId"
+          @click="handleTransferOwnership"
+        >
+          <icon name="ph:swap-bold" size="20" />
+          <span>Transfer</span>
+        </button>
+      </div>
+    </nav>
+
+    <nav v-if="canLeaveProject(project?.id ?? '')" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Leave Project">
       <header class="flex flex-col gap-1">
         <h6>
           Leave Project
@@ -77,9 +107,12 @@ const route = useRoute()
 const slug = route.params.project
 const { user } = storeToRefs(useUserStore())
 const projectStore = useProjectStore()
-const { projects, isOwner } = storeToRefs(projectStore)
+const { projects, isOwner, canLeaveProject } = storeToRefs(projectStore)
 const project = computed(() => projects.value.find(p => p.slug === slug))
 const localProject = ref<Project | null>(null)
+const transferTargetId = ref("")
+
+const transferCandidates = computed(() => (project.value?.memberships ?? []).filter(m => m.role !== "OWNER" && m.userId !== user.value?.id))
 
 const projectFields = [
   {
@@ -167,6 +200,18 @@ async function handleSubmit(index: number) {
   }
 }
 
+async function handleTransferOwnership() {
+  if (!project.value?.id || !transferTargetId.value) {
+    return
+  }
+  const target = transferCandidates.value.find(m => m.userId === transferTargetId.value)
+  if (!confirm(`Transfer ownership of this project to ${target?.user.name ?? "this member"}? The current project owner will be demoted to admin.`)) {
+    return
+  }
+  await projectStore.transferProjectOwnership(project.value.id, { newOwnerId: transferTargetId.value })
+  transferTargetId.value = ""
+}
+
 async function handleDeleteProject() {
   if (!project.value?.id) {
     return
@@ -194,6 +239,7 @@ watch(() => project.value, (proj) => {
   if (!proj) {
     return
   }
+  transferTargetId.value = ""
   if (localProject.value) {
     localProject.value.name = proj.name
     localProject.value.slug = proj.slug

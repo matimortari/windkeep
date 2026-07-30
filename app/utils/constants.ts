@@ -43,7 +43,7 @@ export const FEATURES: { title: string, description: string, icon: string }[] = 
 export const FAQS: { question: string, answer: string }[] = [
   {
     question: "How does role-based access control work?",
-    answer: "The project and organization owner has full control, including managing settings, members, and (for projects) secrets. Admins can invite and manage members and, at the project level, manage secrets, but they can't change organization settings. Members can access data for the organization and its projects, but can't modify settings, secrets, or manage other users. This structure keeps sensitive operations secure while allowing teams to collaborate effectively.",
+    answer: "Organization and project roles are separate. The organization owner has full control of the org and implicit owner access to every project in it, even when someone else is the project owner. Project owners manage day-to-day project settings and membership. Admins can invite and manage members and, at the project level, manage secrets, but they can't change organization settings. Members can access data for the organization and its projects, but can't modify settings, secrets, or manage other users.",
   },
   {
     question: "What are service tokens and how do they work?",

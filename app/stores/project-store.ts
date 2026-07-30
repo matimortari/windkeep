@@ -1,5 +1,5 @@
-import type { AddProjectMemberInput, CreateProjectInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/schemas/project-schema"
-import type { CreateServiceTokenInput } from "#shared/schemas/service-token-schema" // Added for schema validation types
+import type { AddProjectMemberInput, CreateProjectInput, TransferProjectOwnershipInput, UpdateProjectInput, UpdateProjectMemberInput } from "#shared/schemas/project-schema"
+import type { CreateServiceTokenInput } from "#shared/schemas/service-token-schema"
 
 export const useProjectStore = defineStore("project", () => {
   const toast = useToast()
@@ -8,8 +8,14 @@ export const useProjectStore = defineStore("project", () => {
   const serviceTokens = ref<ServiceToken[]>([])
   const loading = ref(false)
 
-  const isOwner = computed(() => (projectId: string) => projects.value.find(p => p.id === projectId)?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "OWNER") ?? false)
-  const isAdmin = computed(() => (projectId: string) => projects.value.find(p => p.id === projectId)?.memberships?.some(m => m.userId === userStore.user?.id && m.role === "ADMIN") ?? false)
+  const isOrgOwner = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "OWNER")
+  const membershipRole = computed(() => (projectId: string) => projects.value.find(p => p.id === projectId)?.memberships?.find(m => m.userId === userStore.user?.id)?.role)
+  const isOwner = computed(() => (projectId: string) => isOrgOwner.value || membershipRole.value(projectId) === "OWNER")
+  const isAdmin = computed(() => (projectId: string) => membershipRole.value(projectId) === "ADMIN")
+  const canLeaveProject = computed(() => (projectId: string) => {
+    const role = membershipRole.value(projectId)
+    return !!role && role !== "OWNER"
+  })
 
   async function getProjects() {
     loading.value = true
@@ -85,6 +91,25 @@ export const useProjectStore = defineStore("project", () => {
       const message = getErrorMessage(err, "Failed to delete project")
       toast.error(message)
       console.error("deleteProject error:", err)
+      throw err
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
+  async function transferProjectOwnership(projectId: string, data: TransferProjectOwnershipInput) {
+    loading.value = true
+
+    try {
+      const res = await $fetch<{ success: boolean, message: string, newOwner: { id: string, name: string, email: string } }>(`/api/projects/${projectId}/transfer`, { method: "POST", body: data, credentials: "include" })
+      toast.success("Project ownership transferred successfully")
+      return res
+    }
+    catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to transfer project ownership")
+      toast.error(message)
+      console.error("transferProjectOwnership error:", err)
       throw err
     }
     finally {
@@ -212,10 +237,12 @@ export const useProjectStore = defineStore("project", () => {
     serviceTokens,
     isOwner,
     isAdmin,
+    canLeaveProject,
     getProjects,
     createProject,
     updateProject,
     deleteProject,
+    transferProjectOwnership,
     addProjectMember,
     updateProjectMember,
     removeProjectMember,

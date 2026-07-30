@@ -74,6 +74,7 @@ export async function generateSlug(base: string, orgId: string): Promise<string>
 
 /**
  * Ensures a user has the required role for an organization or project.
+ * Organization OWNERs have implicit OWNER access on every project in that org.
  * Throws 401 if not authenticated, 403 if insufficient permissions.
  */
 export async function requireRole(userId: string, scope: { type: "org", orgId: string } | { type: "project", projectId: string }, roles: Role[]) {
@@ -96,6 +97,12 @@ export async function requireRole(userId: string, scope: { type: "org", orgId: s
       throw createError({ statusCode: 403, statusMessage: "Forbidden: project is not in the active organization" })
     }
 
+    // Org owners have implicit OWNER permissions on all org projects
+    if (orgMembership.role === "OWNER") {
+      const projectMembership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })
+      return projectMembership ?? { userId, projectId: scope.projectId, role: "OWNER" as Role }
+    }
+
     membership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })
   }
   if (!membership || !roles.includes(membership.role)) {
@@ -103,6 +110,18 @@ export async function requireRole(userId: string, scope: { type: "org", orgId: s
   }
 
   return membership
+}
+
+/**
+ * Clears cached project lists for an organization owner and any extra users.
+ */
+export async function invalidateOrgProjectCaches(orgId: string, ...extraUserIds: string[]) {
+  const owners = await db.orgMembership.findMany({ where: { orgId, role: "OWNER" }, select: { userId: true } })
+  const userIds = new Set([...owners.map(o => o.userId), ...extraUserIds.filter(Boolean)])
+  if (userIds.size === 0) {
+    return
+  }
+  await deleteCached(...[...userIds].map(id => CacheKeys.userProjects(id, orgId)))
 }
 
 /**

@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   // Rate limit: 200 requests per hour per user
   await enforceRateLimit(event, `projects:list:${sessionUser.id}`, 200)
 
-  const activeMembership = await db.orgMembership.findFirst({ where: { userId: sessionUser.id, isActive: true }, select: { orgId: true } })
+  const activeMembership = await db.orgMembership.findFirst({ where: { userId: sessionUser.id, isActive: true }, select: { orgId: true, role: true } })
   if (!activeMembership) {
     return { projects: [] }
   }
@@ -16,10 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const projects = await db.project.findMany({
-    where: {
-      orgId: activeMembership.orgId,
-      memberships: { some: { userId: sessionUser.id } },
-    },
+    where: activeMembership.role === "OWNER" ? { orgId: activeMembership.orgId } : { orgId: activeMembership.orgId, memberships: { some: { userId: sessionUser.id } } },
     select: {
       id: true,
       name: true,
@@ -50,7 +47,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Get projects",
-    description: "Returns projects the user is a member of within their currently active organization.",
+    description: "Returns projects within the user's currently active organization.",
     tags: ["Projects"],
     responses: {
       200: { description: "List of projects with members and secret counts" },

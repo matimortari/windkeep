@@ -33,9 +33,11 @@ export const updateProjectSchema = z.object({
 export const addProjectMemberSchema = z.object({ userId: z.cuid2(), role: z.enum(["ADMIN", "MEMBER"]).optional().default("MEMBER") })
 export const updateProjectMemberSchema = z.object({ role: z.enum(["ADMIN", "MEMBER"]) })
 export const removeProjectMemberSchema = z.object({ projectId: z.cuid2(), userId: z.cuid2() })
+export const transferProjectOwnershipSchema = z.object({ newOwnerId: z.cuid2() })
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>
 export type AddProjectMemberInput = z.infer<typeof addProjectMemberSchema>
 export type UpdateProjectMemberInput = z.infer<typeof updateProjectMemberSchema>
 export type RemoveProjectMemberInput = z.infer<typeof removeProjectMemberSchema>
+export type TransferProjectOwnershipInput = z.infer<typeof transferProjectOwnershipSchema>

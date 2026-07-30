@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  await deleteCached(CacheKeys.userProjects(sessionUser.id, projectData.orgId))
+  await invalidateOrgProjectCaches(projectData.orgId, sessionUser.id)
 
   return { success: true, message: "Project deleted successfully" }
 })
