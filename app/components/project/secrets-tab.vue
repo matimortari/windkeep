@@ -33,14 +33,13 @@
       />
     </div>
 
-    <div
-      v-if="hasPermission" :class="{ 'border-secondary bg-secondary/5 text-secondary': isDragOver }"
-      class="group flex cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center text-muted-foreground transition-all hover:border-secondary hover:bg-primary/10 hover:text-secondary"
-      aria-label="Drop a .env file to open the raw editor" role="button"
-      tabindex="0" @dragenter.prevent="onDragEnter"
+    <button
+      v-if="hasPermission" type="button"
+      :class="{ 'border-secondary bg-secondary/5 text-secondary': isDragOver }"
+      class="group flex w-full flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center text-muted-foreground transition-all hover:border-secondary hover:bg-primary/10 hover:text-secondary"
+      aria-label="Drop a .env file to open the raw editor" @dragenter.prevent="onDragEnter"
       @dragover.prevent @dragleave.prevent="onDragLeave"
-      @drop.prevent="onDrop" @keydown.enter.prevent="envFileInput?.click()"
-      @click="envFileInput?.click()"
+      @drop.prevent="onDrop" @click="envFileInput?.click()"
     >
       <icon :name="isDragOver ? 'ph:file-arrow-down-bold' : 'ph:upload-simple-bold'" size="50" class="transition-transform group-hover:scale-105" />
       <p class="text-caption">
@@ -49,12 +48,13 @@
       <p class="text-xs">
         Drag and drop a .env file here or click to upload manually.
       </p>
-      <input
-        ref="envFileInput" type="file"
-        accept=".env,.env.*,text/plain" class="hidden"
-        aria-hidden="true" @change="onFileInputChange"
-      >
-    </div>
+    </button>
+    <input
+      v-if="hasPermission" ref="envFileInput"
+      type="file" accept=".env,.env.*,text/plain"
+      class="hidden" aria-hidden="true"
+      @change="onFileInputChange"
+    >
 
     <SecretsCreateDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="closeDialog('secrets')" @save="handleSecretChange" />
     <SecretsEditorDialog

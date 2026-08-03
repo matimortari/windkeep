@@ -204,6 +204,36 @@ interface EnvironmentHistory {
   history: HistoryItem[]
 }
 
+interface IntegrationSecretVar {
+  name: string
+  description: string
+  source?: "baseURL" | "projectId" | "serviceToken"
+  placeholder?: string
+}
+
+interface IntegrationDefinition {
+  id: string
+  name: string
+  summary: string
+  description: string
+  icon: string
+  docsUrl?: string
+  docsLabel?: string
+  steps?: { title: string, body: string }[]
+  secrets?: IntegrationSecretVar[]
+  secretsHeading?: string
+  secretsHint?: string
+  snippetHeading?: string
+  defaultEnvironments?: Environment[]
+  defaultTokenName?: string
+  tokenHint?: string
+  buildSnippet?: (ctx: { baseURL: string, projectId: string, projectSlug: string }) => {
+    filename: string
+    language: "yml" | "bash" | "json"
+    code: string
+  }
+}
+
 interface CalendarDay {
   date: Date
   day: number
