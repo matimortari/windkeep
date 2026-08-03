@@ -33,17 +33,23 @@
           </td>
           <td :class="columns[2]?.class">
             <div class="navigation-group">
-              <icon name="ph:key-bold" size="20" />
-              <span>{{ (project as any)._count?.secrets ?? 0 }}</span>
+              <icon name="ph:users-bold" size="20" />
+              <span>{{ project._count?.memberships ?? project.memberships?.length ?? 0 }}</span>
             </div>
           </td>
           <td :class="columns[3]?.class">
             <div class="navigation-group">
-              <icon name="ph:users-bold" size="20" />
-              <span>{{ project.memberships?.length }}</span>
+              <icon name="ph:keyhole-bold" size="20" />
+              <span>{{ project._count?.serviceTokens ?? 0 }}</span>
             </div>
           </td>
           <td :class="columns[4]?.class">
+            <div class="navigation-group">
+              <icon name="ph:key-bold" size="20" />
+              <span>{{ project._count?.secrets ?? 0 }}</span>
+            </div>
+          </td>
+          <td :class="columns[5]?.class">
             <div class="navigation-group">
               <button type="button" aria-label="Project Settings" @click.stop="openProjectSettings(project)">
                 <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
@@ -76,8 +82,9 @@ function openProjectSettings(project: Project) {
 const columns = [
   { key: "name", label: "Name", class: "w-40", sortable: true },
   { key: "description", label: "Description", class: "", sortable: false },
-  { key: "secrets", label: "Secrets", class: "w-24", sortable: true },
-  { key: "members", label: "Members", class: "w-24", sortable: true },
+  { key: "_count.memberships", label: "Members", class: "w-24", sortable: true },
+  { key: "_count.serviceTokens", label: "Access Tokens", class: "w-32", sortable: true },
+  { key: "_count.secrets", label: "Secrets", class: "w-24", sortable: true },
   { key: "actions", label: "Actions", class: "w-24", sortable: false },
 ]
 </script>

@@ -57,6 +57,11 @@ interface Project {
   memberships?: ProjectMembership[]
   serviceTokens?: ServiceToken[]
   auditLogs?: AuditLog[]
+  _count?: {
+    secrets: number
+    serviceTokens: number
+    memberships: number
+  }
   createdAt?: Date | string
   updatedAt?: Date | string
 }
