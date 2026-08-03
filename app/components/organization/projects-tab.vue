@@ -39,9 +39,9 @@
         :initial="{ opacity: 0, x: -10 }" :enter="{ opacity: 1, x: 0 }"
         :duration="500" :delay="Math.min(filteredProjects.length * 50, 300) + 50"
       >
-        <button type="button" class="card group flex h-50 w-full flex-col items-center justify-center gap-4 border-2! border-dashed! bg-transparent! text-muted-foreground" @click="openDialog('projects')">
-          <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105 group-hover:text-secondary" />
-          <span class="font-semibold transition-transform group-hover:scale-105">New Project</span>
+        <button type="button" class="group flex h-50 w-full flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed text-muted-foreground transition-all hover:border-secondary hover:bg-primary/10 hover:text-secondary" @click="openDialog('projects')">
+          <icon name="ph:plus-bold" size="50" class="transition-transform group-hover:scale-105" />
+          <span class="text-caption transition-transform group-hover:scale-105">New Project</span>
         </button>
       </li>
     </ul>

@@ -33,8 +33,35 @@
       />
     </div>
 
+    <div
+      v-if="hasPermission" :class="{ 'border-secondary bg-secondary/5 text-secondary': isDragOver }"
+      class="group flex cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center text-muted-foreground transition-all hover:border-secondary hover:bg-primary/10 hover:text-secondary"
+      aria-label="Drop a .env file to open the raw editor" role="button"
+      tabindex="0" @dragenter.prevent="onDragEnter"
+      @dragover.prevent @dragleave.prevent="onDragLeave"
+      @drop.prevent="onDrop" @keydown.enter.prevent="envFileInput?.click()"
+      @click="envFileInput?.click()"
+    >
+      <icon :name="isDragOver ? 'ph:file-arrow-down-bold' : 'ph:upload-simple-bold'" size="50" class="transition-transform group-hover:scale-105" />
+      <p class="text-caption">
+        {{ isDragOver ? 'Drop to open in editor' : 'Drop a .env file here' }}
+      </p>
+      <p class="text-xs">
+        Drag and drop a .env file here or click to upload manually.
+      </p>
+      <input
+        ref="envFileInput" type="file"
+        accept=".env,.env.*,text/plain" class="hidden"
+        aria-hidden="true" @change="onFileInputChange"
+      >
+    </div>
+
     <SecretsCreateDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="closeDialog('secrets')" @save="handleSecretChange" />
-    <SecretsEditorDialog :project-id="project?.id ?? ''" :secrets="displayedSecrets" @close="closeDialog('raw')" @save="handleImportSecrets" />
+    <SecretsEditorDialog
+      v-model:initial-content="importedEnvContent" :project-id="project?.id ?? ''"
+      :secrets="displayedSecrets" @close="closeDialog('raw')"
+      @save="handleImportSecrets"
+    />
     <SecretsHistoryDialog :secret-id="historySecretId" :secret-key="historySecretKey" :project-id="project?.id ?? ''" @close="() => { closeDialog('history'); historySecretId = ''; historySecretKey = '' }" />
   </TabSection>
 </template>
@@ -55,6 +82,55 @@ const searchQuery = ref("")
 const allVisible = ref(false)
 const pendingChanges = reactive<Map<string, PendingChange>>(new Map())
 const hasPendingChanges = computed(() => pendingChanges.size > 0)
+const importedEnvContent = ref<string | null>(null)
+const isDragOver = ref(false)
+const dragDepth = ref(0)
+const envFileInput = ref<HTMLInputElement | null>(null)
+
+function onDragEnter() {
+  dragDepth.value += 1
+  isDragOver.value = true
+}
+
+function onDragLeave() {
+  dragDepth.value = Math.max(0, dragDepth.value - 1)
+  if (dragDepth.value === 0) {
+    isDragOver.value = false
+  }
+}
+
+async function openEditorWithEnvText(text: string) {
+  importedEnvContent.value = text
+  openDialog("raw")
+}
+
+async function readEnvFile(file: File) {
+  const text = await file.text()
+  if (!text.trim()) {
+    return
+  }
+  await openEditorWithEnvText(text)
+}
+
+async function onDrop(event: DragEvent) {
+  dragDepth.value = 0
+  isDragOver.value = false
+  const file = event.dataTransfer?.files?.[0]
+  if (!file) {
+    return
+  }
+  await readEnvFile(file)
+}
+
+async function onFileInputChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ""
+  if (!file) {
+    return
+  }
+  await readEnvFile(file)
+}
 
 const displayedSecrets = computed(() => {
   const secretsMap = new Map<string, Secret>()
@@ -157,20 +233,6 @@ function handleSecretChange(secret: Secret) {
   }
 
   closeDialog("secrets")
-}
-
-function mergeSecretValues(baseValues: SecretValue[] | undefined, newValues: SecretValue[] | undefined): SecretValue[] {
-  const mergedValues = [...(baseValues || [])]
-  for (const newValue of newValues || []) {
-    const idx = mergedValues.findIndex(v => v.environment === newValue.environment)
-    if (idx >= 0) {
-      mergedValues[idx] = newValue as SecretValue
-    }
-    else {
-      mergedValues.push(newValue as SecretValue)
-    }
-  }
-  return mergedValues
 }
 
 function applyImportedSecret(importedSecret: Secret) {

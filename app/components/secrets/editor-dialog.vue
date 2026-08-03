@@ -5,8 +5,7 @@
         <button
           v-for="env in ENVIRONMENTS" :key="env.value"
           type="button" class="flex-1 rounded-md px-2 py-1 text-sm font-medium transition-colors"
-          :class="selectedEnv === env.value ? 'text-primary-foreground bg-primary' : 'text-muted-foreground hover:text-foreground'"
-          @click=" selectedEnv = env.value; editorContent = buildEnvText(env.value) "
+          :class="selectedEnv === env.value ? 'bg-primary' : 'text-muted-foreground hover:text-foreground'" @click="selectEnvironment(env.value)"
         >
           {{ env.label }}
         </button>
@@ -15,7 +14,7 @@
       <div class="flex min-w-0 flex-col gap-1">
         <div class="flex items-center justify-between">
           <label for="env-content" class="text-sm font-semibold">.env content</label>
-          <span class="text-xs text-muted-foreground">{{ environments.find(env => env.value === selectedEnv)?.label }} environment</span>
+          <span class="text-xs text-muted-foreground">{{ ENVIRONMENTS.find(env => env.value === selectedEnv)?.label }} environment</span>
         </div>
         <textarea
           id="env-content" v-model="editorContent"
@@ -24,11 +23,11 @@
         />
       </div>
 
-      <div v-if="hasDiff" class="flex min-w-0 flex-col gap-1 overflow-hidden rounded-lg border p-2">
+      <div v-if="hasPreview" class="flex min-w-0 flex-col gap-1 overflow-hidden rounded-lg border p-2">
         <span class="text-xs font-semibold text-muted-foreground">Preview</span>
         <ul class="scroll-area flex max-h-40 min-w-0 flex-col gap-0.5 overflow-x-hidden overflow-y-auto">
           <li
-            v-for="item in diffItems" :key="item.key"
+            v-for="item in previewItems" :key="item.key"
             class="navigation-group min-w-0 items-start rounded-sm px-1.5 py-0.5 font-mono text-xs" :class="item.class"
           >
             <icon :name="item.icon" size="15" class="mt-0.5 shrink-0" />
@@ -39,7 +38,7 @@
         </ul>
       </div>
 
-      <p v-else-if="editorContent.trim() && !hasDiff" class="text-xs text-muted-foreground">
+      <p v-else-if="editorContent.trim() && !hasPreview" class="text-xs text-muted-foreground">
         No changes detected from current state.
       </p>
 
@@ -48,7 +47,7 @@
           <button type="button" class="btn-ghost" @click="emit('close')">
             Cancel
           </button>
-          <button type="button" class="btn-success" :disabled="!hasDiff" @click="handleSubmit">
+          <button type="button" class="btn-success" :disabled="!hasPreview" @click="handleSubmit">
             Apply Changes
           </button>
         </div>
@@ -61,117 +60,32 @@
 const props = defineProps<{
   projectId: string
   secrets: Secret[]
+  initialContent?: string | null
 }>()
 
 const emit = defineEmits<{
-  close: []
-  save: [secrets: Secret[], removedKeys: { key: string, environment: Environment }[]]
+  "close": []
+  "save": [secrets: Secret[], removedKeys: { key: string, environment: Environment }[]]
+  "update:initialContent": [value: string | null]
 }>()
 
 const { isRawEditorOpen, closeDialog } = useUIState()
-const editorContent = ref("")
-const environments: { value: Environment, label: string }[] = ENVIRONMENTS
-const selectedEnv = ref<Environment>("DEVELOPMENT")
-const parsedEditorValues = computed(() => parseEnv(editorContent.value))
-
-// Build .env text from existing secrets for the selected environment
-function buildEnvText(env: Environment): string {
-  return props.secrets.filter(s => s.values?.some(v => v.environment === env)).map(s => `${s.key}=${s.values?.find(v => v.environment === env)?.value ?? ""}`).join("\n")
-}
-
-function parseEnv(text: string): Record<string, string> {
-  const result: Record<string, string> = {}
-  for (const line of text.split("\n")) {
-    const trimmedKey = line.trim()
-    if (!trimmedKey || trimmedKey.startsWith("#")) {
-      continue
-    }
-
-    const match = trimmedKey.match(/^([^=]+)=(.*)$/)
-    if (!match) {
-      continue
-    }
-
-    const key = match[1]?.trim() ?? ""
-    let value = match[2]?.trim() ?? ""
-    if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1)
-    }
-
-    const normalizedKey = normalizeKey(key)
-    if (normalizedKey) {
-      result[normalizedKey] = value
-    }
-  }
-
-  return result
-}
-
-// Current env values from existing secrets
-const currentEnvValues = computed<Record<string, string>>(() => {
-  const result: Record<string, string> = {}
-  for (const s of props.secrets) {
-    const val = s.values?.find(v => v.environment === selectedEnv.value)?.value
-    if (val !== undefined) {
-      result[s.key] = val
-    }
-  }
-
-  return result
+const { selectedEnv, editorContent, previewItems, hasPreview, selectEnvironment, resetEditor, getChanges } = useEnvEditor({
+  secrets: () => props.secrets,
+  projectId: () => props.projectId,
 })
-
-const diffItems = computed<DiffItem[]>(() => {
-  const items: DiffItem[] = []
-
-  for (const [key, value] of Object.entries(parsedEditorValues.value)) {
-    if (!value) {
-      continue
-    }
-
-    if (!(key in currentEnvValues.value)) {
-      items.push({ key, value, type: "added", icon: "ph:plus-bold", class: "bg-success/10 text-success" })
-    }
-    else if (currentEnvValues.value[key] !== value) {
-      items.push({ key, value, type: "updated", icon: "ph:pencil-bold", class: "bg-warning/10 text-warning" })
-    }
-  }
-  for (const key of Object.keys(currentEnvValues.value)) {
-    if (!(key in parsedEditorValues.value)) {
-      items.push({ key, type: "removed", icon: "ph:minus-bold", class: "bg-danger/10 text-danger" })
-    }
-  }
-
-  return items
-})
-
-const hasDiff = computed(() => diffItems.value.length > 0)
 
 function handleSubmit() {
-  const upserted = Object.entries(parsedEditorValues.value).filter(([key, value]) => {
-    if (!value) {
-      return false
-    }
-
-    const current = currentEnvValues.value[key]
-    return current === undefined || current !== value
-  }).map(([key, value]) => {
-    const existingSecret = props.secrets.find(s => s.key === key)
-    const existingValues = existingSecret?.values ?? []
-    const mergedValues = [...existingValues.filter(v => v.environment !== selectedEnv.value).map(v => ({ environment: v.environment, value: v.value })), { environment: selectedEnv.value, value }]
-
-    return { key, description: existingSecret?.description ?? "", projectId: props.projectId, values: mergedValues }
-  })
-
-  const removed = Object.keys(currentEnvValues.value).filter(key => !(key in parsedEditorValues.value)).map(key => ({ key, environment: selectedEnv.value }))
-
-  emit("save", upserted as Secret[], removed)
+  const { upserted, removed } = getChanges()
+  emit("save", upserted, removed)
 }
 
-// Populate editor when dialog opens or env switches
 watch(isRawEditorOpen, (open) => {
   if (open) {
-    selectedEnv.value = "DEVELOPMENT"
-    editorContent.value = buildEnvText("DEVELOPMENT")
+    resetEditor(props.initialContent)
+    if (props.initialContent) {
+      emit("update:initialContent", null)
+    }
   }
 })
 </script>

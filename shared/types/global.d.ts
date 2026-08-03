@@ -167,7 +167,7 @@ interface AuditFilters {
   actions: string[]
 }
 
-interface DiffItem {
+interface EnvPreviewItem {
   key: string
   type: "added" | "updated" | "removed"
   value?: string
