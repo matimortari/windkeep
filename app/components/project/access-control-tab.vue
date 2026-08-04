@@ -10,15 +10,21 @@
     </template>
 
     <template #actions>
-      <nav v-if="canManage" class="navigation-group w-full justify-end md:w-auto">
-        <button type="button" class="btn-secondary" @click="isTokenDialogOpen = true">
-          <icon name="ph:key-bold" size="20" />
-          <span>Generate Token</span>
+      <nav class="navigation-group w-full justify-end md:w-auto">
+        <button type="button" class="btn-ghost" @click="isIntegrationsSheetOpen = true">
+          <icon name="ph:plugs-connected-bold" size="20" />
+          <span>Integrations</span>
         </button>
-        <button type="button" class="btn-primary" :disabled="!availableOrgMembers.length" @click="isAddDialogOpen = true">
-          <icon name="ph:plus-circle-bold" size="20" />
-          <span>Add Member</span>
-        </button>
+        <template v-if="canManage">
+          <button type="button" class="btn-secondary" @click="isTokenDialogOpen = true">
+            <icon name="ph:key-bold" size="20" />
+            <span>Generate Token</span>
+          </button>
+          <button type="button" class="btn-primary" :disabled="!availableOrgMembers.length" @click="isAddDialogOpen = true">
+            <icon name="ph:plus-circle-bold" size="20" />
+            <span>Add Member</span>
+          </button>
+        </template>
       </nav>
     </template>
 
@@ -164,6 +170,12 @@
     />
 
     <ProjectServiceTokenDialog v-model:is-open="isTokenDialogOpen" :project-id="project?.id ?? ''" @created="refreshTokens" />
+
+    <ProjectIntegrationsSheet
+      v-model:is-open="isIntegrationsSheetOpen" :project-id="project?.id ?? ''"
+      :project-slug="project?.slug ?? ''" :can-manage="canManage"
+      @token-created="refreshTokens"
+    />
   </TabSection>
 </template>
 
@@ -180,6 +192,7 @@ const canManage = computed(() => isOwner.value(project.value?.id ?? "") || isAdm
 const isAddDialogOpen = ref(false)
 const isMemberDialogOpen = ref(false)
 const isTokenDialogOpen = ref(false)
+const isIntegrationsSheetOpen = ref(false)
 const selectedMember = ref<ProjectMembership | null>(null)
 
 const memberColumns = [

@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       createdAt: true,
       updatedAt: true,
       org: { select: { id: true, name: true } },
-      _count: { select: { secrets: true } },
+      _count: { select: { secrets: true, serviceTokens: true, memberships: true } },
       memberships: {
         select: {
           userId: true,
@@ -50,7 +50,7 @@ defineRouteMeta({
     description: "Returns projects within the user's currently active organization.",
     tags: ["Projects"],
     responses: {
-      200: { description: "List of projects with members and secret counts" },
+      200: { description: "List of projects with members, access token and secret counts" },
       401: { description: "Unauthenticated" },
       429: { description: "Rate limit exceeded" },
     },
