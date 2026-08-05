@@ -15,29 +15,51 @@
           </p>
         </header>
 
-        <div v-if="field.copyable" class="navigation-group justify-end">
-          <p v-if="field.label === 'CLI Token'">
-            <span v-if="!field.hasToken?.value" class="text-caption px-4">No Active Token</span>
-            <span v-else-if="isTokenExpired(field.expiresAt?.value)" class="text-caption-danger px-4">Expired</span>
-            <span v-else class="text-caption px-4">Expires {{ formatDate(field.expiresAt?.value) }}</span>
+        <div v-if="field.label === 'CLI Token'" class="flex max-w-md min-w-0 flex-col items-stretch gap-2 md:items-end">
+          <p class="text-caption">
+            <span v-if="!field.hasToken?.value && !generatedToken">No active token</span>
+            <span v-else-if="isTokenExpired(field.expiresAt?.value)" class="text-caption-danger">Expired</span>
+            <span v-else-if="field.expiresAt?.value">Expires {{ formatDate(field.expiresAt.value) }}</span>
+            <span v-else>No expiration</span>
           </p>
 
-          <span :class="{ 'text-caption-success font-mono!': field.label === 'CLI Token' && generatedToken }">{{ field.value?.value }}</span>
+          <template v-if="generatedToken">
+            <p class="text-caption">
+              Copy this token now — it won't be shown again.
+            </p>
+            <div class="navigation-group w-full rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
+              <span class="min-w-0 flex-1 truncate select-all" :title="isTokenVisible ? generatedToken : undefined">
+                {{ isTokenVisible ? generatedToken : "••••••••••••••••••••••••••••••••" }}
+              </span>
+              <button type="button" class="btn-ghost shrink-0 p-1!" :aria-label="isTokenVisible ? 'Hide token' : 'Show token'" @click="isTokenVisible = !isTokenVisible">
+                <icon :name="isTokenVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
+              </button>
+              <button type="button" class="btn shrink-0 p-1!" aria-label="Copy token" @click="copyIcon[index]?.triggerCopy(generatedToken)">
+                <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
+              </button>
+              <button type="button" class="btn-ghost shrink-0 p-1!" aria-label="Dismiss token" @click="dismissGeneratedToken">
+                <icon name="ph:x-bold" size="20" />
+              </button>
+            </div>
+          </template>
 
+          <div v-else class="navigation-group">
+            <span class="text-caption font-mono!">
+              {{ field.hasToken?.value ? "••••••••••••••••••••••••••••••••" : "No active token generated" }}
+            </span>
+            <button type="button" class="btn" aria-label="Regenerate CLI Token" @click="field.onRegenerate?.()">
+              <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
+            </button>
+          </div>
+        </div>
+
+        <div v-else-if="field.copyable" class="navigation-group justify-end">
+          <span>{{ field.value?.value }}</span>
           <button
-            v-if="field.label !== 'CLI Token' || generatedToken" type="button"
-            class="btn"
+            type="button" class="btn"
             :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')"
           >
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
-          </button>
-
-          <button
-            v-if="field.onRegenerate" type="button"
-            class="btn" aria-label="Regenerate API Token"
-            @click="field.onRegenerate()"
-          >
-            <icon :name="regenerateIcon[index]?.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
           </button>
         </div>
 
@@ -91,6 +113,7 @@ const userStore = useUserStore()
 const { user, tokenMetadata } = storeToRefs(userStore)
 const { activeOrg } = storeToRefs(useOrgStore())
 const generatedToken = ref("")
+const isTokenVisible = ref(true)
 
 const userFields = [
   {
@@ -130,16 +153,9 @@ const userFields = [
   {
     label: "CLI Token",
     description: "Use this token to login to the WindKeep CLI. Keep it secure and do not share it.",
-    value: computed(() => {
-      if (generatedToken.value) {
-        return generatedToken.value
-      }
-      return tokenMetadata.value?.hasToken ? "••••••••••••••••••••••••••••••••" : "No active token generated"
-    }),
     expiresAt: computed(() => tokenMetadata.value?.expiresAt),
     hasToken: computed(() => tokenMetadata.value?.hasToken),
     onRegenerate: handleRegenerateToken,
-    copyable: true,
   },
   {
     label: "Profile Image",
@@ -185,11 +201,17 @@ async function handleRegenerateToken() {
   const res = await userStore.generateApiToken()
   if (res?.rawToken) {
     generatedToken.value = res.rawToken
+    isTokenVisible.value = true
     const cliTokenIndex = userFields.findIndex(f => f.label === "CLI Token")
     if (cliTokenIndex !== -1) {
       regenerateIcon[cliTokenIndex]?.triggerSuccess()
     }
   }
+}
+
+function dismissGeneratedToken() {
+  generatedToken.value = ""
+  isTokenVisible.value = true
 }
 
 async function handleSubmit(index: number) {

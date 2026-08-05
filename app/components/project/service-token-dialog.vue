@@ -1,26 +1,29 @@
 <template>
   <Dialog :is-open="isOpen" title="Generate Service Token" @update:is-open="emit('update:isOpen', $event)">
     <template v-if="generatedRawToken">
-      <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-1">
-          <p class="text-sm font-semibold text-success">
-            Token generated successfully
-          </p>
-          <p class="text-xs text-muted-foreground">
-            Copy this token now. <strong>You will not be able to see it again.</strong>
-          </p>
-        </div>
+      <div class="flex flex-col gap-3">
+        <p class="text-caption">
+          Copy this token now — it won't be shown again.
+        </p>
 
-        <div class="navigation-group rounded-sm border bg-muted p-4 font-mono text-xs break-all">
-          <span class="flex-1">{{ generatedRawToken }}</span>
-          <button type="button" class="btn shrink-0" aria-label="Copy token" @click="copyToken">
+        <div class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
+          <span class="min-w-0 flex-1 truncate select-all" :title="isTokenVisible ? generatedRawToken : undefined">
+            {{ isTokenVisible ? generatedRawToken : "••••••••••••••••••••••••••••••••" }}
+          </span>
+          <button type="button" class="btn-ghost shrink-0 p-1!" :aria-label="isTokenVisible ? 'Hide token' : 'Show token'" @click="isTokenVisible = !isTokenVisible">
+            <icon :name="isTokenVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
+          </button>
+          <button type="button" class="btn shrink-0 p-1!" aria-label="Copy token" @click="copyToken">
             <icon :name="tokenCopyIcon.icon.value" size="20" />
+          </button>
+          <button type="button" class="btn-ghost shrink-0 p-1!" aria-label="Dismiss token" @click="handleDismiss">
+            <icon name="ph:x-bold" size="20" />
           </button>
         </div>
 
         <footer class="flex justify-end">
           <button type="button" class="btn-success" @click="handleDismiss">
-            I've saved this token securely
+            Done
           </button>
         </footer>
       </div>
@@ -87,6 +90,7 @@ const emit = defineEmits<{
 const projectStore = useProjectStore()
 const tokenCopyIcon = useActionIcon("ph:copy-bold")
 const generatedRawToken = ref("")
+const isTokenVisible = ref(true)
 const form = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({
   name: "",
   environments: [],
@@ -108,6 +112,7 @@ function toggleEnvironment(env: Environment) {
 function resetForm() {
   form.value = { name: "", environments: [], expiresInDays: null }
   generatedRawToken.value = ""
+  isTokenVisible.value = true
 }
 
 async function copyToken() {
@@ -134,6 +139,7 @@ async function handleSubmit() {
 
   if (res?.rawToken) {
     generatedRawToken.value = res.rawToken
+    isTokenVisible.value = true
   }
 }
 

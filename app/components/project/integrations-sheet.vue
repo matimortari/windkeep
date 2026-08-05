@@ -8,21 +8,25 @@
         <div
           class="overlay space-y-4" role="dialog"
           aria-modal="true" aria-labelledby="integrations-sheet-title"
-          :class="isMobile ? 'flex size-full max-h-[92dvh] flex-col rounded-t-lg' : 'flex size-full max-h-none max-w-xl flex-col rounded-none border-y-0 border-r-0'"
+          :class="isMobile ? 'flex size-full max-h-[92dvh] flex-col rounded-t-lg' : 'flex size-full max-h-none! max-w-xl flex-col rounded-none! border-0! shadow-none!'"
         >
           <div v-if="isMobile" class="h-1 w-20 self-center rounded-full bg-current opacity-20" />
 
           <header class="flex flex-row items-start justify-between gap-4 border-b pb-2">
-            <div class="flex min-w-0 flex-1 flex-col gap-1">
-              <div v-if="selected" class="navigation-group">
-                <button type="button" class="btn-ghost p-0!" aria-label="Back" @click="selectedId = null">
+            <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <div class="navigation-group">
+                <button
+                  v-if="selected" type="button"
+                  class="btn-ghost p-0!" aria-label="Back"
+                  @click="selectedId = null"
+                >
                   <icon name="ph:arrow-left-bold" size="20" />
                 </button>
                 <h4 id="integrations-sheet-title" class="truncate">
                   {{ sheetTitle }}
                 </h4>
               </div>
-              <p class="text-caption">
+              <p v-if="!selected" class="text-caption">
                 {{ sheetDescription }}
               </p>
             </div>
@@ -34,126 +38,125 @@
 
           <section class="scroll-area min-h-0 flex-1 overflow-y-auto">
             <!-- Catalog -->
-            <div v-if="!selected" class="flex flex-col gap-2">
-              <p class="text-caption px-1">
-                Connect WindKeep to your deploy and CI tools. Start with a recipe, generate a service token, and copy the workflow.
-              </p>
-
+            <div v-if="!selected" class="flex flex-col gap-1">
               <button
                 v-for="item in INTEGRATIONS" :key="item.id"
-                type="button" class="flex w-full items-start gap-2 rounded-md border p-2 text-left transition-colors"
+                type="button" class="flex w-full items-center gap-2 rounded-md px-1 py-2 text-left transition-colors hover:bg-muted/40"
                 @click="selectedId = item.id"
               >
-                <div class="flex size-10 shrink-0 items-center justify-center rounded-md border bg-muted/30">
+                <div class="flex size-8 shrink-0 items-center justify-center rounded-md border bg-muted/30">
                   <icon :name="item.icon" size="20" />
                 </div>
                 <div class="flex min-w-0 flex-1 flex-col">
-                  <span class="font-semibold">{{ item.name }}</span>
-                  <span class="text-caption">{{ item.summary }}</span>
+                  <span class="text-sm">{{ item.name }}</span>
+                  <span class="text-caption text-xs!">{{ item.summary }}</span>
                 </div>
-                <icon name="ph:caret-right-bold" size="15" class="mt-1 shrink-0 text-muted-foreground" />
+                <icon name="ph:caret-right-bold" size="15" class="shrink-0 text-muted-foreground" />
               </button>
             </div>
 
             <!-- Detail -->
-            <div v-else class="flex flex-col gap-4">
-              <header class="flex items-start gap-2">
-                <div class="flex size-12 shrink-0 items-center justify-center rounded-md border bg-muted/30">
-                  <icon :name="selected.icon" size="30" />
-                </div>
-                <div class="flex flex-col gap-1">
-                  <p class="text-sm text-muted-foreground">
-                    {{ selected.description }}
-                  </p>
-                  <nuxt-link v-if="selected.docsUrl" :to="selected.docsUrl" target="_blank" class="navigation-group text-xs text-secondary hover:underline">
-                    <span>{{ selected.docsLabel || "Documentation" }}</span>
-                    <icon name="ph:arrow-up-right-bold" size="15" />
-                  </nuxt-link>
-                </div>
+            <div v-else class="flex flex-col gap-5">
+              <header class="flex flex-col gap-1">
+                <p class="text-caption">
+                  {{ selected.description }}
+                </p>
+                <nuxt-link v-if="selected.docsUrl" :to="selected.docsUrl" target="_blank" class="navigation-group w-fit text-xs text-secondary hover:underline">
+                  <span>{{ selected.docsLabel || "Documentation" }}</span>
+                  <icon name="ph:arrow-up-right-bold" size="15" />
+                </nuxt-link>
               </header>
 
               <section v-if="selected.steps?.length" class="flex flex-col gap-2">
-                <h6>
-                  Setup steps
-                </h6>
+                <p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  Setup
+                </p>
                 <ol class="flex flex-col gap-2">
                   <li v-for="(step, index) in selected.steps" :key="step.title" class="flex gap-2">
-                    <span class="flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold">
-                      {{ index + 1 }}
+                    <span class="mt-0.5 w-4 shrink-0 text-xs text-muted-foreground tabular-nums">
+                      {{ index + 1 }}.
                     </span>
-                    <div class="flex flex-col gap-0.5">
-                      <span class="text-sm font-semibold">{{ step.title }}</span>
-                      <span class="text-caption">{{ step.body }}</span>
+                    <div class="flex min-w-0 flex-col gap-0.5">
+                      <span class="text-sm">{{ step.title }}</span>
+                      <span class="text-caption text-xs!">{{ step.body }}</span>
                     </div>
                   </li>
                 </ol>
               </section>
 
               <section v-if="selected.secrets?.length" class="flex flex-col gap-2">
-                <header class="flex flex-col gap-1">
-                  <h6>
-                    {{ selected.secretsHeading || "Required secrets" }}
-                  </h6>
-                  <p v-if="selected.secretsHint" class="text-caption">
+                <div class="flex flex-col gap-0.5">
+                  <p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {{ selected.secretsHeading || "Secrets" }}
+                  </p>
+                  <p v-if="selected.secretsHint" class="text-caption text-xs!">
                     {{ selected.secretsHint }}
                   </p>
-                </header>
+                </div>
 
                 <div class="flex flex-col gap-2">
-                  <div v-for="secret in selected.secrets" :key="secret.name" class="flex flex-col gap-2 rounded-md border p-3">
-                    <div class="navigation-group justify-between">
-                      <code class="text-xs font-semibold">{{ secret.name }}</code>
+                  <div v-for="secret in selected.secrets" :key="secret.name" class="flex flex-col gap-0.5">
+                    <code class="text-xs">{{ secret.name }}</code>
+                    <p class="text-caption text-xs!">
+                      {{ secret.description }}
+                    </p>
+                    <div
+                      v-if="resolveSecretValue(secret) || secret.placeholder"
+                      class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs"
+                    >
+                      <span class="min-w-0 flex-1 truncate" :title="resolveSecretValue(secret) || secret.placeholder">
+                        {{ resolveSecretValue(secret) || secret.placeholder }}
+                      </span>
                       <button
                         v-if="resolveSecretValue(secret)" type="button"
-                        class="btn-ghost p-0!" :aria-label="`Copy ${secret.name}`"
+                        class="btn-ghost shrink-0 p-0!" :aria-label="`Copy ${secret.name}`"
                         @click="copyValue(secret.name, resolveSecretValue(secret)!)"
                       >
                         <icon :name="copyIcons[secret.name]?.icon.value || 'ph:copy-bold'" size="15" />
                       </button>
-                    </div>
-                    <p class="text-caption">
-                      {{ secret.description }}
-                    </p>
-                    <div v-if="resolveSecretValue(secret) || secret.placeholder" class="rounded-sm border bg-muted/40 px-2 py-1.5 font-mono text-xs break-all text-muted-foreground">
-                      {{ resolveSecretValue(secret) || secret.placeholder }}
                     </div>
                   </div>
                 </div>
               </section>
 
               <section class="flex flex-col gap-2">
-                <header class="flex flex-col gap-1">
-                  <h6>
+                <div class="flex flex-col gap-0.5">
+                  <p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     Service token
-                  </h6>
-                  <p class="text-caption">
+                  </p>
+                  <p class="text-caption text-xs!">
                     {{ selected.tokenHint || "Generate a token scoped for this integration. Copy it into WINDKEEP_TOKEN." }}
                   </p>
-                </header>
+                </div>
 
                 <template v-if="generatedRawToken">
-                  <div class="flex flex-col gap-2 rounded-md border border-success/40 bg-success/5 p-3">
-                    <p class="text-sm font-semibold text-success">
-                      Token generated — copy it now. It will not be shown again.
-                    </p>
-                    <div class="navigation-group rounded-sm border bg-muted p-3 font-mono text-xs break-all">
-                      <span class="flex-1">{{ generatedRawToken }}</span>
-                      <button type="button" class="btn shrink-0" aria-label="Copy token" @click="copyValue('token', generatedRawToken)">
-                        <icon :name="copyIcons.token?.icon.value || 'ph:copy-bold'" size="20" />
-                      </button>
-                    </div>
+                  <div class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
+                    <span class="min-w-0 flex-1 truncate select-all" :title="isTokenVisible ? generatedRawToken : undefined">
+                      {{ isTokenVisible ? generatedRawToken : "••••••••••••••••••••••••••••••••" }}
+                    </span>
+                    <button
+                      type="button" class="btn-ghost shrink-0 p-1!"
+                      :aria-label="isTokenVisible ? 'Hide token' : 'Show token'" @click="isTokenVisible = !isTokenVisible"
+                    >
+                      <icon :name="isTokenVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
+                    </button>
+                    <button type="button" class="btn shrink-0 p-1!" aria-label="Copy token" @click="copyValue('token', generatedRawToken)">
+                      <icon :name="copyIcons.token?.icon.value || 'ph:copy-bold'" size="20" />
+                    </button>
+                    <button type="button" class="btn-ghost shrink-0 p-1!" aria-label="Dismiss token" @click="dismissGeneratedToken">
+                      <icon name="ph:x-bold" size="20" />
+                    </button>
                   </div>
                 </template>
 
-                <form v-else class="flex flex-col gap-2 rounded-md border p-3" @submit.prevent="handleGenerateToken">
+                <form v-else class="flex flex-col gap-2" @submit.prevent="handleGenerateToken">
                   <div class="flex flex-col gap-1">
-                    <label for="integration-token-name" class="text-sm font-semibold">Name</label>
+                    <label for="integration-token-name" class="text-caption text-xs!">Name</label>
                     <input id="integration-token-name" v-model="tokenForm.name" type="text" :placeholder="selected.defaultTokenName || 'Integration'">
                   </div>
 
                   <div class="flex flex-col gap-1">
-                    <span class="text-sm font-semibold">Environments</span>
-                    <span class="text-xs text-muted-foreground">Only values from selected environments are returned by this token.</span>
+                    <span class="text-caption text-xs!">Environments</span>
                     <div class="navigation-group flex-wrap">
                       <button
                         v-for="env in ENVIRONMENTS" :key="env.value"
@@ -166,40 +169,40 @@
                   </div>
 
                   <div class="flex flex-col gap-1">
-                    <label for="integration-token-expiry" class="text-sm font-semibold">Expires in (days)</label>
-                    <input
-                      id="integration-token-expiry" v-model.number="tokenForm.expiresInDays"
-                      type="number" min="1"
-                      max="365" placeholder="Leave empty for no expiration"
-                    >
+                    <label for="integration-token-expiry" class="text-caption text-xs!">Expires in (days)</label>
+                    <div class="navigation-group">
+                      <input
+                        id="integration-token-expiry" v-model.number="tokenForm.expiresInDays"
+                        type="number" min="1"
+                        max="365" placeholder="Leave empty for no expiration"
+                        class="min-w-0 flex-1"
+                      >
+                      <button type="submit" class="btn-success shrink-0" :disabled="!canGenerateToken || !canManage">
+                        <icon name="ph:key-bold" size="20" />
+                        <span>Generate</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <button type="submit" class="btn-success self-end" :disabled="!canGenerateToken || !canManage">
-                    <icon name="ph:key-bold" size="20" />
-                    <span>Generate token</span>
-                  </button>
-                  <p v-if="!canManage" class="text-caption text-warning">
+                  <p v-if="!canManage" class="text-caption text-xs! text-warning">
                     Only project owners and admins can create service tokens.
                   </p>
                 </form>
               </section>
 
               <section v-if="snippet" class="flex flex-col gap-2">
-                <header class="navigation-group justify-between">
-                  <div class="flex flex-col gap-1">
-                    <h6>
-                      {{ selected.snippetHeading || "Snippet" }}
-                    </h6>
-                    <p class="text-caption">
-                      <code>{{ snippet.filename }}</code>
-                    </p>
-                  </div>
-                  <button type="button" class="btn-secondary" aria-label="Copy snippet" @click="copyValue('workflow', snippet.code)">
-                    <icon :name="copyIcons.workflow?.icon.value || 'ph:copy-bold'" size="20" />
-                    <span>Copy</span>
+                <div class="flex min-w-0 flex-col gap-0.5">
+                  <p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {{ selected.snippetHeading || "Snippet" }}
+                  </p>
+                  <code class="text-caption text-xs!">{{ snippet.filename }}</code>
+                </div>
+                <div class="relative">
+                  <button type="button" class="btn absolute top-2 right-2 z-10" aria-label="Copy snippet" @click="copyValue('workflow', snippet.code)">
+                    <icon :name="copyIcons.workflow?.icon.value || 'ph:copy-bold'" size="15" />
                   </button>
-                </header>
-                <Shiki :lang="snippet.language" :code="snippet.code" class="code-block max-h-80 overflow-auto text-xs" />
+                  <Shiki :lang="snippet.language" :code="snippet.code" class="code-block max-h-80 overflow-auto text-xs" />
+                </div>
               </section>
             </div>
           </section>
@@ -224,7 +227,7 @@ const projectStore = useProjectStore()
 const selectedId = ref<string | null>(null)
 const selected = computed(() => selectedId.value ? INTEGRATIONS.find(item => item.id === selectedId.value) ?? null : null)
 const sheetTitle = computed(() => selected.value?.name ?? "Integrations")
-const sheetDescription = computed(() => selected.value ? selected.value.summary : "Recipes for CI/CD and hosting platforms")
+const sheetDescription = computed(() => "Recipes for CI/CD and hosting platforms")
 const isMobile = ref(false)
 const mediaQueryAbort = new AbortController()
 
@@ -240,6 +243,7 @@ const snippet = computed(() => {
 })
 
 const generatedRawToken = ref("")
+const isTokenVisible = ref(true)
 const tokenForm = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({
   name: "Railway Deploy",
   environments: ["PRODUCTION"],
@@ -248,14 +252,8 @@ const tokenForm = ref<{ name: string, environments: Environment[], expiresInDays
 
 const canGenerateToken = computed(() => tokenForm.value.name.trim().length >= 3 && tokenForm.value.environments.length > 0)
 
-const copyIconKeys = [
-  ...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))),
-  "token",
-  "workflow",
-]
-const copyIcons = Object.fromEntries(
-  copyIconKeys.map(key => [key, useActionIcon("ph:copy-bold")]),
-) as Record<string, ReturnType<typeof useActionIcon>>
+const copyIconKeys = [...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))), "token", "workflow"]
+const copyIcons = Object.fromEntries(copyIconKeys.map(key => [key, useActionIcon("ph:copy-bold")])) as Record<string, ReturnType<typeof useActionIcon>>
 
 function resolveSecretValue(secret: { source?: "baseURL" | "projectId" | "serviceToken", placeholder?: string }) {
   if (secret.source === "baseURL") {
@@ -286,11 +284,17 @@ function toggleEnvironment(env: Environment) {
 
 function resetTokenForm() {
   generatedRawToken.value = ""
+  isTokenVisible.value = true
   tokenForm.value = {
     name: selected.value?.defaultTokenName || "Integration",
     environments: [...(selected.value?.defaultEnvironments || ["PRODUCTION"])],
     expiresInDays: null,
   }
+}
+
+function dismissGeneratedToken() {
+  generatedRawToken.value = ""
+  isTokenVisible.value = true
 }
 
 async function handleGenerateToken() {
@@ -307,6 +311,7 @@ async function handleGenerateToken() {
 
   if (res?.rawToken) {
     generatedRawToken.value = res.rawToken
+    isTokenVisible.value = true
     emit("tokenCreated")
   }
 }

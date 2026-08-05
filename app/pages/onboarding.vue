@@ -27,8 +27,8 @@
                 <input v-model="localOrg.website" placeholder="Website (optional)" type="url" class="flex-1">
               </div>
 
-              <div class="card flex flex-col gap-2">
-                <label for="encryption-mode" class="text-caption">Organization secrets key setup</label>
+              <div class="flex flex-col gap-2">
+                <label for="encryption-mode" class="text-caption">Encryption key</label>
                 <select id="encryption-mode" v-model="localOrg.encryptionMode">
                   <option value="AUTO">
                     Auto-generate (recommended)
