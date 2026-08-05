@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <h5 class="mt-2 border-t py-2">
+      <h5 class="mt-2 border-t py-4">
         Environments
       </h5>
 

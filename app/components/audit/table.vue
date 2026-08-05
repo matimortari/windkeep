@@ -78,7 +78,7 @@
 
               <div v-if="(log.metadata || {})" class="relative">
                 <button type="button" class="btn absolute top-2 right-2 z-10" aria-label="Copy metadata" @click.stop="getCopyAction(log.id).triggerCopy(formatMetadata(log.metadata))">
-                  <icon :name="getCopyAction(log.id).icon.value" size="20" />
+                  <icon :name="getCopyAction(log.id).icon.value" size="15" />
                 </button>
                 <Shiki lang="json" :code="formatMetadata(log.metadata)" class="code-block" />
               </div>

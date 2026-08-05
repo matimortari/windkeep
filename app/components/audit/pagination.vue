@@ -32,6 +32,6 @@ const summary = computed(() => {
   const start = (page - 1) * limit + 1
   const end = Math.min(page * limit, totalItems)
   const label = totalItems === 1 ? "log" : "logs"
-  return `Showing ${start}–${end} of ${totalItems} ${label}`
+  return `Showing ${start}—${end} of ${totalItems} ${label}`
 })
 </script>

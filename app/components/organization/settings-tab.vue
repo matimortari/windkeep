@@ -20,23 +20,23 @@
           </p>
         </div>
 
-        <div v-if="field.copyable" class="navigation-group justify-end">
+        <div v-if="field.copyable" class="navigation-group flex-1 justify-end md:max-w-72">
           <span>{{ field.value }}</span>
           <button type="button" class="btn transition-transform" :aria-label="`Copy ${field.label} to Clipboard`" @click="copyIcon[index]?.triggerCopy(field.value?.value || '')">
             <icon :name="copyIcon[index]?.icon.value || 'ph:copy-bold'" size="20" />
           </button>
         </div>
 
-        <div v-else-if="field.type === 'input' && field.editable" class="navigation-group justify-end">
+        <div v-else-if="field.type === 'input' && field.editable" class="navigation-group flex-1 justify-end md:max-w-72">
           <input type="text" :value="field.model?.value" @input="field.update?.(($event.target as HTMLInputElement).value)">
           <button type="button" class="btn transition-transform" aria-label="Save Changes" @click="field.onSave(index)">
             <icon :name="saveIcon[index]?.icon.value || 'ph:floppy-disk-bold'" size="20" />
           </button>
         </div>
 
-        <span v-else-if="field.type === 'input'" class="navigation-group justify-end">{{ field.model?.value }}</span>
+        <span v-else-if="field.type === 'input'" class="navigation-group flex-1 justify-end md:max-w-72">{{ field.model?.value }}</span>
 
-        <span v-else class="navigation-group justify-end">{{ field.value }}</span>
+        <span v-else class="navigation-group flex-1 justify-end md:max-w-72">{{ field.value }}</span>
       </div>
     </div>
 
@@ -51,7 +51,7 @@
       </header>
 
       <div class="navigation-group justify-end" :class="encryptionMode === 'MANUAL' ? 'flex-wrap md:flex-nowrap' : ''">
-        <select v-model="encryptionMode" class="w-full md:max-w-52">
+        <select v-model="encryptionMode" class="w-full md:max-w-72">
           <option value="AUTO">
             Auto-generate (recommended)
           </option>

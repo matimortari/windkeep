@@ -18,7 +18,7 @@
       </nav>
     </template>
 
-    <div class="flex flex-col gap-2 py-2">
+    <div class="flex flex-col gap-2 py-4">
       <section class="flex flex-col gap-2">
         <header class="flex flex-col gap-1">
           <h6>
@@ -83,7 +83,7 @@
         </div>
       </section>
 
-      <section v-if="canManage" class="flex flex-col gap-2 border-t pt-4">
+      <section v-if="canManage" class="flex flex-col gap-2 border-t py-4">
         <header class="flex flex-col gap-1">
           <h6>
             Invitations
@@ -279,6 +279,7 @@ async function handleRevokeInvite(inviteId: string) {
   await orgStore.revokeInvite(activeOrg.value.id, inviteId)
 }
 
+// Refresh invitations when organization changes and user can manage
 watch(activeOrg, async (org) => {
   if (org?.id && canManage.value) {
     await refreshInvitations()

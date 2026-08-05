@@ -17,7 +17,7 @@
         <button
           type="button" class="rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-secondary"
           aria-label="Project menu" :aria-expanded="isMenuOpen"
-          @click="isMenuOpen = !isMenuOpen"
+          @click="toggleMenu"
         >
           <icon name="ph:dots-three-bold" size="25" />
         </button>
@@ -46,8 +46,8 @@
         </transition>
       </div>
 
-      <footer class="text-caption flex items-center justify-between gap-4">
-        <div class="navigation-group">
+      <footer class="flex min-w-0 items-center justify-between gap-2 text-xs font-medium text-muted-foreground">
+        <div class="navigation-group shrink-0">
           <div class="flex flex-row items-center gap-1" title="Members">
             <icon name="ph:users-bold" size="20" />
             <span>{{ project._count?.memberships ?? project.memberships?.length ?? 0 }}</span>
@@ -64,7 +64,9 @@
           </div>
         </div>
 
-        <span class="text-xs!">Updated {{ project.updatedAt ? formatDate(project.updatedAt) : 'never' }}</span>
+        <span class="min-w-0 truncate text-xs" :title="`Updated ${project.updatedAt ? formatDate(project.updatedAt) : 'never'}`">
+          Updated {{ project.updatedAt ? formatDate(project.updatedAt) : 'never' }}
+        </span>
       </footer>
     </div>
   </nuxt-link>
@@ -76,12 +78,22 @@ const props = defineProps<{
 }>()
 
 const { setTab, setActiveProject } = useUIState()
-const isMenuOpen = ref(false)
+const openMenuId = useState<string | null>("project-card-open-menu", () => null)
+const isMenuOpen = computed(() => openMenuId.value === props.project.id)
 const menuRef = ref<HTMLElement | null>(null)
-useClickOutside(menuRef, () => isMenuOpen.value = false, { escapeKey: true })
+
+useClickOutside(menuRef, () => {
+  if (openMenuId.value === props.project.id) {
+    openMenuId.value = null
+  }
+}, { escapeKey: true })
+
+function toggleMenu() {
+  openMenuId.value = isMenuOpen.value ? null : props.project.id
+}
 
 function navigate(tab: "secrets" | "access-control" | "settings") {
-  isMenuOpen.value = false
+  openMenuId.value = null
   setActiveProject(props.project.slug)
   setTab("project", tab)
   navigateTo({ path: `/admin/${props.project.slug}`, query: { t: tab } })

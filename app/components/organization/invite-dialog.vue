@@ -90,6 +90,7 @@ async function copyInviteLink() {
   await inviteLinkIcon.triggerCopy(generatedInviteUrl.value)
 }
 
+// Reset form when dialog is opened
 watch(() => props.isOpen, (open) => {
   if (open) {
     resetForm()

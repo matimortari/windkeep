@@ -84,6 +84,7 @@ async function handleRemove() {
   emit("update:isOpen", false)
 }
 
+// Sync selected role when the member changes
 watch(() => props.member, (member) => {
   if (member && member.role !== "OWNER") {
     selectedRole.value = member.role as "ADMIN" | "MEMBER"

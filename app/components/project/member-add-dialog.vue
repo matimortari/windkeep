@@ -101,6 +101,7 @@ async function handleSubmit() {
   emit("update:isOpen", false)
 }
 
+// Reset form when dialog is opened
 watch(() => props.isOpen, (open) => {
   if (open) {
     resetForm()

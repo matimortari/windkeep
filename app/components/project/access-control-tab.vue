@@ -18,7 +18,7 @@
         <template v-if="canManage">
           <button type="button" class="btn-secondary" @click="isTokenDialogOpen = true">
             <icon name="ph:key-bold" size="20" />
-            <span>Generate Token</span>
+            <span>Create Token</span>
           </button>
           <button type="button" class="btn-primary" :disabled="!availableOrgMembers.length" @click="isAddDialogOpen = true">
             <icon name="ph:plus-circle-bold" size="20" />
@@ -28,7 +28,7 @@
       </nav>
     </template>
 
-    <div class="flex flex-col gap-2 py-2">
+    <div class="flex flex-col gap-2 py-4">
       <section class="flex flex-col gap-2">
         <header class="flex flex-col gap-1">
           <h6>
@@ -93,7 +93,7 @@
         </div>
       </section>
 
-      <section class="flex flex-col gap-2 border-t pt-4">
+      <section class="flex flex-col gap-2 border-t py-4">
         <header class="flex flex-col gap-1">
           <h6>
             Service Tokens
@@ -243,6 +243,7 @@ async function handleRevokeToken(tokenId: string) {
   await projectStore.revokeProjectServiceToken(project.value?.id ?? "", tokenId)
 }
 
+// Fetch service tokens when project changes
 watch(() => project.value?.id, async (id) => {
   if (!id) {
     return

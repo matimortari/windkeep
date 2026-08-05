@@ -1,6 +1,6 @@
 <template>
   <section class="container mx-auto flex flex-col">
-    <header v-if="title" class="flex flex-col items-start gap-2 border-b py-2 md:flex-row md:items-center md:justify-between md:px-2">
+    <header v-if="title" class="flex flex-col items-start gap-2 border-b py-4 md:flex-row md:items-center md:justify-between md:py-2">
       <div class="flex flex-col gap-1">
         <div class="navigation-group">
           <template v-if="$slots.context || context">

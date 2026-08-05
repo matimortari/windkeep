@@ -15,7 +15,7 @@
         <nuxt-link
           v-for="heading in headings" :key="heading.id"
           :to="`#${heading.id}`" class="text-sm transition-colors hover:text-primary"
-          :class="activeId === heading.id ? 'font-semibold text-primary' : 'text-muted-foreground'" @click="handleTocClick(heading.id)"
+          :class="[heading.level === 3 ? 'pl-3' : '', activeId === heading.id ? 'font-semibold text-primary' : 'text-muted-foreground']" @click="handleTocClick(heading.id)"
         >
           {{ heading.text }}
         </nuxt-link>
@@ -56,7 +56,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const isTocOpen = ref(false)
-const headings = ref<{ id: string, text: string }[]>([])
+const headings = ref<{ id: string, text: string, level: 2 | 3 }[]>([])
 const activeId = ref("")
 
 const isCliGuide = computed(() => route.path.startsWith("/cli-guide"))
@@ -69,14 +69,21 @@ const activeCliGuideSlug = computed(() => {
   return route.path.replace(/^\/cli-guide\/?/, "") || "index"
 })
 
+function collectHeadingEls() {
+  return Array.from(document.querySelectorAll<HTMLElement>(".prose :is(h2, h3)[id]"))
+}
+
 function extractHeadings() {
-  const domHeadings = document.querySelectorAll<HTMLElement>(".prose h2[id]")
-  headings.value = Array.from(domHeadings).map(el => ({ id: el.id, text: el.textContent || "" }))
+  headings.value = collectHeadingEls().map(el => ({
+    id: el.id,
+    text: el.textContent || "",
+    level: el.tagName === "H3" ? 3 : 2,
+  }))
   updateActiveHeading()
 }
 
 function updateActiveHeading() {
-  const headingEls = Array.from(document.querySelectorAll<HTMLElement>(".prose h2[id]"))
+  const headingEls = collectHeadingEls()
   if (!headingEls.length) {
     return
   }
@@ -107,9 +114,7 @@ onMounted(() => {
 
 watch(() => route.path, () => nextTick(extractHeadings))
 
-onUnmounted(() => {
-  window.removeEventListener("scroll", updateActiveHeading)
-})
+onUnmounted(() => window.removeEventListener("scroll", updateActiveHeading))
 </script>
 
 <style scoped>
@@ -161,6 +166,7 @@ onUnmounted(() => {
 .prose :deep(h3) {
   font-size: clamp(1.125rem, 3vw, 1.25rem);
   line-height: 1.5;
+  scroll-margin-top: 6rem;
 }
 .prose :deep(h4) {
   font-size: clamp(1rem, 2.5vw, 1.125rem);

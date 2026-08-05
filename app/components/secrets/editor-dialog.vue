@@ -80,6 +80,7 @@ function handleSubmit() {
   emit("save", upserted, removed)
 }
 
+// Reset editor when dialog is opened
 watch(isRawEditorOpen, (open) => {
   if (open) {
     resetEditor(props.initialContent)
