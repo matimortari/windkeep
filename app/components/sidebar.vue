@@ -3,7 +3,7 @@
   <div v-if="isOpen" aria-hidden="true" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden" @click="emit('update:isOpen', false)" />
 
   <aside
-    class="fixed top-0 left-0 z-40 flex h-screen w-64 transform flex-col gap-4 border-r bg-card px-4 py-20 transition-transform ease-in-out md:static md:z-20 md:rounded-br-lg md:border-b md:py-8"
+    class="fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 transform flex-col gap-4 border-r bg-card p-4 pt-20 transition-transform ease-in-out md:sticky md:inset-auto md:top-20 md:z-20 md:mt-8 md:mb-4 md:h-[calc(100vh-8.5rem)] md:translate-x-0! md:self-start md:rounded-2xl md:border md:pt-4 md:shadow-sm"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
   >
     <p class="section-label">

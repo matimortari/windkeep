@@ -109,10 +109,10 @@ const resourceMap: Record<string, string> = {
   organization: "ph:buildings-bold",
   org_invite: "ph:envelope-bold",
   org_member: "ph:users-three-bold",
-  project: "ph:folder-bold",
+  project: "ph:folder-lock-bold",
   project_member: "ph:user-plus-bold",
   service_token: "ph:terminal-bold",
-  secret: "ph:key-bold",
+  secret: "ph:password-bold",
 }
 
 function getCopyAction(logId: string) {

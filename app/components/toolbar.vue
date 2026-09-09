@@ -27,9 +27,9 @@
             <ul v-if="isDropdownOpen" class="dropdown-menu right-auto! left-0!" role="menu">
               <li v-for="org in orgs" :key="org.id" class="whitespace-nowrap">
                 <button
-                  type="button"
-                  class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem"
-                  :class="org.id === activeOrg?.id ? 'bg-muted' : ''" @click="org.id && handleSetActiveOrg(org.id)"
+                  type="button" class="w-full truncate rounded-lg p-2 text-left hover:bg-muted/60"
+                  role="menuitem" :class="org.id === activeOrg?.id ? 'bg-muted' : ''"
+                  @click="org.id && handleSetActiveOrg(org.id)"
                 >
                   {{ org.name }}
                 </button>

@@ -26,10 +26,7 @@
         >
           <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
             <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold" :class="getChangeConfig(secret.key)?.keyTextClass">
-              <icon
-                v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon"
-                size="20" :class="getChangeConfig(secret.key)?.keyTextClass"
-              />
+              <icon v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon" size="15" :class="getChangeConfig(secret.key)?.keyTextClass" />
 
               <span class="truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
 
@@ -41,8 +38,8 @@
               <div v-if="secret.tags?.length" class="flex flex-nowrap items-center gap-1 overflow-hidden">
                 <button
                   v-for="tag in secret.tags" :key="tag"
-                  type="button"
-                  class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors" :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
+                  type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors"
+                  :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
                   :aria-label="`Filter by tag ${tag}`" @click="emit('filterByTag', activeTagFilter === tag ? null : tag)"
                 >
                   {{ tag }}
@@ -51,7 +48,10 @@
             </div>
 
             <div v-else-if="col.type === 'env'" class="flex h-5 min-w-0 items-center justify-between gap-4 overflow-hidden font-mono text-sm">
-              <span class="min-w-0 flex-1 truncate tracking-wide select-none" :class="getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env))" :aria-label="(visibleKeys[secret.key] ?? props.allVisible) ? undefined : 'Hidden value'">{{ renderValue(secret.key, col.env) }}</span>
+              <span
+                class="min-w-0 flex-1 tracking-wide select-none" :class="[getSecretValueClass(secret.key, !!secretValuesByKey.get(secret.key)?.get(col.env)), (visibleKeys[secret.key] ?? props.allVisible) ? 'truncate' : 'overflow-hidden']"
+                :aria-label="(visibleKeys[secret.key] ?? props.allVisible) ? undefined : 'Hidden value'"
+              >{{ renderValue(secret.key, col.env) }}</span>
               <div v-if="secretValuesByKey.get(secret.key)?.get(col.env)" class="flex shrink-0 items-center gap-1">
                 <button type="button" :aria-label="`Toggle visibility for ${secret.key}`" @click="visibleKeys[secret.key] = !(visibleKeys[secret.key] ?? props.allVisible)">
                   <icon :name="(visibleKeys[secret.key] ?? props.allVisible) ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" :class="getActionIconClass(secret.key, 'primary')" />

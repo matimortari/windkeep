@@ -6,8 +6,8 @@ import WordmarkLight from "~/assets/wordmark-light.png"
 
 // Landing page data
 export const HIGHLIGHTS: { title: string, icon: string }[] = [
-  { title: "Rapid Onboarding", icon: "ph:users-three-bold" },
   { title: "Free & Open Source", icon: "ph:code-bold" },
+  { title: "Rapid Onboarding", icon: "ph:user-plus-bold" },
   { title: "Encrypted & Safe", icon: "ph:lock-key-bold" },
 ]
 
@@ -112,14 +112,14 @@ export const CLI_TABS: { key: string, label: string, description: string, code: 
 // Admin dashboard navigation tabs
 export const ORGANIZATION_TABS: { key: string, label: string, icon: string }[] = [
   { key: "projects", label: "Projects", icon: "ph:folder-open-bold" },
-  { key: "members", label: "Members", icon: "ph:users-bold" },
+  { key: "members", label: "Members", icon: "ph:users-three-bold" },
   { key: "audit-logs", label: "Audit Logs", icon: "ph:clipboard-text-bold" },
   { key: "settings", label: "Settings", icon: "ph:gear-six-bold" },
 ]
 
 export const PROJECT_TABS: { key: string, label: string, icon: string }[] = [
-  { key: "secrets", label: "Secrets", icon: "ph:stack-bold" },
-  { key: "access-control", label: "Access Control", icon: "ph:shield-check-bold" },
+  { key: "secrets", label: "Secrets", icon: "ph:password-bold" },
+  { key: "access-control", label: "Access Control", icon: "ph:user-focus-bold" },
   { key: "settings", label: "Settings", icon: "ph:gear-six-bold" },
 ]
 

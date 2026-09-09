@@ -33,19 +33,19 @@
           </td>
           <td :class="columns[2]?.class">
             <div class="navigation-group">
-              <icon name="ph:users-bold" size="20" />
+              <icon name="ph:users-three-bold" size="20" />
               <span>{{ project._count?.memberships ?? project.memberships?.length ?? 0 }}</span>
             </div>
           </td>
           <td :class="columns[3]?.class">
             <div class="navigation-group">
-              <icon name="ph:keyhole-bold" size="20" />
+              <icon name="ph:key-bold" size="20" />
               <span>{{ project._count?.serviceTokens ?? 0 }}</span>
             </div>
           </td>
           <td :class="columns[4]?.class">
             <div class="navigation-group">
-              <icon name="ph:key-bold" size="20" />
+              <icon name="ph:password-bold" size="20" />
               <span>{{ project._count?.secrets ?? 0 }}</span>
             </div>
           </td>

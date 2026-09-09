@@ -7,7 +7,7 @@
     <div class="hero-backdrop" />
     <div class="dot-overlay" />
 
-    <header class="z-20 flex w-full max-w-4xl flex-col items-center gap-4 text-center md:items-start md:text-start">
+    <header class="z-20 flex w-full max-w-5xl flex-col items-center gap-4 text-center md:items-start md:text-start">
       <div
         v-motion :initial="{ opacity: 0, scaleX: 0 }"
         :visible-once="{ opacity: 1, scaleX: 1 }" :duration="1000"
@@ -52,7 +52,7 @@
     </header>
   </section>
 
-  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-24 md:max-w-6xl md:gap-20 2xl:gap-32">
+  <div class="container mx-auto flex w-full flex-col gap-12 px-4 py-24 md:max-w-7xl md:gap-20 2xl:gap-32">
     <section id="cli" class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
       <header class="flex flex-col gap-4 md:border-r md:pr-8">
         <div class="flex items-end justify-between border-b pb-4">
@@ -85,9 +85,8 @@
         <div class="flex flex-row border-b">
           <button
             v-for="tab in CLI_TABS" :key="tab.key"
-            type="button"
-            class="cli-tab" :class="activeTab === tab.key ? 'cli-tab--active' : ''"
-            @click="activeTab = tab.key"
+            type="button" class="cli-tab"
+            :class="activeTab === tab.key ? 'cli-tab--active' : ''" @click="activeTab = tab.key"
           >
             {{ tab.label }}
           </button>

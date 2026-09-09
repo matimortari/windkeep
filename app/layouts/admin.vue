@@ -1,10 +1,10 @@
 <template>
   <Toolbar :orgs="user?.orgMemberships?.map(m => m.org) ?? []" @toggle-sidebar="toggleSidebar" />
 
-  <div class="flex min-h-screen overflow-hidden py-12">
+  <div class="flex min-h-screen w-full gap-4 px-4 py-12">
     <Sidebar :is-open="isSidebarOpen" :loading="isLoading" @update:is-open="value => value ? openSidebar() : closeSidebar()" />
 
-    <main class="container mx-auto flex flex-1 flex-col overflow-x-hidden p-4">
+    <main class="min-w-0 flex-1 overflow-x-hidden p-4">
       <Loading v-if="isLoading" />
       <slot v-else />
     </main>

@@ -8,8 +8,8 @@
         <Logo />
 
         <div class="hidden gap-4! border-l pl-4! text-muted-foreground md:navigation-group">
-          <nuxt-link v-for="link in NAVBAR_LINKS" :key="link.to" :to="link.to" class="flex flex-row items-center gap-1 text-sm font-semibold hover:underline">
-            <icon :name="link.icon" size="15" />
+          <nuxt-link v-for="link in NAVBAR_LINKS" :key="link.to" :to="link.to" class="navigation-group text-sm font-semibold hover:underline">
+            <icon :name="link.icon" size="20" />
             <span>{{ link.label }}</span>
           </nuxt-link>
         </div>

@@ -1,7 +1,7 @@
 <template>
   <div ref="datePickerRef" class="relative">
-    <button type="button" class="btn" @click="isDatePickerOpen = !isDatePickerOpen">
-      <span>{{ displayLabel }}</span>
+    <button type="button" class="btn" @click="toggleDatePicker">
+      <span>{{ isDatePickerOpen ? openLabel : displayLabel }}</span>
       <icon name="ph:caret-down-bold" size="15" />
     </button>
 
@@ -20,13 +20,19 @@
           </select>
         </div>
 
-        <div class="flex flex-row items-center justify-between px-1 text-xs">
-          <span v-if="!modelValue?.start">Select start date</span>
-          <span v-else-if="!modelValue?.end">Select end date</span>
-          <span v-else>Date range selected</span>
+        <div class="navigation-group h-7 justify-between px-1 text-xs">
+          <span class="min-w-0 truncate">
+            <template v-if="!modelValue?.start">Select start date</template>
+            <template v-else-if="!modelValue?.end">Select end date</template>
+            <template v-else>Date range selected</template>
+          </span>
 
-          <div class="navigation-group gap-1">
-            <button v-if="modelValue?.start" type="button" class="btn-warning p-1! text-xs!" @click="emit('update:modelValue', {})">
+          <div class="navigation-group shrink-0 gap-1">
+            <button
+              type="button" class="btn-warning p-1! text-xs!"
+              :class="modelValue?.start ? '' : 'invisible'" :disabled="!modelValue?.start"
+              @click="emit('update:modelValue', {})"
+            >
               Clear range
             </button>
             <button type="button" class="btn-info p-1! text-xs!" @click="handleApply">
@@ -42,8 +48,7 @@
         <div class="grid grid-cols-7 gap-1">
           <button
             v-for="day in calendarDays" :key="`${day.date}-${day.isCurrentMonth}`"
-            type="button"
-            :aria-label="`${day.isStart ? 'Start: ' : day.isEnd ? 'End: ' : ''}${day.date.toLocaleDateString('en-GB')}`"
+            type="button" :aria-label="`${day.isStart ? 'Start: ' : day.isEnd ? 'End: ' : ''}${day.date.toLocaleDateString('en-GB')}`"
             class="aspect-square rounded-lg text-xs transition-colors" :class="{ 'bg-secondary': day.isInRange, 'bg-info': day.isStart || day.isEnd, 'hover:bg-muted': day.isCurrentMonth, 'text-muted-foreground opacity-50': !day.isCurrentMonth }"
             :disabled="!day.isCurrentMonth" @mouseenter="hoverDate = day.date"
             @mouseleave="hoverDate = null" @click="selectDate(day)"
@@ -70,6 +75,7 @@ const currentMonth = ref(new Date().getMonth())
 const currentYear = ref(new Date().getFullYear())
 const hoverDate = ref<Date | null>(null)
 const isDatePickerOpen = ref(false)
+const openLabel = ref("Date")
 useClickOutside(datePickerRef, () => isDatePickerOpen.value = false, { escapeKey: true })
 const startDate = computed(() => parseDate(props.modelValue?.start))
 const endDate = computed(() => parseDate(props.modelValue?.end))
@@ -85,7 +91,7 @@ const displayLabel = computed(() => {
     return `From ${format(start)}`
   }
 
-  return start === end ? `On ${format(start)}` : `${format(start)} → ${format(end)}`
+  return start === end ? `On ${format(start)}` : `${format(start)} – ${format(end)}`
 })
 
 const calendarDays = computed(() => {
@@ -112,7 +118,6 @@ const calendarDays = computed(() => {
     const isEnd = endDate.value?.getTime() === time
     const effectiveEnd = endDate.value || (startDate.value && hoverDate.value && hoverDate.value > startDate.value ? hoverDate.value : null)
     const isInRange = startDate.value && effectiveEnd && time > startDate.value.getTime() && time < effectiveEnd.getTime()
-
     return { ...d, isStart, isEnd, isInRange }
   })
 })
@@ -142,6 +147,13 @@ function selectDate(day: { date: Date, isCurrentMonth: boolean }) {
     const start = parseDate(props.modelValue.start)!
     emit("update:modelValue", day.date < start ? { start: selected, end: props.modelValue.start } : { start: props.modelValue.start, end: selected })
   }
+}
+
+function toggleDatePicker() {
+  if (!isDatePickerOpen.value) {
+    openLabel.value = displayLabel.value
+  }
+  isDatePickerOpen.value = !isDatePickerOpen.value
 }
 
 function handleApply() {

@@ -3,12 +3,12 @@
     <transition :name="isMobile ? 'sheet-up' : 'sheet-right'">
       <div
         v-if="isOpen" class="fixed inset-0 z-50 flex bg-black/50 backdrop-blur-xs"
-        :class="isMobile ? 'items-end justify-center' : 'items-stretch justify-end'" @mousedown.self="emit('update:isOpen', false)"
+        :class="isMobile ? 'items-end justify-center' : 'items-stretch justify-end p-4'" @mousedown.self="emit('update:isOpen', false)"
       >
         <div
           class="overlay space-y-4" role="dialog"
           aria-modal="true" aria-labelledby="integrations-sheet-title"
-          :class="isMobile ? 'flex size-full max-h-[92dvh] flex-col rounded-t-lg' : 'flex size-full max-h-none! max-w-2xl flex-col rounded-none! border-0! shadow-none!'"
+          :class="isMobile ? 'flex size-full max-h-[92dvh] flex-col rounded-t-lg' : 'flex size-full max-h-none! max-w-2xl flex-col rounded-2xl! border shadow-sm'"
         >
           <div v-if="isMobile" class="h-1 w-20 self-center rounded-full bg-current opacity-20" />
 
