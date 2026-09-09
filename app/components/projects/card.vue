@@ -23,16 +23,16 @@
         </button>
 
         <transition name="dropdown">
-          <ul v-if="isMenuOpen" class="dropdown-menu" role="menu">
+          <ul v-if="isMenuOpen" class="dropdown-menu top-4!" role="menu">
             <li>
               <button type="button" class="navigation-group w-full rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem" @click="navigate('secrets')">
-                <icon name="ph:key-bold" size="20" />
+                <icon name="ph:password-bold" size="20" />
                 <span>Secrets</span>
               </button>
             </li>
             <li>
               <button type="button" class="navigation-group w-full rounded-lg p-2 text-left hover:bg-muted/60" role="menuitem" @click="navigate('access-control')">
-                <icon name="ph:shield-check-bold" size="20" />
+                <icon name="ph:user-focus-bold" size="20" />
                 <span>Access Control</span>
               </button>
             </li>
@@ -49,17 +49,17 @@
       <footer class="flex min-w-0 items-center justify-between gap-2 text-xs font-medium text-muted-foreground">
         <div class="navigation-group shrink-0">
           <div class="flex flex-row items-center gap-1" title="Members">
-            <icon name="ph:users-bold" size="20" />
+            <icon name="ph:users-three-bold" size="20" />
             <span>{{ project._count?.memberships ?? project.memberships?.length ?? 0 }}</span>
           </div>
 
           <div class="flex flex-row items-center gap-1" title="Access Tokens">
-            <icon name="ph:keyhole-bold" size="20" />
+            <icon name="ph:key-bold" size="20" />
             <span>{{ project._count?.serviceTokens ?? 0 }}</span>
           </div>
 
           <div class="flex flex-row items-center gap-1" title="Secrets">
-            <icon name="ph:key-bold" size="20" />
+            <icon name="ph:password-bold" size="20" />
             <span>{{ project._count?.secrets ?? 0 }}</span>
           </div>
         </div>

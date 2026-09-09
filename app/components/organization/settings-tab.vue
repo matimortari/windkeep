@@ -71,7 +71,7 @@
             aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey"
             @click="handleRotateEncryptionKey"
           >
-            <icon :name="rotateKeyIcon.icon.value || 'ph:key-bold'" size="20" />
+            <icon :name="rotateKeyIcon.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
             <span>Rotate Key</span>
           </button>
         </div>
@@ -170,7 +170,7 @@ const orgFields = [
 
 const copyIcon = orgFields.map(() => useActionIcon("ph:copy-bold"))
 const saveIcon = orgFields.map(() => useActionIcon("ph:floppy-disk-bold"))
-const rotateKeyIcon = useActionIcon("ph:key-bold")
+const rotateKeyIcon = useActionIcon("ph:arrows-clockwise-bold")
 const canRotateEncryptionKey = computed(() => encryptionMode.value === "AUTO" || manualEncryptionKey.value.trim().length >= 12)
 
 async function handleSubmit(index: number) {

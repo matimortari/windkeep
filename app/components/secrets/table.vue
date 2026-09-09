@@ -26,10 +26,7 @@
         >
           <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
             <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold" :class="getChangeConfig(secret.key)?.keyTextClass">
-              <icon
-                v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon"
-                size="20" :class="getChangeConfig(secret.key)?.keyTextClass"
-              />
+              <icon v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon" size="15" :class="getChangeConfig(secret.key)?.keyTextClass" />
 
               <span class="truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
 
@@ -41,8 +38,8 @@
               <div v-if="secret.tags?.length" class="flex flex-nowrap items-center gap-1 overflow-hidden">
                 <button
                   v-for="tag in secret.tags" :key="tag"
-                  type="button"
-                  class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors" :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
+                  type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors"
+                  :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
                   :aria-label="`Filter by tag ${tag}`" @click="emit('filterByTag', activeTagFilter === tag ? null : tag)"
                 >
                   {{ tag }}
