@@ -20,6 +20,11 @@ describe("createOrgSchema", () => {
     expect(createOrgSchema.safeParse({
       name: "Acme Corp",
       encryptionMode: "MANUAL",
+    }).success).toBe(false)
+
+    expect(createOrgSchema.safeParse({
+      name: "Acme Corp",
+      encryptionMode: "MANUAL",
       encryptionKey: "long-enough-password",
     }).success).toBe(true)
   })
@@ -36,6 +41,20 @@ describe("updateOrgSchema", () => {
       encryptionMode: "MANUAL",
       encryptionKey: "short",
     }).success).toBe(false)
+
+    expect(updateOrgSchema.safeParse({
+      rotateEncryptionKey: true,
+      encryptionMode: "MANUAL",
+      encryptionKey: "long-enough-password",
+    }).success).toBe(true)
+  })
+
+  it("skips encryption key checks when not rotating", () => {
+    expect(updateOrgSchema.safeParse({
+      name: "Acme Corp",
+      encryptionMode: "MANUAL",
+      encryptionKey: "short",
+    }).success).toBe(true)
   })
 })
 

@@ -10,7 +10,7 @@ function validateManualEncryptionKey(data: { encryptionMode?: "AUTO" | "MANUAL",
       ctx.addIssue({
         code: "custom",
         path: ["encryptionKey"],
-        message: parsed.error.issues[0]?.message || "Encryption password is required",
+        message: parsed.error.issues[0]!.message,
       })
     }
   }
