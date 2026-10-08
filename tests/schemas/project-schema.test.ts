@@ -1,29 +1,27 @@
 import { describe, expect, it } from "vitest"
 import { createProjectSchema, updateProjectSchema } from "../../shared/schemas/project-schema"
 
-const CUID2 = "tz4a98xxat96iws9zmbrgj3a"
-
 describe("createProjectSchema", () => {
   it("accepts a valid project", () => {
     expect(createProjectSchema.parse({
       name: "  WindKeep  ",
       description: "  Secrets manager  ",
       website: "https://example.com",
-      orgId: CUID2,
+      orgId: "tz4a98xxat96iws9zmbrgj3a",
     })).toMatchObject({
       name: "WindKeep",
       description: "Secrets manager",
       website: "https://example.com",
-      orgId: CUID2,
+      orgId: "tz4a98xxat96iws9zmbrgj3a",
     })
   })
 
   it("rejects names that are too short", () => {
-    expect(createProjectSchema.safeParse({ name: "ab", orgId: CUID2 }).success).toBe(false)
+    expect(createProjectSchema.safeParse({ name: "ab", orgId: "tz4a98xxat96iws9zmbrgj3a" }).success).toBe(false)
   })
 
   it("rejects names that trim below the minimum length", () => {
-    expect(createProjectSchema.safeParse({ name: "  ab  ", orgId: CUID2 }).success).toBe(false)
+    expect(createProjectSchema.safeParse({ name: "  ab  ", orgId: "tz4a98xxat96iws9zmbrgj3a" }).success).toBe(false)
   })
 })
 

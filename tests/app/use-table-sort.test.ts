@@ -3,11 +3,7 @@ import { useTableSort } from "../../app/composables/use-table-sort"
 
 describe("useTableSort", () => {
   it("cycles sort direction and clears on the third toggle", () => {
-    const data = ref([
-      { name: "Charlie", meta: { score: 2 } },
-      { name: "alice", meta: { score: 3 } },
-      { name: "Bob", meta: { score: 1 } },
-    ])
+    const data = ref([{ name: "Charlie", meta: { score: 2 } }, { name: "alice", meta: { score: 3 } }, { name: "Bob", meta: { score: 1 } }])
     const sort = useTableSort(data)
 
     expect(sort.getSortIconName("name")).toBe("ph:caret-up-down-bold")
@@ -29,11 +25,7 @@ describe("useTableSort", () => {
   })
 
   it("sorts nested paths and pushes nulls to the end", () => {
-    const data = ref([
-      { name: "a", meta: { score: null as number | null } },
-      { name: "b", meta: { score: 1 } },
-      { name: "c", meta: { score: 3 } },
-    ])
+    const data = ref([{ name: "a", meta: { score: null as number | null } }, { name: "b", meta: { score: 1 } }, { name: "c", meta: { score: 3 } }])
     const sort = useTableSort(data)
 
     sort.setSort("meta.score", "asc")
