@@ -94,71 +94,30 @@ describe("getUserFromSession", () => {
   })
 
   it("returns the session user when present", async () => {
-    getUserSession.mockResolvedValue({
-      user: { id: "u1", email: "a@b.c", name: "Ada", image: null },
-    })
-
-    await expect(getUserFromSession({} as any)).resolves.toEqual({
-      id: "u1",
-      email: "a@b.c",
-      name: "Ada",
-      image: "",
-    })
+    getUserSession.mockResolvedValue({ user: { id: "u1", email: "a@b.c", name: "Ada", image: null } })
+    await expect(getUserFromSession({} as any)).resolves.toEqual({ id: "u1", email: "a@b.c", name: "Ada", image: "" })
   })
 
   it("authenticates via a valid bearer api token", async () => {
     getUserSession.mockResolvedValue({})
     getHeader.mockReturnValue("Bearer raw-token")
-    db.user.findFirst.mockResolvedValue({
-      id: "u2",
-      email: "cli@b.c",
-      name: "Cli",
-      image: "img",
-      apiTokenExpiresAt: new Date(Date.now() + 60_000),
-    })
+    db.user.findFirst.mockResolvedValue({ id: "u2", email: "cli@b.c", name: "Cli", image: "img", apiTokenExpiresAt: new Date(Date.now() + 60_000) })
 
-    await expect(getUserFromSession({} as any)).resolves.toEqual({
-      id: "u2",
-      email: "cli@b.c",
-      name: "Cli",
-      image: "img",
-    })
-    expect(db.user.findFirst).toHaveBeenCalledWith({
-      where: { apiToken: hashToken("raw-token") },
-      select: { id: true, email: true, name: true, image: true, apiTokenExpiresAt: true },
-    })
+    await expect(getUserFromSession({} as any)).resolves.toEqual({ id: "u2", email: "cli@b.c", name: "Cli", image: "img" })
+    expect(db.user.findFirst).toHaveBeenCalledWith({ where: { apiToken: hashToken("raw-token") }, select: { id: true, email: true, name: true, image: true, apiTokenExpiresAt: true } })
 
-    db.user.findFirst.mockResolvedValue({
-      id: "u3",
-      email: "cli2@b.c",
-      name: "Cli2",
-      image: null,
-      apiTokenExpiresAt: new Date(Date.now() + 60_000),
-    })
+    db.user.findFirst.mockResolvedValue({ id: "u3", email: "cli2@b.c", name: "Cli2", image: null, apiTokenExpiresAt: new Date(Date.now() + 60_000) })
     await expect(getUserFromSession({} as any)).resolves.toMatchObject({ id: "u3", image: "" })
   })
 
   it("rejects expired or missing bearer tokens", async () => {
     getUserSession.mockResolvedValue({})
     getHeader.mockReturnValue("Bearer expired")
-    db.user.findFirst.mockResolvedValue({
-      id: "u2",
-      email: "cli@b.c",
-      name: "Cli",
-      image: "",
-      apiTokenExpiresAt: new Date(Date.now() - 60_000),
-    })
-
+    db.user.findFirst.mockResolvedValue({ id: "u2", email: "cli@b.c", name: "Cli", image: "", apiTokenExpiresAt: new Date(Date.now() - 60_000) })
     await expect(getUserFromSession({} as any)).rejects.toMatchObject({ statusCode: 401 })
 
     getHeader.mockReturnValue("Bearer no-expiry")
-    db.user.findFirst.mockResolvedValue({
-      id: "u2",
-      email: "cli@b.c",
-      name: "Cli",
-      image: "",
-      apiTokenExpiresAt: null,
-    })
+    db.user.findFirst.mockResolvedValue({ id: "u2", email: "cli@b.c", name: "Cli", image: "", apiTokenExpiresAt: null })
     await expect(getUserFromSession({} as any)).rejects.toMatchObject({ statusCode: 401 })
 
     getHeader.mockReturnValue("Basic nope")
@@ -181,9 +140,7 @@ describe("generateSlug", () => {
   })
 
   it("appends a suffix on collision and falls back after retries", async () => {
-    db.project.findUnique
-      .mockResolvedValueOnce({ id: "1" })
-      .mockResolvedValueOnce(null)
+    db.project.findUnique.mockResolvedValueOnce({ id: "1" }).mockResolvedValueOnce(null)
     const slug = await generateSlug("demo", "org-1")
     expect(slug.startsWith("demo-")).toBe(true)
 
@@ -223,11 +180,7 @@ describe("requireRole", () => {
 
     db.orgMembership.findUnique.mockResolvedValue({ userId: "u1", orgId: "o1", role: "OWNER", isActive: true })
     db.projectMembership.findUnique.mockResolvedValue(null)
-    await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toEqual({
-      userId: "u1",
-      projectId: "p1",
-      role: "OWNER",
-    })
+    await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toEqual({ userId: "u1", projectId: "p1", role: "OWNER" })
 
     db.projectMembership.findUnique.mockResolvedValue({ userId: "u1", projectId: "p1", role: "OWNER" })
     await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toMatchObject({ role: "OWNER" })
@@ -275,10 +228,7 @@ describe("createAuditLog", () => {
       event: {
         node: {
           req: {
-            headers: {
-              "x-forwarded-for": "1.2.3.4, 5.6.7.8",
-              "user-agent": "vitest",
-            },
+            headers: { "x-forwarded-for": "1.2.3.4, 5.6.7.8", "user-agent": "vitest" },
             socket: { remoteAddress: "127.0.0.1" },
           },
         },

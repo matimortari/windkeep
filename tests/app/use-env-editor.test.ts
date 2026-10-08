@@ -33,10 +33,7 @@ describe("formatEnvText / mergeEnvText", () => {
 
 describe("getEnvValues / buildEnvText", () => {
   const secrets = [
-    secret("API_KEY", [
-      { environment: "DEVELOPMENT", value: "dev" },
-      { environment: "PRODUCTION", value: "prod" },
-    ]),
+    secret("API_KEY", [{ environment: "DEVELOPMENT", value: "dev" }, { environment: "PRODUCTION", value: "prod" }]),
     secret("UNUSED", [{ environment: "STAGING", value: "stg" }]),
   ]
 
@@ -52,29 +49,15 @@ describe("getEnvValues / buildEnvText", () => {
 
 describe("mergeSecretValues", () => {
   it("updates matching environments and appends new ones", () => {
-    const merged = mergeSecretValues(
-      [{ environment: "DEVELOPMENT", value: "old" } as SecretValue],
-      [
-        { environment: "DEVELOPMENT", value: "new" } as SecretValue,
-        { environment: "PRODUCTION", value: "prod" } as SecretValue,
-      ],
-    )
-
-    expect(merged).toEqual([
-      { environment: "DEVELOPMENT", value: "new" },
-      { environment: "PRODUCTION", value: "prod" },
-    ])
+    const merged = mergeSecretValues([{ environment: "DEVELOPMENT", value: "old" } as SecretValue], [{ environment: "DEVELOPMENT", value: "new" } as SecretValue, { environment: "PRODUCTION", value: "prod" } as SecretValue])
+    expect(merged).toEqual([{ environment: "DEVELOPMENT", value: "new" }, { environment: "PRODUCTION", value: "prod" }])
   })
 })
 
 describe("buildEnvPreview", () => {
   it("classifies added, updated, and removed keys", () => {
     const items = buildEnvPreview({ A: "1", B: "2", C: "3" }, { A: "1", B: "9", D: "4" })
-    expect(items.map(i => [i.key, i.type])).toEqual([
-      ["B", "updated"],
-      ["D", "added"],
-      ["C", "removed"],
-    ])
+    expect(items.map(i => [i.key, i.type])).toEqual([["B", "updated"], ["D", "added"], ["C", "removed"]])
   })
 
   it("skips empty next values", () => {
@@ -90,27 +73,16 @@ describe("buildSecretChangesFromEnv", () => {
   ]
 
   it("returns upserts and removals for the selected env", () => {
-    const { upserted, removed } = buildSecretChangesFromEnv(
-      "project-1",
-      secrets,
-      "DEVELOPMENT",
-      { KEEP: "same", UPDATE: "new", ADD: "fresh" },
-    )
-
+    const { upserted, removed } = buildSecretChangesFromEnv("project-1", secrets, "DEVELOPMENT", { KEEP: "same", UPDATE: "new", ADD: "fresh" })
     expect(removed).toEqual([{ key: "REMOVE", environment: "DEVELOPMENT" }])
     expect(upserted.map(s => s.key).sort()).toEqual(["ADD", "UPDATE"])
-    expect(upserted.find(s => s.key === "ADD")).toMatchObject({
-      projectId: "project-1",
-      values: [{ environment: "DEVELOPMENT", value: "fresh" }],
-    })
+    expect(upserted.find(s => s.key === "ADD")).toMatchObject({ projectId: "project-1", values: [{ environment: "DEVELOPMENT", value: "fresh" }] })
   })
 })
 
 describe("useEnvEditor", () => {
   it("selects environments, previews diffs, and reports changes", () => {
-    const secrets = ref([
-      secret("API_KEY", [{ environment: "DEVELOPMENT", value: "dev" }]),
-    ])
+    const secrets = ref([secret("API_KEY", [{ environment: "DEVELOPMENT", value: "dev" }])])
     const editor = useEnvEditor({ secrets, projectId: "project-1" })
 
     editor.resetEditor()
