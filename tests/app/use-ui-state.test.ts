@@ -44,10 +44,6 @@ describe("useUIState", () => {
     ui.setTab("organization", "members")
     ui.setTab("project", "settings")
     ui.setActiveProject("demo")
-    expect(ui.uiState.adminTabs).toEqual({
-      organization: "members",
-      project: "settings",
-      projectSlug: "demo",
-    })
+    expect(ui.uiState.adminTabs).toEqual({ organization: "members", project: "settings", projectSlug: "demo" })
   })
 })
