@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { formatDate, getErrorMessage, normalizeKey, slugify } from "../app/utils/helpers"
+import { formatDate, getErrorMessage, normalizeKey, slugify } from "../../app/utils/helpers"
 
 describe("formatDate", () => {
   it("returns a placeholder for empty input", () => {

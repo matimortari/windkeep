@@ -1,10 +1,7 @@
 import { Buffer } from "node:buffer"
 import crypto from "node:crypto"
 
-const algorithm = "aes-256-gcm"
-const masterKeySecret = requireEnv("ENCRYPTION_KEY")
-
-function parseEncryptedData(encryptedData: string) {
+export function parseEncryptedData(encryptedData: string) {
   const [version, ivHex, authTagHex, encryptedHex] = encryptedData.split(":")
   if (version !== "v1" || !ivHex || !authTagHex || !encryptedHex) {
     throw new Error("Invalid encrypted input format")
@@ -13,32 +10,32 @@ function parseEncryptedData(encryptedData: string) {
   return { iv: Buffer.from(ivHex, "hex"), authTag: Buffer.from(authTagHex, "hex"), encrypted: Buffer.from(encryptedHex, "hex") }
 }
 
-function encryptWithKey(input: string, key: Buffer): string {
+export function encryptWithKey(input: string, key: Buffer | Uint8Array): string {
   const iv = crypto.randomBytes(12)
-  const cipher = crypto.createCipheriv(algorithm, key, iv)
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv)
   const encrypted = Buffer.concat([cipher.update(input, "utf8"), cipher.final()])
   const authTag = cipher.getAuthTag()
   return `v1:${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted.toString("hex")}`
 }
 
-function decryptWithKey(encryptedData: string, key: Buffer): string {
+export function decryptWithKey(encryptedData: string, key: Buffer | Uint8Array): string {
   const { iv, authTag, encrypted } = parseEncryptedData(encryptedData)
-  const decipher = crypto.createDecipheriv(algorithm, key, iv)
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv)
   decipher.setAuthTag(authTag)
   const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()])
   return decrypted.toString("utf8")
 }
 
 function wrapOrgKey(orgKey: Buffer): string {
-  return encryptWithKey(orgKey.toString("hex"), crypto.createHash("sha256").update(masterKeySecret).digest())
+  return encryptWithKey(orgKey.toString("hex"), crypto.createHash("sha256").update(process.env.ENCRYPTION_KEY!).digest())
 }
 
 function unwrapOrgKey(wrappedKey: string): Buffer {
-  return Buffer.from(decryptWithKey(wrappedKey, crypto.createHash("sha256").update(masterKeySecret).digest()), "hex")
+  return Buffer.from(decryptWithKey(wrappedKey, crypto.createHash("sha256").update(process.env.ENCRYPTION_KEY!).digest()), "hex")
 }
 
 function normalizeManualKey(manualKey: string): Buffer {
-  return crypto.pbkdf2Sync(manualKey.trim(), crypto.createHash("sha256").update(masterKeySecret).digest(), 310_000, 32, "sha256")
+  return crypto.pbkdf2Sync(manualKey.trim(), crypto.createHash("sha256").update(process.env.ENCRYPTION_KEY!).digest(), 310_000, 32, "sha256")
 }
 
 async function getOrgDataKey(orgId: string): Promise<Buffer> {
