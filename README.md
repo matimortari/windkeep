@@ -33,6 +33,7 @@
 - **ESLint**.
 - **Tailwind CSS**.
 - **Go** for CLI development using **Cobra**.
+- **Vitest** and **@nuxt/test-utils** for testing.
 
 ## Contact
 

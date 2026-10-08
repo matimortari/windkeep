@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createAuditLog, generateSlug, generateToken, getBinaryBlobUrl, getInviteBaseUrl, getUserFromSession, hashToken, invalidateOrgProjectCaches, requireEnv, requireRole } from "../../server/utils/helpers"
-import { db, deleteCached, getHeader, getUserSession, resetNitroMocks } from "./nitro-mocks"
+import { db, deleteCached, getHeader, getUserSession, resetNitroMocks } from "../mocks/nitro-runtime"
 
 const TEST_ENCRYPTION_KEY = "dGVzdC1lbmNyeXB0aW9uLWtleS0zMi1ieXRlcw=="
 
