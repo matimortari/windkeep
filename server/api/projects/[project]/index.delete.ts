@@ -24,8 +24,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
-  await db.project.delete({ where: { id: projectId } })
-
+  // Generate audit log before deleting the project to avoid orphaned data
   await createAuditLog({
     event,
     userId: sessionUser.id,
@@ -36,11 +35,13 @@ export default defineEventHandler(async (event) => {
     description: `Deleted project "${projectData.name}" from organization "${projectData.org.name}" (${projectData._count.secrets} secret(s), ${projectData._count.memberships} member(s))`,
     metadata: {
       projectName: projectData.name,
+      projectSlug: projectData.slug,
       secretsDeleted: projectData._count.secrets,
       membersRemoved: projectData._count.memberships,
     },
   })
 
+  await db.project.delete({ where: { id: projectId } })
   await invalidateOrgProjectCaches(projectData.orgId, sessionUser.id)
 
   return { success: true, message: "Project deleted successfully" }
