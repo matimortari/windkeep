@@ -1,7 +1,16 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createWrappedOrganizationKey, decryptWithKey, encryptWithKey, parseEncryptedData } from "../../server/utils/encryption"
 
 const KEY = new Uint8Array(32).fill(7)
+const TEST_ENCRYPTION_KEY = "dGVzdC1lbmNyeXB0aW9uLWtleS0zMi1ieXRlcw=="
+
+beforeEach(() => {
+  vi.stubEnv("ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
+})
+
+afterEach(() => {
+  vi.unstubAllEnvs()
+})
 
 describe("parseEncryptedData", () => {
   it("parses a valid v1 payload", () => {

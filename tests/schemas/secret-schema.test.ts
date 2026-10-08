@@ -7,8 +7,14 @@ describe("createSecretSchema", () => {
   it("accepts a valid secret key", () => {
     expect(createSecretSchema.parse({
       key: "API_KEY",
+      description: "  Primary API key  ",
       projectId: CUID2,
-    })).toMatchObject({ key: "API_KEY", tags: [], projectId: CUID2 })
+    })).toMatchObject({
+      key: "API_KEY",
+      description: "Primary API key",
+      tags: [],
+      projectId: CUID2,
+    })
   })
 
   it("rejects lowercase or punctuation in keys", () => {
@@ -36,6 +42,10 @@ describe("createSecretSchema", () => {
 describe("updateSecretSchema", () => {
   it("allows clearing description", () => {
     expect(updateSecretSchema.parse({ description: null })).toEqual({ description: null })
+  })
+
+  it("trims description updates", () => {
+    expect(updateSecretSchema.parse({ description: "  Updated  " })).toEqual({ description: "Updated" })
   })
 })
 
