@@ -154,8 +154,8 @@ model ServiceToken {
   environment Environment[]
   projectId   String
   project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdBy   String
-  user        User          @relation(fields: [createdBy], references: [id])
+  createdBy   String?
+  user        User?         @relation(fields: [createdBy], references: [id], onDelete: SetNull)
   auditLogs   AuditLog[]
   expiresAt   DateTime?
   lastUsedAt  DateTime?

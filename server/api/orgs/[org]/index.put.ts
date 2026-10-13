@@ -27,7 +27,11 @@ export default defineEventHandler(async (event) => {
 
   await db.organization.update({
     where: { id: orgId },
-    data: { name: result.data.name, description: result.data.description ?? null, website: result.data.website ?? null },
+    data: {
+      ...(result.data.name !== undefined ? { name: result.data.name } : {}),
+      ...(result.data.description !== undefined ? { description: result.data.description || null } : {}),
+      ...(result.data.website !== undefined ? { website: result.data.website } : {}),
+    },
   })
   if (result.data.rotateEncryptionKey) {
     await rotateOrganizationKey(orgId, result.data.encryptionMode === "MANUAL" ? result.data.encryptionKey : undefined)

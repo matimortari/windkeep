@@ -80,13 +80,13 @@
   </TabSection>
 
   <TabSection title="Danger Zone">
-    <nav class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Leave Organization">
+    <nav v-if="!isOwner" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Leave Organization">
       <header class="flex flex-col gap-1">
         <h6>
           Leave Organization
         </h6>
         <p class="text-caption-danger">
-          This action is irreversible. You will no longer have access to this organization. If you are the last owner, the organization will be deleted.
+          This action is irreversible. You will no longer have access to this organization.
         </p>
       </header>
 

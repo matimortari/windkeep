@@ -114,8 +114,8 @@ interface ServiceToken {
   environment: Environment[]
   projectId: string
   project: Project
-  createdBy: string
-  user: User
+  createdBy?: string | null
+  user?: User | null
   auditLogs?: AuditLog[]
   expiresAt: Date | string | null
   lastUsedAt: Date | string | null
