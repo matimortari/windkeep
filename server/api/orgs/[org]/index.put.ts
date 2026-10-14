@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
     where: { id: orgId },
     data: {
       ...(result.data.name !== undefined ? { name: result.data.name } : {}),
-      ...(result.data.description !== undefined ? { description: result.data.description || null } : {}),
+      ...(result.data.description !== undefined ? { description: result.data.description } : {}),
       ...(result.data.website !== undefined ? { website: result.data.website } : {}),
     },
   })

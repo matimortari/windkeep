@@ -26,8 +26,8 @@ export const createOrgSchema = z.object({
 
 export const updateOrgSchema = z.object({
   name: z.string().trim().min(3, "Organization name must be at least 3 characters").max(50, "Organization name must be at most 50 characters").optional(),
-  description: z.string().trim().max(255, "Description must be at most 255 characters").optional(),
-  website: z.string().trim().optional().transform(v => v || undefined).pipe(z.url("Website must be a valid URL").optional()),
+  description: z.string().trim().max(255, "Description must be at most 255 characters").nullable().optional(),
+  website: z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").nullable().optional(),
   rotateEncryptionKey: z.boolean().optional(),
   encryptionMode: z.enum(["AUTO", "MANUAL"]).optional(),
   encryptionKey: z.string().trim().optional(),

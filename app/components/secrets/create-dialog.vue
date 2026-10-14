@@ -80,10 +80,10 @@ const isUpdateMode = computed(() => !!props.selectedSecret?.id)
 
 function addTag() {
   const tag = newTagInput.value.trim()
-  if (!tag) {
+  if (!tag || tag.length > 32 || form.value.tags.length >= 10) {
     return
   }
-  if (!form.value.tags.includes(tag)) {
+  if (!form.value.tags.some(existing => existing.toLowerCase() === tag.toLowerCase())) {
     form.value.tags.push(tag)
   }
   newTagInput.value = ""

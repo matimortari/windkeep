@@ -108,11 +108,11 @@ const slug = route.params.project
 const { user } = storeToRefs(useUserStore())
 const projectStore = useProjectStore()
 const { projects, isOwner, canLeaveProject } = storeToRefs(projectStore)
-const project = computed(() => projects.value.find(p => p.slug === slug))
+const project = computed(() => projects.value.find((p: Project) => p.slug === slug))
 const localProject = ref<Project | null>(null)
 const transferTargetId = ref("")
 
-const transferCandidates = computed(() => (project.value?.memberships ?? []).filter(m => m.role !== "OWNER" && m.userId !== user.value?.id))
+const transferCandidates = computed(() => (project.value?.memberships ?? []).filter((m: ProjectMembership) => m.role !== "OWNER" && m.userId !== user.value?.id))
 
 const projectFields = [
   {
@@ -190,8 +190,8 @@ async function handleSubmit(index: number) {
   await projectStore.updateProject(project.value.id, {
     name: localProject.value?.name ?? "",
     slug: localProject.value?.slug ?? "",
-    description: localProject.value?.description || undefined,
-    website: localProject.value?.website || undefined,
+    description: localProject.value?.description?.trim() ? localProject.value.description.trim() : null,
+    website: localProject.value?.website?.trim() ? localProject.value.website.trim() : null,
   })
   await projectStore.getProjects()
   saveIcon[index]?.triggerSuccess()
@@ -204,7 +204,7 @@ async function handleTransferOwnership() {
   if (!project.value?.id || !transferTargetId.value) {
     return
   }
-  const target = transferCandidates.value.find(m => m.userId === transferTargetId.value)
+  const target = transferCandidates.value.find((m: ProjectMembership) => m.userId === transferTargetId.value)
   if (!confirm(`Transfer ownership of this project to ${target?.user.name ?? "this member"}? The current project owner will be demoted to admin.`)) {
     return
   }

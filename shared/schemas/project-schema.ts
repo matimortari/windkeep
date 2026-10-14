@@ -26,8 +26,8 @@ export const updateProjectSchema = z.object({
     .max(50, "Slug must be at most 50 characters")
     .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
     .optional(),
-  description: z.string().max(255, "Description must be at most 255 characters").transform(val => val.trim()).optional(),
-  website: z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").optional(),
+  description: z.string().trim().max(255, "Description must be at most 255 characters").nullable().optional(),
+  website: z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").nullable().optional(),
 })
 
 export const addProjectMemberSchema = z.object({ userId: z.cuid2(), role: z.enum(["ADMIN", "MEMBER"]).optional().default("MEMBER") })

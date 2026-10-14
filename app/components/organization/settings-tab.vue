@@ -180,8 +180,8 @@ async function handleSubmit(index: number) {
 
   await orgStore.updateOrg(activeOrg.value.id, {
     name: activeOrg.value.name,
-    description: activeOrg.value.description || undefined,
-    website: activeOrg.value.website || undefined,
+    description: activeOrg.value.description?.trim() ? activeOrg.value.description.trim() : null,
+    website: activeOrg.value.website?.trim() ? activeOrg.value.website.trim() : null,
   })
 
   await orgStore.getOrg(activeOrg.value.id)
