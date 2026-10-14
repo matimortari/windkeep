@@ -22,6 +22,43 @@ describe("createSecretSchema", () => {
   it("accepts environment values when provided", () => {
     expect(createSecretSchema.parse({ key: "DB_URL", projectId: "tz4a98xxat96iws9zmbrgj3a", values: [{ environment: "DEVELOPMENT", value: "postgres://localhost" }] }).values).toHaveLength(1)
   })
+
+  it("rejects duplicate environments", () => {
+    expect(createSecretSchema.safeParse({
+      key: "DB_URL",
+      projectId: "tz4a98xxat96iws9zmbrgj3a",
+      values: [
+        { environment: "DEVELOPMENT", value: "one" },
+        { environment: "DEVELOPMENT", value: "two" },
+      ],
+    }).success).toBe(false)
+  })
+
+  it("rejects more than three environment values", () => {
+    expect(createSecretSchema.safeParse({
+      key: "DB_URL",
+      projectId: "tz4a98xxat96iws9zmbrgj3a",
+      values: [
+        { environment: "DEVELOPMENT", value: "one" },
+        { environment: "STAGING", value: "two" },
+        { environment: "PRODUCTION", value: "three" },
+        { environment: "DEVELOPMENT", value: "four" },
+      ],
+    }).success).toBe(false)
+  })
+
+  it("rejects too many or oversized tags", () => {
+    expect(createSecretSchema.safeParse({
+      key: "DB_URL",
+      projectId: "tz4a98xxat96iws9zmbrgj3a",
+      tags: Array.from({ length: 11 }, (_, i) => `tag${i}`),
+    }).success).toBe(false)
+    expect(createSecretSchema.safeParse({
+      key: "DB_URL",
+      projectId: "tz4a98xxat96iws9zmbrgj3a",
+      tags: ["x".repeat(33)],
+    }).success).toBe(false)
+  })
 })
 
 describe("updateSecretSchema", () => {
@@ -31,6 +68,15 @@ describe("updateSecretSchema", () => {
 
   it("trims description updates", () => {
     expect(updateSecretSchema.parse({ description: "  Updated  " })).toEqual({ description: "Updated" })
+  })
+
+  it("rejects duplicate environments on update", () => {
+    expect(updateSecretSchema.safeParse({
+      values: [
+        { environment: "PRODUCTION", value: "one" },
+        { environment: "PRODUCTION", value: "two" },
+      ],
+    }).success).toBe(false)
   })
 })
 

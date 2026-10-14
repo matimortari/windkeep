@@ -28,6 +28,10 @@ describe("updateOrgSchema", () => {
   it("skips encryption key checks when not rotating", () => {
     expect(updateOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL", encryptionKey: "short" }).success).toBe(true)
   })
+
+  it("clears description and website when null", () => {
+    expect(updateOrgSchema.parse({ description: null, website: null })).toEqual({ description: null, website: null })
+  })
 })
 
 describe("getAuditLogsSchema", () => {

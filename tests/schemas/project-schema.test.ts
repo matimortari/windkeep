@@ -47,4 +47,8 @@ describe("updateProjectSchema", () => {
   it("rejects names that trim below the minimum length", () => {
     expect(updateProjectSchema.safeParse({ name: "  ab  " }).success).toBe(false)
   })
+
+  it("clears description and website when null", () => {
+    expect(updateProjectSchema.parse({ description: null, website: null })).toEqual({ description: null, website: null })
+  })
 })
