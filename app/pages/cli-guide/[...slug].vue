@@ -1,9 +1,9 @@
 <template>
   <h1>
-    {{ CLI_PAGES[slug]?.title }}
+    {{ page.title }}
   </h1>
 
-  <div v-for="(section, index) in CLI_PAGES[slug]?.content" :key="index">
+  <div v-for="(section, index) in page.content" :key="index">
     <h2 :id="slugify(section.title)">
       {{ section.title }}
     </h2>
@@ -48,8 +48,8 @@
       </ul>
     </template>
 
-    <ul v-if="section.commands?.some(c => !c.code)">
-      <li v-for="(item, lIdx) in section.commands?.filter(c => !c.code) ?? []" :key="lIdx">
+    <ul v-if="section.commands?.some((c) => !c.code)">
+      <li v-for="(item, lIdx) in section.commands?.filter((c) => !c.code) ?? []" :key="lIdx">
         <strong v-if="item.label">{{ item.label }}: </strong>
         <template v-if="item.description">
           {{ item.description }}
@@ -79,15 +79,14 @@ const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const param = route.params.slug as string | string[]
 const slug = (Array.isArray(param) ? param.join("/") : param) || "index"
-
-type CommandOption = NonNullable<CliSection["commands"]>[number]
+const page = CLI_PAGES[slug as keyof typeof CLI_PAGES]
 
 function groupCommandOptions(commands?: CliSection["commands"]) {
   if (!commands?.length) {
     return []
   }
 
-  const groups: { label: string, items: CommandOption[] }[] = []
+  const groups: { label: string, items: NonNullable<CliSection["commands"]>[number][] }[] = []
 
   for (const item of commands) {
     if (!item.code) {
@@ -108,10 +107,17 @@ function groupCommandOptions(commands?: CliSection["commands"]) {
 }
 
 useHead({
-  title: CLI_PAGES[slug]?.title,
+  title: page.title,
   link: [{ rel: "canonical", href: `${baseURL}/cli-guide/${slug === "index" ? "" : slug}` }],
-  meta: [{ name: "description", content: CLI_PAGES[slug]?.description }],
+  meta: [{ name: "description", content: page.description }],
 })
 
-definePageMeta({ layout: "content" })
+definePageMeta({
+  layout: "content",
+  validate(route: { params: { slug?: string | string[] } }) {
+    const param = route.params.slug
+    const slug = (Array.isArray(param) ? param.join("/") : param) || "index"
+    return ["index", "orgs-projects", "secrets", "guides"].includes(slug)
+  },
+})
 </script>

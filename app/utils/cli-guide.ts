@@ -611,12 +611,12 @@ const GUIDES_CONTENT: CliSection[] = [
   },
 ]
 
-export const CLI_PAGES: Record<string, { title: string, description: string, content: CliSection[] }> = {
+export const CLI_PAGES = {
   "index": { title: "Command Line Interface", description: "WindKeep Command Line Interface.", content: INDEX_CONTENT },
   "orgs-projects": { title: "CLI: Organizations & Projects", description: "Manage organizations and projects with the WindKeep CLI.", content: ORGS_PROJECTS_CONTENT },
   "secrets": { title: "CLI: Secrets Management", description: "Manage secrets and run commands with the WindKeep CLI.", content: SECRETS_CONTENT },
   "guides": { title: "CLI: Guides & Troubleshooting", description: "Guides and troubleshooting for the WindKeep CLI.", content: GUIDES_CONTENT },
-}
+} as const
 
 export const CLI_GUIDE_ROUTES = Object.entries(CLI_PAGES).map(([slug, page]) => ({
   slug,
