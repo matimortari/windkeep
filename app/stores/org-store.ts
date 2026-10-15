@@ -263,11 +263,11 @@ export const useOrgStore = defineStore("org", () => {
     }
   }
 
-  async function acceptInvite(orgId: string, data: AcceptInviteInput) {
+  async function acceptInvite(data: AcceptInviteInput) {
     loading.value = true
 
     try {
-      const res = await $fetch<{ organization: Organization, membership: OrgMembership }>(`/api/orgs/${orgId}/invitations/accept`, { method: "POST", body: data, credentials: "include" })
+      const res = await $fetch<{ organization: Organization, membership: OrgMembership }>("/api/orgs/invitations/accept", { method: "POST", body: data, credentials: "include" })
       if (res.organization && !organizations.value.some(o => o.id === res.organization.id)) {
         organizations.value.push(res.organization)
       }

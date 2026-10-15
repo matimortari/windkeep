@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return { invitation, inviteUrl: `${getInviteBaseUrl(event)}/onboarding?token=${token}&org=${orgId}` }
+  return { invitation, inviteUrl: `${getInviteBaseUrl(event)}/onboarding?token=${token}` }
 })
 
 defineRouteMeta({

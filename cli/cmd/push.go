@@ -74,6 +74,9 @@ Examples:
 
 			key := strings.TrimSpace(parts[0])
 			value := strings.TrimSpace(parts[1])
+			if len(value) >= 2 && ((value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'')) {
+				value = value[1 : len(value)-1]
+			}
 			if key == "" {
 				continue
 			}

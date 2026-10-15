@@ -2,10 +2,6 @@ import { acceptInviteSchema } from "#shared/schemas/org-schema"
 
 export default defineEventHandler(async (event) => {
   const sessionUser = await getUserFromSession(event)
-  const orgId = getRouterParam(event, "org")
-  if (!orgId) {
-    throw createError({ statusCode: 400, statusMessage: "Organization ID is required" })
-  }
 
   // Rate limit: 20 requests per hour per user
   await enforceRateLimit(event, `org:invite:accept:${sessionUser.id}`, 20)
@@ -16,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message || "Invalid input" })
   }
 
-  const invitation = await db.invitation.findFirst({ where: { token: result.data.token, orgId }, include: { org: { select: { id: true, name: true } } } })
+  const invitation = await db.invitation.findUnique({ where: { token: result.data.token }, include: { org: { select: { id: true, name: true } } } })
   if (!invitation || invitation.acceptedAt) {
     throw createError({ statusCode: 404, statusMessage: "Invitation not found, expired, or already used" })
   }
@@ -45,6 +41,7 @@ export default defineEventHandler(async (event) => {
 
     // Flag the invitation as accepted
     await tx.invitation.update({ where: { id: invitation.id }, data: { acceptedAt: new Date() } })
+
     return [membership]
   })
 
@@ -71,11 +68,8 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Accept organization invitation",
-    description: "Accepts an invitation by token. The authenticated user's email must match the invitation. Sets the new organization membership as active.",
+    description: "Accepts an invitation by token. The authenticated user's email must match the invitation.",
     tags: ["Invitations"],
-    parameters: [
-      { in: "path", name: "org", required: true, schema: { type: "string" }, description: "Organization ID" },
-    ],
     requestBody: {
       required: true,
       content: {
@@ -83,19 +77,17 @@ defineRouteMeta({
           schema: {
             type: "object",
             required: ["token"],
-            properties: {
-              token: { type: "string", description: "Invitation token" },
-            },
+            properties: { token: { type: "string", description: "Invitation token" } },
           },
         },
       },
     },
     responses: {
-      200: { description: "Joined organization, returns organization and membership" },
+      200: { description: "Joined organization" },
       400: { description: "Validation error" },
       401: { description: "Unauthenticated" },
-      403: { description: "Email mismatch or wrong organization" },
-      404: { description: "Invitation not found in this organization or already used" },
+      403: { description: "Email mismatch" },
+      404: { description: "Invitation not found or already used" },
       409: { description: "Already a member of the organization" },
       410: { description: "Invitation expired" },
       429: { description: "Rate limit exceeded" },
