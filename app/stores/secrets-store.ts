@@ -121,41 +121,37 @@ export const useSecretsStore = defineStore("secrets", () => {
     const failed: string[] = []
     const succeeded: string[] = []
 
-    const results = await Promise.allSettled(entries.map(async ([key, change]) => {
-      if (change.type === "create") {
-        const { values, ...data } = change.secret
-        await createProjectSecret(projectId, {
-          key: data.key,
-          description: data.description || "",
-          tags: data.tags || [],
-          projectId,
-          values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
-        }, true)
-      }
-      else if (change.type === "update" && change.secret.id) {
-        const { values, ...data } = change.secret
-        await updateProjectSecret(projectId, change.secret.id, {
-          description: data.description || "",
-          tags: data.tags || undefined,
-          values: values || [],
-        }, true)
-      }
-      else if (change.type === "delete" && change.secret.id) {
-        await deleteProjectSecret(projectId, change.secret.id, true)
-      }
-      return key
-    }))
-
-    results.forEach((result, index) => {
-      const key = entries[index]![0]
-      if (result.status === "fulfilled") {
+    // Sequential processing to avoid opening concurrent interactive transactions and exhausting the pool
+    for (const [key, change] of entries) {
+      try {
+        if (change.type === "create") {
+          const { values, ...data } = change.secret
+          await createProjectSecret(projectId, {
+            key: data.key,
+            description: data.description || "",
+            tags: data.tags || [],
+            projectId,
+            values: (values || []).map(v => ({ environment: v.environment, value: v.value })),
+          }, true)
+        }
+        else if (change.type === "update" && change.secret.id) {
+          const { values, ...data } = change.secret
+          await updateProjectSecret(projectId, change.secret.id, {
+            description: data.description || "",
+            tags: data.tags || undefined,
+            values: values || [],
+          }, true)
+        }
+        else if (change.type === "delete" && change.secret.id) {
+          await deleteProjectSecret(projectId, change.secret.id, true)
+        }
         succeeded.push(key)
       }
-      else {
+      catch (err: unknown) {
         failed.push(key)
-        console.error(`Failed to save secret "${key}":`, result.reason)
+        console.error(`Failed to save secret "${key}":`, err)
       }
-    })
+    }
 
     if (failed.length && succeeded.length) {
       toast.warning(`${succeeded.length} secret(s) saved, ${failed.length} failed`)
