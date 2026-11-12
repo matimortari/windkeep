@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createAuditLog, generateSlug, generateToken, getBinaryBlobUrl, getInviteBaseUrl, getUserFromSession, hashToken, invalidateOrgProjectCaches, requireEnv, requireRole } from "../../server/utils/helpers"
-import { db, deleteCached, getHeader, getUserSession, resetNitroMocks } from "../mocks/nitro-runtime"
+import { assertValidUserSession, createError, db, deleteCached, getHeader, getUserSession, resetNitroMocks } from "../mocks/nitro-runtime"
 
 const TEST_ENCRYPTION_KEY = "dGVzdC1lbmNyeXB0aW9uLWtleS0zMi1ieXRlcw=="
 
@@ -40,6 +40,13 @@ describe("hashToken", () => {
 
   it("changes when the token changes", () => {
     expect(hashToken("token-a")).not.toBe(hashToken("token-b"))
+  })
+
+  it("hashes service tokens with plain sha256", () => {
+    const hashed = hashToken("st_abc123")
+    expect(hashed).toMatch(/^[a-f0-9]{64}$/)
+    expect(hashToken("st_abc123")).toBe(hashed)
+    expect(hashed).not.toBe(hashToken("token-a"))
   })
 })
 
@@ -93,9 +100,25 @@ describe("getUserFromSession", () => {
     vi.unstubAllEnvs()
   })
 
-  it("returns the session user when present", async () => {
-    getUserSession.mockResolvedValue({ user: { id: "u1", email: "a@b.c", name: "Ada", image: null } })
+  it("returns the session user after server-side session validation", async () => {
+    const session = {
+      user: { id: "u1", email: "a@b.c", name: "Ada", image: null },
+      loggedInAt: new Date(),
+      expiresAt: new Date(Date.now() + 60_000),
+      lastActivityAt: new Date(),
+      sessionId: "sid-1",
+    }
+    getUserSession.mockResolvedValue(session)
+    assertValidUserSession.mockResolvedValue(session)
+
     await expect(getUserFromSession({} as any)).resolves.toEqual({ id: "u1", email: "a@b.c", name: "Ada", image: "" })
+    expect(assertValidUserSession).toHaveBeenCalled()
+  })
+
+  it("rejects when server-side session validation fails", async () => {
+    getUserSession.mockResolvedValue({ user: { id: "u1", email: "a@b.c", name: "Ada", image: null } })
+    assertValidUserSession.mockRejectedValue(createError({ statusCode: 401, statusMessage: "Session expired" }))
+    await expect(getUserFromSession({} as any)).rejects.toMatchObject({ statusCode: 401 })
   })
 
   it("authenticates via a valid bearer api token", async () => {
@@ -105,6 +128,7 @@ describe("getUserFromSession", () => {
 
     await expect(getUserFromSession({} as any)).resolves.toEqual({ id: "u2", email: "cli@b.c", name: "Cli", image: "img" })
     expect(db.user.findFirst).toHaveBeenCalledWith({ where: { apiToken: hashToken("raw-token") }, select: { id: true, email: true, name: true, image: true, apiTokenExpiresAt: true } })
+    expect(assertValidUserSession).not.toHaveBeenCalled()
 
     db.user.findFirst.mockResolvedValue({ id: "u3", email: "cli2@b.c", name: "Cli2", image: null, apiTokenExpiresAt: new Date(Date.now() + 60_000) })
     await expect(getUserFromSession({} as any)).resolves.toMatchObject({ id: "u3", image: "" })
@@ -275,12 +299,13 @@ describe("createAuditLog", () => {
   })
 
   it("uses unknown when no event is provided", async () => {
-    await createAuditLog({ userId: "u1", action: "PING", description: "custom" })
+    await createAuditLog({ userId: "u1", action: "PING", serviceTokenId: "st1", description: "custom" })
     expect(db.auditLog.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         ip: "unknown",
         ua: "unknown",
         description: "custom",
+        serviceTokenId: "st1",
       }),
     })
   })
