@@ -13,6 +13,7 @@ declare module "#auth-utils" {
     loggedInAt: Date | string
     expiresAt: Date | string
     lastActivityAt: Date | string
+    sessionId?: string
   }
 
   interface Account {
