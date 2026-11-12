@@ -15,10 +15,8 @@ export const useOrgStore = defineStore("org", () => {
 
   const orgMembers = computed(() => activeOrg.value?.memberships ?? [])
   const orgProjects = computed(() => projectStore.projects.filter((p: Project) => p.orgId === activeOrg.value?.id) ?? [])
-
-  const isOwner = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "OWNER")
-  const isAdmin = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "ADMIN")
-
+  const isOwner = computed(() => !!userStore.user?.orgMemberships?.find(m => m.isActive && m.role === "OWNER"))
+  const isAdmin = computed(() => !!userStore.user?.orgMemberships?.find(m => m.isActive && m.role === "ADMIN"))
   const auditActions = computed(() => [
     { label: "Organization Created", value: "CREATE.ORG" },
     { label: "Organization Updated", value: "UPDATE.ORG" },

@@ -1,14 +1,9 @@
 import type { UpdateUserInput } from "#shared/schemas/user-schema"
 
-export interface TokenMetadata {
-  hasToken: boolean
-  expiresAt: string | null
-}
-
 export const useUserStore = defineStore("user", () => {
   const toast = useToast()
   const user = ref<User | null>(null)
-  const tokenMetadata = ref<TokenMetadata | null>(null)
+  const tokenMetadata = ref<{ hasToken: boolean, expiresAt: string | null } | null>(null)
   const loading = ref(false)
 
   async function getUser() {
@@ -99,7 +94,7 @@ export const useUserStore = defineStore("user", () => {
     loading.value = true
 
     try {
-      const res = await $fetch<TokenMetadata>("/api/user/token", { method: "GET", credentials: "include" })
+      const res = await $fetch<{ hasToken: boolean, expiresAt: string | null }>("/api/user/token", { method: "GET", credentials: "include" })
       tokenMetadata.value = res
       return res
     }

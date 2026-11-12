@@ -33,7 +33,7 @@ const emit = defineEmits<{ close: [], save: [payload: { name: string, descriptio
 const { isProjectsEditorOpen, closeDialog } = useUIState()
 const form = ref<{ name: string, description: string }>({ name: "", description: "" })
 
-async function handleSubmit() {
+function handleSubmit() {
   if (!form.value.name.trim()) {
     return
   }

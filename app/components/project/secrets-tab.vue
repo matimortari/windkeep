@@ -99,7 +99,7 @@ function onDragLeave() {
   }
 }
 
-async function openEditorWithEnvText(text: string) {
+function openEditorWithEnvText(text: string) {
   importedEnvContent.value = text
   openDialog("raw")
 }
@@ -109,7 +109,7 @@ async function readEnvFile(file: File) {
   if (!text.trim()) {
     return
   }
-  await openEditorWithEnvText(text)
+  openEditorWithEnvText(text)
 }
 
 async function onDrop(event: DragEvent) {
@@ -157,7 +157,7 @@ const availableTags = computed(() => {
   const tags = new Set<string>()
   secrets.value.forEach(secret => secret.tags?.forEach(tag => tags.add(tag)))
   pendingChanges.forEach(change => change.secret.tags?.forEach(tag => tags.add(tag)))
-  return Array.from(tags).sort()
+  return Array.from(tags).sort((a, b) => a.localeCompare(b))
 })
 
 function handleEditSecret(secret: Secret) {

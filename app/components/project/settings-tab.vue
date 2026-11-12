@@ -107,12 +107,19 @@ const route = useRoute()
 const slug = route.params.project
 const { user } = storeToRefs(useUserStore())
 const projectStore = useProjectStore()
-const { projects, isOwner, canLeaveProject } = storeToRefs(projectStore)
+const { projects, isOwner, membershipRole } = storeToRefs(projectStore)
 const project = computed(() => projects.value.find((p: Project) => p.slug === slug))
 const localProject = ref<Project | null>(null)
 const transferTargetId = ref("")
 
 const transferCandidates = computed(() => (project.value?.memberships ?? []).filter((m: ProjectMembership) => m.role !== "OWNER" && m.userId !== user.value?.id))
+<<<<<<< Updated upstream
+||||||| Stash base
+const transferTarget = computed(() => transferCandidates.value.find((m: ProjectMembership) => m.userId === transferTargetId.value))
+=======
+const transferTarget = computed(() => transferCandidates.value.find((m: ProjectMembership) => m.userId === transferTargetId.value))
+const canLeaveProject = computed(() => (projectId: string) => !!membershipRole.value(projectId) && membershipRole.value(projectId) !== "OWNER")
+>>>>>>> Stashed changes
 
 const projectFields = [
   {

@@ -8,14 +8,9 @@ export const useProjectStore = defineStore("project", () => {
   const serviceTokens = ref<ServiceToken[]>([])
   const loading = ref(false)
 
-  const isOrgOwner = computed(() => userStore.user?.orgMemberships?.find(m => m.isActive)?.role === "OWNER")
   const membershipRole = computed(() => (projectId: string) => projects.value.find(p => p.id === projectId)?.memberships?.find(m => m.userId === userStore.user?.id)?.role)
-  const isOwner = computed(() => (projectId: string) => isOrgOwner.value || membershipRole.value(projectId) === "OWNER")
+  const isOwner = computed(() => (projectId: string) => !!userStore.user?.orgMemberships?.find(m => m.isActive && m.role === "OWNER") || membershipRole.value(projectId) === "OWNER")
   const isAdmin = computed(() => (projectId: string) => membershipRole.value(projectId) === "ADMIN")
-  const canLeaveProject = computed(() => (projectId: string) => {
-    const role = membershipRole.value(projectId)
-    return !!role && role !== "OWNER"
-  })
 
   async function getProjects() {
     loading.value = true
@@ -237,7 +232,7 @@ export const useProjectStore = defineStore("project", () => {
     serviceTokens,
     isOwner,
     isAdmin,
-    canLeaveProject,
+    membershipRole,
     getProjects,
     createProject,
     updateProject,

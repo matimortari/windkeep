@@ -93,7 +93,7 @@ function removeTag(tagToRemove: string) {
   form.value.tags = form.value.tags.filter(tag => tag !== tagToRemove)
 }
 
-async function handleSubmit() {
+function handleSubmit() {
   const normalizedKey = normalizeKey(form.value.key)
   if (!normalizedKey) {
     return
