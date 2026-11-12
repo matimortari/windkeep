@@ -1,5 +1,5 @@
 import type { EventHandlerRequest, H3Event } from "h3"
-import { createHmac, randomBytes } from "node:crypto"
+import { createHash, createHmac, randomBytes } from "node:crypto"
 
 /**
  * Ensure required environment variables are set, throwing an error if missing.
@@ -20,7 +20,8 @@ export function requireEnv(name: string): string {
 export async function getUserFromSession(event: H3Event<EventHandlerRequest>): Promise<User> {
   const session = await getUserSession(event)
   if (session?.user?.id) {
-    const { id, email, name, image } = session.user
+    const validSession = await assertValidUserSession(event, session)
+    const { id, email, name, image } = validSession.user
     return { id, email, name, image: image ?? "" }
   }
 
@@ -40,10 +41,60 @@ export async function getUserFromSession(event: H3Event<EventHandlerRequest>): P
 }
 
 /**
+ * Generates a secure random token as a hexadecimal string.
+ * Default length is 12 bytes (24 hex characters).
+ */
+export function generateToken(byteLength: number = 12): string {
+  return randomBytes(byteLength).toString("hex")
+}
+
+/**
  * Hashes tokens before persistence/comparison to avoid storing raw bearer credentials.
+ * Service tokens (st_…) use plain SHA-256; personal API tokens use HMAC-SHA256.
  */
 export function hashToken(token: string): string {
+  if (token.startsWith("st_")) {
+    return createHash("sha256").update(token).digest("hex")
+  }
   return createHmac("sha256", requireEnv("ENCRYPTION_KEY")).update(token).digest("hex")
+}
+
+/**
+ * Extracts a raw service token from an Authorization header (`Bearer st_...`).
+ */
+export function extractServiceToken(authHeader: string | undefined): string | null {
+  if (!authHeader?.startsWith("Bearer st_")) {
+    return null
+  }
+  return authHeader.slice(7)
+}
+
+/**
+ * Looks up a valid (non-expired) service token and updates lastUsedAt.
+ * Throws 401 when the token is missing or expired.
+ */
+export async function requireServiceToken(rawToken: string) {
+  const serviceToken = await db.serviceToken.findUnique({
+    where: { tokenHash: hashToken(rawToken) },
+    select: {
+      id: true,
+      name: true,
+      environment: true,
+      expiresAt: true,
+      projectId: true,
+      project: { select: { id: true, name: true, slug: true, orgId: true } },
+    },
+  })
+  if (!serviceToken) {
+    throw createError({ statusCode: 401, statusMessage: "Invalid service token" })
+  }
+  if (serviceToken.expiresAt && serviceToken.expiresAt < new Date()) {
+    throw createError({ statusCode: 401, statusMessage: "Service token has expired" })
+  }
+
+  await db.serviceToken.update({ where: { id: serviceToken.id }, data: { lastUsedAt: new Date() } })
+
+  return serviceToken
 }
 
 /**
@@ -122,14 +173,6 @@ export async function invalidateOrgProjectCaches(orgId: string, ...extraUserIds:
     return
   }
   await deleteCached(...[...userIds].map(id => CacheKeys.userProjects(id, orgId)))
-}
-
-/**
- * Generates a secure random token as a hexadecimal string.
- * Default length is 12 bytes (24 hex characters).
- */
-export function generateToken(byteLength: number = 12): string {
-  return randomBytes(byteLength).toString("hex")
 }
 
 /**

@@ -250,7 +250,7 @@ const canGenerateToken = computed(() => tokenForm.value.name.trim().length >= 3 
 const copyIconKeys = [...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))), "token", "workflow"]
 const copyIcons = Object.fromEntries(copyIconKeys.map(key => [key, useActionIcon("ph:copy-bold")])) as Record<string, ReturnType<typeof useActionIcon>>
 
-function resolveSecretValue(secret: { source?: "baseURL" | "projectId" | "serviceToken", placeholder?: string }) {
+function resolveSecretValue(secret: { source?: "baseURL" | "projectId" | "serviceToken" | "environment", placeholder?: string }) {
   if (secret.source === "baseURL") {
     return (baseURL as string)?.replace(/\/$/, "") || ""
   }
@@ -259,6 +259,9 @@ function resolveSecretValue(secret: { source?: "baseURL" | "projectId" | "servic
   }
   if (secret.source === "serviceToken") {
     return generatedRawToken.value || ""
+  }
+  if (secret.source === "environment") {
+    return selected.value?.defaultEnvironments?.[0] || secret.placeholder || "PRODUCTION"
   }
   return ""
 }

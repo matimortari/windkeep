@@ -20,11 +20,15 @@ export default defineEventHandler(async (event) => {
   if (!targetMembership) {
     throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
   }
-  if (targetMembership.role === "OWNER") {
-    throw createError({ statusCode: memberId === sessionUser.id ? 400 : 403, statusMessage: memberId === sessionUser.id ? "Cannot leave project as owner. Transfer ownership or delete the project first." : "Cannot remove project owners." })
-  }
   if (memberId !== sessionUser.id) {
-    await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
+    const actorMembership = await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
+    const rank = { OWNER: 2, ADMIN: 1, MEMBER: 0 } as const
+    if (rank[actorMembership.role] <= rank[targetMembership.role]) {
+      throw createError({ statusCode: 403, statusMessage: "Cannot remove this member" })
+    }
+  }
+  else if (targetMembership.role === "OWNER") {
+    throw createError({ statusCode: 400, statusMessage: "Cannot leave project as owner. Transfer ownership or delete the project first." })
   }
 
   await db.projectMembership.delete({ where: { userId_projectId: { userId: memberId, projectId } } })
@@ -53,7 +57,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Remove or leave project",
-    description: "Removes a project member from the project. Members can remove themselves (leave). Owners cannot be removed, transfer ownership or delete the project first. Requires project OWNER or ADMIN role.",
+    description: "Removes a project member from the project. Members can remove themselves (leave). Admins can remove members, but only owners can remove admins. Owners cannot be removed, transfer ownership or delete the project first. Requires project OWNER or ADMIN role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -63,7 +67,7 @@ defineRouteMeta({
       200: { description: "Member removed" },
       400: { description: "Cannot remove owner, transfer ownership or delete the project first" },
       401: { description: "Unauthenticated" },
-      403: { description: "Insufficient role or attempting to remove an owner" },
+      403: { description: "Insufficient role to remove this member" },
       404: { description: "Member not found" },
       429: { description: "Rate limit exceeded" },
     },

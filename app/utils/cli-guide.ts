@@ -35,22 +35,39 @@ const INDEX_CONTENT: CliSection[] = [
   },
   {
     title: "Authentication",
-    paragraphs: [[
-      "Before running other commands, authenticate with your API token.",
-      " Copy it from the ",
-      { link: { href: "/admin/preferences", text: "preferences page" } },
-      " in the WindKeep dashboard.",
-    ]],
+    paragraphs: [
+      [
+        "Interactive use: authenticate with your ",
+        { strong: "personal API token" },
+        " from the ",
+        { link: { href: "/admin/preferences", text: "preferences page" } },
+        ".",
+      ],
+      [
+        "CI/CD: use a project ",
+        { strong: "service token" },
+        " (",
+        { code: "st_…" },
+        ") from Access Control, or set ",
+        { code: "WINDKEEP_TOKEN" },
+        " and ",
+        { code: "WINDKEEP_PROJECT_ID" },
+        " in the environment — see Guides → CI/CD.",
+      ],
+    ],
     note: ["Login validates your token and saves credentials to ", { code: "~/.config/windkeep/config.yml" }, " (Linux) or ", { code: "%APPDATA%\\windkeep\\config.yml" }, " (Windows)."],
     code: [{
       command: [
-        "# Authenticate with your API token",
+        "# Personal token — full CLI access",
         "windkeep login YOUR_API_TOKEN",
+        "",
+        "# Service token — read-only, single project (CI-friendly)",
+        "windkeep login st_YOUR_SERVICE_TOKEN",
         "",
         "# Or use interactive mode (token input is hidden)",
         "windkeep login",
         "",
-        "# Show your user and active org/project context",
+        "# Show your user or service-token context",
         "windkeep whoami",
         "",
         "# Remove stored credentials",
@@ -510,7 +527,11 @@ const GUIDES_CONTENT: CliSection[] = [
   },
   {
     title: "Workflow: CI/CD Pipeline Integration",
-    paragraphs: [[{ strong: "Scenario:" }, " You want to inject secrets in GitHub Actions or GitLab CI without committing static config files."]],
+    paragraphs: [
+      [{ strong: "Scenario:" }, " You want to inject secrets in GitHub Actions or GitLab CI without committing static config files."],
+      ["Use a ", { strong: "service token" }, " (", { code: "st_…" }, ") from the project's Access Control tab — not a personal API token. Service tokens are scoped to one project and selected environments, so a leaked CI secret cannot list orgs or delete resources."],
+      ["Set ", { code: "WINDKEEP_TOKEN" }, " and ", { code: "WINDKEEP_PROJECT_ID" }, " as CI secrets. The CLI reads them from the environment — no ", { code: "login" }, " or ", { code: "projects switch" }, " step is required."],
+    ],
     code: [
       {
         label: "GitHub Actions:",
@@ -518,10 +539,8 @@ const GUIDES_CONTENT: CliSection[] = [
           "- name: Deploy with WindKeep secrets",
           "  env:",
           "    WINDKEEP_TOKEN: $" + "{{ secrets.WINDKEEP_TOKEN }}",
-          "  run: |",
-          "    windkeep login $WINDKEEP_TOKEN",
-          "    windkeep projects switch my-app",
-          "    windkeep run --env prod npm run build",
+          "    WINDKEEP_PROJECT_ID: $" + "{{ secrets.WINDKEEP_PROJECT_ID }}",
+          "  run: windkeep run --env prod npm run build",
         ].join("\n"),
       },
       {
@@ -529,13 +548,24 @@ const GUIDES_CONTENT: CliSection[] = [
         command: [
           "deploy:",
           "  stage: deploy",
+          "  variables:",
+          "    WINDKEEP_TOKEN: $WINDKEEP_TOKEN",
+          "    WINDKEEP_PROJECT_ID: $WINDKEEP_PROJECT_ID",
           "  script:",
-          "    - windkeep login $WINDKEEP_TOKEN",
-          "    - windkeep projects switch my-app",
           "    - windkeep run --env prod npm run deploy",
         ].join("\n"),
       },
+      {
+        label: "Optional — persist a service token locally:",
+        command: [
+          "# Validates st_… against /api/service-token and pins the scoped project",
+          "windkeep login st_your_service_token",
+          "windkeep whoami",
+          "windkeep run --env prod npm run build",
+        ].join("\n"),
+      },
     ],
+    note: ["Personal tokens from Preferences still work for interactive CLI use. Prefer service tokens anywhere credentials live in CI."],
   },
   {
     title: "Workflow: Managing Microservices",

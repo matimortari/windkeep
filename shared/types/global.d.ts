@@ -207,7 +207,7 @@ interface EnvironmentHistory {
 interface IntegrationSecretVar {
   name: string
   description: string
-  source?: "baseURL" | "projectId" | "serviceToken"
+  source?: "baseURL" | "projectId" | "serviceToken" | "environment"
   placeholder?: string
 }
 

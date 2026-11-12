@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   // Rate limit: 30 requests per hour per user
   await enforceRateLimit(event, `project:member:update:${sessionUser.id}`, 30)
-  await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
+  const actorMembership = await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN"])
 
   const body = await readBody(event)
   const result = updateProjectMemberSchema.safeParse(body)
@@ -22,11 +22,12 @@ export default defineEventHandler(async (event) => {
   if (!targetMembership) {
     throw createError({ statusCode: 404, statusMessage: "Member not found in project" })
   }
-  if (targetMembership.role === "OWNER") {
-    throw createError({ statusCode: 403, statusMessage: "Cannot change the role of project owners" })
-  }
   if (memberId === sessionUser.id) {
     throw createError({ statusCode: 400, statusMessage: "You cannot change your own role" })
+  }
+  const rank = { OWNER: 2, ADMIN: 1, MEMBER: 0 } as const
+  if (rank[actorMembership.role] <= rank[targetMembership.role]) {
+    throw createError({ statusCode: 403, statusMessage: "Cannot change this member's role" })
   }
 
   const updatedMembership = await db.projectMembership.update({
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Update project member role",
-    description: "Updates a project member's role. Cannot change owner roles or your own role. Requires project OWNER or ADMIN role.",
+    description: "Updates a project member's role. Cannot change owner roles or your own role. Only owners can change admin roles. Requires project OWNER or ADMIN role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -88,7 +89,7 @@ defineRouteMeta({
       200: { description: "Updated membership" },
       400: { description: "Validation error or attempting to change own role" },
       401: { description: "Unauthenticated" },
-      403: { description: "Insufficient role or attempting to change an owner's role" },
+      403: { description: "Insufficient role to change this member" },
       404: { description: "Member not found" },
       429: { description: "Rate limit exceeded" },
     },

@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto"
-
 export default defineEventHandler(async (event) => {
   const projectId = getRouterParam(event, "project")
   if (!projectId) {
@@ -13,24 +11,14 @@ export default defineEventHandler(async (event) => {
 
   // Determine auth method — service token (st_ prefix) or session user
   let allowedEnvironments: Environment[] | null = null
-  const authHeader = getHeader(event, "authorization")
-  const rawToken = authHeader?.startsWith("Bearer st_") ? authHeader.slice(7) : null
+  const rawToken = extractServiceToken(getHeader(event, "authorization"))
 
   if (rawToken) {
-    const tokenHash = createHash("sha256").update(rawToken).digest("hex")
-    const serviceToken = await db.serviceToken.findUnique({
-      where: { tokenHash },
-      select: { id: true, projectId: true, environment: true, expiresAt: true },
-    })
-
-    if (!serviceToken || serviceToken.projectId !== projectId) {
+    const serviceToken = await requireServiceToken(rawToken)
+    if (serviceToken.projectId !== projectId) {
       throw createError({ statusCode: 401, statusMessage: "Invalid service token" })
     }
-    if (serviceToken.expiresAt && serviceToken.expiresAt < new Date()) {
-      throw createError({ statusCode: 401, statusMessage: "Service token has expired" })
-    }
 
-    await db.serviceToken.update({ where: { id: serviceToken.id }, data: { lastUsedAt: new Date() } })
     // Rate limit: 200 requests per hour per token
     await enforceRateLimit(event, `secrets:list:token:${serviceToken.id}`, 200)
     allowedEnvironments = serviceToken.environment as Environment[]

@@ -1,10 +1,11 @@
 /* eslint-disable no-template-curly-in-string */
 
-// Shared curl + jq block that fetches decrypted secrets into KEY/VALUE TSV rows
+// Shared curl + jq block that fetches decrypted secrets into KEY/VALUE rows.
 function fetchSecretsScript(indent = "          "): string[] {
   const i = indent
   return [
     `${i}set -euo pipefail`,
+    `${i}: "\${WINDKEEP_ENVIRONMENT:?Set WINDKEEP_ENVIRONMENT (e.g. PRODUCTION)}"`,
     "",
     `${i}HTTP_CODE=$(curl -s -o /tmp/wk_response.json -w "%{http_code}" \\`,
     `${i}  -H "Authorization: Bearer \${WINDKEEP_TOKEN}" \\`,
@@ -14,8 +15,29 @@ function fetchSecretsScript(indent = "          "): string[] {
     `${i}  echo "HTTP \${HTTP_CODE}:" && cat /tmp/wk_response.json`,
     `${i}  exit 1`,
     `${i}fi`,
+  ]
+}
+
+// Null-delimited KEY/VALUE loop filtered to a single WindKeep environment.
+function eachSecretLoop(indent: string, body: string[]): string[] {
+  const i = indent
+  const jqFilter = [
+    ".decryptedSecrets[] as $s",
+    "| $s.values[]",
+    "| select(.environment == $env)",
+    "| \"\\($s.key | ascii_upcase)\\u0000\\(.value)\\u0000\"",
+  ].join(" ")
+
+  return [
+    `${i}COUNT=0`,
+    String.raw`${i}while IFS= read -r -d '' KEY && IFS= read -r -d '' VALUE; do`,
+    ...body.map(line => `${i}  ${line}`),
+    `${i}  COUNT=$((COUNT + 1))`,
+    `${i}done < <(jq -rj --arg env "$WINDKEEP_ENVIRONMENT" '${jqFilter}' /tmp/wk_response.json)`,
     "",
-    `${i}RESPONSE=$(cat /tmp/wk_response.json)`,
+    `${i}if [ "$COUNT" -eq 0 ]; then`,
+    `${i}  echo "No secrets returned for environment $WINDKEEP_ENVIRONMENT." && exit 1`,
+    `${i}fi`,
   ]
 }
 
@@ -36,6 +58,12 @@ const windkeepSecrets: IntegrationSecretVar[] = [
     source: "serviceToken",
     placeholder: "Generate below, then paste into your secrets store",
   },
+  {
+    name: "WINDKEEP_ENVIRONMENT",
+    description: "Which secret environment to inject (DEVELOPMENT, STAGING, or PRODUCTION). Required so multi-env tokens cannot mix values.",
+    source: "environment",
+    placeholder: "PRODUCTION",
+  },
 ]
 
 export const INTEGRATIONS: IntegrationDefinition[] = [
@@ -43,7 +71,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     id: "railway",
     name: "Railway",
     summary: "Sync secrets into a Railway service and deploy from GitHub Actions.",
-    description: "On every push to main, GitHub Actions pulls decrypted secrets from WindKeep with a service token, writes them to your Railway service with the Railway CLI, then deploys.",
+    description: "On every push to main, GitHub Actions pulls decrypted secrets from WindKeep with a service token, writes them to your Railway service with the Railway CLI, removes keys this workflow previously synced that are no longer in WindKeep, then deploys.",
     icon: "simple-icons:railway",
     docsUrl: "https://docs.railway.com/guides/cli",
     docsLabel: "Railway CLI docs",
@@ -94,6 +122,9 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "  push:",
         "    branches: [main]",
         "",
+        "permissions:",
+        "  contents: read",
+        "",
         "jobs:",
         "  deploy:",
         "    runs-on: ubuntu-latest",
@@ -102,31 +133,42 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "      - uses: actions/checkout@v4",
         "",
         "      - name: Install Railway CLI",
-        "        run: npm install -g @railway/cli",
+        "        run: npm install -g @railway/cli@5.71.0",
         "",
         "      - name: Sync secrets",
         "        env:",
         "          WINDKEEP_URL: ${{ secrets.WINDKEEP_URL }}",
         "          WINDKEEP_PROJECT_ID: ${{ secrets.WINDKEEP_PROJECT_ID }}",
         "          WINDKEEP_TOKEN: ${{ secrets.WINDKEEP_TOKEN }}",
+        "          WINDKEEP_ENVIRONMENT: ${{ secrets.WINDKEEP_ENVIRONMENT }}",
         "          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}",
         "          RAILWAY_SERVICE: ${{ secrets.RAILWAY_SERVICE }}",
         "        run: |",
         ...fetchSecretsScript(),
         "",
         "          VARS_ARGS=()",
-        String.raw`          while IFS=$'\t' read -r KEY VALUE; do`,
-        "            echo \"::add-mask::${VALUE}\"",
-        "            VARS_ARGS+=(\"${KEY}=${VALUE}\")",
-        "          done < <(echo \"$RESPONSE\" | jq -r '",
-        "            .decryptedSecrets[] | . as $s | .values[] | [($s.key | ascii_upcase), .value] | @tsv",
-        "          ')",
+        "          WK_KEYS=()",
+        ...eachSecretLoop("          ", [
+          "echo \"::add-mask::${VALUE}\"",
+          "VARS_ARGS+=(\"${KEY}=${VALUE}\")",
+          "WK_KEYS+=(\"${KEY}\")",
+        ]),
         "",
-        "          if [ ${#VARS_ARGS[@]} -eq 0 ]; then",
-        "            echo \"No secrets returned.\" && exit 1",
-        "          fi",
+        "          railway variables set \"${VARS_ARGS[@]}\" --skip-deploys --service \"$RAILWAY_SERVICE\"",
         "",
-        "          railway variables set \"${VARS_ARGS[@]}\" --service \"$RAILWAY_SERVICE\"",
+        "          SYNC_META=WINDKEEP_SYNCED_KEYS",
+        "          mapfile -t PREV_KEYS < <(railway variables --json --service \"$RAILWAY_SERVICE\" | jq -r --arg k \"$SYNC_META\" '.[$k] // empty | split(\",\")[] | select(length > 0)')",
+        "          for OLD in \"${PREV_KEYS[@]}\"; do",
+        "            found=0",
+        "            for K in \"${WK_KEYS[@]}\"; do",
+        "              [ \"$OLD\" = \"$K\" ] && found=1 && break",
+        "            done",
+        "            if [ \"$found\" -eq 0 ]; then",
+        "              railway variables delete \"$OLD\" --skip-deploys --service \"$RAILWAY_SERVICE\"",
+        "            fi",
+        "          done",
+        "          JOINED=$(IFS=,; echo \"${WK_KEYS[*]}\")",
+        "          railway variables set \"${SYNC_META}=${JOINED}\" --skip-deploys --service \"$RAILWAY_SERVICE\"",
         "",
         "      - name: Deploy to Railway",
         "        env:",
@@ -161,7 +203,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
       },
       {
         title: "Add GitHub Actions secrets",
-        body: "In your repo → Settings → Secrets and variables → Actions, add WINDKEEP_URL, WINDKEEP_PROJECT_ID, and WINDKEEP_TOKEN. Values can be copied from this sheet.",
+        body: "In your repo → Settings → Secrets and variables → Actions, add WINDKEEP_URL, WINDKEEP_PROJECT_ID, WINDKEEP_TOKEN, and WINDKEEP_ENVIRONMENT. Values can be copied from this sheet.",
       },
       {
         title: "Add the fetch step",
@@ -188,6 +230,9 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "    branches: [main]",
         "  pull_request:",
         "",
+        "permissions:",
+        "  contents: read",
+        "",
         "jobs:",
         "  build:",
         "    runs-on: ubuntu-latest",
@@ -200,19 +245,18 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "          WINDKEEP_URL: ${{ secrets.WINDKEEP_URL }}",
         "          WINDKEEP_PROJECT_ID: ${{ secrets.WINDKEEP_PROJECT_ID }}",
         "          WINDKEEP_TOKEN: ${{ secrets.WINDKEEP_TOKEN }}",
+        "          WINDKEEP_ENVIRONMENT: ${{ secrets.WINDKEEP_ENVIRONMENT }}",
         "        run: |",
         ...fetchSecretsScript(),
         "",
-        String.raw`          while IFS=$'\t' read -r KEY VALUE; do`,
-        "            echo \"::add-mask::${VALUE}\"",
-        "            {",
-        "              echo \"${KEY}<<EOF\"",
-        "              echo \"${VALUE}\"",
-        "              echo \"EOF\"",
-        "            } >> \"$GITHUB_ENV\"",
-        "          done < <(echo \"$RESPONSE\" | jq -r '",
-        "            .decryptedSecrets[] | . as $s | .values[] | [($s.key | ascii_upcase), .value] | @tsv",
-        "          ')",
+        ...eachSecretLoop("          ", [
+          "echo \"::add-mask::${VALUE}\"",
+          "{",
+          "  echo \"${KEY}<<EOF\"",
+          "  printf '%s\\n' \"${VALUE}\"",
+          "  echo \"EOF\"",
+          "} >> \"$GITHUB_ENV\"",
+        ]),
         "",
         "      - name: Build",
         "        run: |",
@@ -285,6 +329,9 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "  push:",
         "    branches: [main]",
         "",
+        "permissions:",
+        "  contents: read",
+        "",
         "jobs:",
         "  sync:",
         "    runs-on: ubuntu-latest",
@@ -300,19 +347,18 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "          WINDKEEP_URL: ${{ secrets.WINDKEEP_URL }}",
         "          WINDKEEP_PROJECT_ID: ${{ secrets.WINDKEEP_PROJECT_ID }}",
         "          WINDKEEP_TOKEN: ${{ secrets.WINDKEEP_TOKEN }}",
+        "          WINDKEEP_ENVIRONMENT: ${{ secrets.WINDKEEP_ENVIRONMENT }}",
         "          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}",
         "          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}",
         "          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}",
         "        run: |",
         ...fetchSecretsScript(),
         "",
-        String.raw`          while IFS=$'\t' read -r KEY VALUE; do`,
-        "            echo \"::add-mask::${VALUE}\"",
-        "            vercel env rm \"$KEY\" production -y >/dev/null 2>&1 || true",
-        "            printf '%s' \"$VALUE\" | vercel env add \"$KEY\" production",
-        "          done < <(echo \"$RESPONSE\" | jq -r '",
-        "            .decryptedSecrets[] | . as $s | .values[] | [($s.key | ascii_upcase), .value] | @tsv",
-        "          ')",
+        ...eachSecretLoop("          ", [
+          "echo \"::add-mask::${VALUE}\"",
+          "vercel env rm \"$KEY\" production -y >/dev/null 2>&1 || true",
+          "printf '%s' \"$VALUE\" | vercel env add \"$KEY\" production",
+        ]),
         "",
         "      - name: Deploy to Vercel",
         "        env:",
@@ -347,7 +393,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
       },
       {
         title: "Export WindKeep variables",
-        body: "Set WINDKEEP_URL, WINDKEEP_PROJECT_ID, and WINDKEEP_TOKEN in your shell (or CI). Values can be copied from this sheet.",
+        body: "Set WINDKEEP_URL, WINDKEEP_PROJECT_ID, WINDKEEP_TOKEN, and WINDKEEP_ENVIRONMENT in your shell (or CI). Values can be copied from this sheet.",
       },
       {
         title: "Add the pull script",
@@ -358,11 +404,15 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         body: "Point services at the generated file with env_file: .env.windkeep in compose.yaml, or rely on --env-file for Compose variable substitution.",
       },
     ],
-    secrets: windkeepSecrets.map(s =>
-      s.name === "WINDKEEP_TOKEN"
-        ? { ...s, placeholder: "Generate below, then export as WINDKEEP_TOKEN" }
-        : s,
-    ),
+    secrets: windkeepSecrets.map((s) => {
+      if (s.name === "WINDKEEP_TOKEN") {
+        return { ...s, placeholder: "Generate below, then export as WINDKEEP_TOKEN" }
+      }
+      if (s.name === "WINDKEEP_ENVIRONMENT") {
+        return { ...s, placeholder: "DEVELOPMENT" }
+      }
+      return s
+    }),
     buildSnippet: ({ baseURL, projectId, projectSlug }) => ({
       filename: "scripts/windkeep-compose.sh",
       language: "bash",
@@ -374,6 +424,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         ": \"${WINDKEEP_URL:?Set WINDKEEP_URL}\"",
         ": \"${WINDKEEP_PROJECT_ID:?Set WINDKEEP_PROJECT_ID}\"",
         ": \"${WINDKEEP_TOKEN:?Set WINDKEEP_TOKEN}\"",
+        ": \"${WINDKEEP_ENVIRONMENT:?Set WINDKEEP_ENVIRONMENT (e.g. DEVELOPMENT)}\"",
         "",
         "ENV_FILE=\"${ENV_FILE:-.env.windkeep}\"",
         "COMPOSE_FILE=\"${COMPOSE_FILE:-compose.yaml}\"",
@@ -389,19 +440,13 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "",
         "umask 077",
         ": > \"$ENV_FILE\"",
-        String.raw`while IFS=$'\t' read -r KEY VALUE; do`,
-        "  # Escape backslashes and double-quotes for dotenv",
-        String.raw`  ESCAPED=$(printf '%s' "$VALUE" | sed 's/\\/\\\\/g; s/"/\\"/g')`,
-        String.raw`  printf '%s="%s"\n' "$KEY" "$ESCAPED" >> "$ENV_FILE"`,
-        "done < <(jq -r '",
-        "  .decryptedSecrets[] | . as $s | .values[] | [($s.key | ascii_upcase), .value] | @tsv",
-        "' /tmp/wk_response.json)",
+        ...eachSecretLoop("", [
+          "# Quote values so multiline secrets (PEM keys) stay intact in dotenv",
+          String.raw`ESCAPED=$(printf '%s' "$VALUE" | sed 's/\\/\\\\/g; s/"/\\"/g')`,
+          String.raw`printf '%s="%s"\n' "$KEY" "$ESCAPED" >> "$ENV_FILE"`,
+        ]),
         "",
-        "if [ ! -s \"$ENV_FILE\" ]; then",
-        "  echo \"No secrets returned.\" && exit 1",
-        "fi",
-        "",
-        "echo \"Wrote $(wc -l < \"$ENV_FILE\") secret(s) → $ENV_FILE\"",
+        "echo \"Wrote $COUNT secret(s) → $ENV_FILE\"",
         "docker compose -f \"$COMPOSE_FILE\" --env-file \"$ENV_FILE\" up \"$@\"",
         "",
         `# Project: ${projectId}`,

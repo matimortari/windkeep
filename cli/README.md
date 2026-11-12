@@ -28,12 +28,28 @@ Requires Go and a Go bin directory on your PATH. Does not set up the `wk` shortc
 
 ## Getting Started
 
-1. Sign in to [**WindKeep**](https://windkeep.up.railway.app) and copy your API token from the preferences page
+### Interactive use
 
-2. Authenticate using the CLI:
+Copy your **personal API token** from the general Preferences tab. Personal tokens are unscoped and suitable for general use.
 
 ```bash
 windkeep login YOUR_API_TOKEN
+```
+
+### CI/CD
+
+Use a **service token** from the project's Access Control tab. Service tokens can only read secrets for the project they are scoped to.
+
+```bash
+export WINDKEEP_TOKEN=st_...
+export WINDKEEP_PROJECT_ID=your_project_id
+windkeep run --env prod npm run build
+```
+
+Or persist the service token locally:
+
+```bash
+windkeep login st_YOUR_SERVICE_TOKEN
 ```
 
 Configuration is stored at:
@@ -46,5 +62,6 @@ api_token: your-api-token
 active_org_id: org-id
 active_org_name: My Organization
 active_project_slug: my-project
+active_project_id: project-id
 active_project_name: My Project
 ```

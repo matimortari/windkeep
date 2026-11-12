@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "node:crypto"
+import { randomBytes } from "node:crypto"
 import { createServiceTokenSchema } from "#shared/schemas/service-token-schema"
 
 export default defineEventHandler(async (event) => {
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   const serviceToken = await db.serviceToken.create({
     data: {
       name: result.data.name,
-      tokenHash: createHash("sha256").update(rawToken).digest("hex"),
+      tokenHash: hashToken(rawToken),
       environment: result.data.environment,
       projectId,
       createdBy: sessionUser.id,
