@@ -2,7 +2,7 @@
   <div
     :key="String(slug)" v-motion
     :initial="{ opacity: 0, x: -20 }" :visible="{ opacity: 1, x: 0 }"
-    :duration="1000" class="container mx-auto"
+    :duration="1000" class="container mx-auto min-w-0"
   >
     <ProjectSecretsTab v-show="activeTab === 'secrets'" :project="project" :has-permission="hasPermission" />
     <ProjectAccessControlTab v-if="activeTab === 'access-control'" />
@@ -43,7 +43,7 @@ watch(() => project.value?.id, (id) => {
 
   useHead({
     title: `${project.value?.name}`,
-    link: [{ rel: "canonical", href: `${baseURL}/${id}` }],
+    link: [{ rel: "canonical", href: `${baseURL}/admin/${project.value?.slug ?? slug}` }],
     meta: [{ name: "description", content: `${project.value?.name} project page.` }],
   })
 }, { immediate: true })

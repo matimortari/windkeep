@@ -1,9 +1,13 @@
 <template>
   <TabSection title="Members">
     <template #context>
-      <h3 class="flex max-w-lg flex-row items-center gap-1 truncate text-muted-foreground">
-        <span class="truncate">{{ activeOrg?.name }}</span>
-        <nuxt-link v-if="activeOrg?.website" :href="activeOrg.website" target="_blank" aria-label="Visit organization website">
+      <h3 class="flex max-w-full min-w-0 items-center gap-1 text-muted-foreground">
+        <span class="min-w-0 truncate">{{ activeOrg?.name }}</span>
+        <nuxt-link
+          v-if="activeOrg?.website" :href="activeOrg.website"
+          target="_blank" class="shrink-0"
+          aria-label="Visit organization website"
+        >
           <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
         </nuxt-link>
       </h3>
@@ -72,7 +76,7 @@
                 <td class="w-28">
                   {{ ROLES.find(role => role.value === member.role)?.label }}
                 </td>
-                <td class="w-24">
+                <td class="w-24 text-end">
                   <button v-if="canManageMember(member)" type="button" aria-label="Manage member" @click.stop="openMemberDialog(member)">
                     <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                   </button>
@@ -140,8 +144,8 @@
                 <td class="w-40 whitespace-nowrap">
                   {{ getInviteStatus(invite) === "accepted" ? formatDate(invite.acceptedAt) : formatDate(invite.expiresAt) }}
                 </td>
-                <td class="w-28">
-                  <div class="navigation-group">
+                <td class="w-28 text-end">
+                  <div class="navigation-group justify-end">
                     <button v-if="getInviteStatus(invite) === 'pending'" type="button" aria-label="Copy invite link" @click="handleCopyInviteLink(invite)">
                       <icon :name="activeCopyInviteId === invite.id ? inviteLinkIcon.icon.value : 'ph:link-bold'" size="20" class="text-muted-foreground hover:text-secondary" />
                     </button>
@@ -187,7 +191,7 @@ const memberColumns = [
   { key: "user.name", label: "Member", class: "", sortable: true },
   { key: "user.email", label: "Email", class: "", sortable: true },
   { key: "role", label: "Role", class: "w-28", sortable: true },
-  { key: "actions", label: "Actions", class: "w-24", sortable: false },
+  { key: "actions", label: "Actions", class: "w-24 text-end", sortable: false },
 ]
 
 const inviteColumns = [
@@ -197,7 +201,7 @@ const inviteColumns = [
   { key: "invitedBy.name", label: "Invited by", class: "", sortable: true },
   { key: "createdAt", label: "Created", class: "w-40", sortable: true },
   { key: "expiresAt", label: "Expires / Accepted", class: "w-40", sortable: true },
-  { key: "actions", label: "Actions", class: "w-28", sortable: false },
+  { key: "actions", label: "Actions", class: "w-28 text-end", sortable: false },
 ]
 
 const invitationsWithStatus = computed(() => invitations.value.map(invite => ({ ...invite, status: getInviteStatus(invite) })))

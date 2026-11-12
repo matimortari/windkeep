@@ -60,7 +60,7 @@ const errorMessage = computed(() => {
 
 useHead({
   title: "Sign In",
-  link: [{ rel: "canonical", href: `${baseURL}` }],
+  link: [{ rel: "canonical", href: `${baseURL}/sign-in` }],
   meta: [{ name: "description", content: "Sign in to your WindKeep account" }],
 })
 </script>

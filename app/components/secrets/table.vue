@@ -24,21 +24,25 @@
           class="group hover:bg-muted/20" :class="getChangeConfig(secret.key)?.rowClass"
           :data-change-type="getChangeConfig(secret.key) ? props.pendingChanges.get(secret.key)?.type : 'none'"
         >
-          <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
-            <div v-if="col.key === 'key'" class="navigation-group font-mono text-sm font-semibold" :class="getChangeConfig(secret.key)?.keyTextClass">
-              <icon v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon" size="15" :class="getChangeConfig(secret.key)?.keyTextClass" />
+          <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-hidden md:overflow-visible!' : '']">
+            <div v-if="col.key === 'key'" class="navigation-group w-full min-w-0 font-mono text-sm font-semibold" :class="getChangeConfig(secret.key)?.keyTextClass">
+              <icon
+                v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon"
+                size="15" class="shrink-0"
+                :class="getChangeConfig(secret.key)?.keyTextClass"
+              />
 
-              <span class="truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
+              <span class="max-w-max min-w-0 flex-1 truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
 
               <span v-if="secret.description" class="group/tooltip relative hidden shrink-0 cursor-pointer md:inline-flex">
                 <icon name="ph:info-bold" size="15" />
                 <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
               </span>
 
-              <div v-if="secret.tags?.length" class="flex flex-nowrap items-center gap-1 overflow-hidden">
+              <div v-if="secret.tags?.length" class="flex max-w-max min-w-0 flex-1 flex-nowrap items-center gap-1 overflow-hidden">
                 <button
                   v-for="tag in secret.tags" :key="tag"
-                  type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium transition-colors"
+                  type="button" class="max-w-full min-w-0 truncate rounded-full px-1.5 py-0.5 text-xs font-medium whitespace-nowrap transition-colors"
                   :class="activeTagFilter === tag ? 'bg-secondary/20 text-secondary' : 'bg-muted/30 text-muted-foreground hover:bg-secondary/10 hover:text-secondary'"
                   :aria-label="`Filter by tag ${tag}`" @click="emit('filterByTag', activeTagFilter === tag ? null : tag)"
                 >
@@ -61,7 +65,7 @@
                 </button>
               </div>
             </div>
-            <div v-else-if="col.key === 'actions'" class="navigation-group">
+            <div v-else-if="col.key === 'actions'" class="navigation-group justify-end">
               <button type="button" aria-label="View history" @click="emit('history', secret)">
                 <icon name="ph:clock-counter-clockwise-bold" size="20" :class="getActionIconClass(secret.key, 'primary')" />
               </button>
@@ -125,7 +129,7 @@ const changeTypeConfig = {
 const secretValuesByKey = computed(() => new Map(props.secrets.map(secret => [secret.key, new Map((secret.values ?? []).map(v => [v.environment, v.value]))])))
 
 const columns = computed<Record<string, any>[]>(() => {
-  const base = [{ key: "key", label: "Key", class: "w-64 md:w-[50%]", type: "base", sortable: true }]
+  const base = [{ key: "key", label: "Key", class: "w-80 md:w-[50%]", type: "base", sortable: true }]
   const envCols = environments.map(env => ({
     key: env.toLowerCase(),
     label: env.charAt(0) + env.slice(1).toLowerCase(),
@@ -134,7 +138,7 @@ const columns = computed<Record<string, any>[]>(() => {
     class: "w-40 md:w-[20%]",
     sortable: false,
   }))
-  const actions = [{ key: "actions", label: "Actions", class: "w-32 shrink-0", type: "actions", sortable: false }]
+  const actions = [{ key: "actions", label: "Actions", class: "w-32 shrink-0 text-end", type: "actions", sortable: false }]
   return [...base, ...envCols, ...actions]
 })
 

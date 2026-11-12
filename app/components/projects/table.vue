@@ -50,7 +50,7 @@
             </div>
           </td>
           <td :class="columns[5]?.class">
-            <div class="navigation-group">
+            <div class="navigation-group justify-end">
               <button type="button" aria-label="Project Settings" @click.stop="openProjectSettings(project)">
                 <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
               </button>
@@ -85,6 +85,6 @@ const columns = [
   { key: "_count.memberships", label: "Members", class: "w-24", sortable: true },
   { key: "_count.serviceTokens", label: "Access Tokens", class: "w-32", sortable: true },
   { key: "_count.secrets", label: "Secrets", class: "w-24", sortable: true },
-  { key: "actions", label: "Actions", class: "w-24", sortable: false },
+  { key: "actions", label: "Actions", class: "w-24 text-end", sortable: false },
 ]
 </script>

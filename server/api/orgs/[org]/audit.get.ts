@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
     }),
     db.user.findMany({
       where: { auditLogs: { some: { orgId } } },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, image: true },
       orderBy: { name: "asc" },
     }),
     db.project.findMany({

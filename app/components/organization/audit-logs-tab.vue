@@ -1,9 +1,13 @@
 <template>
   <TabSection title="Audit Logs">
     <template #context>
-      <h3 class="flex max-w-lg flex-row items-center gap-1 truncate text-muted-foreground">
-        <span class="truncate">{{ activeOrg?.name }}</span>
-        <nuxt-link v-if="activeOrg?.website" :href="activeOrg.website" target="_blank" aria-label="Visit organization website">
+      <h3 class="flex max-w-full min-w-0 items-center gap-1 text-muted-foreground">
+        <span class="min-w-0 truncate">{{ activeOrg?.name }}</span>
+        <nuxt-link
+          v-if="activeOrg?.website" :href="activeOrg.website"
+          target="_blank" class="shrink-0"
+          aria-label="Visit organization website"
+        >
           <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
         </nuxt-link>
       </h3>

@@ -1,24 +1,26 @@
 <template>
-  <section class="container mx-auto flex flex-col">
-    <header v-if="title" class="flex flex-col items-start gap-2 border-b py-4 md:flex-row md:items-center md:justify-between md:py-2">
-      <div class="flex flex-col gap-1">
-        <div class="navigation-group">
+  <section class="container mx-auto flex min-w-0 flex-col">
+    <header v-if="title" class="flex w-full min-w-0 flex-col gap-2 border-b py-4 md:flex-row md:items-center md:justify-between md:py-2">
+      <div class="max-w-full min-w-0">
+        <div class="navigation-group max-w-full min-w-0">
           <template v-if="$slots.context || context">
-            <slot name="context">
-              <h3 class="max-w-lg truncate text-muted-foreground">
-                {{ context }}
-              </h3>
-            </slot>
+            <div class="min-w-0 overflow-hidden">
+              <slot name="context">
+                <h3 class="truncate text-muted-foreground">
+                  {{ context }}
+                </h3>
+              </slot>
+            </div>
             <icon name="ph:caret-right-bold" size="15" class="shrink-0 text-muted-foreground" />
           </template>
 
-          <h3 class="truncate">
+          <h3 class="shrink-0">
             {{ title }}
           </h3>
         </div>
       </div>
 
-      <div class="w-full md:w-auto">
+      <div class="w-full min-w-0 overflow-visible md:w-auto md:shrink-0">
         <slot name="actions" />
       </div>
     </header>

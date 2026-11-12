@@ -1,9 +1,13 @@
 <template>
   <TabSection title="Settings">
     <template #context>
-      <h3 class="flex max-w-lg flex-row items-center gap-1 truncate text-muted-foreground">
-        <span class="truncate">{{ activeOrg?.name }}</span>
-        <nuxt-link v-if="activeOrg?.website" :href="activeOrg.website" target="_blank" aria-label="Visit organization website">
+      <h3 class="flex max-w-full min-w-0 items-center gap-1 text-muted-foreground">
+        <span class="min-w-0 truncate">{{ activeOrg?.name }}</span>
+        <nuxt-link
+          v-if="activeOrg?.website" :href="activeOrg.website"
+          target="_blank" class="shrink-0"
+          aria-label="Visit organization website"
+        >
           <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
         </nuxt-link>
       </h3>
@@ -39,13 +43,15 @@
         <span v-else class="navigation-group flex-1 justify-end md:max-w-72">{{ field.value }}</span>
       </div>
     </div>
+  </TabSection>
 
-    <div v-if="isOwner" class="flex flex-col justify-between gap-4 border-t py-4 md:navigation-group" aria-label="Organization encryption settings">
+  <TabSection title="Danger Zone">
+    <nav v-if="isOwner" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Rotate Organization Encryption Key">
       <header class="flex flex-col gap-1">
         <h6>
           Rotate Organization Encryption Key
         </h6>
-        <p class="text-caption">
+        <p class="text-caption-danger">
           Existing secrets are re-encrypted automatically.
         </p>
       </header>
@@ -76,10 +82,8 @@
           </button>
         </div>
       </div>
-    </div>
-  </TabSection>
+    </nav>
 
-  <TabSection title="Danger Zone">
     <nav v-if="!isOwner" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Leave Organization">
       <header class="flex flex-col gap-1">
         <h6>

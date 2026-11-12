@@ -54,7 +54,8 @@
 
       <nav class="navigation-group" aria-label="User Actions">
         <nuxt-link to="/admin/preferences" aria-label="User Preferences" class="btn">
-          <icon name="ph:user-circle-gear-bold" size="20" />
+          <img v-if="user?.image" :src="user.image" alt="Avatar" class="size-5 rounded-full border">
+          <icon v-else name="ph:user-circle-gear-bold" size="20" />
         </nuxt-link>
         <button type="button" aria-label="Toggle Theme" class="btn" @click="toggleTheme()">
           <icon :name="themeIcon" size="20" />

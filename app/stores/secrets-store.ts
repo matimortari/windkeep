@@ -121,7 +121,6 @@ export const useSecretsStore = defineStore("secrets", () => {
     const failed: string[] = []
     const succeeded: string[] = []
 
-    // Sequential processing to avoid opening concurrent interactive transactions and exhausting the pool
     for (const [key, change] of entries) {
       try {
         if (change.type === "create") {

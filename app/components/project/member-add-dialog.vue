@@ -12,7 +12,10 @@
               aria-haspopup="listbox" :aria-expanded="isDropdownOpen"
               aria-labelledby="project-member-label" @click="isDropdownOpen = !isDropdownOpen"
             >
-              <span class="truncate">{{ selectedMember ? selectedMember.user.name : "Select a member..." }}</span>
+              <span class="navigation-group min-w-0">
+                <img v-if="selectedMember?.user.image" :src="selectedMember.user.image" alt="Avatar" class="size-5 rounded-full border">
+                <span class="truncate">{{ selectedMember ? selectedMember.user.name : "Select a member..." }}</span>
+              </span>
               <icon name="ph:caret-down-bold" size="20" :class="isDropdownOpen ? 'rotate-180' : 'rotate-0'" />
             </button>
 

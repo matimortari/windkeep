@@ -1,9 +1,13 @@
 <template>
   <TabSection title="Settings">
     <template #context>
-      <h3 class="navigation-group max-w-lg truncate text-muted-foreground">
-        <span class="truncate">{{ project?.name }}</span>
-        <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
+      <h3 class="flex max-w-full min-w-0 items-center gap-1 text-muted-foreground">
+        <span class="min-w-0 truncate">{{ project?.name }}</span>
+        <nuxt-link
+          v-if="project?.website" :href="project.website"
+          target="_blank" class="shrink-0"
+          aria-label="Visit project website"
+        >
           <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
         </nuxt-link>
       </h3>
@@ -51,14 +55,39 @@
       </header>
 
       <div class="navigation-group justify-end">
-        <select v-model="transferTargetId" class="w-full md:max-w-64" :disabled="!transferCandidates.length">
-          <option disabled value="">
-            {{ transferCandidates.length ? "Select new owner" : "No eligible members" }}
-          </option>
-          <option v-for="member in transferCandidates" :key="member.userId" :value="member.userId">
-            {{ member.user.name }} ({{ member.user.email }})
-          </option>
-        </select>
+        <div ref="transferDropdownRef" class="relative w-full md:max-w-64">
+          <button
+            type="button" class="btn w-full justify-between"
+            :disabled="!transferCandidates.length"
+            aria-haspopup="listbox" :aria-expanded="isTransferDropdownOpen"
+            aria-label="Select new owner" @click="isTransferDropdownOpen = !isTransferDropdownOpen"
+          >
+            <span class="navigation-group min-w-0">
+              <img v-if="transferTarget?.user.image" :src="transferTarget.user.image" alt="Avatar" class="size-5 rounded-full border">
+              <span class="truncate">{{ transferTarget ? transferTarget.user.name : (transferCandidates.length ? "Select new owner" : "No eligible members") }}</span>
+            </span>
+            <icon name="ph:caret-down-bold" size="20" :class="isTransferDropdownOpen ? 'rotate-180' : 'rotate-0'" />
+          </button>
+
+          <transition name="dropdown">
+            <ul v-if="isTransferDropdownOpen && transferCandidates.length" class="dropdown-menu max-h-60 w-full" role="listbox">
+              <li v-for="member in transferCandidates" :key="member.userId" role="presentation">
+                <button
+                  type="button" role="option"
+                  :aria-selected="transferTargetId === member.userId" class="navigation-group w-full truncate rounded-lg p-2 text-left hover:bg-muted/60"
+                  :class="transferTargetId === member.userId ? 'bg-muted' : ''"
+                  @click="transferTargetId = member.userId; isTransferDropdownOpen = false"
+                >
+                  <img v-if="member.user.image" :src="member.user.image" alt="Avatar" class="size-6 rounded-full border">
+                  <div class="flex flex-col truncate">
+                    <span class="truncate font-semibold">{{ member.user.name }}</span>
+                    <span class="text-xs text-muted-foreground">{{ member.user.email }}</span>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </transition>
+        </div>
         <button
           type="button" class="btn-warning self-end"
           aria-label="Transfer Project Ownership" :disabled="!transferTargetId"
@@ -111,15 +140,13 @@ const { projects, isOwner, membershipRole } = storeToRefs(projectStore)
 const project = computed(() => projects.value.find((p: Project) => p.slug === slug))
 const localProject = ref<Project | null>(null)
 const transferTargetId = ref("")
+const isTransferDropdownOpen = ref(false)
+const transferDropdownRef = ref<HTMLElement | null>(null)
+useClickOutside(transferDropdownRef, () => isTransferDropdownOpen.value = false, { escapeKey: true })
 
 const transferCandidates = computed(() => (project.value?.memberships ?? []).filter((m: ProjectMembership) => m.role !== "OWNER" && m.userId !== user.value?.id))
-<<<<<<< Updated upstream
-||||||| Stash base
-const transferTarget = computed(() => transferCandidates.value.find((m: ProjectMembership) => m.userId === transferTargetId.value))
-=======
 const transferTarget = computed(() => transferCandidates.value.find((m: ProjectMembership) => m.userId === transferTargetId.value))
 const canLeaveProject = computed(() => (projectId: string) => !!membershipRole.value(projectId) && membershipRole.value(projectId) !== "OWNER")
->>>>>>> Stashed changes
 
 const projectFields = [
   {
@@ -247,6 +274,7 @@ watch(() => project.value, (proj) => {
     return
   }
   transferTargetId.value = ""
+  isTransferDropdownOpen.value = false
   if (localProject.value) {
     localProject.value.name = proj.name
     localProject.value.slug = proj.slug

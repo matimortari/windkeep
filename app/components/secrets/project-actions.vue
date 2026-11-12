@@ -1,5 +1,5 @@
 <template>
-  <nav class="navigation-group w-full justify-end md:w-auto" aria-label="Project Actions">
+  <nav class="navigation-group w-full flex-wrap justify-end md:w-auto md:flex-nowrap" aria-label="Project Actions">
     <div class="hidden min-w-0 flex-1 md:relative md:flex-none">
       <input
         id="search" :value="searchQuery"
@@ -11,7 +11,7 @@
       </span>
     </div>
 
-    <div v-if="availableTags.length" ref="tagDropdownRef" class="relative">
+    <div v-if="availableTags.length" ref="tagDropdownRef" class="relative z-50">
       <button
         type="button"
         class="btn" :class="activeTagFilter ? 'border-secondary! text-secondary!' : ''"
@@ -19,16 +19,19 @@
         @click="isTagDropdownOpen = !isTagDropdownOpen"
       >
         <icon name="ph:tag-bold" size="20" />
-        <span>{{ activeTagFilter ? activeTagFilter : 'Tags' }}</span>
+        <span class="max-w-24 truncate md:max-w-40">{{ activeTagFilter ? activeTagFilter : 'Tags' }}</span>
         <icon v-if="activeTagFilter" name="ph:x-bold" size="15" @click.stop="emit('filterByTag', null)" />
         <icon v-else name="ph:caret-down-bold" size="15" />
       </button>
 
       <transition name="dropdown">
-        <ul v-if="isTagDropdownOpen" class="dropdown-menu" role="menu">
+        <ul
+          v-if="isTagDropdownOpen" class="dropdown-menu right-auto! left-0! max-w-[min(20rem,calc(100vw-2rem))] whitespace-normal!"
+          role="menu"
+        >
           <li v-for="tag in availableTags" :key="tag">
             <button
-              type="button" class="w-full rounded-lg p-2 text-left text-sm hover:bg-muted/60"
+              type="button" class="w-full rounded-lg p-2 text-left text-sm wrap-break-word whitespace-normal hover:bg-muted/60"
               :class="tag === activeTagFilter ? 'bg-muted font-medium' : ''" role="menuitem"
               @click="selectTag(tag)"
             >
@@ -45,9 +48,8 @@
 
     <button
       v-if="hasPermission" type="button"
-      class="btn-secondary"
-      aria-label="Bulk Edit" :disabled="hasPendingChanges"
-      @click="emit('openEditorDialog')"
+      class="btn-secondary" aria-label="Bulk Edit"
+      :disabled="hasPendingChanges" @click="emit('openEditorDialog')"
     >
       <span class="hidden md:inline">Bulk Edit</span>
       <icon name="ph:text-indent-bold" size="20" />
@@ -72,9 +74,8 @@
 
     <button
       v-if="hasPermission" type="button"
-      class="btn-primary"
-      :disabled="hasPendingChanges" aria-label="Add New Secret"
-      @click="emit('openSecretsDialog')"
+      class="btn-primary" :disabled="hasPendingChanges"
+      aria-label="Add New Secret" @click="emit('openSecretsDialog')"
     >
       <span class="hidden md:inline">New Secret</span>
       <icon name="ph:plus-bold" size="20" />

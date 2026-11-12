@@ -1,9 +1,13 @@
 <template>
   <TabSection title="Secrets">
     <template #context>
-      <h3 class="navigation-group max-w-lg truncate text-muted-foreground">
-        <span class="truncate">{{ project?.name }}</span>
-        <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
+      <h3 class="flex max-w-full min-w-0 items-center gap-1 text-muted-foreground">
+        <span class="min-w-0 truncate">{{ project?.name }}</span>
+        <nuxt-link
+          v-if="project?.website" :href="project.website"
+          target="_blank" class="shrink-0"
+          aria-label="Visit project website"
+        >
           <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
         </nuxt-link>
       </h3>
@@ -36,7 +40,7 @@
     <button
       v-if="hasPermission" type="button"
       :class="{ 'border-secondary bg-secondary/5 text-secondary': isDragOver }"
-      class="group flex w-full flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center text-muted-foreground transition-all hover:border-secondary hover:bg-primary/10 hover:text-secondary"
+      class="group mt-4 flex w-full flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center text-muted-foreground transition-all hover:border-secondary hover:bg-primary/10 hover:text-secondary"
       aria-label="Drop a .env file to open the raw editor" @dragenter.prevent="onDragEnter"
       @dragover.prevent @dragleave.prevent="onDragLeave"
       @drop.prevent="onDrop" @click="envFileInput?.click()"

@@ -2,7 +2,7 @@
   <div
     v-motion :initial="{ opacity: 0, x: -20 }"
     :visible="{ opacity: 1, x: 0 }" :duration="1000"
-    class="container mx-auto"
+    class="container mx-auto min-w-0"
   >
     <TabSection title="Preferences">
       <div v-for="(field, index) in userFields" :key="index" class="flex flex-col justify-between gap-4 border-b py-4 last:border-b-0 md:navigation-group">

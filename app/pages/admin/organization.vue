@@ -2,7 +2,7 @@
   <div
     :key="activeTab" v-motion
     :initial="{ opacity: 0, x: -20 }" :visible="{ opacity: 1, x: 0 }"
-    :duration="1000" class="container mx-auto"
+    :duration="1000" class="container mx-auto min-w-0"
   >
     <OrganizationProjectsTab v-if="activeTab === 'projects'" />
     <OrganizationMembersTab v-else-if="activeTab === 'members'" />

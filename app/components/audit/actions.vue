@@ -26,20 +26,22 @@
 
     <div ref="userDropdownRef" class="relative">
       <button type="button" class="btn" @click="isUserDropdownOpen = !isUserDropdownOpen">
-        <span>{{ getUserDisplayName(currentAuditFilters.userId) || 'All Users' }}</span>
+        <img v-if="selectedFilterUser?.image" :src="selectedFilterUser.image" alt="Avatar" class="size-5 rounded-full border">
+        <span>{{ selectedFilterUser?.name || "All Users" }}</span>
         <icon name="ph:caret-down-bold" size="15" />
       </button>
 
       <transition name="dropdown">
         <ul v-if="isUserDropdownOpen" class="dropdown-menu" role="menu">
           <li>
-            <button type="button" class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', '')">
+            <button type="button" class="navigation-group w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="!currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', '')">
               All Users
             </button>
           </li>
           <li v-for="user in availableUsers" :key="user.id">
-            <button type="button" class="w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="user.id === currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', user.id)">
-              {{ user.name }}
+            <button type="button" class="navigation-group w-full rounded-lg p-2 text-left hover:bg-muted/60" :class="user.id === currentAuditFilters.userId ? 'bg-muted' : ''" @click="updateFilter('user', user.id)">
+              <img v-if="user.image" :src="user.image" alt="Avatar" class="size-5 rounded-full border">
+              <span class="truncate">{{ user.name }}</span>
             </button>
           </li>
         </ul>
@@ -59,14 +61,7 @@ const actionDropdownRef = ref<HTMLElement | null>(null)
 useClickOutside(userDropdownRef, () => isUserDropdownOpen.value = false, { escapeKey: true })
 useClickOutside(actionDropdownRef, () => isActionDropdownOpen.value = false, { escapeKey: true })
 const availableUsers = computed(() => auditFilters.value?.users || [])
-
-function getUserDisplayName(userId?: string) {
-  if (!userId) {
-    return "All Users"
-  }
-
-  return availableUsers.value.find((u: { id: string, name: string | null }) => u.id === userId)?.name
-}
+const selectedFilterUser = computed(() => availableUsers.value.find((u: AuditFilters["users"][number]) => u.id === currentAuditFilters.value.userId))
 
 function toDateInput(value?: string | Date): string | undefined {
   if (!value) {

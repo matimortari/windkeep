@@ -1,9 +1,13 @@
 <template>
   <TabSection title="Access Control">
     <template #context>
-      <h3 class="flex max-w-lg flex-row items-center gap-1 truncate text-muted-foreground">
-        <span class="truncate">{{ project?.name }}</span>
-        <nuxt-link v-if="project?.website" :href="project.website" target="_blank" aria-label="Visit project website">
+      <h3 class="flex max-w-full min-w-0 items-center gap-1 text-muted-foreground">
+        <span class="min-w-0 truncate">{{ project?.name }}</span>
+        <nuxt-link
+          v-if="project?.website" :href="project.website"
+          target="_blank" class="shrink-0"
+          aria-label="Visit project website"
+        >
           <icon name="ph:arrow-up-right-bold" size="15" class="hover:text-primary" />
         </nuxt-link>
       </h3>
@@ -11,10 +15,6 @@
 
     <template #actions>
       <nav class="navigation-group w-full justify-end md:w-auto">
-        <button type="button" class="btn-ghost" @click="isIntegrationsSheetOpen = true">
-          <icon name="ph:plugs-connected-bold" size="20" />
-          <span>Integrations</span>
-        </button>
         <template v-if="canManage">
           <button type="button" class="btn-secondary" @click="isTokenDialogOpen = true">
             <icon name="ph:key-bold" size="20" />
@@ -23,6 +23,10 @@
           <button type="button" class="btn-primary" :disabled="!availableOrgMembers.length" @click="isAddDialogOpen = true">
             <icon name="ph:plus-circle-bold" size="20" />
             <span>Add Member</span>
+          </button>
+          <button type="button" class="btn-ghost" @click="isIntegrationsSheetOpen = true">
+            <icon name="ph:plugs-connected-bold" size="20" />
+            <span class="hidden md:inline">Integrations</span>
           </button>
         </template>
       </nav>
@@ -82,7 +86,7 @@
                 <td class="w-28">
                   {{ ROLES.find(role => role.value === member.role)?.label }}
                 </td>
-                <td class="w-24">
+                <td class="w-24 text-end">
                   <button v-if="canManageMember(member)" type="button" aria-label="Manage member" @click.stop="openMemberDialog(member)">
                     <icon name="ph:gear-bold" size="20" class="text-muted-foreground hover:text-secondary" />
                   </button>
@@ -149,7 +153,7 @@
                 <td class="max-w-xs truncate">
                   {{ token.user?.name }}
                 </td>
-                <td class="w-24">
+                <td class="w-24 text-end">
                   <button type="button" aria-label="Revoke token" @click="handleRevokeToken(token.id)">
                     <icon name="ph:x-bold" size="20" class="text-muted-foreground hover:text-danger" />
                   </button>
@@ -199,7 +203,7 @@ const memberColumns = [
   { key: "user.name", label: "Member", class: "", sortable: true },
   { key: "user.email", label: "Email", class: "", sortable: true },
   { key: "role", label: "Role", class: "w-28", sortable: true },
-  { key: "actions", label: "Actions", class: "w-24", sortable: false },
+  { key: "actions", label: "Actions", class: "w-24 text-end", sortable: false },
 ]
 
 const tokenColumns = [
@@ -207,7 +211,7 @@ const tokenColumns = [
   { key: "expiresAt", label: "Expires", class: "w-40", sortable: true },
   { key: "lastUsedAt", label: "Last used", class: "w-40", sortable: true },
   { key: "user.name", label: "Created by", class: "", sortable: true },
-  { key: "actions", label: "Actions", class: "w-24", sortable: false },
+  { key: "actions", label: "Actions", class: "w-24 text-end", sortable: false },
 ]
 
 const { sortedData: sortedMembers, toggleSort: toggleMemberSort, getSortIconName: getMemberSortIconName } = useTableSort(memberships)

@@ -50,9 +50,9 @@ export default defineNuxtConfig({
   fonts: {
     processCSSVariables: true,
     families: [
-      { name: "Roboto", provider: "google", weights: ["300 800"] },
-      { name: "Russo One", provider: "google", weights: ["400"] },
-      { name: "JetBrains Mono", provider: "google", weights: ["400"] },
+      { name: "Roboto", provider: "google", weights: [300, 400, 500, 600, 700, 800] },
+      { name: "Russo One", provider: "google", weights: [400] },
+      { name: "JetBrains Mono", provider: "google", weights: [400] },
     ],
   },
   icon: {

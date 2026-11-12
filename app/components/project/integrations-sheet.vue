@@ -6,9 +6,9 @@
         :class="isMobile ? 'items-end justify-center' : 'items-stretch justify-end p-4'" @mousedown.self="emit('update:isOpen', false)"
       >
         <div
-          class="overlay space-y-4" role="dialog"
+          class="overlay min-w-0 space-y-4 overflow-x-hidden" role="dialog"
           aria-modal="true" aria-labelledby="integrations-sheet-title"
-          :class="isMobile ? 'flex size-full max-h-[92dvh] flex-col rounded-t-lg' : 'flex size-full max-h-none! max-w-2xl flex-col rounded-2xl! border shadow-sm'"
+          :class="isMobile ? 'flex max-h-[92dvh] w-full max-w-full flex-col rounded-t-lg' : 'flex size-full max-h-none! max-w-3xl flex-col rounded-2xl! border shadow-sm'"
         >
           <div v-if="isMobile" class="h-1 w-20 self-center rounded-full bg-current opacity-20" />
 
@@ -36,7 +36,7 @@
             </button>
           </header>
 
-          <section class="scroll-area min-h-0 flex-1 overflow-y-auto pr-2">
+          <section class="scroll-area min-h-0 w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-2">
             <!-- Catalog -->
             <div v-if="!selected" class="flex flex-col gap-2 p-1">
               <button
@@ -56,18 +56,16 @@
             </div>
 
             <!-- Detail -->
-            <div v-else class="flex flex-col gap-4">
-              <header class="flex flex-col gap-2 p-1">
-                <p class="text-caption">
-                  {{ selected.description }}
-                </p>
-                <nuxt-link v-if="selected.docsUrl" :to="selected.docsUrl" target="_blank" class="navigation-group w-fit text-xs text-secondary hover:underline">
+            <div v-else class="flex w-full min-w-0 flex-col divide-y">
+              <p class="text-caption pb-4">
+                {{ selected.description }}
+                <nuxt-link v-if="selected.docsUrl" :to="selected.docsUrl" target="_blank" class="ml-1 inline-flex items-center gap-0.5 text-secondary hover:underline">
                   <span>{{ selected.docsLabel }}</span>
-                  <icon name="ph:arrow-up-right-bold" size="20" />
+                  <icon name="ph:arrow-up-right-bold" size="12" />
                 </nuxt-link>
-              </header>
+              </p>
 
-              <details v-if="selected.steps?.length" class="group" open>
+              <details v-if="selected.steps?.length" class="group py-4" open>
                 <summary class="text-caption flex cursor-pointer list-none items-center gap-1 tracking-wider uppercase">
                   <icon name="ph:caret-right-bold" size="15" class="shrink-0 transition-transform group-open:rotate-90" />
                   Setup
@@ -77,107 +75,104 @@
                     <span class="text-caption w-4 shrink-0 tabular-nums">
                       {{ index + 1 }}.
                     </span>
-                    <div class="flex min-w-0 flex-col gap-0.5">
-                      <span class="text-sm font-medium">{{ step.title }}</span>
-                      <span class="text-xs text-muted-foreground">{{ step.body }}</span>
-                    </div>
+                    <p class="min-w-0 text-sm">
+                      <span class="font-medium">{{ step.title }}.</span>
+                      <span class="text-muted-foreground"> {{ step.body }}</span>
+                    </p>
                   </li>
                 </ol>
               </details>
 
-              <details v-if="selected.secrets?.length" class="group">
+              <details v-if="selected.secrets?.length" class="group py-4" open>
                 <summary class="text-caption flex cursor-pointer list-none items-center gap-1 tracking-wider uppercase">
                   <icon name="ph:caret-right-bold" size="15" class="shrink-0 transition-transform group-open:rotate-90" />
                   {{ selected.secretsHeading }}
                 </summary>
-                <p v-if="selected.secretsHint" class="py-2 text-xs text-muted-foreground">
+                <p v-if="selected.secretsHint" class="mt-2 text-xs text-muted-foreground">
                   {{ selected.secretsHint }}
                 </p>
 
-                <div class="mt-2 flex flex-col gap-2">
-                  <div v-for="secret in selected.secrets" :key="secret.name" class="flex flex-col gap-0.5">
-                    <div class="flex flex-col gap-1">
-                      <span class="font-mono text-sm font-medium">{{ secret.name }}</span>
-                      <p class="text-xs text-muted-foreground">
-                        {{ secret.description }}
-                      </p>
-                    </div>
-
-                    <div v-if="resolveSecretValue(secret) || secret.placeholder" class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
-                      <span class="min-w-0 flex-1 truncate" :title="resolveSecretValue(secret) || secret.placeholder">
-                        {{ resolveSecretValue(secret) || secret.placeholder }}
+                <div class="mt-4 flex min-w-0 flex-col gap-4 overflow-visible rounded-md border bg-muted/30 p-4">
+                  <div v-for="(secret, index) in selected.secrets" :key="secret.name" class="flex min-w-0 flex-col gap-0.5 overflow-visible">
+                    <div class="navigation-group min-w-0">
+                      <span class="min-w-0 truncate font-mono text-sm font-medium"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.name }}</span>
+                      <span v-if="secret.description" class="group/tooltip relative inline-flex shrink-0 cursor-pointer text-muted-foreground">
+                        <icon name="ph:info-bold" size="20" />
+                        <span class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-xs p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
                       </span>
                       <button
                         v-if="resolveSecretValue(secret)" type="button"
-                        class="btn-ghost shrink-0 p-0!" :aria-label="`Copy ${secret.name}`"
+                        class="btn-ghost shrink-0 p-0! text-muted-foreground" :aria-label="`Copy ${secret.name}`"
                         @click="copyValue(secret.name, resolveSecretValue(secret)!)"
                       >
-                        <icon :name="copyIcons[secret.name]?.icon.value || 'ph:copy-bold'" size="15" />
+                        <icon :name="copyIcons[secret.name]?.icon.value || 'ph:copy-bold'" size="20" />
                       </button>
                     </div>
+                    <span v-if="resolveSecretValue(secret) || secret.placeholder" class="text-caption min-w-0 truncate" :class="secret.instruction && !resolveSecretValue(secret) ? '' : 'font-mono!'" :title="resolveSecretValue(secret) || secret.placeholder">
+                      {{ resolveSecretValue(secret) || secret.placeholder }}
+                    </span>
                   </div>
                 </div>
               </details>
 
-              <section class="flex flex-col gap-2 p-1">
-                <div class="flex flex-col gap-0.5">
+              <section class="flex flex-col gap-2 py-4">
+                <div class="navigation-group">
                   <p class="text-caption tracking-wider uppercase">
                     Service token
                   </p>
-                  <p class="text-caption text-xs!">
-                    {{ selected.tokenHint || "Generate a token scoped for this integration. Copy it into WINDKEEP_TOKEN." }}
-                  </p>
+                  <span class="group/tooltip relative inline-flex shrink-0 cursor-pointer text-muted-foreground">
+                    <icon name="ph:info-bold" size="15" />
+                    <span class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-xs p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
+                      {{ selected.tokenHint || "Generate a token scoped for this integration. Copy it into WINDKEEP_TOKEN." }}
+                    </span>
+                  </span>
                 </div>
 
                 <template v-if="generatedRawToken">
-                  <div class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
-                    <span class="min-w-0 flex-1 truncate select-all" :title="isTokenVisible ? generatedRawToken : undefined">
+                  <div class="navigation-group font-mono text-xs">
+                    <span class="text-caption min-w-0 truncate font-mono! select-all" :title="isTokenVisible ? generatedRawToken : undefined">
                       {{ isTokenVisible ? generatedRawToken : "••••••••••••••••••••••••••••••••" }}
                     </span>
-                    <button type="button" class="btn-ghost shrink-0 p-1!" :aria-label="isTokenVisible ? 'Hide token' : 'Show token'" @click="isTokenVisible = !isTokenVisible">
-                      <icon :name="isTokenVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
+                    <button type="button" class="btn-ghost shrink-0 p-0! text-muted-foreground" :aria-label="isTokenVisible ? 'Hide token' : 'Show token'" @click="isTokenVisible = !isTokenVisible">
+                      <icon :name="isTokenVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
                     </button>
-                    <button type="button" class="btn shrink-0 p-1!" aria-label="Copy token" @click="copyValue('token', generatedRawToken)">
-                      <icon :name="copyIcons.token?.icon.value || 'ph:copy-bold'" size="20" />
+                    <button type="button" class="btn-ghost shrink-0 p-0! text-muted-foreground" aria-label="Copy token" @click="copyValue('token', generatedRawToken)">
+                      <icon :name="copyIcons.token?.icon.value || 'ph:copy-bold'" size="15" />
                     </button>
-                    <button type="button" class="btn-ghost shrink-0 p-1!" aria-label="Dismiss token" @click="dismissGeneratedToken">
-                      <icon name="ph:x-bold" size="20" />
+                    <button type="button" class="btn-ghost shrink-0 p-0! text-muted-foreground" aria-label="Dismiss token" @click="dismissGeneratedToken">
+                      <icon name="ph:x-bold" size="15" />
                     </button>
                   </div>
                 </template>
 
-                <form v-else class="flex flex-col gap-2 p-1" @submit.prevent="handleGenerateToken">
-                  <div class="flex flex-col gap-1">
-                    <label for="integration-token-name" class="text-caption text-xs!">Name</label>
-                    <input id="integration-token-name" v-model="tokenForm.name" type="text" :placeholder="selected.defaultTokenName || 'Integration'">
+                <form v-else class="flex min-w-0 flex-col gap-2" @submit.prevent="handleGenerateToken">
+                  <div class="navigation-group min-w-0">
+                    <input
+                      id="integration-token-name" v-model="tokenForm.name"
+                      type="text" class="min-w-0 flex-1"
+                      :placeholder="selected.defaultTokenName || 'Integration'" aria-label="Token name"
+                    >
+                    <input
+                      id="integration-token-expiry" v-model.number="tokenForm.expiresInDays"
+                      type="number" min="1"
+                      max="365" placeholder="Days"
+                      aria-label="Expires in days"
+                      class="w-24! shrink-0"
+                    >
+                    <button type="submit" class="btn-success shrink-0" :disabled="!canGenerateToken || !canManage">
+                      <icon name="ph:arrow-right-bold" size="20" />
+                    </button>
                   </div>
 
-                  <div class="flex flex-col gap-1">
-                    <span class="text-caption text-xs!">Environments</span>
-                    <div class="navigation-group flex-wrap">
-                      <button
-                        v-for="env in ENVIRONMENTS" :key="env.value"
-                        type="button" :class="tokenForm.environments.includes(env.value) ? 'border-secondary! text-secondary!' : ''"
-                        class="btn-ghost" @click="toggleEnvironment(env.value)"
-                      >
-                        {{ env.label }}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col gap-1">
-                    <label for="integration-token-expiry" class="text-caption text-xs!">Expires in (days)</label>
-                    <div class="navigation-group">
-                      <input
-                        id="integration-token-expiry" v-model.number="tokenForm.expiresInDays"
-                        type="number" min="1"
-                        max="365" placeholder="Leave empty for no expiration"
-                        class="min-w-0 flex-1"
-                      >
-                      <button type="submit" class="btn-success shrink-0" :disabled="!canGenerateToken || !canManage">
-                        <icon name="ph:arrow-right-bold" size="20" />
-                      </button>
-                    </div>
+                  <div class="navigation-group flex-wrap">
+                    <button
+                      v-for="env in ENVIRONMENTS" :key="env.value"
+                      type="button" :class="tokenForm.environments.includes(env.value) ? 'border-secondary! text-secondary!' : ''"
+                      class="btn-ghost" :aria-label="env.label"
+                      @click="toggleEnvironment(env.value)"
+                    >
+                      {{ env.label }}
+                    </button>
                   </div>
 
                   <p v-if="!canManage" class="text-caption text-xs! text-warning">
@@ -186,17 +181,23 @@
                 </form>
               </section>
 
-              <details v-if="snippet" class="group" open>
+              <details v-if="snippet" class="group py-4">
                 <summary class="text-caption flex cursor-pointer list-none items-center gap-1 tracking-wider uppercase">
                   <icon name="ph:caret-right-bold" size="15" class="shrink-0 transition-transform group-open:rotate-90" />
                   {{ selected.snippetHeading || "Snippet" }}
                   <code class="text-caption text-xs! font-normal! tracking-normal! normal-case!">{{ snippet.filename }}</code>
+                  <span class="group/tooltip relative inline-flex shrink-0 cursor-pointer text-muted-foreground" @click.stop>
+                    <icon name="ph:info-bold" size="15" />
+                    <span class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-xs p-1! text-xs! font-normal! tracking-normal! normal-case! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
+                      {{ selected.snippetHint || "Copy this file into your repository." }}
+                    </span>
+                  </span>
                 </summary>
-                <div class="relative mt-2">
+                <div class="relative mt-2 max-w-full min-w-0">
                   <button type="button" class="btn absolute top-2 right-2 z-10" aria-label="Copy snippet" @click="copyValue('workflow', snippet.code)">
                     <icon :name="copyIcons.workflow?.icon.value || 'ph:copy-bold'" size="15" />
                   </button>
-                  <Shiki :lang="snippet.language" :code="snippet.code" class="code-block max-h-80 overflow-auto text-xs" />
+                  <Shiki :lang="snippet.language" :code="snippet.code" class="code-block max-h-80 max-w-full min-w-0 overflow-auto text-xs" />
                 </div>
               </details>
             </div>

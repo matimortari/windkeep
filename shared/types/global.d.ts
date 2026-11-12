@@ -166,7 +166,7 @@ interface AuditLogsPagination {
 }
 
 interface AuditFilters {
-  users: Array<{ id: string, name: string | null, email: string }>
+  users: Array<{ id: string, name: string | null, email: string, image: string | null }>
   serviceTokens?: Array<{ id: string, name: string }>
   projects: Array<{ id: string, name: string }>
   actions: string[]
@@ -209,6 +209,7 @@ interface IntegrationSecretVar {
   description: string
   source?: "baseURL" | "projectId" | "serviceToken" | "environment"
   placeholder?: string
+  instruction?: boolean
 }
 
 interface IntegrationDefinition {
@@ -224,6 +225,7 @@ interface IntegrationDefinition {
   secretsHeading?: string
   secretsHint?: string
   snippetHeading?: string
+  snippetHint?: string
   defaultEnvironments?: Environment[]
   defaultTokenName?: string
   tokenHint?: string
