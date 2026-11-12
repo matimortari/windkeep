@@ -12,6 +12,10 @@ func newClient() *api.Client {
 	return api.NewClient(config.APIURL, cfg.APIToken)
 }
 
+func usingServiceToken() bool {
+	return api.IsServiceToken(cfg.APIToken)
+}
+
 func findProjectBySlug(client *api.Client, slug string) (*api.Project, error) {
 	if cfg.ActiveOrgID == "" {
 		return nil, fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
@@ -39,8 +43,39 @@ func projectsInOrg(client *api.Client, orgID string) ([]api.Project, error) {
 	return projects, nil
 }
 
+func resolveServiceTokenProject(slug string) (*api.Project, error) {
+	if cfg.ActiveProjectID == "" {
+		return nil, fmt.Errorf("service token auth requires a project id — set WINDKEEP_PROJECT_ID or run 'windkeep login' with the service token")
+	}
+	if slug != "" && cfg.ActiveProjectSlug != "" && slug != cfg.ActiveProjectSlug {
+		return nil, fmt.Errorf("service tokens are scoped to project '%s' and cannot switch projects", cfg.ActiveProjectSlug)
+	}
+	if slug != "" && cfg.ActiveProjectSlug == "" {
+		return nil, fmt.Errorf("service tokens cannot resolve projects by slug — omit -p or login with the service token first")
+	}
+
+	name := cfg.ActiveProjectName
+	if name == "" {
+		name = cfg.ActiveProjectSlug
+	}
+	if name == "" {
+		name = cfg.ActiveProjectID
+	}
+
+	return &api.Project{
+		ID:    cfg.ActiveProjectID,
+		Slug:  cfg.ActiveProjectSlug,
+		Name:  name,
+		OrgID: cfg.ActiveOrgID,
+	}, nil
+}
+
 // resolveProject returns a project by slug, or the active project when slug is empty.
 func resolveProject(client *api.Client, slug string) (*api.Project, error) {
+	if usingServiceToken() {
+		return resolveServiceTokenProject(slug)
+	}
+
 	if slug == "" {
 		if cfg.ActiveProjectSlug == "" {
 			return nil, fmt.Errorf("no active project. Use 'windkeep projects switch' first")

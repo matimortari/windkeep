@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -18,6 +19,35 @@ type Config struct {
 	ActiveProjectSlug string `yaml:"active_project_slug,omitempty"`
 	ActiveProjectID   string `yaml:"active_project_id,omitempty"`
 	ActiveProjectName string `yaml:"active_project_name,omitempty"`
+	ServiceTokenName  string `yaml:"service_token_name,omitempty"`
+}
+
+// LoadAuth resolves credentials from environment variables (CI) or the config file.
+// WINDKEEP_TOKEN overrides a stored token. For service tokens, WINDKEEP_PROJECT_ID can supply the scoped project without a prior login.
+func LoadAuth() (*Config, error) {
+	envToken := strings.TrimSpace(os.Getenv("WINDKEEP_TOKEN"))
+	envProjectID := strings.TrimSpace(os.Getenv("WINDKEEP_PROJECT_ID"))
+
+	cfg, err := Load()
+	if err != nil {
+		if envToken == "" {
+			return nil, err
+		}
+		cfg = &Config{}
+	}
+
+	if envToken != "" {
+		cfg.APIToken = envToken
+	}
+	if envProjectID != "" {
+		cfg.ActiveProjectID = envProjectID
+	}
+
+	if cfg.APIToken == "" {
+		return nil, fmt.Errorf("not authenticated. Run 'windkeep login' or set WINDKEEP_TOKEN")
+	}
+
+	return cfg, nil
 }
 
 // GetConfigPath returns the full path to the config file

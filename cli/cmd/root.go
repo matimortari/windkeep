@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/config"
 	"github.com/spf13/cobra"
 )
@@ -33,17 +35,36 @@ multiple environments with ease.`,
 		}
 
 		var err error
-		cfg, err = config.Load()
+		cfg, err = config.LoadAuth()
 		if err != nil {
-			return fmt.Errorf("failed to load config: %w\nRun 'windkeep login' to authenticate", err)
+			return fmt.Errorf("%w\nRun 'windkeep login' or set WINDKEEP_TOKEN", err)
 		}
 
-		if cfg.APIToken == "" {
-			return fmt.Errorf("not authenticated. Run 'windkeep login' first")
+		if api.IsServiceToken(cfg.APIToken) {
+			if err := ensureServiceTokenCommandAllowed(cmd); err != nil {
+				return err
+			}
 		}
 
 		return nil
 	},
+}
+
+func ensureServiceTokenCommandAllowed(cmd *cobra.Command) error {
+	var parts []string
+	for c := cmd; c != nil && c.Parent() != nil; c = c.Parent() {
+		parts = append([]string{c.Name()}, parts...)
+	}
+	path := strings.Join(parts, " ")
+
+	allowed := []string{"run", "pull", "whoami", "secrets list", "secrets get"}
+	for _, name := range allowed {
+		if path == name {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("service tokens are read-only and project-scoped — '%s' requires a personal API token from Preferences", path)
 }
 
 func Execute() error {

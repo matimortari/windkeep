@@ -169,6 +169,20 @@ func (c *Client) GetUser() (*User, error) {
 	return &response.User, nil
 }
 
+func (c *Client) GetServiceToken() (*ServiceTokenInfo, error) {
+	var response struct {
+		ServiceToken ServiceTokenInfo `json:"serviceToken"`
+	}
+	if err := c.Get("/api/service-token", &response); err != nil {
+		return nil, err
+	}
+	return &response.ServiceToken, nil
+}
+
+func IsServiceToken(token string) bool {
+	return strings.HasPrefix(token, "st_")
+}
+
 func (c *Client) GetOrganization(orgID string) (*Organization, error) {
 	var response struct {
 		Organization Organization `json:"organization"`

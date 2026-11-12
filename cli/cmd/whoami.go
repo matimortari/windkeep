@@ -11,33 +11,58 @@ import (
 var whoamiCmd = &cobra.Command{
 	Use:   "whoami",
 	Short: "Display current user and configuration",
-	Long:  `Show information about the currently authenticated user and active configuration.`,
+	Long:  `Show information about the currently authenticated user or service token and active configuration.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		user, err := newClient().GetUser()
-		if err != nil {
-			return fmt.Errorf("failed to get user information: %w", err)
-		}
+		client := newClient()
 
-		ui.PrintInfo("User Information")
-		fmt.Printf("Name:  %s\n", ui.Highlight(user.Name))
-		fmt.Printf("Email: %s\n", ui.Info(user.Email))
-		fmt.Println()
+		if usingServiceToken() {
+			info, err := client.GetServiceToken()
+			if err != nil {
+				return fmt.Errorf("failed to validate service token: %w", err)
+			}
 
-		ui.PrintInfo("Active Context")
-		if cfg.ActiveOrgID != "" {
-			fmt.Printf("Organization: %s\n", ui.Highlight(cfg.ActiveOrgName))
-			fmt.Printf("ID:           %s\n", ui.Info(cfg.ActiveOrgID))
+			ui.PrintInfo("Service Token")
+			fmt.Printf("Name:         %s\n", ui.Highlight(info.Name))
+			fmt.Printf("Environments: %s\n", ui.Info(joinEnvironments(info.Environment)))
+			if info.ExpiresAt != nil {
+				fmt.Printf("Expires:      %s\n", ui.Info(info.ExpiresAt.Format("2006-01-02")))
+			} else {
+				fmt.Printf("Expires:      %s\n", ui.Info("never"))
+			}
+			fmt.Println()
+
+			ui.PrintInfo("Scoped Project")
+			fmt.Printf("Project:      %s\n", ui.Highlight(info.Project.Name))
+			fmt.Printf("Slug:         %s\n", ui.Info(info.Project.Slug))
+			fmt.Printf("ID:           %s\n", ui.Info(info.Project.ID))
+			fmt.Println()
 		} else {
-			ui.PrintWarning("No active organization")
-		}
+			user, err := client.GetUser()
+			if err != nil {
+				return fmt.Errorf("failed to get user information: %w", err)
+			}
 
-		if cfg.ActiveProjectSlug != "" {
-			fmt.Printf("Project:      %s\n", ui.Highlight(cfg.ActiveProjectName))
-			fmt.Printf("Slug:         %s\n", ui.Info(cfg.ActiveProjectSlug))
-		} else {
-			ui.PrintWarning("No active project")
+			ui.PrintInfo("User Information")
+			fmt.Printf("Name:  %s\n", ui.Highlight(user.Name))
+			fmt.Printf("Email: %s\n", ui.Info(user.Email))
+			fmt.Println()
+
+			ui.PrintInfo("Active Context")
+			if cfg.ActiveOrgID != "" {
+				fmt.Printf("Organization: %s\n", ui.Highlight(cfg.ActiveOrgName))
+				fmt.Printf("ID:           %s\n", ui.Info(cfg.ActiveOrgID))
+			} else {
+				ui.PrintWarning("No active organization")
+			}
+
+			if cfg.ActiveProjectSlug != "" {
+				fmt.Printf("Project:      %s\n", ui.Highlight(cfg.ActiveProjectName))
+				fmt.Printf("Slug:         %s\n", ui.Info(cfg.ActiveProjectSlug))
+			} else {
+				ui.PrintWarning("No active project")
+			}
+			fmt.Println()
 		}
-		fmt.Println()
 
 		configPath, err := config.GetConfigPath()
 		if err != nil {

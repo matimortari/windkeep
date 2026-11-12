@@ -137,3 +137,18 @@ type SecretValueInput struct {
 	Environment Environment `json:"environment"`
 	Value       string      `json:"value"`
 }
+
+type ServiceTokenProject struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Slug  string `json:"slug"`
+	OrgID string `json:"orgId"`
+}
+
+type ServiceTokenInfo struct {
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	Environment []Environment       `json:"environment"`
+	ExpiresAt   *time.Time          `json:"expiresAt"`
+	Project     ServiceTokenProject `json:"project"`
+}
