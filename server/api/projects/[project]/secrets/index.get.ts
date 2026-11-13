@@ -49,10 +49,8 @@ export default defineEventHandler(async (event) => {
     orderBy: { key: "asc" },
   })
 
-  const decryptedSecrets = await Promise.all(secrets.map(async secret => ({
-    ...secret,
-    values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))),
-  })))
+  const key = await getOrgDataKey(project.orgId)
+  const decryptedSecrets = secrets.map(secret => ({ ...secret, values: secret.values.map(val => ({ ...val, value: decryptWithKey(val.value, key) })) }))
 
   return { decryptedSecrets }
 })

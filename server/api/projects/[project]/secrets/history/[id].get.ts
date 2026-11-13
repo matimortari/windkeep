@@ -28,18 +28,17 @@ export default defineEventHandler(async (event) => {
     orderBy: { createdAt: "desc" },
   })
 
-  const history = await Promise.all(
-    secretValues.map(async (sv) => {
-      return { environment: sv.environment, currentValue: await decrypt(secret.project.orgId, sv.value), history: await Promise.all(
-        historyRecords.filter(log => log.secretValueId === sv.id).map(async h => ({
-          id: h.id,
-          value: await decrypt(secret.project.orgId, h.value),
-          changedBy: h.changedByUser ?? { id: "deleted", name: "Deleted User", email: "noreply@system.local", image: null },
-          changedAt: h.createdAt,
-        })),
-      ) }
-    }),
-  )
+  const key = await getOrgDataKey(secret.project.orgId)
+  const history = secretValues.map(sv => ({
+    environment: sv.environment,
+    currentValue: decryptWithKey(sv.value, key),
+    history: historyRecords.filter(log => log.secretValueId === sv.id).map(h => ({
+      id: h.id,
+      value: decryptWithKey(h.value, key),
+      changedBy: h.changedByUser ?? { id: "deleted", name: "Deleted User", email: "noreply@system.local", image: null },
+      changedAt: h.createdAt,
+    })),
+  }))
 
   return { history }
 })

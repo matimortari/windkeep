@@ -178,10 +178,11 @@ export async function invalidateOrgProjectCaches(orgId: string, ...extraUserIds:
 /**
  * Creates an audit log entry for a user action, capturing relevant metadata.
  */
-export async function createAuditLog({ userId, orgId, projectId, action, resource, metadata, description, event }: {
+export async function createAuditLog({ userId, orgId, projectId, serviceTokenId, action, resource, metadata, description, event }: {
   userId: string
   orgId?: string
   projectId?: string
+  serviceTokenId?: string
   action: string
   resource?: string
   metadata?: Record<string, unknown>
@@ -197,6 +198,7 @@ export async function createAuditLog({ userId, orgId, projectId, action, resourc
       userId,
       orgId,
       projectId,
+      serviceTokenId,
       action,
       resource,
       metadata: metadata ? JSON.stringify(metadata) : undefined,

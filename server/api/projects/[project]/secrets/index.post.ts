@@ -27,30 +27,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
-  const secretData: any = {
-    key: result.data.key,
-    description: result.data.description,
-    tags: result.data.tags || [],
-    projectId,
+  const secretData: any = { key: result.data.key, description: result.data.description, tags: result.data.tags || [], projectId }
+  const key = await getOrgDataKey(project.orgId)
+  if (result.data.values && Array.isArray(result.data.values)) {
+    secretData.values = { create: result.data.values.map((val: any) => ({ environment: val.environment, value: encryptWithKey(val.value, key), changedBy: sessionUser.id })) }
   }
 
-  // Create secret and associated values within a transaction to ensure atomicity and proper history tracking
-  const secret = await db.$transaction(async (tx) => {
-    if (result.data.values && Array.isArray(result.data.values)) {
-      secretData.values = { create: await Promise.all(result.data.values.map(async (val: any) => {
-        const encryptedValue = await encrypt(project.orgId, val.value)
-        return {
-          environment: val.environment,
-          value: encryptedValue,
-          history: { create: { value: encryptedValue, changedBy: sessionUser.id } }, // Seed initial history record tracking point directly upon entity creation
-        }
-      })) }
-    }
-
-    return await tx.secret.create({
-      data: secretData,
-      include: { values: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
-    })
+  const secret = await db.secret.create({
+    data: secretData,
+    include: { values: true, project: { select: { id: true, name: true, org: { select: { id: true, name: true } } } } },
   })
 
   await createAuditLog({
@@ -70,10 +55,7 @@ export default defineEventHandler(async (event) => {
 
   await deleteCached(CacheKeys.userProjects(sessionUser.id, secret.project.org.id))
 
-  const decryptedSecret = {
-    ...secret,
-    values: await Promise.all(secret.values.map(async val => ({ ...val, value: await decrypt(project.orgId, val.value) }))),
-  }
+  const decryptedSecret = { ...secret, values: secret.values.map(val => ({ ...val, value: decryptWithKey(val.value, key) })) }
 
   return { decryptedSecret }
 })
@@ -81,7 +63,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Create secret",
-    description: "Creates a new secret with optional per-environment values. Values are encrypted at rest. Seeds initial history for each value. Requires project OWNER or ADMIN role.",
+    description: "Creates a new secret with optional per-environment values. Values are encrypted at rest. Requires project OWNER or ADMIN role.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

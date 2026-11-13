@@ -127,6 +127,7 @@ model SecretValue {
   secretId    String
   environment Environment
   value       String
+  changedBy   String?
   secret      Secret               @relation(fields: [secretId], references: [id], onDelete: Cascade)
   history     SecretValueHistory[]
   createdAt   DateTime             @default(now())

@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const orgId = existingSecret.project.orgId
+  const key = await getOrgDataKey(orgId)
   const updateData: any = {}
   if (result.data.description !== undefined) {
     updateData.description = result.data.description
@@ -37,7 +38,6 @@ export default defineEventHandler(async (event) => {
 
   const valueChanges: string[] = []
 
-  // Update secret values within a transaction to ensure atomicity and proper history tracking
   const updatedSecret = await db.$transaction(async (tx) => {
     if (result.data.values && Array.isArray(result.data.values)) {
       const incomingEnvironments = result.data.values.map(val => val.environment)
@@ -55,26 +55,18 @@ export default defineEventHandler(async (event) => {
 
         const existingValue = await tx.secretValue.findUnique({ where: { secretId_environment: { secretId, environment: val.environment } } })
         if (existingValue) {
-          const currentPlaintext = await decrypt(orgId, existingValue.value)
-          if (currentPlaintext === val.value) {
+          if (decryptWithKey(existingValue.value, key) === val.value) {
             continue
           }
 
-          const encryptedNewValue = await encrypt(orgId, val.value)
           valueChanges.push(val.environment)
-          await tx.secretValueHistory.create({ data: { secretValueId: existingValue.id, value: existingValue.value, changedBy: sessionUser.id } })
-          await tx.secretValue.update({ where: { id: existingValue.id }, data: { value: encryptedNewValue } })
+          await tx.secretValueHistory.create({ data: { secretValueId: existingValue.id, value: existingValue.value, changedBy: existingValue.changedBy } })
+          await tx.secretValue.update({ where: { id: existingValue.id }, data: { value: encryptWithKey(val.value, key), changedBy: sessionUser.id } })
         }
         else {
-          const encryptedNewValue = await encrypt(orgId, val.value)
           valueChanges.push(val.environment)
           await tx.secretValue.create({
-            data: {
-              secretId,
-              environment: val.environment,
-              value: encryptedNewValue,
-              history: { create: { value: encryptedNewValue, changedBy: sessionUser.id } },
-            },
+            data: { secretId, environment: val.environment, value: encryptWithKey(val.value, key), changedBy: sessionUser.id },
           })
         }
       }
@@ -119,7 +111,7 @@ export default defineEventHandler(async (event) => {
 
   const decryptedSecret = {
     ...updatedSecret,
-    values: await Promise.all(updatedSecret.values.map(async val => ({ ...val, value: await decrypt(orgId, val.value) }))),
+    values: updatedSecret.values.map(val => ({ ...val, value: decryptWithKey(val.value, key) })),
   }
 
   return { decryptedSecret }

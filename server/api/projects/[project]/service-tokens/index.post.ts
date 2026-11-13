@@ -48,6 +48,7 @@ export default defineEventHandler(async (event) => {
     userId: sessionUser.id,
     orgId: project.org.id,
     projectId: project.id,
+    serviceTokenId: serviceToken.id,
     action: "CREATE.SERVICE_TOKEN",
     resource: "service_token",
     description: `Created service token "${serviceToken.name}" in project "${project.name}" for environment(s): ${serviceToken.environment.join(", ")}`,

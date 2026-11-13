@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: result.error.issues[0]?.message ?? "Invalid query parameters" })
   }
 
-  const filterHash = JSON.stringify({ projectId: result.data.projectId, action: result.data.action, userId: result.data.userId, serviceTokenId: result.data.serviceTokenId, startDate: result.data.startDate, endDate: result.data.endDate })
+  const filterHash = JSON.stringify({ projectId: result.data.projectId, action: result.data.action, userId: result.data.userId, serviceTokenId: result.data.serviceTokenId, startDate: result.data.startDate, endDate: result.data.endDate, limit: result.data.limit })
   const cacheKey = CacheKeys.orgAuditLogs(orgId, result.data.page, filterHash)
   const cached = await getCached<any>(cacheKey)
   if (cached) {

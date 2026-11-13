@@ -38,8 +38,8 @@ function normalizeManualKey(manualKey: string): Buffer {
   return crypto.pbkdf2Sync(manualKey.trim(), crypto.createHash("sha256").update(process.env.ENCRYPTION_KEY!).digest(), 310_000, 32, "sha256")
 }
 
-async function getOrgDataKey(orgId: string): Promise<Buffer> {
-  const org = await db.organization.findUnique({ where: { id: orgId }, select: { wrappedEncryptionKey: true } })
+export async function getOrgDataKey(orgId: string): Promise<Buffer> {
+  const [org] = await db.$queryRaw<{ wrappedEncryptionKey: string | null }[]>`SELECT "wrappedEncryptionKey" FROM "Organization" WHERE id = ${orgId} FOR SHARE`
   if (!org?.wrappedEncryptionKey) {
     throw new Error("Organization encryption key not found")
   }
@@ -51,62 +51,36 @@ export function createWrappedOrganizationKey(manualKey?: string): string {
 }
 
 export async function rotateOrganizationKey(orgId: string, manualKey?: string) {
-  const org = await db.organization.findUnique({ where: { id: orgId }, select: { wrappedEncryptionKey: true, encryptionKeyVersion: true } })
-  if (!org?.wrappedEncryptionKey) {
-    throw new Error("Organization encryption key not found")
-  }
-
-  const oldKey = unwrapOrgKey(org.wrappedEncryptionKey)
   const newKey = manualKey ? normalizeManualKey(manualKey) : crypto.randomBytes(32)
 
-  const secretValues = await db.secretValue.findMany({
-    where: { secret: { project: { orgId } } },
-    select: { id: true, value: true },
-  })
+  await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT id FROM "Organization" WHERE id = ${orgId} FOR UPDATE`
+    const org = await tx.organization.findUnique({ where: { id: orgId }, select: { wrappedEncryptionKey: true, encryptionKeyVersion: true } })
+    if (!org?.wrappedEncryptionKey) {
+      throw new Error("Organization encryption key not found")
+    }
 
-  const historyValues = await db.secretValueHistory.findMany({
-    where: { secretValue: { secret: { project: { orgId } } } },
-    select: { id: true, value: true },
-  })
+    const oldKey = unwrapOrgKey(org.wrappedEncryptionKey)
+    const secretValues = await tx.secretValue.findMany({ where: { secret: { project: { orgId } } }, select: { id: true, value: true } })
+    const historyValues = await tx.secretValueHistory.findMany({ where: { secretValue: { secret: { project: { orgId } } } }, select: { id: true, value: true } })
 
-  const updates = [
-    ...secretValues.map(sv => db.secretValue.update({
-      where: { id: sv.id },
-      data: { value: encryptWithKey(decryptWithKey(sv.value, oldKey), newKey) },
-    })),
-    ...historyValues.map(h => db.secretValueHistory.update({
-      where: { id: h.id },
-      data: { value: encryptWithKey(decryptWithKey(h.value, oldKey), newKey) },
-    })),
-    db.organization.update({
-      where: { id: orgId },
-      data: {
-        wrappedEncryptionKey: wrapOrgKey(newKey),
-        encryptionKeyVersion: org.encryptionKeyVersion + 1,
-        encryptionKeyUpdatedAt: new Date(),
-      },
-    }),
-  ]
-
-  await db.$transaction(updates)
-}
-
-export async function encrypt(orgId: string, input: string): Promise<string> {
-  try {
-    const key = await getOrgDataKey(orgId)
-    return encryptWithKey(input, key)
-  }
-  catch {
-    throw new Error("Encryption failed")
-  }
-}
-
-export async function decrypt(orgId: string, encryptedData: string): Promise<string> {
-  try {
-    const key = await getOrgDataKey(orgId)
-    return decryptWithKey(encryptedData, key)
-  }
-  catch {
-    throw new Error("Decryption failed")
-  }
+    await Promise.all([
+      ...secretValues.map(sv => tx.secretValue.update({
+        where: { id: sv.id },
+        data: { value: encryptWithKey(decryptWithKey(sv.value, oldKey), newKey) },
+      })),
+      ...historyValues.map(h => tx.secretValueHistory.update({
+        where: { id: h.id },
+        data: { value: encryptWithKey(decryptWithKey(h.value, oldKey), newKey) },
+      })),
+      tx.organization.update({
+        where: { id: orgId },
+        data: {
+          wrappedEncryptionKey: wrapOrgKey(newKey),
+          encryptionKeyVersion: org.encryptionKeyVersion + 1,
+          encryptionKeyUpdatedAt: new Date(),
+        },
+      }),
+    ])
+  }, { isolationLevel: "Serializable" })
 }
