@@ -34,9 +34,9 @@
 
               <span class="max-w-max min-w-0 flex-1 truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
 
-              <span v-if="secret.description" class="group/tooltip relative hidden shrink-0 cursor-pointer md:inline-flex">
+              <span v-if="secret.description" class="group/tooltip relative inline-flex shrink-0 cursor-pointer" :aria-expanded="openTooltipKey === secret.key" @click.stop="toggleTooltip(secret.key, $event)">
                 <icon name="ph:info-bold" size="15" />
-                <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
+                <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! transition-opacity group-hover/tooltip:opacity-100" :class="openTooltipKey === secret.key ? 'opacity-100' : 'opacity-0'">{{ secret.description }}</span>
               </span>
 
               <div v-if="secret.tags?.length" class="flex max-w-max min-w-0 flex-1 flex-nowrap items-center gap-1 overflow-hidden">
@@ -102,9 +102,26 @@ const emit = defineEmits<{
 
 const visibleKeys = ref<Record<string, boolean>>({})
 const copyStates = ref<Record<string, boolean>>({})
+const openTooltipKey = ref<string | null>(null)
+const openTooltipEl = ref<HTMLElement | null>(null)
 const { isOwner, isAdmin } = storeToRefs(useProjectStore())
 const environments: Environment[] = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
 const { sortedData: sortedSecrets, toggleSort, getSortIconName } = useTableSort<Secret>(toRef(props, "secrets"))
+useClickOutside(openTooltipEl, () => {
+  openTooltipKey.value = null
+  openTooltipEl.value = null
+}, { escapeKey: true })
+
+function toggleTooltip(key: string, event: MouseEvent) {
+  if (openTooltipKey.value === key) {
+    openTooltipKey.value = null
+    openTooltipEl.value = null
+    return
+  }
+
+  openTooltipKey.value = key
+  openTooltipEl.value = event.currentTarget as HTMLElement
+}
 const changeTypeConfig = {
   create: {
     rowClass: "bg-success/10 text-success!",

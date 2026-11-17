@@ -1,5 +1,7 @@
 <template>
-  <div class="table-wrapper">
+  <Empty v-if="!loading && !auditLogs.length" message="No audit logs found." icon-name="ph:magnifying-glass-minus-bold" />
+
+  <div v-else class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -20,13 +22,7 @@
       </thead>
 
       <tbody>
-        <tr v-if="!loading && !auditLogs.length">
-          <td :colspan="columns.length" class="p-8 text-center">
-            <Empty message="No audit logs found." icon-name="ph:magnifying-glass-minus-bold" />
-          </td>
-        </tr>
-
-        <template v-for="log in sortedLogs" v-else :key="log.id">
+        <template v-for="log in sortedLogs" :key="log.id">
           <tr class="cursor-pointer hover:bg-muted/20" :aria-expanded="expandedRows.has(log.id)" @click="toggleRow(log.id)">
             <td :class="columns[0]?.class">
               <icon name="ph:caret-right-bold" size="15" class="hover:text-secondary" :class="expandedRows.has(log.id) ? 'rotate-90' : 'rotate-0'" />

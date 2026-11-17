@@ -26,7 +26,7 @@
                   {{ sheetTitle }}
                 </h4>
               </div>
-              <p class="text-caption">
+              <p class="text-caption pt-2">
                 {{ sheetDescription }}
               </p>
             </div>
@@ -36,7 +36,7 @@
             </button>
           </header>
 
-          <section class="scroll-area min-h-0 w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-2">
+          <section class="scroll-area min-h-0 w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-4">
             <!-- Catalog -->
             <div v-if="!selected" class="flex flex-col gap-2 p-1">
               <button
@@ -75,10 +75,14 @@
                     <span class="text-caption w-4 shrink-0 tabular-nums">
                       {{ index + 1 }}.
                     </span>
-                    <p class="min-w-0 text-sm">
-                      <span class="font-medium">{{ step.title }}.</span>
-                      <span class="text-muted-foreground"> {{ step.body }}</span>
-                    </p>
+                    <div class="min-w-0 text-sm">
+                      <p class="font-medium">
+                        {{ step.title }}.
+                      </p>
+                      <p class="text-muted-foreground">
+                        {{ step.body }}
+                      </p>
+                    </div>
                   </li>
                 </ol>
               </details>
@@ -92,17 +96,23 @@
                   {{ selected.secretsHint }}
                 </p>
 
-                <div class="mt-4 flex min-w-0 flex-col gap-4 overflow-visible rounded-md border bg-muted/30 p-4">
-                  <div v-for="(secret, index) in selected.secrets" :key="secret.name" class="flex min-w-0 flex-col gap-0.5 overflow-visible">
-                    <div class="navigation-group min-w-0">
+                <div class="mt-4 flex min-w-0 flex-col gap-4 rounded-md border bg-muted/30 p-4">
+                  <div v-for="(secret, index) in selected.secrets" :key="secret.name" class="flex min-w-0 flex-col gap-0.5">
+                    <div class="relative navigation-group min-w-0">
                       <span class="min-w-0 truncate font-mono text-sm font-medium"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.name }}</span>
-                      <span v-if="secret.description" class="group/tooltip relative inline-flex shrink-0 cursor-pointer text-muted-foreground">
+                      <span
+                        v-if="secret.description" class="peer/tip shrink-0 cursor-pointer text-muted-foreground"
+                        :aria-expanded="openTooltipKey === `secret-${secret.name}`" @click.stop="toggleTooltip(`secret-${secret.name}`, $event)"
+                      >
                         <icon name="ph:info-bold" size="20" />
-                        <span class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-xs p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">{{ secret.description }}</span>
                       </span>
+                      <span
+                        v-if="secret.description" class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-full p-1! text-xs! font-normal! tracking-normal! text-foreground! normal-case! opacity-0 transition-opacity peer-hover/tip:opacity-100"
+                        :class="openTooltipKey === `secret-${secret.name}` ? 'opacity-100!' : ''"
+                      >{{ secret.description }}</span>
                       <button
                         v-if="resolveSecretValue(secret)" type="button"
-                        class="btn-ghost shrink-0 p-0! text-muted-foreground" :aria-label="`Copy ${secret.name}`"
+                        class="shrink-0 cursor-pointer text-muted-foreground" :aria-label="`Copy ${secret.name}`"
                         @click="copyValue(secret.name, resolveSecretValue(secret)!)"
                       >
                         <icon :name="copyIcons[secret.name]?.icon.value || 'ph:copy-bold'" size="20" />
@@ -116,15 +126,18 @@
               </details>
 
               <section class="flex flex-col gap-2 py-4">
-                <div class="navigation-group">
+                <div class="relative navigation-group">
                   <p class="text-caption tracking-wider uppercase">
                     Service token
                   </p>
-                  <span class="group/tooltip relative inline-flex shrink-0 cursor-pointer text-muted-foreground">
+                  <span class="peer/tip shrink-0 cursor-pointer text-muted-foreground" :aria-expanded="openTooltipKey === 'token'" @click.stop="toggleTooltip('token', $event)">
                     <icon name="ph:info-bold" size="15" />
-                    <span class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-xs p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
-                      {{ selected.tokenHint || "Generate a token scoped for this integration. Copy it into WINDKEEP_TOKEN." }}
-                    </span>
+                  </span>
+                  <span
+                    class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-full p-1! text-xs! font-normal! tracking-normal! text-foreground! normal-case! opacity-0 transition-opacity peer-hover/tip:opacity-100"
+                    :class="openTooltipKey === 'token' ? 'opacity-100!' : ''"
+                  >
+                    {{ selected.tokenHint || "Generate a token scoped for this integration. Copy it into WINDKEEP_TOKEN." }}
                   </span>
                 </div>
 
@@ -156,8 +169,7 @@
                       id="integration-token-expiry" v-model.number="tokenForm.expiresInDays"
                       type="number" min="1"
                       max="365" placeholder="Days"
-                      aria-label="Expires in days"
-                      class="w-24! shrink-0"
+                      aria-label="Expires in days" class="w-24! shrink-0"
                     >
                     <button type="submit" class="btn-success shrink-0" :disabled="!canGenerateToken || !canManage">
                       <icon name="ph:arrow-right-bold" size="20" />
@@ -182,15 +194,22 @@
               </section>
 
               <details v-if="snippet" class="group py-4">
-                <summary class="text-caption flex cursor-pointer list-none items-center gap-1 tracking-wider uppercase">
+                <summary class="text-caption relative flex cursor-pointer list-none items-center gap-1 tracking-wider uppercase">
                   <icon name="ph:caret-right-bold" size="15" class="shrink-0 transition-transform group-open:rotate-90" />
                   {{ selected.snippetHeading || "Snippet" }}
                   <code class="text-caption text-xs! font-normal! tracking-normal! normal-case!">{{ snippet.filename }}</code>
-                  <span class="group/tooltip relative inline-flex shrink-0 cursor-pointer text-muted-foreground" @click.stop>
+                  <span
+                    class="peer/tip shrink-0 cursor-pointer text-muted-foreground"
+                    :aria-expanded="openTooltipKey === 'snippet'"
+                    @click.stop="toggleTooltip('snippet', $event)"
+                  >
                     <icon name="ph:info-bold" size="15" />
-                    <span class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-xs p-1! text-xs! font-normal! tracking-normal! normal-case! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
-                      {{ selected.snippetHint || "Copy this file into your repository." }}
-                    </span>
+                  </span>
+                  <span
+                    class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-full p-1! text-xs! font-normal! tracking-normal! text-foreground! normal-case! opacity-0 transition-opacity peer-hover/tip:opacity-100"
+                    :class="openTooltipKey === 'snippet' ? 'opacity-100!' : ''"
+                  >
+                    {{ selected.snippetHint || "Copy this file into your repository." }}
                   </span>
                 </summary>
                 <div class="relative mt-2 max-w-full min-w-0">
@@ -226,6 +245,18 @@ const sheetTitle = computed(() => selected.value?.name ?? "Integrations")
 const sheetDescription = computed(() => selected.value?.summary ?? "Recipes for CI/CD and hosting platforms")
 const isMobile = ref(false)
 const mediaQueryAbort = new AbortController()
+const openTooltipKey = ref<string | null>(null)
+const openTooltipEl = ref<HTMLElement | null>(null)
+const generatedRawToken = ref("")
+const isTokenVisible = ref(true)
+const tokenForm = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({ name: "Railway Deploy", environments: ["PRODUCTION"], expiresInDays: null })
+const canGenerateToken = computed(() => tokenForm.value.name.trim().length >= 3 && tokenForm.value.environments.length > 0)
+const copyIconKeys = [...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))), "token", "workflow"]
+const copyIcons = Object.fromEntries(copyIconKeys.map(key => [key, useActionIcon("ph:copy-bold")])) as Record<string, ReturnType<typeof useActionIcon>>
+useClickOutside(openTooltipEl, () => {
+  openTooltipKey.value = null
+  openTooltipEl.value = null
+}, { escapeKey: true })
 
 const snippet = computed(() => {
   if (!selected.value?.buildSnippet || !props.projectId) {
@@ -238,18 +269,16 @@ const snippet = computed(() => {
   })
 })
 
-const generatedRawToken = ref("")
-const isTokenVisible = ref(true)
-const tokenForm = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({
-  name: "Railway Deploy",
-  environments: ["PRODUCTION"],
-  expiresInDays: null,
-})
+function toggleTooltip(key: string, event: MouseEvent) {
+  if (openTooltipKey.value === key) {
+    openTooltipKey.value = null
+    openTooltipEl.value = null
+    return
+  }
 
-const canGenerateToken = computed(() => tokenForm.value.name.trim().length >= 3 && tokenForm.value.environments.length > 0)
-
-const copyIconKeys = [...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))), "token", "workflow"]
-const copyIcons = Object.fromEntries(copyIconKeys.map(key => [key, useActionIcon("ph:copy-bold")])) as Record<string, ReturnType<typeof useActionIcon>>
+  openTooltipKey.value = key
+  openTooltipEl.value = event.currentTarget as HTMLElement
+}
 
 function resolveSecretValue(secret: { source?: "baseURL" | "projectId" | "serviceToken" | "environment", placeholder?: string }) {
   if (secret.source === "baseURL") {
@@ -339,6 +368,8 @@ onMounted(() => {
 
 watch(() => props.isOpen, (open) => {
   scrollLock(open)
+  openTooltipKey.value = null
+  openTooltipEl.value = null
   if (open) {
     selectedId.value = null
     resetTokenForm()
@@ -346,7 +377,11 @@ watch(() => props.isOpen, (open) => {
 })
 
 // Reset token form when the selected integration changes
-watch(selectedId, () => resetTokenForm())
+watch(selectedId, () => {
+  openTooltipKey.value = null
+  openTooltipEl.value = null
+  resetTokenForm()
+})
 
 onBeforeUnmount(() => {
   mediaQueryAbort.abort()

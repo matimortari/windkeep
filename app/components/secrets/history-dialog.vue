@@ -5,59 +5,61 @@
     </p>
 
     <template v-else>
-      <Empty v-if="!history || history.length === 0" message="No history available for this secret." icon-name="ph:clock-counter-clockwise-bold" />
-
-      <template v-else>
-        <div class="card p-0!">
-          <div class="flex flex-row items-center justify-between border-b">
-            <div class="flex flex-row overflow-x-auto">
-              <button
-                v-for="env in mergedHistory" :key="env.environment"
-                type="button"
-                class="history-tab" :class="activeEnv === env.environment ? 'history-tab--active' : ''"
-                @click="activeEnv = env.environment"
-              >
-                {{ env.environment }}
-              </button>
-            </div>
-
-            <button type="button" class="btn shrink-0 rounded-none!" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'" @click="allVisible = !allVisible">
-              <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
-              <span class="hidden md:inline">{{ allVisible ? 'Hide all' : 'Reveal all' }}</span>
+      <div class="flex flex-col gap-2">
+        <div class="navigation-group justify-between gap-1">
+          <div class="flex min-w-0 flex-1 flex-row overflow-x-auto">
+            <button
+              v-for="env in ENVIRONMENTS" :key="env.value"
+              type="button" class="history-tab"
+              :class="activeEnv === env.value ? 'history-tab--active' : ''" :disabled="!historyByEnv.has(env.value)"
+              @click="activeEnv = env.value"
+            >
+              {{ env.label }}
             </button>
           </div>
 
-          <div v-if="activeHistory" class="scroll-area max-h-[70vh] space-y-2 overflow-y-auto p-2">
-            <div v-for="row in activeHistory.rows" :key="row.id" class="space-y-1 rounded-lg p-2">
-              <div v-if="!row.isCurrent" class="flex items-center justify-between text-muted-foreground">
-                <div class="navigation-group">
-                  <img :src="row.changedBy?.image || ''" :alt="row.changedBy?.name || 'Unknown'" class="size-4 rounded-full border">
-                  <span class="text-xs font-medium">{{ row.changedBy?.name || 'Unknown' }}</span>
-                </div>
-                <span class="text-xs">{{ formatChangedAt(row.changedAt!) }}</span>
+          <button
+            type="button" class="btn-ghost shrink-0"
+            :disabled="!activeHistory" :aria-label="allVisible ? 'Hide all values' : 'Reveal all values'"
+            @click="allVisible = !allVisible"
+          >
+            <icon :name="allVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
+            <span class="hidden md:inline">{{ allVisible ? 'Hide all' : 'Reveal all' }}</span>
+          </button>
+        </div>
+
+        <Empty v-if="!activeHistory" message="No history available for this environment." icon-name="ph:clock-counter-clockwise-bold" />
+
+        <div v-else class="card scroll-area max-h-[70vh] space-y-2 overflow-y-auto p-2">
+          <div v-for="row in activeHistory.rows" :key="row.id" class="space-y-1 rounded-lg p-2">
+            <div v-if="!row.isCurrent" class="flex items-center justify-between text-muted-foreground">
+              <div class="navigation-group">
+                <img :src="row.changedBy?.image || ''" :alt="row.changedBy?.name || 'Unknown'" class="size-4 rounded-full border">
+                <span class="text-xs font-medium">{{ row.changedBy?.name || 'Unknown' }}</span>
               </div>
+              <span class="text-xs">{{ formatChangedAt(row.changedAt!) }}</span>
+            </div>
 
-              <div class="navigation-group justify-between text-sm">
-                <p class="flex flex-row items-center gap-1">
-                  <span class="truncate font-mono text-muted-foreground select-none" :aria-label="visibleMap[row.id] || allVisible ? undefined : 'Hidden value'">
-                    {{ visibleMap[row.id] || allVisible ? row.value : "•".repeat(Math.min(Math.max(row.value?.length || 0, 6), 32)) }}
-                  </span>
-                  <span v-if="row.isCurrent" class="shrink-0 rounded-full bg-info/10 px-1.5 py-0.5 text-xs font-medium text-info">Current Value</span>
-                </p>
+            <div class="navigation-group justify-between text-sm">
+              <p class="flex flex-row items-center gap-1">
+                <span class="truncate font-mono text-muted-foreground select-none" :aria-label="visibleMap[row.id] || allVisible ? undefined : 'Hidden value'">
+                  {{ visibleMap[row.id] || allVisible ? row.value : "•".repeat(Math.min(Math.max(row.value?.length || 0, 6), 32)) }}
+                </span>
+                <span v-if="row.isCurrent" class="shrink-0 rounded-full bg-info/10 px-1.5 py-0.5 text-xs font-medium text-info">Current Value</span>
+              </p>
 
-                <div class="flex flex-row items-center gap-1 text-muted-foreground">
-                  <button type="button" :aria-label="`Toggle visibility for ${row.id}`" @click="visibleMap[row.id] = !visibleMap[row.id]">
-                    <icon :name="visibleMap[row.id] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
-                  </button>
-                  <button type="button" :aria-label="`Copy value for ${row.id}`" @click="handleCopy(row.id, row.value)">
-                    <icon :name="copyStates[row.id] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" />
-                  </button>
-                </div>
+              <div class="navigation-group text-muted-foreground">
+                <button type="button" :aria-label="`Toggle visibility for ${row.id}`" @click="visibleMap[row.id] = !visibleMap[row.id]">
+                  <icon :name="visibleMap[row.id] ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
+                </button>
+                <button type="button" :aria-label="`Copy value for ${row.id}`" @click="handleCopy(row.id, row.value)">
+                  <icon :name="copyStates[row.id] ? 'ph:check-bold' : 'ph:copy-bold'" size="20" />
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </template>
+      </div>
     </template>
   </Dialog>
 </template>
@@ -79,6 +81,8 @@ const copyStates = ref<Record<string, boolean>>({})
 const allVisible = ref(false)
 const activeEnv = ref<Environment | null>(null)
 
+const historyByEnv = computed(() => new Map(history.value.map(env => [env.environment, env])))
+
 const mergedHistory = computed(() => history.value.map(env => ({
   environment: env.environment,
   history: env.history,
@@ -88,7 +92,7 @@ const mergedHistory = computed(() => history.value.map(env => ({
   ],
 })))
 
-const activeHistory = computed(() => mergedHistory.value.find(env => env.environment === activeEnv.value) ?? mergedHistory.value[0] ?? null)
+const activeHistory = computed(() => mergedHistory.value.find(env => env.environment === activeEnv.value) ?? null)
 
 async function handleCopy(key: string, value: string) {
   if (!value) {
@@ -152,19 +156,21 @@ watch(isHistoryEditorOpen, async (newVal) => {
   background: transparent;
   color: var(--muted-foreground);
   border: none;
-  border-right: var(--border-style);
-  transition: all var(--transition);
+  border-bottom: 2px solid transparent;
+  transition:
+    color var(--transition),
+    border-color var(--transition);
   white-space: nowrap;
 }
-.history-tab:last-child {
-  border-right: none;
-}
 .history-tab--active {
-  background-color: color-mix(in srgb, var(--muted) 30%, transparent);
   color: var(--foreground);
-  border-bottom: 2px solid var(--primary);
+  border-bottom-color: var(--primary);
 }
-.history-tab:not(.history-tab--active):hover {
-  background-color: color-mix(in srgb, var(--muted) 20%, transparent);
+.history-tab:not(.history-tab--active):not(:disabled):hover {
+  color: var(--foreground);
+}
+.history-tab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 </style>

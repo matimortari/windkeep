@@ -168,7 +168,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "              [ \"$OLD\" = \"$K\" ] && found=1 && break",
         "            done",
         "            if [ \"$found\" -eq 0 ]; then",
-        "              railway variables delete \"$OLD\" --skip-deploys --service \"$RAILWAY_SERVICE\"",
+        "              railway variables delete \"$OLD\" --service \"$RAILWAY_SERVICE\"",
         "            fi",
         "          done",
         "          JOINED=$(IFS=,; echo \"${WK_KEYS[*]}\")",

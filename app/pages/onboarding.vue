@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen w-full items-center justify-center">
+  <div class="flex min-h-screen w-full items-center justify-center p-4">
     <div class="onboarding-panel w-full max-w-xl border-none bg-transparent py-32">
       <header class="flex flex-col items-center gap-2 py-4 text-center">
         <h1 class="font-display">
@@ -34,13 +34,13 @@
                     Auto-generate (recommended)
                   </option>
                   <option value="MANUAL">
-                    Enter my own password
+                    Use a custom passphrase
                   </option>
                 </select>
 
                 <input
                   v-if="localOrg.encryptionMode === 'MANUAL'" v-model="localOrg.encryptionKey"
-                  placeholder="Organization encryption password (min 12 chars)" type="password"
+                  placeholder="Encryption passphrase (min 12 chars)" type="password"
                   autocomplete="new-password"
                 >
               </div>

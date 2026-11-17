@@ -43,7 +43,9 @@
           </p>
         </header>
 
-        <div class="table-wrapper">
+        <Empty v-if="!sortedMembers.length" message="No members found." icon-name="ph:users-three-bold" />
+
+        <div v-else class="table-wrapper">
           <table>
             <thead>
               <tr>
@@ -63,12 +65,6 @@
             </thead>
 
             <tbody>
-              <tr v-if="!sortedMembers.length">
-                <td :colspan="memberColumns.length" class="p-8 text-center">
-                  <Empty message="No members found." icon-name="ph:users-three-bold" />
-                </td>
-              </tr>
-
               <tr
                 v-for="member in sortedMembers" :key="member.userId"
                 class="hover:bg-muted/20" :class="canManageMember(member) ? 'cursor-pointer' : ''"
@@ -107,7 +103,9 @@
           </p>
         </header>
 
-        <div class="table-wrapper">
+        <Empty v-if="!sortedTokens.length" message="No service tokens for this project." icon-name="ph:key-bold" />
+
+        <div v-else class="table-wrapper">
           <table>
             <thead>
               <tr>
@@ -127,12 +125,6 @@
             </thead>
 
             <tbody>
-              <tr v-if="!sortedTokens.length">
-                <td :colspan="tokenColumns.length" class="p-8 text-center">
-                  <Empty message="No service tokens for this project." icon-name="ph:key-bold" />
-                </td>
-              </tr>
-
               <tr v-for="token in sortedTokens" :key="token.id" class="hover:bg-muted/20">
                 <td>
                   <div class="navigation-group">

@@ -23,13 +23,8 @@
           <td :class="columns[0]?.class">
             {{ project.name }}
           </td>
-          <td class="max-w-md overflow-visible!" :class="columns[1]?.class">
-            <span class="group/tooltip relative inline-flex max-w-full">
-              <span class="truncate">{{ project.description || 'No description provided.' }}</span>
-              <span class="card pointer-events-none absolute bottom-full left-0 z-50 w-max p-1! text-xs! opacity-0 transition-opacity group-hover/tooltip:opacity-100">
-                {{ project.description || 'No description provided.' }}
-              </span>
-            </span>
+          <td class="max-w-md" :class="columns[1]?.class">
+            <span class="block truncate">{{ project.description || 'No description provided.' }}</span>
           </td>
           <td :class="columns[2]?.class">
             <div class="navigation-group">

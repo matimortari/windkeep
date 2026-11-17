@@ -54,19 +54,19 @@
         </p>
       </header>
 
-      <div class="navigation-group justify-end">
-        <div ref="transferDropdownRef" class="relative w-full md:max-w-64">
+      <div class="navigation-group w-full justify-end">
+        <div ref="transferDropdownRef" class="relative min-w-0 flex-1 md:max-w-64">
           <button
             type="button" class="btn w-full justify-between"
             :disabled="!transferCandidates.length"
             aria-haspopup="listbox" :aria-expanded="isTransferDropdownOpen"
             aria-label="Select new owner" @click="isTransferDropdownOpen = !isTransferDropdownOpen"
           >
-            <span class="navigation-group min-w-0">
+            <span class="navigation-group min-w-0 flex-1">
               <img v-if="transferTarget?.user.image" :src="transferTarget.user.image" alt="Avatar" class="size-5 rounded-full border">
               <span class="truncate">{{ transferTarget ? transferTarget.user.name : (transferCandidates.length ? "Select new owner" : "No eligible members") }}</span>
             </span>
-            <icon name="ph:caret-down-bold" size="20" :class="isTransferDropdownOpen ? 'rotate-180' : 'rotate-0'" />
+            <icon name="ph:caret-down-bold" size="20" class="shrink-0" :class="isTransferDropdownOpen ? 'rotate-180' : 'rotate-0'" />
           </button>
 
           <transition name="dropdown">
@@ -89,7 +89,7 @@
           </transition>
         </div>
         <button
-          type="button" class="btn-warning self-end"
+          type="button" class="btn-warning shrink-0"
           aria-label="Transfer Project Ownership" :disabled="!transferTargetId"
           @click="handleTransferOwnership"
         >

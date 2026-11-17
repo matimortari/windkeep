@@ -1,6 +1,6 @@
 <template>
   <Dialog :is-open="isOpen" title="Invite Member" @update:is-open="emit('update:isOpen', $event)">
-    <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
+    <form class="flex w-full min-w-0 flex-col gap-4 md:w-md" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="invite-email" class="text-sm font-semibold">Email</label>
         <input id="invite-email" v-model="email" type="email" placeholder="colleague@example.com">
@@ -18,17 +18,14 @@
       </div>
 
       <template v-if="generatedInviteUrl">
-        <div class="flex flex-col gap-2 rounded-sm border bg-muted/40 p-4">
-          <p class="text-sm font-semibold text-success">
-            Invitation created
-          </p>
+        <div class="flex flex-col gap-1.5">
           <p class="text-xs text-muted-foreground">
-            Share this link with the invitee. It expires in 12 hours.
+            Invitation created — share this link with the invitee. It will expire in 12 hours.
           </p>
-          <div class="navigation-group rounded-sm border bg-muted p-4 font-mono text-xs break-all">
-            <span class="flex-1">{{ generatedInviteUrl }}</span>
-            <button type="button" class="btn shrink-0" aria-label="Copy invite link" @click="copyInviteLink">
-              <icon :name="inviteLinkIcon.icon.value" size="20" />
+          <div class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
+            <span class="min-w-0 flex-1 truncate select-all" :title="generatedInviteUrl">{{ generatedInviteUrl }}</span>
+            <button type="button" class="btn-ghost shrink-0 p-0! text-muted-foreground" aria-label="Copy invite link" @click="copyInviteLink">
+              <icon :name="inviteLinkIcon.icon.value" size="15" />
             </button>
           </div>
         </div>

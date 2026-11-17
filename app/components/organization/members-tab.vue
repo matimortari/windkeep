@@ -33,7 +33,9 @@
           </p>
         </header>
 
-        <div class="table-wrapper">
+        <Empty v-if="!sortedMembers.length" message="No members found." icon-name="ph:users-three-bold" />
+
+        <div v-else class="table-wrapper">
           <table>
             <thead>
               <tr>
@@ -53,12 +55,6 @@
             </thead>
 
             <tbody>
-              <tr v-if="!sortedMembers.length">
-                <td :colspan="memberColumns.length" class="p-8 text-center">
-                  <Empty message="No members found." icon-name="ph:users-three-bold" />
-                </td>
-              </tr>
-
               <tr
                 v-for="member in sortedMembers" :key="member.user.id"
                 class="hover:bg-muted/20" :class="canManageMember(member) ? 'cursor-pointer' : ''"
@@ -97,7 +93,9 @@
           </p>
         </header>
 
-        <div class="table-wrapper">
+        <Empty v-if="!sortedInvitations.length" message="No invitations yet." icon-name="ph:envelope-open-bold" />
+
+        <div v-else class="table-wrapper">
           <table>
             <thead>
               <tr>
@@ -117,12 +115,6 @@
             </thead>
 
             <tbody>
-              <tr v-if="!sortedInvitations.length">
-                <td :colspan="inviteColumns.length" class="p-8 text-center">
-                  <Empty message="No invitations yet." icon-name="ph:envelope-open-bold" />
-                </td>
-              </tr>
-
               <tr v-for="invite in sortedInvitations" :key="invite.id" class="hover:bg-muted/20">
                 <td class="max-w-xs truncate">
                   {{ invite.email }}

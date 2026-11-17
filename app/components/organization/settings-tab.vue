@@ -47,8 +47,8 @@
 
   <TabSection title="Danger Zone">
     <nav v-if="isOwner" class="flex flex-col justify-between gap-4 border-b py-4 md:navigation-group" aria-label="Rotate Organization Encryption Key">
-      <header class="flex flex-col gap-1">
-        <h6>
+      <header class="flex min-w-0 flex-col gap-1 md:shrink-0">
+        <h6 class="md:whitespace-nowrap">
           Rotate Organization Encryption Key
         </h6>
         <p class="text-caption-danger">
@@ -56,31 +56,28 @@
         </p>
       </header>
 
-      <div class="navigation-group justify-end" :class="encryptionMode === 'MANUAL' ? 'flex-wrap md:flex-nowrap' : ''">
-        <select v-model="encryptionMode" class="w-full md:max-w-72">
+      <div class="navigation-group w-full min-w-0 justify-end md:max-w-md">
+        <select v-model="encryptionMode" class="min-w-0 flex-1 basis-0">
           <option value="AUTO">
-            Auto-generate (recommended)
+            Auto-generate
           </option>
           <option value="MANUAL">
-            Enter my own password
+            Custom passphrase
           </option>
         </select>
-
-        <div class="navigation-group">
-          <input
-            v-if="encryptionMode === 'MANUAL'" v-model="manualEncryptionKey"
-            type="password" autocomplete="new-password"
-            placeholder="New encryption password (min 12 chars)"
-          >
-          <button
-            type="button" class="btn-warning"
-            aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey"
-            @click="handleRotateEncryptionKey"
-          >
-            <icon :name="rotateKeyIcon.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
-            <span>Rotate Key</span>
-          </button>
-        </div>
+        <input
+          v-if="encryptionMode === 'MANUAL'" v-model="manualEncryptionKey"
+          type="password" autocomplete="new-password"
+          class="min-w-0 flex-1 basis-0" placeholder="Passphrase (min 12 chars)"
+        >
+        <button
+          type="button" class="btn-warning shrink-0"
+          aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey"
+          @click="handleRotateEncryptionKey"
+        >
+          <icon :name="rotateKeyIcon.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
+          <span>Rotate Key</span>
+        </button>
       </div>
     </nav>
 
