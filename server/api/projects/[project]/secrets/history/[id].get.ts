@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   // Rate limit: 100 requests per hour per user
   await enforceRateLimit(event, `secret:history:${sessionUser.id}`, 100)
-  await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
+  const membership = await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
 
   const secret = await db.secret.findUnique({
     where: { id: secretId },
@@ -21,7 +21,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: "Secret does not belong to this project" })
   }
 
-  const secretValues = await db.secretValue.findMany({ where: { secretId }, select: { id: true, environment: true, value: true } })
+  const allowedEnvironments = membership.role === "MEMBER" ? (("environment" in membership ? membership.environment : []) as Environment[]) : null
+  const secretValues = await db.secretValue.findMany({
+    where: { secretId, ...(allowedEnvironments ? { environment: { in: allowedEnvironments } } : {}) },
+    select: { id: true, environment: true, value: true },
+  })
   const historyRecords = await db.secretValueHistory.findMany({
     where: { secretValueId: { in: secretValues.map(sv => sv.id) } },
     include: { changedByUser: { select: { id: true, name: true, email: true, image: true } } },
@@ -46,7 +50,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Get secret value history",
-    description: "Returns the full value history for each environment of a secret, including who made each change.",
+    description: "Returns the value history for each environment of a secret the caller can read, including who made each change. MEMBERs only see history for their allowed environments.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

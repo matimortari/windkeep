@@ -27,7 +27,10 @@ export default defineEventHandler(async (event) => {
     const sessionUser = await getUserFromSession(event)
     // Rate limit: 200 requests per hour per user
     await enforceRateLimit(event, `secrets:list:${sessionUser.id}`, 200)
-    await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
+    const membership = await requireRole(sessionUser.id, { type: "project", projectId }, ["OWNER", "ADMIN", "MEMBER"])
+    if (membership.role === "MEMBER") {
+      allowedEnvironments = ("environment" in membership ? membership.environment : []) as Environment[]
+    }
   }
 
   const secrets = await db.secret.findMany({
@@ -42,7 +45,7 @@ export default defineEventHandler(async (event) => {
       updatedAt: true,
       values: {
         select: { id: true, secretId: true, environment: true, value: true, createdAt: true, updatedAt: true },
-        ...(allowedEnvironments ? { where: { environment: { in: allowedEnvironments } } } : {}), // Filter values by allowed environments for token auth
+        ...(allowedEnvironments ? { where: { environment: { in: allowedEnvironments } } } : {}),
         orderBy: { environment: "asc" },
       },
     },
@@ -58,14 +61,14 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Get secrets",
-    description: "Returns all decrypted secrets for the project.Can be authenticated with a service token or session cookie. Service tokens only return values for their allowed environments.",
+    description: "Returns decrypted secrets for the project. Service tokens and project MEMBERs only receive values for their allowed environments. OWNER and ADMIN always receive all environments.",
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
       { in: "header", name: "Authorization", required: false, schema: { type: "string" }, description: "Bearer token — service token auth (e.g. `Bearer st_...`). Falls back to session if omitted." },
     ],
     responses: {
-      200: { description: "Decrypted secrets, filtered by environment if using a service token" },
+      200: { description: "Decrypted secrets, filtered by environment for service tokens and MEMBERs" },
       401: { description: "Unauthenticated or invalid/expired service token" },
       403: { description: "Insufficient role" },
       404: { description: "Project not found" },

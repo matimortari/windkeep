@@ -114,7 +114,7 @@ defineRouteMeta({
               website: { type: "string", description: "Organization website (optional)" },
               rotateEncryptionKey: { type: "boolean", description: "Rotate encryption key" },
               encryptionMode: { type: "string", enum: ["AUTO", "MANUAL"], description: "Encryption mode" },
-              encryptionKey: { type: "string", description: "Encryption key (required when encryptionMode is MANUAL)" },
+              encryptionKey: { type: "string", description: "Custom passphrase used once to derive the org key (required when encryptionMode is MANUAL)" },
             },
           },
         },

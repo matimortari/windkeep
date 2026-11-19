@@ -70,6 +70,7 @@ interface ProjectMembership {
   userId: string
   projectId: string
   role: Role
+  environment: Environment[]
   user: User
   project: Project
   createdAt?: Date | string

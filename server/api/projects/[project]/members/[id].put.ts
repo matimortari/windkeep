@@ -30,42 +30,71 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: "Cannot change this member's role" })
   }
 
+  const nextRole = result.data.role ?? targetMembership.role
+  if (nextRole === "OWNER") {
+    throw createError({ statusCode: 400, statusMessage: "Cannot assign OWNER role via member update" })
+  }
+
+  const data: { role?: "ADMIN" | "MEMBER", environment?: Environment[] } = {}
+  if (result.data.role) {
+    data.role = result.data.role
+  }
+  if (nextRole === "ADMIN") {
+    data.environment = ["DEVELOPMENT", "STAGING", "PRODUCTION"]
+  }
+  else if (result.data.environment) {
+    data.environment = result.data.environment
+  }
+
   const updatedMembership = await db.projectMembership.update({
     where: { userId_projectId: { userId: memberId, projectId } },
-    data: { role: result.data.role },
+    data,
     select: {
       role: true,
+      environment: true,
       user: { select: { id: true, email: true, name: true, image: true } },
       project: { select: { id: true, name: true, orgId: true, org: { select: { id: true, name: true } } } },
     },
   })
+
+  const changes: string[] = []
+  const metadata: Record<string, unknown> = {
+    memberId: updatedMembership.user.id,
+    memberName: updatedMembership.user.name,
+    memberEmail: updatedMembership.user.email,
+  }
+  if (targetMembership.role !== updatedMembership.role) {
+    changes.push(`role from ${targetMembership.role} to ${updatedMembership.role}`)
+    metadata.oldRole = targetMembership.role
+    metadata.newRole = updatedMembership.role
+  }
+  if (JSON.stringify(targetMembership.environment) !== JSON.stringify(updatedMembership.environment)) {
+    changes.push(`environments to ${updatedMembership.environment.join(", ")}`)
+    metadata.oldEnvironments = targetMembership.environment
+    metadata.newEnvironments = updatedMembership.environment
+  }
 
   await createAuditLog({
     event,
     userId: sessionUser.id,
     orgId: updatedMembership.project.org.id,
     projectId,
-    action: "UPDATE.PROJECT_MEMBER_ROLE",
+    action: "UPDATE.PROJECT_MEMBER",
     resource: "project_member",
-    description: `Updated ${updatedMembership.user.name} (${updatedMembership.user.email}) role from ${targetMembership.role} to ${updatedMembership.role} in project "${updatedMembership.project.name}"`,
-    metadata: {
-      memberId: updatedMembership.user.id,
-      memberName: updatedMembership.user.name,
-      memberEmail: updatedMembership.user.email,
-      oldRole: targetMembership.role,
-      newRole: updatedMembership.role,
-    },
+    description: `Updated ${updatedMembership.user.name} (${updatedMembership.user.email}) in project "${updatedMembership.project.name}": ${changes.join("; ") || "no changes"}`,
+    metadata,
   })
 
-  await deleteCached(CacheKeys.userData(memberId), CacheKeys.userProjects(memberId, updatedMembership.project.orgId))
+  await deleteCached(CacheKeys.userData(memberId))
+  await invalidateProjectMembershipCaches(projectId, updatedMembership.project.orgId, sessionUser.id, memberId)
 
   return { membership: updatedMembership }
 })
 
 defineRouteMeta({
   openAPI: {
-    summary: "Update project member role",
-    description: "Updates a project member's role. Cannot change owner roles or your own role. Only owners can change admin roles. Requires project OWNER or ADMIN role.",
+    summary: "Update project member",
+    description: "Updates a project member's role and/or readable environments. Cannot change owner roles or your own role. ADMINs always get all environments. Requires project OWNER or ADMIN role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -77,9 +106,9 @@ defineRouteMeta({
         "application/json": {
           schema: {
             type: "object",
-            required: ["role"],
             properties: {
               role: { type: "string", enum: ["ADMIN", "MEMBER"] },
+              environment: { type: "array", items: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"] } },
             },
           },
         },

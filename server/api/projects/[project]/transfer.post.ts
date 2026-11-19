@@ -39,9 +39,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "User is already an owner of this project" })
   }
 
-  const orgMembership = await db.orgMembership.findUnique({
-    where: { userId_orgId: { userId: result.data.newOwnerId, orgId: project.orgId } },
-  })
+  const orgMembership = await db.orgMembership.findUnique({ where: { userId_orgId: { userId: result.data.newOwnerId, orgId: project.orgId } } })
   if (!orgMembership) {
     throw createError({ statusCode: 403, statusMessage: "New owner must be a member of the organization" })
   }
@@ -51,10 +49,10 @@ export default defineEventHandler(async (event) => {
 
   await db.$transaction([...previousOwnerIds.map(userId => db.projectMembership.update({
     where: { userId_projectId: { userId, projectId } },
-    data: { role: "ADMIN" },
+    data: { role: "ADMIN", environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] },
   })), db.projectMembership.update({
     where: { userId_projectId: { userId: result.data.newOwnerId, projectId } },
-    data: { role: "OWNER" },
+    data: { role: "OWNER", environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] },
   })])
 
   await createAuditLog({

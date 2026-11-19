@@ -37,10 +37,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 409, statusMessage: "User is already a member of this project" })
   }
 
+  const environment = result.data.role === "ADMIN" ? ["DEVELOPMENT", "STAGING", "PRODUCTION"] as Environment[] : (result.data.environment ?? ["DEVELOPMENT"])
   const newMembership = await db.projectMembership.create({
-    data: { userId: result.data.userId, projectId, role: result.data.role },
+    data: { userId: result.data.userId, projectId, role: result.data.role, environment },
     select: {
       role: true,
+      environment: true,
       user: { select: { id: true, email: true, name: true, image: true } },
       project: { select: { id: true, name: true } },
     },
@@ -59,10 +61,12 @@ export default defineEventHandler(async (event) => {
       memberName: newMembership.user.name,
       memberEmail: newMembership.user.email,
       memberRole: newMembership.role,
+      environments: newMembership.environment,
     },
   })
 
-  await deleteCached(CacheKeys.userData(result.data.userId), CacheKeys.userProjects(result.data.userId, project.orgId))
+  await deleteCached(CacheKeys.userData(result.data.userId))
+  await invalidateProjectMembershipCaches(projectId, project.orgId, sessionUser.id, result.data.userId)
 
   return { membership: newMembership }
 })
@@ -70,7 +74,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Add project member",
-    description: "Adds an existing organization member to the project. Requires project OWNER or ADMIN role.",
+    description: "Adds an existing organization member to the project. MEMBERs can be scoped to specific secret environments; ADMINs always get all environments. Requires project OWNER or ADMIN role.",
     tags: ["Projects"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
@@ -85,6 +89,7 @@ defineRouteMeta({
             properties: {
               userId: { type: "string" },
               role: { type: "string", enum: ["ADMIN", "MEMBER"] },
+              environment: { type: "array", items: { type: "string", enum: ["DEVELOPMENT", "STAGING", "PRODUCTION"] }, description: "Environments the member may read (MEMBER only; defaults to DEVELOPMENT)" },
             },
           },
         },

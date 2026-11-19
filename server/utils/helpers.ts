@@ -151,7 +151,7 @@ export async function requireRole(userId: string, scope: { type: "org", orgId: s
     // Org owners have implicit OWNER permissions on all org projects
     if (orgMembership.role === "OWNER") {
       const projectMembership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })
-      return projectMembership ?? { userId, projectId: scope.projectId, role: "OWNER" as Role }
+      return projectMembership ?? { userId, projectId: scope.projectId, role: "OWNER" as Role, environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] }
     }
 
     membership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })
@@ -173,6 +173,14 @@ export async function invalidateOrgProjectCaches(orgId: string, ...extraUserIds:
     return
   }
   await deleteCached(...[...userIds].map(id => CacheKeys.userProjects(id, orgId)))
+}
+
+/**
+ * Invalidates the project membership caches for a project and all its members.
+ */
+export async function invalidateProjectMembershipCaches(projectId: string, orgId: string, ...extraUserIds: string[]) {
+  const members = await db.projectMembership.findMany({ where: { projectId }, select: { userId: true } })
+  await invalidateOrgProjectCaches(orgId, ...members.map(m => m.userId), ...extraUserIds)
 }
 
 /**

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
       description: result.data.description ?? null,
       website: result.data.website ?? null,
       orgId: result.data.orgId,
-      memberships: { create: { userId: sessionUser.id, role: "OWNER" } },
+      memberships: { create: { userId: sessionUser.id, role: "OWNER", environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] } },
     },
     select: {
       id: true,
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
       updatedAt: true,
       org: { select: { id: true, name: true } },
       _count: { select: { secrets: true, serviceTokens: true, memberships: true } },
-      memberships: { select: { userId: true, role: true, user: { select: { id: true, name: true, image: true } } } },
+      memberships: { select: { userId: true, role: true, environment: true, user: { select: { id: true, name: true, image: true } } } },
     },
   })
 

@@ -30,8 +30,18 @@ export const updateProjectSchema = z.object({
   website: z.url("Website must be a valid URL").max(255, "Website URL must be at most 255 characters").nullable().optional(),
 })
 
-export const addProjectMemberSchema = z.object({ userId: z.cuid2(), role: z.enum(["ADMIN", "MEMBER"]).optional().default("MEMBER") })
-export const updateProjectMemberSchema = z.object({ role: z.enum(["ADMIN", "MEMBER"]) })
+export const addProjectMemberSchema = z.object({
+  userId: z.cuid2(),
+  role: z.enum(["ADMIN", "MEMBER"]).optional().default("MEMBER"),
+  environment: z.array(z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"])).min(1, "Member must be assigned to at least one environment").optional(),
+})
+
+export const updateProjectMemberSchema = z.object({
+  role: z.enum(["ADMIN", "MEMBER"]).optional(),
+  environment: z.array(z.enum(["DEVELOPMENT", "STAGING", "PRODUCTION"])).min(1, "Member must be assigned to at least one environment").optional(),
+}).refine(data => data.role !== undefined || data.environment !== undefined, {
+  message: "At least one of role or environment must be provided",
+})
 export const removeProjectMemberSchema = z.object({ projectId: z.cuid2(), userId: z.cuid2() })
 export const transferProjectOwnershipSchema = z.object({ newOwnerId: z.cuid2() })
 

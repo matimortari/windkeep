@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
       projectMemberships: {
         select: {
           role: true,
+          environment: true,
           projectId: true,
           project: { select: { id: true, name: true, slug: true, orgId: true } },
         },
