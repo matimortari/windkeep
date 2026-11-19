@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { createAuditLog, generateSlug, generateToken, getBinaryBlobUrl, getInviteBaseUrl, getUserFromSession, hashToken, invalidateOrgProjectCaches, requireEnv, requireRole } from "../../server/utils/helpers"
+import { createAuditLog, generateSlug, generateToken, getBinaryBlobUrl, getInviteBaseUrl, getUserFromSession, hashToken, invalidateOrgProjectCaches, invalidateProjectMembershipCaches, requireEnv, requireRole } from "../../server/utils/helpers"
 import { assertValidUserSession, createError, db, deleteCached, getHeader, getUserSession, resetNitroMocks } from "../mocks/nitro-runtime"
 
 const TEST_ENCRYPTION_KEY = "dGVzdC1lbmNyeXB0aW9uLWtleS0zMi1ieXRlcw=="
@@ -204,7 +204,7 @@ describe("requireRole", () => {
 
     db.orgMembership.findUnique.mockResolvedValue({ userId: "u1", orgId: "o1", role: "OWNER", isActive: true })
     db.projectMembership.findUnique.mockResolvedValue(null)
-    await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toEqual({ userId: "u1", projectId: "p1", role: "OWNER" })
+    await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toEqual({ userId: "u1", projectId: "p1", role: "OWNER", environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] })
 
     db.projectMembership.findUnique.mockResolvedValue({ userId: "u1", projectId: "p1", role: "OWNER" })
     await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toMatchObject({ role: "OWNER" })
@@ -233,6 +233,24 @@ describe("invalidateOrgProjectCaches", () => {
     db.orgMembership.findMany.mockResolvedValue([{ userId: "owner-1" }])
     await invalidateOrgProjectCaches("o1", "extra-1", "")
     expect(deleteCached).toHaveBeenCalledWith("user:projects:owner-1:o1", "user:projects:extra-1:o1")
+  })
+})
+
+describe("invalidateProjectMembershipCaches", () => {
+  beforeEach(() => {
+    resetNitroMocks()
+  })
+
+  it("invalidates org owners, project members, and extra users", async () => {
+    db.projectMembership.findMany.mockResolvedValue([{ userId: "member-1" }, { userId: "admin-1" }])
+    db.orgMembership.findMany.mockResolvedValue([{ userId: "owner-1" }])
+    await invalidateProjectMembershipCaches("p1", "o1", "removed-1")
+    expect(deleteCached).toHaveBeenCalledWith(
+      "user:projects:owner-1:o1",
+      "user:projects:member-1:o1",
+      "user:projects:admin-1:o1",
+      "user:projects:removed-1:o1",
+    )
   })
 })
 

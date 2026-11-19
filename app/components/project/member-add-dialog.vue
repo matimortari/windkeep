@@ -47,6 +47,24 @@
             </option>
           </select>
         </div>
+
+        <div v-if="role === 'MEMBER'" class="flex flex-col items-start gap-1">
+          <span class="text-sm font-semibold">Environments</span>
+          <span class="text-xs text-muted-foreground">Member can only read secrets from selected environments.</span>
+          <div class="navigation-group flex-wrap">
+            <button
+              v-for="env in ENVIRONMENTS" :key="env.value"
+              type="button" class="btn-ghost"
+              :class="environments.includes(env.value) ? 'border-secondary! text-secondary!' : ''"
+              @click="toggleEnvironment(env.value)"
+            >
+              {{ env.label }}
+            </button>
+          </div>
+        </div>
+        <p v-else class="text-xs text-muted-foreground">
+          Admins can read secrets from all environments.
+        </p>
       </template>
 
       <footer class="flex flex-row items-center justify-end">
@@ -54,7 +72,7 @@
           <button type="button" class="btn-ghost" @click="emit('update:isOpen', false)">
             Cancel
           </button>
-          <button v-if="availableMembers.length" type="submit" class="btn-success" :disabled="!selectedUserId">
+          <button v-if="availableMembers.length" type="submit" class="btn-success" :disabled="!canSubmit">
             <icon name="ph:plus-circle-bold" size="20" />
             <span>Add Member</span>
           </button>
@@ -79,25 +97,39 @@ const emit = defineEmits<{
 const projectStore = useProjectStore()
 const selectedUserId = ref("")
 const role = ref<"ADMIN" | "MEMBER">("MEMBER")
+const environments = ref<Environment[]>(["DEVELOPMENT"])
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 useClickOutside(dropdownRef, () => isDropdownOpen.value = false, { escapeKey: true })
 const selectedMember = computed(() => props.availableMembers.find(m => m.user.id === selectedUserId.value))
+const canSubmit = computed(() => !!selectedUserId.value && (role.value === "ADMIN" || environments.value.length > 0))
+
+function toggleEnvironment(env: Environment) {
+  const idx = environments.value.indexOf(env)
+  if (idx === -1) {
+    environments.value.push(env)
+  }
+  else if (environments.value.length > 1) {
+    environments.value.splice(idx, 1)
+  }
+}
 
 function resetForm() {
   selectedUserId.value = ""
   role.value = "MEMBER"
+  environments.value = ["DEVELOPMENT"]
   isDropdownOpen.value = false
 }
 
 async function handleSubmit() {
-  if (!props.projectId || !selectedUserId.value) {
+  if (!props.projectId || !selectedUserId.value || !canSubmit.value) {
     return
   }
 
   await projectStore.addProjectMember(props.projectId, {
     userId: selectedUserId.value,
     role: role.value,
+    ...(role.value === "MEMBER" ? { environment: [...environments.value] } : {}),
   })
   await projectStore.getProjects()
   emit("added")

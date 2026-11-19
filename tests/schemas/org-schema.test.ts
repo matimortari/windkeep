@@ -8,7 +8,7 @@ describe("createOrgSchema", () => {
     expect(result.encryptionMode).toBe("AUTO")
   })
 
-  it("requires a long enough encryption password in MANUAL mode", () => {
+  it("requires a long enough encryption passphrase in MANUAL mode", () => {
     expect(createOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL", encryptionKey: "short" }).success).toBe(false)
     expect(createOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL" }).success).toBe(false)
     expect(createOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL", encryptionKey: "long-enough-password" }).success).toBe(true)

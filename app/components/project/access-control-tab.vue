@@ -39,7 +39,7 @@
             Members
           </h6>
           <p class="text-caption">
-            Users with access to this project and their roles.
+            Users with access to this project, their roles, and environments.
           </p>
         </header>
 
@@ -81,6 +81,11 @@
                 </td>
                 <td class="w-28">
                   {{ ROLES.find(role => role.value === member.role)?.label }}
+                </td>
+                <td>
+                  <div v-if="member.environment?.length" class="flex flex-wrap items-center gap-1">
+                    <span v-for="env in member.environment" :key="env" class="rounded-full border border-muted/40 bg-muted/20 px-1.5 py-0.5 text-xs font-medium text-muted-foreground">{{ ENVIRONMENTS.find(e => e.value === env)?.label }}</span>
+                  </div>
                 </td>
                 <td class="w-24 text-end">
                   <button v-if="canManageMember(member)" type="button" aria-label="Manage member" @click.stop="openMemberDialog(member)">
@@ -195,6 +200,7 @@ const memberColumns = [
   { key: "user.name", label: "Member", class: "", sortable: true },
   { key: "user.email", label: "Email", class: "", sortable: true },
   { key: "role", label: "Role", class: "w-28", sortable: true },
+  { key: "environment", label: "Environments", class: "", sortable: false },
   { key: "actions", label: "Actions", class: "w-24 text-end", sortable: false },
 ]
 

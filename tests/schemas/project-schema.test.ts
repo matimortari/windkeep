@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { createProjectSchema, updateProjectSchema } from "../../shared/schemas/project-schema"
+import { addProjectMemberSchema, createProjectSchema, updateProjectMemberSchema, updateProjectSchema } from "../../shared/schemas/project-schema"
 
 describe("createProjectSchema", () => {
   it("accepts a valid project", () => {
@@ -50,5 +50,37 @@ describe("updateProjectSchema", () => {
 
   it("clears description and website when null", () => {
     expect(updateProjectSchema.parse({ description: null, website: null })).toEqual({ description: null, website: null })
+  })
+})
+
+describe("addProjectMemberSchema", () => {
+  it("defaults role to MEMBER and accepts environments", () => {
+    expect(addProjectMemberSchema.parse({
+      userId: "tz4a98xxat96iws9zmbrgj3a",
+      environment: ["DEVELOPMENT", "STAGING"],
+    })).toEqual({
+      userId: "tz4a98xxat96iws9zmbrgj3a",
+      role: "MEMBER",
+      environment: ["DEVELOPMENT", "STAGING"],
+    })
+  })
+
+  it("rejects empty environments", () => {
+    expect(addProjectMemberSchema.safeParse({
+      userId: "tz4a98xxat96iws9zmbrgj3a",
+      environment: [],
+    }).success).toBe(false)
+  })
+})
+
+describe("updateProjectMemberSchema", () => {
+  it("accepts environment-only updates", () => {
+    expect(updateProjectMemberSchema.parse({ environment: ["PRODUCTION"] })).toEqual({
+      environment: ["PRODUCTION"],
+    })
+  })
+
+  it("requires role or environment", () => {
+    expect(updateProjectMemberSchema.safeParse({}).success).toBe(false)
   })
 })

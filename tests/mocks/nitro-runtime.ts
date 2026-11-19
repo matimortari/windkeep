@@ -27,7 +27,7 @@ export const db = {
   user: { findFirst: vi.fn() },
   project: { findUnique: vi.fn() },
   orgMembership: { findUnique: vi.fn(), findMany: vi.fn() },
-  projectMembership: { findUnique: vi.fn() },
+  projectMembership: { findUnique: vi.fn(), findMany: vi.fn() },
   auditLog: { create: vi.fn() },
   serviceToken: { findUnique: vi.fn(), update: vi.fn() },
 }
@@ -49,6 +49,7 @@ export function resetNitroMocks() {
   db.orgMembership.findUnique.mockReset()
   db.orgMembership.findMany.mockReset()
   db.projectMembership.findUnique.mockReset()
+  db.projectMembership.findMany.mockReset()
   db.auditLog.create.mockReset()
   db.serviceToken.findUnique.mockReset()
   db.serviceToken.update.mockReset()
