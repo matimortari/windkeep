@@ -54,8 +54,8 @@
         </p>
       </header>
 
-      <div class="navigation-group w-full justify-end">
-        <div ref="transferDropdownRef" class="relative min-w-0 flex-1 md:max-w-64">
+      <div class="navigation-group w-full justify-end md:w-auto">
+        <div ref="transferDropdownRef" class="relative min-w-0 flex-1 md:w-64 md:flex-none">
           <button
             type="button" class="btn w-full justify-between"
             :disabled="!transferCandidates.length"
