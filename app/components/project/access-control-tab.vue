@@ -187,6 +187,7 @@ const { user } = storeToRefs(useUserStore())
 const { orgMembers } = storeToRefs(useOrgStore())
 const projectStore = useProjectStore()
 const { projects, serviceTokens, isOwner, isAdmin } = storeToRefs(projectStore)
+const { confirm } = useUI()
 const project = computed(() => projects.value.find(p => p.slug === slug))
 const memberships = computed(() => project.value?.memberships ?? [])
 const canManage = computed(() => isOwner.value(project.value?.id ?? "") || isAdmin.value(project.value?.id ?? ""))
@@ -239,7 +240,7 @@ async function refreshTokens() {
 }
 
 async function handleRevokeToken(tokenId: string) {
-  if (!confirm("Are you sure you want to revoke this service token? Any system using it will lose access immediately.")) {
+  if (!await confirm({ title: "Revoke Service Token", message: "Are you sure you want to revoke this service token? Any system using it will lose access immediately.", confirmLabel: "Revoke", variant: "danger" })) {
     return
   }
   await projectStore.revokeProjectServiceToken(project.value?.id ?? "", tokenId)

@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isProjectsEditorOpen" title="Create New Project" @update:is-open="closeDialog('projects')">
+  <Dialog :is-open="dialog.isOpen('projects')" title="Create New Project" @update:is-open="dialog.close('projects')">
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="name" class="text-sm font-semibold">Project Name</label>
@@ -30,7 +30,7 @@
 <script setup lang="ts">
 const emit = defineEmits<{ close: [], save: [payload: { name: string, description: string }] }>()
 
-const { isProjectsEditorOpen, closeDialog } = useUIState()
+const { dialog } = useUI()
 const form = ref<{ name: string, description: string }>({ name: "", description: "" })
 
 function handleSubmit() {
@@ -42,7 +42,7 @@ function handleSubmit() {
 }
 
 // Reset form when dialog is opened
-watch(isProjectsEditorOpen, (open) => {
+watch(() => dialog.isOpen("projects"), (open) => {
   if (open) {
     form.value.name = ""
     form.value.description = ""

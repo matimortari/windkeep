@@ -107,6 +107,7 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, isOwner } = storeToRefs(orgStore)
+const { confirm } = useUI()
 const orgFields = [
   {
     label: "Organization Name",
@@ -177,7 +178,7 @@ async function handleRotateEncryptionKey() {
   if (!activeOrg.value?.id) {
     return
   }
-  if (!confirm("Rotate the organization encryption key now? This will re-encrypt all organization secrets.")) {
+  if (!await confirm({ title: "Rotate Encryption Key", message: "Rotate the organization encryption key now? This will re-encrypt all organization secrets.", confirmLabel: "Rotate Key", variant: "warning" })) {
     return
   }
 
@@ -190,7 +191,7 @@ async function handleLeaveOrg() {
   if (!activeOrg.value?.id || !user.value?.id) {
     return
   }
-  if (!confirm("Are you sure you want to leave this organization? This action cannot be undone.")) {
+  if (!await confirm({ title: "Leave Organization", message: "Are you sure you want to leave this organization? This action cannot be undone.", confirmLabel: "Leave", variant: "danger" })) {
     return
   }
 
@@ -202,7 +203,7 @@ async function handleDeleteOrg() {
   if (!activeOrg.value?.id) {
     return
   }
-  if (!confirm("Are you sure you want to delete this organization? This action cannot be undone.")) {
+  if (!await confirm({ title: "Delete Organization", message: "Are you sure you want to delete this organization? This action cannot be undone.", confirmLabel: "Delete", variant: "danger" })) {
     return
   }
 

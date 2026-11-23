@@ -208,7 +208,7 @@ interface EnvironmentHistory {
 interface IntegrationSecretVar {
   name: string
   description: string
-  source?: "baseURL" | "projectId" | "serviceToken" | "environment"
+  source?: "projectId" | "serviceToken" | "environment"
   placeholder?: string
   instruction?: boolean
 }
@@ -255,22 +255,11 @@ interface CliSection {
   steps?: string[]
 }
 
-interface UIState {
-  sidebar: boolean
-  dialogs: {
-    projects: boolean
-    secrets: {
-      isOpen: boolean
-      selectedSecret: Secret | null
-    }
-    history: boolean
-    raw: boolean
-  }
-  adminTabs: {
-    organization: string
-    project: string
-    projectSlug: string | null
-  }
+interface DialogPayloads {
+  projects: null
+  secrets: Secret | null
+  history: null
+  raw: null
 }
 
 interface Toast {
@@ -278,4 +267,19 @@ interface Toast {
   message: string
   type: "danger" | "success" | "warning" | "info"
   duration?: number
+}
+
+interface ConfirmOptions {
+  title: string
+  message: string
+  confirmLabel?: string
+  cancelLabel?: string
+  variant?: "primary" | "danger" | "warning"
+}
+
+interface UIState {
+  sidebar: boolean
+  dialogs: { [K in keyof DialogPayloads]: { isOpen: boolean, data: DialogPayloads[K] } }
+  toasts: Toast[]
+  confirmation: { isOpen: boolean, options: ConfirmOptions | null }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 
 // Shared curl + jq block that fetches decrypted secrets into KEY/VALUE rows.
-function fetchSecretsScript(indent = "          "): string[] {
+function fetchSecretsScript(baseURL: string, indent = "          "): string[] {
   const i = indent
   return [
     `${i}set -euo pipefail`,
@@ -9,7 +9,7 @@ function fetchSecretsScript(indent = "          "): string[] {
     "",
     `${i}HTTP_CODE=$(curl -s -o /tmp/wk_response.json -w "%{http_code}" \\`,
     `${i}  -H "Authorization: Bearer \${WINDKEEP_TOKEN}" \\`,
-    `${i}  "\${WINDKEEP_URL}/api/projects/\${WINDKEEP_PROJECT_ID}/secrets")`,
+    `${i}  "${baseURL}/api/projects/\${WINDKEEP_PROJECT_ID}/secrets")`,
     "",
     `${i}if [ "$HTTP_CODE" != "200" ]; then`,
     `${i}  echo "HTTP \${HTTP_CODE}:" && cat /tmp/wk_response.json`,
@@ -42,11 +42,6 @@ function eachSecretLoop(indent: string, body: string[]): string[] {
 }
 
 const windkeepSecrets: IntegrationSecretVar[] = [
-  {
-    name: "WINDKEEP_URL",
-    description: "Public base URL of your WindKeep instance (no trailing slash).",
-    source: "baseURL",
-  },
   {
     name: "WINDKEEP_PROJECT_ID",
     description: "This project's ID — used in the secrets API path.",
@@ -94,7 +89,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
       },
       {
         title: "Add GitHub Actions secrets",
-        body: "In your repo → Settings → Secrets and variables → Actions, add the variables listed below. Project ID and WindKeep URL can be copied from this sheet.",
+        body: "In your repo → Settings → Secrets and variables → Actions, add the variables listed below. The project ID can be copied from this sheet.",
       },
       {
         title: "Commit the workflow",
@@ -141,14 +136,13 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "",
         "      - name: Sync secrets",
         "        env:",
-        "          WINDKEEP_URL: ${{ secrets.WINDKEEP_URL }}",
         "          WINDKEEP_PROJECT_ID: ${{ secrets.WINDKEEP_PROJECT_ID }}",
         "          WINDKEEP_TOKEN: ${{ secrets.WINDKEEP_TOKEN }}",
         "          WINDKEEP_ENVIRONMENT: ${{ secrets.WINDKEEP_ENVIRONMENT }}",
         "          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}",
         "          RAILWAY_SERVICE: ${{ secrets.RAILWAY_SERVICE }}",
         "        run: |",
-        ...fetchSecretsScript(),
+        ...fetchSecretsScript(baseURL),
         "",
         "          VARS_ARGS=()",
         "          WK_KEYS=()",
@@ -182,7 +176,6 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "          railway up --detach --service \"$RAILWAY_SERVICE\"",
         "",
         `# Project: ${projectId}`,
-        `# WindKeep: ${baseURL}`,
       ].join("\n"),
     }),
   },
@@ -208,7 +201,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
       },
       {
         title: "Add GitHub Actions secrets",
-        body: "In your repo → Settings → Secrets and variables → Actions, add WINDKEEP_URL, WINDKEEP_PROJECT_ID, WINDKEEP_TOKEN, and WINDKEEP_ENVIRONMENT. Values can be copied from this sheet.",
+        body: "In your repo → Settings → Secrets and variables → Actions, add WINDKEEP_PROJECT_ID, WINDKEEP_TOKEN, and WINDKEEP_ENVIRONMENT. Values can be copied from this sheet.",
       },
       {
         title: "Add the fetch step",
@@ -247,12 +240,11 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "",
         "      - name: Fetch WindKeep secrets",
         "        env:",
-        "          WINDKEEP_URL: ${{ secrets.WINDKEEP_URL }}",
         "          WINDKEEP_PROJECT_ID: ${{ secrets.WINDKEEP_PROJECT_ID }}",
         "          WINDKEEP_TOKEN: ${{ secrets.WINDKEEP_TOKEN }}",
         "          WINDKEEP_ENVIRONMENT: ${{ secrets.WINDKEEP_ENVIRONMENT }}",
         "        run: |",
-        ...fetchSecretsScript(),
+        ...fetchSecretsScript(baseURL),
         "",
         ...eachSecretLoop("          ", [
           "echo \"::add-mask::${VALUE}\"",
@@ -270,7 +262,6 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "          npm run build",
         "",
         `# Project: ${projectSlug} (${projectId})`,
-        `# WindKeep: ${baseURL}`,
       ].join("\n"),
     }),
   },
@@ -353,7 +344,6 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "",
         "      - name: Sync secrets to Vercel",
         "        env:",
-        "          WINDKEEP_URL: ${{ secrets.WINDKEEP_URL }}",
         "          WINDKEEP_PROJECT_ID: ${{ secrets.WINDKEEP_PROJECT_ID }}",
         "          WINDKEEP_TOKEN: ${{ secrets.WINDKEEP_TOKEN }}",
         "          WINDKEEP_ENVIRONMENT: ${{ secrets.WINDKEEP_ENVIRONMENT }}",
@@ -361,7 +351,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}",
         "          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}",
         "        run: |",
-        ...fetchSecretsScript(),
+        ...fetchSecretsScript(baseURL),
         "",
         ...eachSecretLoop("          ", [
           "echo \"::add-mask::${VALUE}\"",
@@ -377,7 +367,6 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "        run: vercel deploy --prod --yes",
         "",
         `# Project: ${projectId}`,
-        `# WindKeep: ${baseURL}`,
       ].join("\n"),
     }),
   },
@@ -403,7 +392,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
       },
       {
         title: "Export WindKeep variables",
-        body: "Set WINDKEEP_URL, WINDKEEP_PROJECT_ID, WINDKEEP_TOKEN, and WINDKEEP_ENVIRONMENT in your shell (or CI). Values can be copied from this sheet.",
+        body: "Set WINDKEEP_PROJECT_ID, WINDKEEP_TOKEN, and WINDKEEP_ENVIRONMENT in your shell (or CI). Values can be copied from this sheet.",
       },
       {
         title: "Add the pull script",
@@ -431,7 +420,6 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         `# Pull WindKeep secrets for ${projectSlug} and start Compose`,
         "set -euo pipefail",
         "",
-        ": \"${WINDKEEP_URL:?Set WINDKEEP_URL}\"",
         ": \"${WINDKEEP_PROJECT_ID:?Set WINDKEEP_PROJECT_ID}\"",
         ": \"${WINDKEEP_TOKEN:?Set WINDKEEP_TOKEN}\"",
         ": \"${WINDKEEP_ENVIRONMENT:?Set WINDKEEP_ENVIRONMENT (e.g. DEVELOPMENT)}\"",
@@ -441,7 +429,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "",
         "HTTP_CODE=$(curl -s -o /tmp/wk_response.json -w \"%{http_code}\" \\",
         "  -H \"Authorization: Bearer ${WINDKEEP_TOKEN}\" \\",
-        "  \"${WINDKEEP_URL}/api/projects/${WINDKEEP_PROJECT_ID}/secrets\")",
+        `  "${baseURL}/api/projects/\${WINDKEEP_PROJECT_ID}/secrets")`,
         "",
         "if [ \"$HTTP_CODE\" != \"200\" ]; then",
         "  echo \"HTTP ${HTTP_CODE}:\" && cat /tmp/wk_response.json",
@@ -460,7 +448,6 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         "docker compose -f \"$COMPOSE_FILE\" --env-file \"$ENV_FILE\" up \"$@\"",
         "",
         `# Project: ${projectId}`,
-        `# WindKeep: ${baseURL}`,
       ].join("\n"),
     }),
   },

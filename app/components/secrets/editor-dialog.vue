@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isRawEditorOpen" title="Raw .env Editor" @update:is-open="closeDialog('raw')">
+  <Dialog :is-open="dialog.isOpen('raw')" title="Raw .env Editor" @update:is-open="dialog.close('raw')">
     <div class="flex w-full max-w-xl flex-col gap-2 overflow-hidden">
       <div class="flex flex-row gap-1 rounded-lg border p-1">
         <button
@@ -69,7 +69,7 @@ const emit = defineEmits<{
   "update:initialContent": [value: string | null]
 }>()
 
-const { isRawEditorOpen, closeDialog } = useUIState()
+const { dialog } = useUI()
 const { selectedEnv, editorContent, previewItems, hasPreview, selectEnvironment, resetEditor, getChanges } = useEnvEditor({
   secrets: () => props.secrets,
   projectId: () => props.projectId,
@@ -81,7 +81,7 @@ function handleSubmit() {
 }
 
 // Reset editor when dialog is opened
-watch(isRawEditorOpen, (open) => {
+watch(() => dialog.isOpen("raw"), (open) => {
   if (open) {
     resetEditor(props.initialContent)
     if (props.initialContent) {

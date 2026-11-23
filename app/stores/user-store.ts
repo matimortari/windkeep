@@ -1,7 +1,7 @@
 import type { UpdateUserInput } from "#shared/schemas/user-schema"
 
 export const useUserStore = defineStore("user", () => {
-  const toast = useToast()
+  const { toast } = useUI()
   const user = ref<User | null>(null)
   const tokenMetadata = ref<{ hasToken: boolean, expiresAt: string | null } | null>(null)
   const loading = ref(false)

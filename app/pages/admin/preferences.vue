@@ -107,6 +107,7 @@ const { clear } = useUserSession()
 const userStore = useUserStore()
 const { user, tokenMetadata } = storeToRefs(userStore)
 const { activeOrg } = storeToRefs(useOrgStore())
+const { confirm } = useUI()
 const generatedToken = ref("")
 const isTokenVisible = ref(true)
 
@@ -188,7 +189,7 @@ async function handleUpdateImage(event: Event) {
 
 async function handleRegenerateToken() {
   if (tokenMetadata.value?.hasToken) {
-    if (!confirm("Regenerating your token will instantly revoke CLI access using the current token. Are you sure you want to proceed?")) {
+    if (!await confirm({ title: "Regenerate CLI Token", message: "Regenerating your token will instantly revoke CLI access using the current token. Are you sure you want to proceed?", confirmLabel: "Regenerate", variant: "warning" })) {
       return
     }
   }
@@ -219,7 +220,7 @@ async function handleSubmit(index: number) {
 }
 
 async function handleDeleteUser() {
-  if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+  if (!await confirm({ title: "Delete Account", message: "Are you sure you want to delete your account? This action cannot be undone.", confirmLabel: "Delete", variant: "danger" })) {
     return
   }
 

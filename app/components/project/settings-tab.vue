@@ -137,6 +137,7 @@ const slug = route.params.project
 const { user } = storeToRefs(useUserStore())
 const projectStore = useProjectStore()
 const { projects, isOwner, membershipRole } = storeToRefs(projectStore)
+const { confirm } = useUI()
 const project = computed(() => projects.value.find((p: Project) => p.slug === slug))
 const localProject = ref<Project | null>(null)
 const transferTargetId = ref("")
@@ -239,7 +240,7 @@ async function handleTransferOwnership() {
     return
   }
   const target = transferCandidates.value.find((m: ProjectMembership) => m.userId === transferTargetId.value)
-  if (!confirm(`Transfer ownership of this project to ${target?.user.name ?? "this member"}? The current project owner will be demoted to admin.`)) {
+  if (!await confirm({ title: "Transfer Ownership", message: `Transfer ownership of this project to ${target?.user.name ?? "this member"}? The current project owner will be demoted to admin.`, confirmLabel: "Transfer", variant: "warning" })) {
     return
   }
   await projectStore.transferProjectOwnership(project.value.id, { newOwnerId: transferTargetId.value })
@@ -250,7 +251,7 @@ async function handleDeleteProject() {
   if (!project.value?.id) {
     return
   }
-  if (!confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
+  if (!await confirm({ title: "Delete Project", message: "Are you sure you want to delete this project? This action cannot be undone.", confirmLabel: "Delete", variant: "danger" })) {
     return
   }
   await projectStore.deleteProject(project.value.id)
@@ -261,7 +262,7 @@ async function handleLeaveProject() {
   if (!project.value?.id || !user.value?.id) {
     return
   }
-  if (!confirm("Are you sure you want to leave this project? This action cannot be undone.")) {
+  if (!await confirm({ title: "Leave Project", message: "Are you sure you want to leave this project? This action cannot be undone.", confirmLabel: "Leave", variant: "danger" })) {
     return
   }
   await projectStore.removeProjectMember(project.value.id, user.value.id)

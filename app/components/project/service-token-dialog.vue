@@ -7,22 +7,16 @@
         </p>
 
         <div class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
-          <span class="min-w-0 flex-1 truncate select-all" :title="isTokenVisible ? generatedRawToken : undefined">
-            {{ isTokenVisible ? generatedRawToken : "••••••••••••••••••••••••••••••••" }}
+          <span class="min-w-0 flex-1 truncate select-all" :title="generatedRawToken">
+            {{ generatedRawToken }}
           </span>
-          <button type="button" class="btn-ghost shrink-0 p-1!" :aria-label="isTokenVisible ? 'Hide token' : 'Show token'" @click="isTokenVisible = !isTokenVisible">
-            <icon :name="isTokenVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="20" />
-          </button>
           <button type="button" class="btn shrink-0 p-1!" aria-label="Copy token" @click="copyToken">
             <icon :name="tokenCopyIcon.icon.value" size="20" />
-          </button>
-          <button type="button" class="btn-ghost shrink-0 p-1!" aria-label="Dismiss token" @click="handleDismiss">
-            <icon name="ph:x-bold" size="20" />
           </button>
         </div>
 
         <footer class="flex justify-end">
-          <button type="button" class="btn-success" @click="handleDismiss">
+          <button type="button" class="btn-success" @click="emit('update:isOpen', false)">
             Done
           </button>
         </footer>
@@ -80,17 +74,18 @@
 const props = defineProps<{
   isOpen: boolean
   projectId: string
+  defaultName?: string
+  defaultEnvironments?: Environment[]
 }>()
 
 const emit = defineEmits<{
   "update:isOpen": [value: boolean]
-  "created": []
+  "created": [rawToken: string]
 }>()
 
 const projectStore = useProjectStore()
 const tokenCopyIcon = useActionIcon("ph:copy-bold")
 const generatedRawToken = ref("")
-const isTokenVisible = ref(true)
 const form = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({
   name: "",
   environments: [],
@@ -110,19 +105,12 @@ function toggleEnvironment(env: Environment) {
 }
 
 function resetForm() {
-  form.value = { name: "", environments: [], expiresInDays: null }
+  form.value = { name: props.defaultName ?? "", environments: [...(props.defaultEnvironments ?? [])], expiresInDays: null }
   generatedRawToken.value = ""
-  isTokenVisible.value = true
 }
 
 async function copyToken() {
   await tokenCopyIcon.triggerCopy(generatedRawToken.value)
-}
-
-function handleDismiss() {
-  resetForm()
-  emit("created")
-  emit("update:isOpen", false)
 }
 
 async function handleSubmit() {
@@ -139,7 +127,7 @@ async function handleSubmit() {
 
   if (res?.rawToken) {
     generatedRawToken.value = res.rawToken
-    isTokenVisible.value = true
+    emit("created", res.rawToken)
   }
 }
 

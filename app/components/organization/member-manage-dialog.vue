@@ -53,6 +53,7 @@ const emit = defineEmits<{
 
 const orgStore = useOrgStore()
 const userStore = useUserStore()
+const { confirm } = useUI()
 const saveIcon = useActionIcon("ph:floppy-disk-bold")
 const selectedRole = ref<"ADMIN" | "MEMBER">("MEMBER")
 
@@ -73,7 +74,7 @@ async function handleRemove() {
   if (!props.orgId || !props.member?.user.id) {
     return
   }
-  if (!confirm("Are you sure you want to remove this member?")) {
+  if (!await confirm({ title: "Remove Member", message: "Are you sure you want to remove this member?", confirmLabel: "Remove", variant: "danger" })) {
     return
   }
 

@@ -142,7 +142,7 @@ const ORGS_PROJECTS_CONTENT: CliSection[] = [
   },
   {
     title: "Organizations: Update",
-    paragraphs: [["Rename your ", { strong: "active" }, " organization. Requires OWNER or ADMIN."]],
+    paragraphs: [["Rename your ", { strong: "active" }, " organization. Only the owner can perform this action."]],
     commands: [{ label: "Arguments", code: "NAME", description: "New organization name (required)." }],
     code: [{
       command: [

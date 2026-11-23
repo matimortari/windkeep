@@ -17,8 +17,8 @@
       <SecretsProjectActions
         :has-permission="hasPermission" :has-pending-changes="hasPendingChanges"
         :all-visible="allVisible" :available-tags="availableTags"
-        :active-tag-filter="activeTagFilter" @open-secrets-dialog="() => { selectSecret(null); openDialog('secrets') }"
-        @open-editor-dialog="openDialog('raw')" @export="exportToEnv"
+        :active-tag-filter="activeTagFilter" @open-secrets-dialog="dialog.open('secrets')"
+        @open-editor-dialog="dialog.open('raw')" @export="exportToEnv"
         @save="saveAllChanges" @toggle-all-visible="allVisible = !allVisible"
         @discard="discardAllChanges" @filter-by-tag="activeTagFilter = $event"
         @search="searchQuery = $event"
@@ -60,13 +60,13 @@
       @change="onFileInputChange"
     >
 
-    <SecretsCreateDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="closeDialog('secrets')" @save="handleSecretChange" />
+    <SecretsCreateDialog :selected-secret="selectedSecret" :project-id="project?.id ?? ''" @close="dialog.close('secrets')" @save="handleSecretChange" />
     <SecretsEditorDialog
       v-model:initial-content="importedEnvContent" :project-id="project?.id ?? ''"
-      :secrets="displayedSecrets" @close="closeDialog('raw')"
+      :secrets="displayedSecrets" @close="dialog.close('raw')"
       @save="handleImportSecrets"
     />
-    <SecretsHistoryDialog :secret-id="historySecretId" :secret-key="historySecretKey" :project-id="project?.id ?? ''" @close="() => { closeDialog('history'); historySecretId = ''; historySecretKey = '' }" />
+    <SecretsHistoryDialog :secret-id="historySecretId" :secret-key="historySecretKey" :project-id="project?.id ?? ''" @close="() => { dialog.close('history'); historySecretId = ''; historySecretKey = '' }" />
   </TabSection>
 </template>
 
@@ -77,7 +77,8 @@ const props = defineProps<{
 }>()
 
 const secretsStore = useSecretsStore()
-const { openDialog, closeDialog, selectSecret, selectedSecret } = useUIState()
+const { dialog, confirm } = useUI()
+const selectedSecret = computed(() => dialog.data("secrets"))
 const { secrets } = storeToRefs(secretsStore)
 const activeTagFilter = ref<string | null>(null)
 const historySecretId = ref("")
@@ -105,7 +106,7 @@ function onDragLeave() {
 
 function openEditorWithEnvText(text: string) {
   importedEnvContent.value = text
-  openDialog("raw")
+  dialog.open("raw")
 }
 
 async function readEnvFile(file: File) {
@@ -165,14 +166,13 @@ const availableTags = computed(() => {
 })
 
 function handleEditSecret(secret: Secret) {
-  selectSecret(secret)
-  openDialog("secrets")
+  dialog.open("secrets", secret)
 }
 
 function handleViewHistory(secret: Secret) {
   historySecretId.value = secret.id
   historySecretKey.value = secret.key
-  openDialog("history")
+  dialog.open("history")
 }
 
 function handleDeleteSecret(key: string) {
@@ -236,7 +236,7 @@ function handleSecretChange(secret: Secret) {
     pendingChanges.delete(secret.key)
   }
 
-  closeDialog("secrets")
+  dialog.close("secrets")
 }
 
 function applyImportedSecret(importedSecret: Secret) {
@@ -267,7 +267,7 @@ function applyRemovedKey(key: string, environment: Environment) {
 }
 
 function handleImportSecrets(importedSecrets: Secret[], removedKeys: { key: string, environment: Environment }[]) {
-  closeDialog("raw")
+  dialog.close("raw")
   importedSecrets.forEach(applyImportedSecret)
   removedKeys.forEach(({ key, environment }) => applyRemovedKey(key, environment))
 }
@@ -281,8 +281,8 @@ async function saveAllChanges() {
   succeeded.forEach(key => pendingChanges.delete(key))
 }
 
-function discardAllChanges() {
-  if (!confirm("Are you sure you want to discard all pending changes?")) {
+async function discardAllChanges() {
+  if (!await confirm({ title: "Discard Changes", message: "Are you sure you want to discard all pending changes?", confirmLabel: "Discard", variant: "danger" })) {
     return
   }
   pendingChanges.clear()
@@ -310,7 +310,7 @@ function exportToEnv(env: string | null | undefined) {
 
 onBeforeRouteLeave(() => {
   if (hasPendingChanges.value) {
-    return confirm("You have unsaved changes. Are you sure you want to leave?")
+    return confirm({ title: "Unsaved Changes", message: "You have unsaved changes. Are you sure you want to leave?", confirmLabel: "Leave", variant: "danger" })
   }
 
   return true

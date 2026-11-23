@@ -1,7 +1,7 @@
 import type { CreateSecretInput, UpdateSecretInput } from "#shared/schemas/secret-schema"
 
 export const useSecretsStore = defineStore("secrets", () => {
-  const toast = useToast()
+  const { toast } = useUI()
   const secrets = ref<Secret[]>([])
   const loading = ref(false)
 

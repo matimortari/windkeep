@@ -141,56 +141,14 @@
                   </span>
                 </div>
 
-                <template v-if="generatedRawToken">
-                  <div class="navigation-group font-mono text-xs">
-                    <span class="text-caption min-w-0 truncate font-mono! select-all" :title="isTokenVisible ? generatedRawToken : undefined">
-                      {{ isTokenVisible ? generatedRawToken : "••••••••••••••••••••••••••••••••" }}
-                    </span>
-                    <button type="button" class="btn-ghost shrink-0 p-0! text-muted-foreground" :aria-label="isTokenVisible ? 'Hide token' : 'Show token'" @click="isTokenVisible = !isTokenVisible">
-                      <icon :name="isTokenVisible ? 'ph:eye-closed-bold' : 'ph:eye-bold'" size="15" />
-                    </button>
-                    <button type="button" class="btn-ghost shrink-0 p-0! text-muted-foreground" aria-label="Copy token" @click="copyValue('token', generatedRawToken)">
-                      <icon :name="copyIcons.token?.icon.value || 'ph:copy-bold'" size="15" />
-                    </button>
-                    <button type="button" class="btn-ghost shrink-0 p-0! text-muted-foreground" aria-label="Dismiss token" @click="dismissGeneratedToken">
-                      <icon name="ph:x-bold" size="15" />
-                    </button>
-                  </div>
-                </template>
+                <button type="button" class="btn-secondary w-fit" :disabled="!canManage" @click="isTokenDialogOpen = true">
+                  <icon name="ph:key-bold" size="20" />
+                  <span>{{ generatedRawToken ? "Generate another token" : "Generate token" }}</span>
+                </button>
 
-                <form v-else class="flex min-w-0 flex-col gap-2" @submit.prevent="handleGenerateToken">
-                  <div class="navigation-group min-w-0">
-                    <input
-                      id="integration-token-name" v-model="tokenForm.name"
-                      type="text" class="min-w-0 flex-1"
-                      :placeholder="selected.defaultTokenName || 'Integration'" aria-label="Token name"
-                    >
-                    <input
-                      id="integration-token-expiry" v-model.number="tokenForm.expiresInDays"
-                      type="number" min="1"
-                      max="365" placeholder="Days"
-                      aria-label="Expires in days" class="w-24! shrink-0"
-                    >
-                    <button type="submit" class="btn-success shrink-0" :disabled="!canGenerateToken || !canManage">
-                      <icon name="ph:arrow-right-bold" size="20" />
-                    </button>
-                  </div>
-
-                  <div class="navigation-group flex-wrap">
-                    <button
-                      v-for="env in ENVIRONMENTS" :key="env.value"
-                      type="button" :class="tokenForm.environments.includes(env.value) ? 'border-secondary! text-secondary!' : ''"
-                      class="btn-ghost" :aria-label="env.label"
-                      @click="toggleEnvironment(env.value)"
-                    >
-                      {{ env.label }}
-                    </button>
-                  </div>
-
-                  <p v-if="!canManage" class="text-caption text-xs! text-warning">
-                    Only project owners and admins can create service tokens.
-                  </p>
-                </form>
+                <p v-if="!canManage" class="text-caption text-xs! text-warning">
+                  Only project owners and admins can create service tokens.
+                </p>
               </section>
 
               <details v-if="snippet" class="group py-4">
@@ -225,6 +183,12 @@
       </div>
     </transition>
   </teleport>
+
+  <ProjectServiceTokenDialog
+    v-model:is-open="isTokenDialogOpen" :project-id="projectId"
+    :default-name="selected?.defaultTokenName" :default-environments="selected?.defaultEnvironments"
+    @created="handleTokenCreated"
+  />
 </template>
 
 <script setup lang="ts">
@@ -238,7 +202,6 @@ const props = defineProps<{
 const emit = defineEmits<{ "update:isOpen": [value: boolean], "tokenCreated": [] }>()
 
 const { public: { baseURL } } = useRuntimeConfig()
-const projectStore = useProjectStore()
 const selectedId = ref<string | null>(null)
 const selected = computed(() => selectedId.value ? INTEGRATIONS.find(item => item.id === selectedId.value) ?? null : null)
 const sheetTitle = computed(() => selected.value?.name ?? "Integrations")
@@ -248,10 +211,8 @@ const mediaQueryAbort = new AbortController()
 const openTooltipKey = ref<string | null>(null)
 const openTooltipEl = ref<HTMLElement | null>(null)
 const generatedRawToken = ref("")
-const isTokenVisible = ref(true)
-const tokenForm = ref<{ name: string, environments: Environment[], expiresInDays: number | null }>({ name: "Railway Deploy", environments: ["PRODUCTION"], expiresInDays: null })
-const canGenerateToken = computed(() => tokenForm.value.name.trim().length >= 3 && tokenForm.value.environments.length > 0)
-const copyIconKeys = [...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))), "token", "workflow"]
+const isTokenDialogOpen = ref(false)
+const copyIconKeys = [...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))), "workflow"]
 const copyIcons = Object.fromEntries(copyIconKeys.map(key => [key, useActionIcon("ph:copy-bold")])) as Record<string, ReturnType<typeof useActionIcon>>
 useClickOutside(openTooltipEl, () => {
   openTooltipKey.value = null
@@ -280,10 +241,7 @@ function toggleTooltip(key: string, event: MouseEvent) {
   openTooltipEl.value = event.currentTarget as HTMLElement
 }
 
-function resolveSecretValue(secret: { source?: "baseURL" | "projectId" | "serviceToken" | "environment", placeholder?: string }) {
-  if (secret.source === "baseURL") {
-    return (baseURL as string)?.replace(/\/$/, "") || ""
-  }
+function resolveSecretValue(secret: { source?: "projectId" | "serviceToken" | "environment", placeholder?: string }) {
   if (secret.source === "projectId") {
     return props.projectId
   }
@@ -300,52 +258,13 @@ async function copyValue(key: string, value: string) {
   await copyIcons[key]?.triggerCopy(value)
 }
 
-function toggleEnvironment(env: Environment) {
-  const idx = tokenForm.value.environments.indexOf(env)
-  if (idx === -1) {
-    tokenForm.value.environments.push(env)
-  }
-  else {
-    tokenForm.value.environments.splice(idx, 1)
-  }
-}
-
-function resetTokenForm() {
-  generatedRawToken.value = ""
-  isTokenVisible.value = true
-  tokenForm.value = {
-    name: selected.value?.defaultTokenName || "Integration",
-    environments: [...(selected.value?.defaultEnvironments || ["PRODUCTION"])],
-    expiresInDays: null,
-  }
-}
-
-function dismissGeneratedToken() {
-  generatedRawToken.value = ""
-  isTokenVisible.value = true
-}
-
-async function handleGenerateToken() {
-  if (!props.projectId || !canGenerateToken.value || !props.canManage) {
-    return
-  }
-
-  const daysValue = tokenForm.value.expiresInDays
-  const res = await projectStore.createProjectServiceToken(props.projectId, {
-    name: tokenForm.value.name.trim(),
-    environment: tokenForm.value.environments.map(env => env.toUpperCase() as Environment),
-    expiresInDays: daysValue && Number(daysValue) > 0 ? Number(daysValue) : undefined,
-  })
-
-  if (res?.rawToken) {
-    generatedRawToken.value = res.rawToken
-    isTokenVisible.value = true
-    emit("tokenCreated")
-  }
+function handleTokenCreated(rawToken: string) {
+  generatedRawToken.value = rawToken
+  emit("tokenCreated")
 }
 
 function onEscape(e: KeyboardEvent) {
-  if (e.key === "Escape" && props.isOpen) {
+  if (e.key === "Escape" && props.isOpen && !isTokenDialogOpen.value) {
     emit("update:isOpen", false)
   }
 }
@@ -366,22 +285,30 @@ onMounted(() => {
   }
 })
 
+// Lock page scroll and return to the catalog when the sheet opens
 watch(() => props.isOpen, (open) => {
   scrollLock(open)
   openTooltipKey.value = null
   openTooltipEl.value = null
   if (open) {
     selectedId.value = null
-    resetTokenForm()
+    generatedRawToken.value = ""
   }
 })
 
-// Reset token form when the selected integration changes
+// Clear tooltips and the generated token when switching integrations
 watch(selectedId, () => {
   openTooltipKey.value = null
   openTooltipEl.value = null
-  resetTokenForm()
+  generatedRawToken.value = ""
 })
+
+// The dialog unlocks page scroll on close; restore it while the sheet stays open
+watch(isTokenDialogOpen, (open) => {
+  if (!open && props.isOpen) {
+    scrollLock(true)
+  }
+}, { flush: "post" })
 
 onBeforeUnmount(() => {
   mediaQueryAbort.abort()

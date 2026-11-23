@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isSecretsEditorOpen" :title="isUpdateMode ? 'Edit Secret' : 'Create New Secret'" @update:is-open="closeDialog('secrets')">
+  <Dialog :is-open="dialog.isOpen('secrets')" :title="isUpdateMode ? 'Edit Secret' : 'Create New Secret'" @update:is-open="dialog.close('secrets')">
     <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
       <div class="flex flex-col items-start gap-1">
         <label for="key" class="text-sm font-semibold">Key</label>
@@ -67,7 +67,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ close: [], save: [payload: Secret] }>()
 
-const { isSecretsEditorOpen, closeDialog } = useUIState()
+const { dialog } = useUI()
 const newTagInput = ref("")
 const form = ref<{ key: string, description: string, tags: string[], values: Record<Environment, string> }>({
   key: "",
@@ -140,7 +140,7 @@ function resetForm() {
 }
 
 // Reset form when dialog is opened or selected secret changes
-watch([isSecretsEditorOpen, () => props.selectedSecret], ([open]) => {
+watch([() => dialog.isOpen("secrets"), () => props.selectedSecret], ([open]) => {
   if (open) {
     resetForm()
   }

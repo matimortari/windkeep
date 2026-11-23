@@ -26,7 +26,7 @@
         Projects
       </p>
 
-      <button type="button" aria-label="Create New Project" class="btn-ghost p-0!" @click="openDialog('projects')">
+      <button type="button" aria-label="Create New Project" class="btn-ghost p-0!" @click="dialog.open('projects')">
         <icon name="ph:plus-bold" size="20" />
       </button>
     </div>
@@ -65,7 +65,7 @@
     </div>
   </aside>
 
-  <ProjectsDialog @close="closeDialog('projects')" @save="handleCreateProject" />
+  <ProjectsDialog @close="dialog.close('projects')" @save="handleCreateProject" />
 </template>
 
 <script setup lang="ts">
@@ -79,7 +79,7 @@ const emit = defineEmits<{ "update:isOpen": [value: boolean] }>()
 const route = useRoute()
 const { activeOrg, orgProjects } = storeToRefs(useOrgStore())
 const projectStore = useProjectStore()
-const { openDialog, closeDialog, setActiveProject } = useUIState()
+const { dialog } = useUI()
 
 const activeQueryTab = computed(() => {
   const tab = route.query.t
@@ -104,13 +104,11 @@ function selectOrgTab(tabKey: string) {
 }
 
 function handleProjectClick(project: Project) {
-  setActiveProject(project.slug)
   navigateTo({ path: `/admin/${project.slug}`, query: { t: PROJECT_TABS[0]!.key } })
   emit("update:isOpen", false)
 }
 
 function selectProjectTab(project: Project, tabKey: string) {
-  setActiveProject(project.slug)
   navigateTo({ path: `/admin/${project.slug}`, query: { t: tabKey } })
   emit("update:isOpen", false)
 }
@@ -122,9 +120,6 @@ async function handleCreateProject(project: { name: string, description?: string
 
   await projectStore.createProject({ name: project.name, description: project.description || undefined, orgId: activeOrg.value.id })
   await projectStore.getProjects()
-  closeDialog("projects")
+  dialog.close("projects")
 }
-
-// Keep the shared "current project" field in sync with the route
-watch(() => route.params.project, slug => setActiveProject(typeof slug === "string" ? slug : null), { immediate: true })
 </script>

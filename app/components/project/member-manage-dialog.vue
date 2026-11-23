@@ -73,6 +73,7 @@ const emit = defineEmits<{
 }>()
 
 const projectStore = useProjectStore()
+const { confirm } = useUI()
 const saveIcon = useActionIcon("ph:floppy-disk-bold")
 const selectedRole = ref<"ADMIN" | "MEMBER">("MEMBER")
 const selectedEnvironments = ref<Environment[]>(["DEVELOPMENT"])
@@ -123,7 +124,7 @@ async function handleRemove() {
   if (!props.projectId || !props.member?.userId) {
     return
   }
-  if (!confirm("Are you sure you want to remove this member?")) {
+  if (!await confirm({ title: "Remove Member", message: "Are you sure you want to remove this member?", confirmLabel: "Remove", variant: "danger" })) {
     return
   }
 

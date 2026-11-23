@@ -171,6 +171,7 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, orgMembers, invitations, isOwner, isAdmin } = storeToRefs(orgStore)
+const { confirm } = useUI()
 const canManage = computed(() => isOwner.value || isAdmin.value)
 const isInviteDialogOpen = ref(false)
 const isMemberDialogOpen = ref(false)
@@ -269,7 +270,7 @@ async function handleRevokeInvite(inviteId: string) {
   if (!activeOrg.value?.id) {
     return
   }
-  if (!confirm("Are you sure you want to revoke this invitation?")) {
+  if (!await confirm({ title: "Revoke Invitation", message: "Are you sure you want to revoke this invitation?", confirmLabel: "Revoke", variant: "danger" })) {
     return
   }
   await orgStore.revokeInvite(activeOrg.value.id, inviteId)

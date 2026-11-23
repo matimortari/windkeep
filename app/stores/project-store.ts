@@ -2,7 +2,7 @@ import type { AddProjectMemberInput, CreateProjectInput, TransferProjectOwnershi
 import type { CreateServiceTokenInput } from "#shared/schemas/service-token-schema"
 
 export const useProjectStore = defineStore("project", () => {
-  const toast = useToast()
+  const { toast } = useUI()
   const userStore = useUserStore()
   const projects = ref<Project[]>([])
   const serviceTokens = ref<ServiceToken[]>([])

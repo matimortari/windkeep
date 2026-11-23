@@ -65,12 +65,9 @@ const props = defineProps<{
   projects: Project[]
 }>()
 
-const { setTab, setActiveProject } = useUIState()
 const { sortedData: sortedProjects, toggleSort, getSortIconName } = useTableSort<Project>(toRef(props, "projects"))
 
 function openProjectSettings(project: Project) {
-  setActiveProject(project.slug)
-  setTab("project", "settings")
   navigateTo({ path: `/admin/${project.slug}`, query: { t: "settings" } })
 }
 

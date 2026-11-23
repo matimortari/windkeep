@@ -77,7 +77,6 @@ const props = defineProps<{
   project: Project
 }>()
 
-const { setTab, setActiveProject } = useUIState()
 const openMenuId = useState<string | null>("project-card-open-menu", () => null)
 const isMenuOpen = computed(() => openMenuId.value === props.project.id)
 const menuRef = ref<HTMLElement | null>(null)
@@ -94,8 +93,6 @@ function toggleMenu() {
 
 function navigate(tab: "secrets" | "access-control" | "settings") {
   openMenuId.value = null
-  setActiveProject(props.project.slug)
-  setTab("project", tab)
   navigateTo({ path: `/admin/${props.project.slug}`, query: { t: tab } })
 }
 </script>

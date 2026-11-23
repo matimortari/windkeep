@@ -1,5 +1,5 @@
 <template>
-  <Dialog :is-open="isHistoryEditorOpen" title="Secret History" @update:is-open="closeDialog('history')">
+  <Dialog :is-open="dialog.isOpen('history')" title="Secret History" @update:is-open="dialog.close('history')">
     <p v-if="secretsStore.loading" class="text-caption">
       Loading history...
     </p>
@@ -73,7 +73,7 @@ const props = defineProps<{
 
 defineEmits<{ close: [] }>()
 
-const { isHistoryEditorOpen, closeDialog } = useUIState()
+const { dialog } = useUI()
 const secretsStore = useSecretsStore()
 const history = ref<EnvironmentHistory[]>([])
 const visibleMap = ref<Record<string, boolean>>({})
@@ -129,7 +129,7 @@ function formatChangedAt(date: Date | string) {
 }
 
 // Get history when dialog opens and reset state when dialog is closed
-watch(isHistoryEditorOpen, async (newVal) => {
+watch(() => dialog.isOpen("history"), async (newVal) => {
   if (newVal) {
     if (props.secretId) {
       const data = await secretsStore.getSecretHistory(props.projectId, props.secretId)
