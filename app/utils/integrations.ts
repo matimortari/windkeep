@@ -51,7 +51,7 @@ const windkeepSecrets: IntegrationSecretVar[] = [
     name: "WINDKEEP_TOKEN",
     description: "Service token with access to the environments you want synced (Bearer st_…).",
     source: "serviceToken",
-    placeholder: "Generate below, then paste into your secrets store",
+    placeholder: "Generated when you create the secrets",
     instruction: true,
   },
   {
@@ -77,11 +77,10 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     snippetHint: "Commit this file to .github/workflows/. On the next push to main, secrets sync to Railway and the service deploys.",
     defaultTokenName: "Railway Deploy",
     defaultEnvironments: ["PRODUCTION"],
-    tokenHint: "Generate a token scoped for this integration. Copy it into the WINDKEEP_TOKEN GitHub secret.",
     steps: [
       {
-        title: "Create a WindKeep service token",
-        body: "Generate a token scoped to the environments you want Railway to receive (typically Production). Copy it once — it will not be shown again.",
+        title: "Create the secrets in WindKeep",
+        body: "Click Create secrets in project below. It generates a scoped service token and stores it alongside the project ID and environment; replace any <NAME> placeholders with real values.",
       },
       {
         title: "Create a Railway API token",
@@ -193,11 +192,10 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     snippetHint: "Commit this file to .github/workflows/, or paste the Fetch WindKeep secrets step into an existing workflow.",
     defaultTokenName: "GitHub Actions CI",
     defaultEnvironments: ["PRODUCTION"],
-    tokenHint: "Generate a token scoped for this integration. Copy it into the WINDKEEP_TOKEN GitHub secret.",
     steps: [
       {
-        title: "Create a WindKeep service token",
-        body: "Generate a token scoped to the environments your CI job needs (typically Production). Copy it once — it will not be shown again.",
+        title: "Create the secrets in WindKeep",
+        body: "Click Create secrets in project below. It generates a scoped service token and stores it alongside the project ID and environment; replace any <NAME> placeholders with real values.",
       },
       {
         title: "Add GitHub Actions secrets",
@@ -214,7 +212,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     ],
     secrets: windkeepSecrets.map(s =>
       s.name === "WINDKEEP_TOKEN"
-        ? { ...s, placeholder: "Generate below, then paste into GitHub Secrets" }
+        ? { ...s, placeholder: "Generated when you create the secrets" }
         : s,
     ),
     buildSnippet: ({ baseURL, projectId, projectSlug }) => ({
@@ -279,11 +277,10 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     snippetHint: "Commit this file to .github/workflows/. On the next push to main, secrets sync to Vercel Production and a deploy is triggered.",
     defaultTokenName: "Vercel Sync",
     defaultEnvironments: ["PRODUCTION"],
-    tokenHint: "Generate a token scoped for this integration. Copy it into the WINDKEEP_TOKEN GitHub secret.",
     steps: [
       {
-        title: "Create a WindKeep service token",
-        body: "Generate a token scoped to the environments you want Vercel to receive (typically Production). Copy it once — it will not be shown again.",
+        title: "Create the secrets in WindKeep",
+        body: "Click Create secrets in project below. It generates a scoped service token and stores it alongside the project ID and environment; replace any <NAME> placeholders with real values.",
       },
       {
         title: "Create a Vercel token",
@@ -384,11 +381,10 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     snippetHint: "Save this script as scripts/windkeep-compose.sh, make it executable, and run it to write .env.windkeep then start Compose.",
     defaultTokenName: "Docker Compose",
     defaultEnvironments: ["DEVELOPMENT"],
-    tokenHint: "Generate a token scoped for this integration. Export it as WINDKEEP_TOKEN before running the script.",
     steps: [
       {
-        title: "Create a WindKeep service token",
-        body: "Generate a token scoped to the environments your Compose stack needs (typically Development for local work). Copy it once — it will not be shown again.",
+        title: "Create the secrets in WindKeep",
+        body: "Click Create secrets in project below. It generates a scoped service token and stores it alongside the project ID and environment; replace any <NAME> placeholders with real values.",
       },
       {
         title: "Export WindKeep variables",
@@ -405,7 +401,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     ],
     secrets: windkeepSecrets.map((s) => {
       if (s.name === "WINDKEEP_TOKEN") {
-        return { ...s, placeholder: "Generate below, then export as WINDKEEP_TOKEN" }
+        return { ...s, placeholder: "Generated when you create the secrets" }
       }
       if (s.name === "WINDKEEP_ENVIRONMENT") {
         return { ...s, placeholder: "DEVELOPMENT" }

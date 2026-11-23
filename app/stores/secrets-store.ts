@@ -135,11 +135,7 @@ export const useSecretsStore = defineStore("secrets", () => {
         }
         else if (change.type === "update" && change.secret.id) {
           const { values, ...data } = change.secret
-          await updateProjectSecret(projectId, change.secret.id, {
-            description: data.description || "",
-            tags: data.tags || undefined,
-            values: values || [],
-          }, true)
+          await updateProjectSecret(projectId, change.secret.id, { description: data.description || "", tags: data.tags || undefined, values: values || [] }, true)
         }
         else if (change.type === "delete" && change.secret.id) {
           await deleteProjectSecret(projectId, change.secret.id, true)
@@ -165,11 +161,40 @@ export const useSecretsStore = defineStore("secrets", () => {
     return { succeeded, failed }
   }
 
+  async function createProjectSecrets(projectId: string, inputs: CreateSecretInput[]) {
+    const failed: string[] = []
+    const succeeded: string[] = []
+
+    for (const input of inputs) {
+      try {
+        await createProjectSecret(projectId, input, true)
+        succeeded.push(input.key)
+      }
+      catch (err: unknown) {
+        failed.push(input.key)
+        console.error(`Failed to create secret "${input.key}":`, err)
+      }
+    }
+
+    if (failed.length && succeeded.length) {
+      toast.warning(`${succeeded.length} secret(s) created, ${failed.length} failed`)
+    }
+    else if (failed.length) {
+      toast.error(`Failed to create ${failed.length} secret(s)`)
+    }
+    else {
+      toast.success(`${succeeded.length} secret(s) created successfully`)
+    }
+
+    return { succeeded, failed }
+  }
+
   return {
     secrets,
     loading,
     getProjectSecrets,
     createProjectSecret,
+    createProjectSecrets,
     updateProjectSecret,
     deleteProjectSecret,
     getSecretHistory,

@@ -229,7 +229,6 @@ interface IntegrationDefinition {
   snippetHint?: string
   defaultEnvironments?: Environment[]
   defaultTokenName?: string
-  tokenHint?: string
   buildSnippet?: (ctx: { baseURL: string, projectId: string, projectSlug: string }) => {
     filename: string
     language: "yml" | "bash" | "json"

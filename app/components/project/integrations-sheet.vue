@@ -123,33 +123,17 @@
                     </span>
                   </div>
                 </div>
-              </details>
 
-              <section class="flex flex-col gap-2 py-4">
-                <div class="relative navigation-group">
-                  <p class="text-caption tracking-wider uppercase">
-                    Service token
+                <div class="mt-4 flex flex-col gap-2">
+                  <button type="button" class="btn-secondary w-fit" :disabled="!canManage" @click="isSecretsDialogOpen = true">
+                    <icon name="ph:plus-bold" size="20" />
+                    <span>Create secrets in project</span>
+                  </button>
+                  <p v-if="!canManage" class="text-caption text-xs! text-warning">
+                    Only project owners and admins can create secrets and service tokens.
                   </p>
-                  <span class="peer/tip shrink-0 cursor-pointer text-muted-foreground" :aria-expanded="openTooltipKey === 'token'" @click.stop="toggleTooltip('token', $event)">
-                    <icon name="ph:info-bold" size="15" />
-                  </span>
-                  <span
-                    class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-full p-1! text-xs! font-normal! tracking-normal! text-foreground! normal-case! opacity-0 transition-opacity peer-hover/tip:opacity-100"
-                    :class="openTooltipKey === 'token' ? 'opacity-100!' : ''"
-                  >
-                    {{ selected.tokenHint || "Generate a token scoped for this integration. Copy it into WINDKEEP_TOKEN." }}
-                  </span>
                 </div>
-
-                <button type="button" class="btn-secondary w-fit" :disabled="!canManage" @click="isTokenDialogOpen = true">
-                  <icon name="ph:key-bold" size="20" />
-                  <span>{{ generatedRawToken ? "Generate another token" : "Generate token" }}</span>
-                </button>
-
-                <p v-if="!canManage" class="text-caption text-xs! text-warning">
-                  Only project owners and admins can create service tokens.
-                </p>
-              </section>
+              </details>
 
               <details v-if="snippet" class="group py-4">
                 <summary class="text-caption relative flex cursor-pointer list-none items-center gap-1 tracking-wider uppercase">
@@ -184,11 +168,7 @@
     </transition>
   </teleport>
 
-  <ProjectServiceTokenDialog
-    v-model:is-open="isTokenDialogOpen" :project-id="projectId"
-    :default-name="selected?.defaultTokenName" :default-environments="selected?.defaultEnvironments"
-    @created="handleTokenCreated"
-  />
+  <ProjectIntegrationSecretsDialog v-model:is-open="isSecretsDialogOpen" :project-id="projectId" :integration="selected" @token-created="handleTokenCreated" />
 </template>
 
 <script setup lang="ts">
@@ -211,7 +191,7 @@ const mediaQueryAbort = new AbortController()
 const openTooltipKey = ref<string | null>(null)
 const openTooltipEl = ref<HTMLElement | null>(null)
 const generatedRawToken = ref("")
-const isTokenDialogOpen = ref(false)
+const isSecretsDialogOpen = ref(false)
 const copyIconKeys = [...new Set(INTEGRATIONS.flatMap(item => (item.secrets ?? []).map(secret => secret.name))), "workflow"]
 const copyIcons = Object.fromEntries(copyIconKeys.map(key => [key, useActionIcon("ph:copy-bold")])) as Record<string, ReturnType<typeof useActionIcon>>
 useClickOutside(openTooltipEl, () => {
@@ -223,12 +203,13 @@ const snippet = computed(() => {
   if (!selected.value?.buildSnippet || !props.projectId) {
     return null
   }
-  return selected.value.buildSnippet({
-    baseURL: (baseURL as string)?.replace(/\/$/, "") || "",
-    projectId: props.projectId,
-    projectSlug: props.projectSlug,
-  })
+  return selected.value.buildSnippet({ baseURL: (baseURL as string)?.replace(/\/$/, "") || "", projectId: props.projectId, projectSlug: props.projectSlug })
 })
+
+function handleTokenCreated(rawToken: string) {
+  generatedRawToken.value = rawToken
+  emit("tokenCreated")
+}
 
 function toggleTooltip(key: string, event: MouseEvent) {
   if (openTooltipKey.value === key) {
@@ -258,13 +239,8 @@ async function copyValue(key: string, value: string) {
   await copyIcons[key]?.triggerCopy(value)
 }
 
-function handleTokenCreated(rawToken: string) {
-  generatedRawToken.value = rawToken
-  emit("tokenCreated")
-}
-
 function onEscape(e: KeyboardEvent) {
-  if (e.key === "Escape" && props.isOpen && !isTokenDialogOpen.value) {
+  if (e.key === "Escape" && props.isOpen && !isSecretsDialogOpen.value) {
     emit("update:isOpen", false)
   }
 }
@@ -304,7 +280,7 @@ watch(selectedId, () => {
 })
 
 // The dialog unlocks page scroll on close; restore it while the sheet stays open
-watch(isTokenDialogOpen, (open) => {
+watch(isSecretsDialogOpen, (open) => {
   if (!open && props.isOpen) {
     scrollLock(true)
   }

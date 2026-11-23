@@ -24,19 +24,15 @@
           class="group hover:bg-muted/20" :class="getChangeConfig(secret.key)?.rowClass"
           :data-change-type="getChangeConfig(secret.key) ? props.pendingChanges.get(secret.key)?.type : 'none'"
         >
-          <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-hidden md:overflow-visible!' : '']">
-            <div v-if="col.key === 'key'" class="navigation-group w-full min-w-0 font-mono text-sm font-semibold" :class="getChangeConfig(secret.key)?.keyTextClass">
-              <icon
-                v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon"
-                size="15" class="shrink-0"
-                :class="getChangeConfig(secret.key)?.keyTextClass"
-              />
+          <td v-for="col in columns" :key="col.key" :class="[col.class, col.key === 'key' ? 'overflow-visible!' : '']">
+            <div v-if="col.key === 'key'" class="relative navigation-group w-full min-w-0 font-mono text-sm font-semibold" :class="getChangeConfig(secret.key)?.keyTextClass">
+              <icon v-if="getChangeConfig(secret.key)?.icon" :name="getChangeConfig(secret.key)!.icon" size="15" :class="getChangeConfig(secret.key)?.keyTextClass" />
 
               <span class="max-w-max min-w-0 flex-1 truncate"><span class="opacity-70">{{ index + 1 }}.</span> {{ secret.key }}</span>
 
-              <span v-if="secret.description" class="group/tooltip relative inline-flex shrink-0 cursor-pointer" :aria-expanded="openTooltipKey === secret.key" @click.stop="toggleTooltip(secret.key, $event)">
+              <span v-if="secret.description" class="group/tooltip inline-flex shrink-0 cursor-pointer" :aria-expanded="openTooltipKey === secret.key" @click.stop="toggleTooltip(secret.key, $event)">
                 <icon name="ph:info-bold" size="15" />
-                <span class="card pointer-events-none absolute bottom-full left-1/2 w-max -translate-x-1/2 p-1! text-xs! transition-opacity group-hover/tooltip:opacity-100" :class="openTooltipKey === secret.key ? 'opacity-100' : 'opacity-0'">{{ secret.description }}</span>
+                <span class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-full p-1! font-sans text-xs! font-normal whitespace-normal transition-opacity group-hover/tooltip:opacity-100" :class="openTooltipKey === secret.key ? 'opacity-100' : 'opacity-0'">{{ secret.description }}</span>
               </span>
 
               <div v-if="secret.tags?.length" class="flex max-w-max min-w-0 flex-1 flex-nowrap items-center gap-1 overflow-hidden">
