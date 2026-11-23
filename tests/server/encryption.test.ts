@@ -41,11 +41,7 @@ describe("encryptWithKey / decryptWithKey", () => {
 })
 
 describe("createWrappedOrganizationKey", () => {
-  it("returns a v1 wrapped key for auto mode", () => {
+  it("returns a v1 wrapped key", () => {
     expect(createWrappedOrganizationKey().startsWith("v1:")).toBe(true)
-  })
-
-  it("returns a v1 wrapped key for manual mode", () => {
-    expect(createWrappedOrganizationKey("manual-password-long").startsWith("v1:")).toBe(true)
   })
 })

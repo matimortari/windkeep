@@ -206,8 +206,8 @@ describe("requireRole", () => {
     db.projectMembership.findUnique.mockResolvedValue(null)
     await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toEqual({ userId: "u1", projectId: "p1", role: "OWNER", environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] })
 
-    db.projectMembership.findUnique.mockResolvedValue({ userId: "u1", projectId: "p1", role: "OWNER" })
-    await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toMatchObject({ role: "OWNER" })
+    db.projectMembership.findUnique.mockResolvedValue({ userId: "u1", projectId: "p1", role: "ADMIN" })
+    await expect(requireRole("u1", { type: "project", projectId: "p1" }, ["OWNER"])).resolves.toEqual({ userId: "u1", projectId: "p1", role: "OWNER", environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] })
 
     db.orgMembership.findUnique.mockResolvedValue({ userId: "u1", orgId: "o1", role: "MEMBER", isActive: true })
     db.projectMembership.findUnique.mockResolvedValue({ userId: "u1", projectId: "p1", role: "ADMIN" })

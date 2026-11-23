@@ -2,16 +2,9 @@ import { describe, expect, it } from "vitest"
 import { createInviteSchema, createOrgSchema, getAuditLogsSchema, updateOrgSchema } from "../../shared/schemas/org-schema"
 
 describe("createOrgSchema", () => {
-  it("accepts a minimal AUTO org", () => {
+  it("accepts a minimal org", () => {
     const result = createOrgSchema.parse({ name: "Acme Corp" })
     expect(result.name).toBe("Acme Corp")
-    expect(result.encryptionMode).toBe("AUTO")
-  })
-
-  it("requires a long enough encryption passphrase in MANUAL mode", () => {
-    expect(createOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL", encryptionKey: "short" }).success).toBe(false)
-    expect(createOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL" }).success).toBe(false)
-    expect(createOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL", encryptionKey: "long-enough-password" }).success).toBe(true)
   })
 
   it("rejects invalid websites", () => {
@@ -20,13 +13,8 @@ describe("createOrgSchema", () => {
 })
 
 describe("updateOrgSchema", () => {
-  it("validates MANUAL encryption key when rotating", () => {
-    expect(updateOrgSchema.safeParse({ rotateEncryptionKey: true, encryptionMode: "MANUAL", encryptionKey: "short" }).success).toBe(false)
-    expect(updateOrgSchema.safeParse({ rotateEncryptionKey: true, encryptionMode: "MANUAL", encryptionKey: "long-enough-password" }).success).toBe(true)
-  })
-
-  it("skips encryption key checks when not rotating", () => {
-    expect(updateOrgSchema.safeParse({ name: "Acme Corp", encryptionMode: "MANUAL", encryptionKey: "short" }).success).toBe(true)
+  it("accepts rotateEncryptionKey", () => {
+    expect(updateOrgSchema.safeParse({ rotateEncryptionKey: true }).success).toBe(true)
   })
 
   it("clears description and website when null", () => {

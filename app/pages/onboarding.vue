@@ -27,24 +27,6 @@
                 <input v-model="localOrg.website" placeholder="Website (optional)" type="url" class="flex-1">
               </div>
 
-              <div class="flex flex-col gap-2">
-                <label for="encryption-mode" class="text-caption">Encryption key</label>
-                <select id="encryption-mode" v-model="localOrg.encryptionMode">
-                  <option value="AUTO">
-                    Auto-generate (recommended)
-                  </option>
-                  <option value="MANUAL">
-                    Use a custom passphrase
-                  </option>
-                </select>
-
-                <input
-                  v-if="localOrg.encryptionMode === 'MANUAL'" v-model="localOrg.encryptionKey"
-                  placeholder="Encryption passphrase (min 12 chars)" type="password"
-                  autocomplete="new-password"
-                >
-              </div>
-
               <button type="submit" class="btn-primary w-full" :disabled="!localOrg.name">
                 Create Organization
               </button>
@@ -81,15 +63,11 @@ const { public: { baseURL } } = useRuntimeConfig()
 const route = useRoute()
 const userStore = useUserStore()
 const orgStore = useOrgStore()
-const localOrg = ref({ name: "", description: "", website: "", encryptionMode: "AUTO" as "AUTO" | "MANUAL", encryptionKey: "" })
+const localOrg = ref({ name: "", description: "", website: "" })
 const token = ref((route.query.token as string) || "")
 const activeSection = ref<"create" | "invite" | null>(route.query.token ? "invite" : "create")
 
 async function handleCreateOrg() {
-  if (localOrg.value.encryptionMode === "MANUAL" && localOrg.value.encryptionKey.trim().length < 12) {
-    return
-  }
-
   const org = await orgStore.createOrg(localOrg.value)
   if (!org) {
     return

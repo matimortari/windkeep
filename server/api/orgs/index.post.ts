@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
         name: result.data.name,
         description: result.data.description || null,
         website: result.data.website || null,
-        wrappedEncryptionKey: createWrappedOrganizationKey(result.data.encryptionMode === "MANUAL" ? result.data.encryptionKey : undefined),
+        wrappedEncryptionKey: createWrappedOrganizationKey(),
         memberships: { create: { userId: sessionUser.id, role: "OWNER", isActive: true } },
       },
     })
@@ -63,8 +63,6 @@ defineRouteMeta({
               name: { type: "string", description: "Organization name" },
               description: { type: "string", description: "Organization description (optional)" },
               website: { type: "string", description: "Organization website (optional)" },
-              encryptionMode: { type: "string", enum: ["AUTO", "MANUAL"], description: "Encryption mode" },
-              encryptionKey: { type: "string", description: "Custom passphrase used once to derive the org key (required when encryptionMode is MANUAL)" },
             },
           },
         },

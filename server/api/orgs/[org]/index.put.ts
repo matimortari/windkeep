@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (result.data.rotateEncryptionKey) {
-    await rotateOrganizationKey(orgId, result.data.encryptionMode === "MANUAL" ? result.data.encryptionKey : undefined)
+    await rotateOrganizationKey(orgId)
   }
 
   const updatedOrg = await db.organization.findUniqueOrThrow({
@@ -113,8 +113,6 @@ defineRouteMeta({
               description: { type: "string", description: "Organization description (optional)" },
               website: { type: "string", description: "Organization website (optional)" },
               rotateEncryptionKey: { type: "boolean", description: "Rotate encryption key" },
-              encryptionMode: { type: "string", enum: ["AUTO", "MANUAL"], description: "Encryption mode" },
-              encryptionKey: { type: "string", description: "Custom passphrase used once to derive the org key (required when encryptionMode is MANUAL)" },
             },
           },
         },

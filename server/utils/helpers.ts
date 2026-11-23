@@ -148,10 +148,9 @@ export async function requireRole(userId: string, scope: { type: "org", orgId: s
       throw createError({ statusCode: 403, statusMessage: "Forbidden: project is not in the active organization" })
     }
 
-    // Org owners have implicit OWNER permissions on all org projects
+    // Org owners have implicit OWNER permissions on all org projects when they also hold a lower project membership (e.g. after transfer)
     if (orgMembership.role === "OWNER") {
-      const projectMembership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })
-      return projectMembership ?? { userId, projectId: scope.projectId, role: "OWNER" as Role, environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] }
+      return { userId, projectId: scope.projectId, role: "OWNER" as Role, environment: ["DEVELOPMENT", "STAGING", "PRODUCTION"] }
     }
 
     membership = await db.projectMembership.findUnique({ where: { userId_projectId: { userId, projectId: scope.projectId } } })

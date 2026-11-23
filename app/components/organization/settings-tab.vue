@@ -57,22 +57,9 @@
       </header>
 
       <div class="navigation-group w-full min-w-0 justify-end md:max-w-md">
-        <select v-model="encryptionMode" class="min-w-0 flex-1 basis-0">
-          <option value="AUTO">
-            Auto-generate
-          </option>
-          <option value="MANUAL">
-            Custom passphrase
-          </option>
-        </select>
-        <input
-          v-if="encryptionMode === 'MANUAL'" v-model="manualEncryptionKey"
-          type="password" autocomplete="new-password"
-          class="min-w-0 flex-1 basis-0" placeholder="Passphrase (min 12 chars)"
-        >
         <button
           type="button" class="btn-warning shrink-0"
-          aria-label="Rotate Organization Encryption Key" :disabled="!canRotateEncryptionKey"
+          aria-label="Rotate Organization Encryption Key"
           @click="handleRotateEncryptionKey"
         >
           <icon :name="rotateKeyIcon.icon.value || 'ph:arrows-clockwise-bold'" size="20" />
@@ -120,9 +107,6 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const orgStore = useOrgStore()
 const { activeOrg, isOwner } = storeToRefs(orgStore)
-const encryptionMode = ref<"AUTO" | "MANUAL">("AUTO")
-const manualEncryptionKey = ref("")
-
 const orgFields = [
   {
     label: "Organization Name",
@@ -172,7 +156,6 @@ const orgFields = [
 const copyIcon = orgFields.map(() => useActionIcon("ph:copy-bold"))
 const saveIcon = orgFields.map(() => useActionIcon("ph:floppy-disk-bold"))
 const rotateKeyIcon = useActionIcon("ph:arrows-clockwise-bold")
-const canRotateEncryptionKey = computed(() => encryptionMode.value === "AUTO" || manualEncryptionKey.value.trim().length >= 12)
 
 async function handleSubmit(index: number) {
   if (!activeOrg.value?.id) {
@@ -191,20 +174,14 @@ async function handleSubmit(index: number) {
 }
 
 async function handleRotateEncryptionKey() {
-  if (!activeOrg.value?.id || !canRotateEncryptionKey.value) {
+  if (!activeOrg.value?.id) {
     return
   }
   if (!confirm("Rotate the organization encryption key now? This will re-encrypt all organization secrets.")) {
     return
   }
 
-  await orgStore.updateOrg(activeOrg.value.id, {
-    rotateEncryptionKey: true,
-    encryptionMode: encryptionMode.value,
-    encryptionKey: encryptionMode.value === "MANUAL" ? manualEncryptionKey.value : undefined,
-  })
-
-  manualEncryptionKey.value = ""
+  await orgStore.updateOrg(activeOrg.value.id, { rotateEncryptionKey: true })
   await orgStore.getOrg(activeOrg.value.id)
   rotateKeyIcon.triggerSuccess()
 }
