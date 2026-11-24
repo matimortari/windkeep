@@ -42,19 +42,13 @@ func applyPendingUpgrade() (bool, error) {
 		return false, nil
 	}
 
-	oldPath := exePath + ".old"
-	_ = os.Remove(oldPath)
-	if err := os.Rename(exePath, oldPath); err != nil {
-		return false, fmt.Errorf("failed to stage current binary: %w", err)
-	}
-	if err := os.Rename(pendingPath, exePath); err != nil {
-		_ = os.Rename(oldPath, exePath)
+	if err := cmd.ReplaceExecutable(exePath, pendingPath); err != nil {
 		return false, fmt.Errorf("failed to install pending upgrade: %w", err)
 	}
-	_ = os.Remove(oldPath)
 	return true, nil
 }
 
+// reexec runs the freshly installed binary with the original arguments and exits with its status.
 func reexec() {
 	exePath, err := os.Executable()
 	if err != nil {

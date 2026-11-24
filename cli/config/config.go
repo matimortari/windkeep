@@ -22,8 +22,7 @@ type Config struct {
 	ServiceTokenName  string `yaml:"service_token_name,omitempty"`
 }
 
-// LoadAuth resolves credentials from environment variables (CI) or the config file.
-// WINDKEEP_TOKEN overrides a stored token. For service tokens, WINDKEEP_PROJECT_ID can supply the scoped project without a prior login.
+// LoadAuth loads the config file, letting WINDKEEP_TOKEN and WINDKEEP_PROJECT_ID override it (e.g. in CI without a prior login).
 func LoadAuth() (*Config, error) {
 	envToken := strings.TrimSpace(os.Getenv("WINDKEEP_TOKEN"))
 	envProjectID := strings.TrimSpace(os.Getenv("WINDKEEP_PROJECT_ID"))
@@ -44,13 +43,12 @@ func LoadAuth() (*Config, error) {
 	}
 
 	if cfg.APIToken == "" {
-		return nil, fmt.Errorf("not authenticated. Run 'windkeep login' or set WINDKEEP_TOKEN")
+		return nil, fmt.Errorf("not authenticated")
 	}
 
 	return cfg, nil
 }
 
-// GetConfigPath returns the full path to the config file
 func GetConfigPath() (string, error) {
 	var baseDir string
 
@@ -71,7 +69,6 @@ func GetConfigPath() (string, error) {
 	return filepath.Join(dir, "config.yml"), nil
 }
 
-// Load reads the configuration from the file
 func Load() (*Config, error) {
 	configPath, err := GetConfigPath()
 	if err != nil {
@@ -94,7 +91,6 @@ func Load() (*Config, error) {
 	return &cfg, nil
 }
 
-// Save writes the configuration to the file
 func (c *Config) Save() error {
 	configPath, err := GetConfigPath()
 	if err != nil {
@@ -117,7 +113,6 @@ func (c *Config) Save() error {
 	return nil
 }
 
-// Delete removes the configuration file
 func Delete() error {
 	configPath, err := GetConfigPath()
 	if err != nil {

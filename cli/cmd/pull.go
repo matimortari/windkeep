@@ -10,9 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	pullEnv string
-)
+var pullEnv string
 
 var pullCmd = &cobra.Command{
 	Use:   "pull [OUTPUT_FILE]",
@@ -52,11 +50,8 @@ Examples:
 
 		var lines []string
 		for _, secret := range secrets {
-			for _, val := range secret.Values {
-				if val.Environment == env {
-					lines = append(lines, fmt.Sprintf("%s=%s", secret.Key, val.Value))
-					break
-				}
+			if value, ok := valueForEnv(secret, env); ok {
+				lines = append(lines, secret.Key+"="+value)
 			}
 		}
 		if len(lines) == 0 {

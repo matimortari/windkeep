@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
@@ -9,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// getActiveOrg returns nil, nil when no org is active or the user is no longer a member of it.
 func getActiveOrg(client *api.Client) (*api.OrgMembership, error) {
 	if cfg.ActiveOrgID == "" {
 		return nil, nil
@@ -19,12 +21,9 @@ func getActiveOrg(client *api.Client) (*api.OrgMembership, error) {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
-	for _, membership := range user.OrgMemberships {
-		if membership.OrgID == cfg.ActiveOrgID {
-			return &membership, nil
-		}
+	if i := slices.IndexFunc(user.OrgMemberships, func(m api.OrgMembership) bool { return m.OrgID == cfg.ActiveOrgID }); i >= 0 {
+		return &user.OrgMemberships[i], nil
 	}
-
 	return nil, nil
 }
 
@@ -144,15 +143,7 @@ var orgsSwitchCmd = &cobra.Command{
 		} else {
 			orgID = args[0]
 
-			// Verify user has access
-			var found bool
-			for _, membership := range user.OrgMemberships {
-				if membership.OrgID == orgID {
-					found = true
-					break
-				}
-			}
-			if !found {
+			if !slices.ContainsFunc(user.OrgMemberships, func(m api.OrgMembership) bool { return m.OrgID == orgID }) {
 				return fmt.Errorf("organization not found or you are not a member")
 			}
 		}
@@ -183,7 +174,7 @@ var orgsUpdateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if cfg.ActiveOrgID == "" {
-			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
+			return errNoActiveOrg
 		}
 
 		name := args[0]
@@ -207,8 +198,5 @@ var orgsUpdateCmd = &cobra.Command{
 }
 
 func init() {
-	orgsCmd.AddCommand(orgsListCmd)
-	orgsCmd.AddCommand(orgsCreateCmd)
-	orgsCmd.AddCommand(orgsSwitchCmd)
-	orgsCmd.AddCommand(orgsUpdateCmd)
+	orgsCmd.AddCommand(orgsListCmd, orgsCreateCmd, orgsSwitchCmd, orgsUpdateCmd)
 }

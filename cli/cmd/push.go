@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -11,9 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	pushEnv string
-)
+var pushEnv string
 
 var pushCmd = &cobra.Command{
 	Use:   "push [INPUT_FILE]",
@@ -57,34 +54,27 @@ Examples:
 		}
 		var entries []parsedEntry
 
-		scanner := bufio.NewScanner(strings.NewReader(string(data)))
 		lineNum := 0
-		for scanner.Scan() {
+		for line := range strings.Lines(string(data)) {
 			lineNum++
-			line := strings.TrimSpace(scanner.Text())
+			line = strings.TrimSpace(line)
 			if line == "" || strings.HasPrefix(line, "#") {
 				continue
 			}
 
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) != 2 {
+			key, value, ok := strings.Cut(line, "=")
+			if !ok {
 				ui.PrintWarning("Skipping line %d: invalid format (expected KEY=VALUE)", lineNum)
 				continue
 			}
 
-			key := strings.TrimSpace(parts[0])
-			value := strings.TrimSpace(parts[1])
-			if len(value) >= 2 && ((value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'')) {
+			key, value = strings.TrimSpace(key), strings.TrimSpace(value)
+			if len(value) >= 2 && (value[0] == '"' || value[0] == '\'') && value[len(value)-1] == value[0] {
 				value = value[1 : len(value)-1]
 			}
-			if key == "" {
-				continue
+			if key != "" {
+				entries = append(entries, parsedEntry{key, value})
 			}
-			entries = append(entries, parsedEntry{key, value})
-		}
-
-		if err := scanner.Err(); err != nil {
-			return fmt.Errorf("failed to read file: %w", err)
 		}
 		if len(entries) == 0 {
 			ui.PrintWarning("No secrets found in '%s'", inputFile)
@@ -103,40 +93,29 @@ Examples:
 
 		created, updated, skipped := 0, 0, 0
 		for _, entry := range entries {
-			if existingSecret, exists := existingMap[entry.key]; exists {
-				if !overwrite {
-					ui.PrintWarning("Skipping '%s' (already exists — use --overwrite to update)", entry.key)
-					skipped++
-					continue
-				}
-
-				req := api.UpdateSecretRequest{
-					Values: mergeSecretValues(existingSecret.Values, []api.SecretValueInput{
-						{Environment: env, Value: entry.value},
-					}),
-				}
+			values := []api.SecretValueInput{{Environment: env, Value: entry.value}}
+			existingSecret, exists := existingMap[entry.key]
+			switch {
+			case exists && !overwrite:
+				ui.PrintWarning("Skipping '%s' (already exists – use --overwrite to update)", entry.key)
+				skipped++
+			case exists:
+				req := api.UpdateSecretRequest{Values: mergeSecretValues(existingSecret.Values, values)}
 				if _, err := client.UpdateSecret(project.ID, existingSecret.ID, req); err != nil {
 					ui.PrintWarning("Failed to update '%s': %v", entry.key, err)
 					skipped++
-					continue
+				} else {
+					updated++
 				}
-				updated++
-				continue
+			default:
+				req := api.CreateSecretRequest{Key: entry.key, ProjectID: project.ID, Values: values}
+				if _, err := client.CreateSecret(project.ID, req); err != nil {
+					ui.PrintWarning("Failed to create '%s': %v", entry.key, err)
+					skipped++
+				} else {
+					created++
+				}
 			}
-
-			req := api.CreateSecretRequest{
-				Key:       entry.key,
-				ProjectID: project.ID,
-				Values: []api.SecretValueInput{
-					{Environment: env, Value: entry.value},
-				},
-			}
-			if _, err := client.CreateSecret(project.ID, req); err != nil {
-				ui.PrintWarning("Failed to create '%s': %v", entry.key, err)
-				skipped++
-				continue
-			}
-			created++
 		}
 
 		fmt.Println()

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/manifoldco/promptui"
@@ -11,16 +12,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	slugInvalidChars = regexp.MustCompile("[^a-z0-9-]+")
+	slugDashRuns     = regexp.MustCompile("-+")
+)
+
 func generateSlug(name string) string {
-	slug := strings.ToLower(name)
-	slug = strings.ReplaceAll(slug, " ", "-")
-	slug = strings.ReplaceAll(slug, "_", "-")
-	reg := regexp.MustCompile("[^a-z0-9-]+")
-	slug = reg.ReplaceAllString(slug, "")
-	reg = regexp.MustCompile("-+")
-	slug = reg.ReplaceAllString(slug, "-")
-	slug = strings.Trim(slug, "-")
-	return slug
+	slug := strings.NewReplacer(" ", "-", "_", "-").Replace(strings.ToLower(name))
+	slug = slugInvalidChars.ReplaceAllString(slug, "")
+	return strings.Trim(slugDashRuns.ReplaceAllString(slug, "-"), "-")
 }
 
 var projectsCmd = &cobra.Command{
@@ -35,25 +35,9 @@ var projectsListCmd = &cobra.Command{
 	Short: "List projects in the active organization",
 	Long:  `List all projects in your active organization.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newClient()
-
-		activeOrg, err := getActiveOrg(client)
-		if err != nil {
+		_, projects, err := activeOrgProjects(newClient())
+		if err != nil || len(projects) == 0 {
 			return err
-		}
-		if activeOrg == nil {
-			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
-		}
-
-		projects, err := projectsInOrg(client, activeOrg.OrgID)
-		if err != nil {
-			return err
-		}
-
-		if len(projects) == 0 {
-			ui.PrintWarning("No projects found in '%s'.", activeOrg.Org.Name)
-			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep projects create"))
-			return nil
 		}
 
 		table := ui.CreateTable([]string{"ID", "Name", "Slug", "Secrets"})
@@ -66,7 +50,7 @@ var projectsListCmd = &cobra.Command{
 				proj.ID,
 				proj.Name,
 				proj.Slug,
-				fmt.Sprintf("%d", secretCount),
+				strconv.Itoa(secretCount),
 			})
 		}
 		table.Render()
@@ -82,13 +66,9 @@ var projectsCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newClient()
-
-		activeOrg, err := getActiveOrg(client)
+		activeOrg, err := requireActiveOrg(client)
 		if err != nil {
 			return err
-		}
-		if activeOrg == nil {
-			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
 		}
 
 		name := args[0]
@@ -128,26 +108,9 @@ var projectsSwitchCmd = &cobra.Command{
 	Long:  `Set the active project for future commands. Only shows projects from the active organization.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newClient()
-
-		// Require an active org — projects are org-scoped
-		activeOrg, err := getActiveOrg(client)
-		if err != nil {
+		activeOrg, projects, err := activeOrgProjects(newClient())
+		if err != nil || len(projects) == 0 {
 			return err
-		}
-		if activeOrg == nil {
-			return fmt.Errorf("no active organization. Use 'windkeep orgs switch' first")
-		}
-
-		projects, err := projectsInOrg(client, activeOrg.OrgID)
-		if err != nil {
-			return err
-		}
-
-		if len(projects) == 0 {
-			ui.PrintWarning("No projects found in '%s'.", activeOrg.Org.Name)
-			ui.PrintInfo("Create one with: %s", ui.Highlight("windkeep projects create"))
-			return nil
 		}
 
 		var selectedProject *api.Project
@@ -172,15 +135,8 @@ var projectsSwitchCmd = &cobra.Command{
 			}
 			selectedProject = &projects[idx]
 		} else {
-			slug := args[0]
-			for i := range projects {
-				if projects[i].Slug == slug {
-					selectedProject = &projects[i]
-					break
-				}
-			}
-			if selectedProject == nil {
-				return fmt.Errorf("project '%s' not found in organization '%s'", slug, activeOrg.Org.Name)
+			if selectedProject = projectWithSlug(projects, args[0]); selectedProject == nil {
+				return fmt.Errorf("project '%s' not found in organization '%s'", args[0], activeOrg.Org.Name)
 			}
 		}
 
@@ -256,18 +212,8 @@ var projectsDeleteCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		projectSlug := args[0]
-		confirm, _ := cmd.Flags().GetBool("confirm")
-
-		if !confirm {
-			prompt := promptui.Prompt{
-				Label:     fmt.Sprintf("Delete project '%s' and all its secrets", projectSlug),
-				IsConfirm: true,
-			}
-			_, err := prompt.Run()
-			if err != nil {
-				ui.PrintInfo("Deletion cancelled")
-				return nil
-			}
+		if !confirmDelete(cmd, fmt.Sprintf("Delete project '%s' and all its secrets", projectSlug)) {
+			return nil
 		}
 
 		client := newClient()
@@ -296,11 +242,7 @@ var projectsDeleteCmd = &cobra.Command{
 }
 
 func init() {
-	projectsCmd.AddCommand(projectsListCmd)
-	projectsCmd.AddCommand(projectsCreateCmd)
-	projectsCmd.AddCommand(projectsSwitchCmd)
-	projectsCmd.AddCommand(projectsUpdateCmd)
-	projectsCmd.AddCommand(projectsDeleteCmd)
+	projectsCmd.AddCommand(projectsListCmd, projectsCreateCmd, projectsSwitchCmd, projectsUpdateCmd, projectsDeleteCmd)
 
 	projectsCreateCmd.Flags().StringP("description", "d", "", "Project description")
 	projectsUpdateCmd.Flags().StringP("name", "n", "", "New project name")

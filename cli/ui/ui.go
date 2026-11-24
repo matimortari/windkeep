@@ -10,9 +10,7 @@ import (
 
 var (
 	Success    = color.New(color.FgGreen, color.Bold).SprintfFunc()
-	Error      = color.New(color.FgRed, color.Bold).SprintfFunc()
 	Info       = color.New(color.FgCyan).SprintfFunc()
-	Warning    = color.New(color.FgYellow).SprintfFunc()
 	Highlight  = color.New(color.FgMagenta, color.Bold).SprintfFunc()
 	GreenBold  = color.New(color.FgGreen, color.Bold)
 	RedBold    = color.New(color.FgRed, color.Bold)

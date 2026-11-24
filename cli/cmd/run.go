@@ -103,11 +103,8 @@ Flags:
 
 		envVars := make(map[string]string)
 		for _, secret := range secrets {
-			for _, val := range secret.Values {
-				if val.Environment == env {
-					envVars[secret.Key] = val.Value
-					break
-				}
+			if value, ok := valueForEnv(secret, env); ok {
+				envVars[secret.Key] = value
 			}
 		}
 

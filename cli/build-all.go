@@ -7,8 +7,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io"
-	"math"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,11 +15,14 @@ import (
 	"strings"
 )
 
+const binDir = "../.data/bin"
+
 var builds = [][3]string{
 	{"linux", "amd64", "windkeep-linux-amd64"},
 	{"windows", "amd64", "windkeep-windows-amd64.exe"},
 }
 
+// configValue reads key from the environment, falling back to ../.env.
 func configValue(key string) (string, error) {
 	if value := strings.TrimSpace(os.Getenv(key)); value != "" {
 		return value, nil
@@ -49,100 +51,66 @@ func configValue(key string) (string, error) {
 	return "", fmt.Errorf("%s not set (export %s or add it to ../.env)", key, key)
 }
 
-func fatalf(format string, args ...any) {
-	fmt.Fprintf(os.Stderr, "error: "+format+"\n", args...)
-	os.Exit(1)
-}
-
-func hostBinary() string {
-	for _, b := range builds {
-		if b[0] == runtime.GOOS && b[1] == runtime.GOARCH {
-			return filepath.Join("../.data/bin", b[2])
-		}
-	}
-	return ""
-}
-
-func binaryVersion(path string) (string, bool) {
-	out, err := exec.Command(path, "--version").Output()
-	if err != nil {
-		return "", false
-	}
-	v := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(string(out)), "windkeep version "))
-	return v, v != ""
-}
-
-func confirmOverwrite(version string) bool {
-	bin := hostBinary()
-	if bin == "" {
-		return true
-	}
-	prev, ok := binaryVersion(bin)
-	if !ok || prev != version {
-		return true
-	}
-	fmt.Printf("Version %s already built. Continue? (y/N): ", version)
-	var input string
-	fmt.Scanln(&input)
-	return strings.ToLower(strings.TrimSpace(input)) == "y"
-}
-
 func main() {
+	log.SetFlags(0)
+	log.SetPrefix("error: ")
+
 	version, err := configValue("CLI_VERSION")
 	if err != nil {
-		fatalf("%v", err)
+		log.Fatal(err)
+	}
+	fmt.Printf("Building WindKeep CLI – version %s\n", version)
+
+	for _, b := range builds {
+		if b[0] != runtime.GOOS || b[1] != runtime.GOARCH {
+			continue
+		}
+		out, err := exec.Command(filepath.Join(binDir, b[2]), "--version").Output()
+		if err != nil || strings.TrimSpace(strings.TrimPrefix(string(out), "windkeep version ")) != version {
+			break
+		}
+		fmt.Printf("Version %s already built. Continue? (y/N): ", version)
+		var input string
+		fmt.Scanln(&input)
+		if !strings.EqualFold(strings.TrimSpace(input), "y") {
+			fmt.Println("Build cancelled.")
+			return
+		}
 	}
 
-	fmt.Printf("Building WindKeep CLI — version %s\n", version)
-	if !confirmOverwrite(version) {
-		fmt.Println("Build cancelled.")
-		return
+	if err := os.RemoveAll(binDir); err != nil {
+		log.Fatalf("failed to remove bin dir: %v", err)
+	}
+	if err := os.MkdirAll(binDir, 0755); err != nil {
+		log.Fatalf("failed to create bin dir: %v", err)
 	}
 
-	ldflags := fmt.Sprintf("-s -w -X github.com/matimortari/windkeep/cli/cmd.Version=%s", version)
-
-	if err := os.RemoveAll("../.data/bin"); err != nil && !os.IsNotExist(err) {
-		fatalf("failed to remove bin dir: %v", err)
-	}
-	os.MkdirAll("../.data/bin", 0755)
-
-	checksumsPath := filepath.Join("../.data/bin", "checksums.txt")
-
+	ldflags := "-s -w -X github.com/matimortari/windkeep/cli/cmd.Version=" + version
+	var checksums strings.Builder
 	for _, b := range builds {
 		goos, arch, name := b[0], b[1], b[2]
 		fmt.Printf("\nBuilding %s...\n", name)
 
-		out := filepath.Join("../.data/bin", name)
+		out := filepath.Join(binDir, name)
 		cmd := exec.Command("go", "build", "-o", out, "-ldflags="+ldflags, ".")
 		cmd.Env = append(os.Environ(), "GOOS="+goos, "GOARCH="+arch, "CGO_ENABLED=0")
 		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
-
 		if err := cmd.Run(); err != nil {
 			fmt.Printf("✗ Failed: %v\n", err)
 			continue
 		}
 
-		bin, err := os.Open(out)
+		data, err := os.ReadFile(out)
 		if err != nil {
 			fmt.Printf("✗ Failed to hash: %v\n", err)
 			continue
 		}
-		h := sha256.New()
-		io.Copy(h, bin)
-		bin.Close()
+		sum := sha256.Sum256(data)
+		fmt.Fprintf(&checksums, "%s  %s\n", hex.EncodeToString(sum[:]), name)
+		fmt.Printf("✓ %s (%.2f MB)\n", name, float64(len(data))/1e6)
+	}
 
-		cf, err := os.OpenFile(checksumsPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			fmt.Printf("✗ Failed to write checksum: %v\n", err)
-			continue
-		}
-		fmt.Fprintf(cf, "%s  %s\n", hex.EncodeToString(h.Sum(nil)), name)
-		cf.Close()
-
-		if info, err := os.Stat(out); err == nil {
-			fmt.Printf("✓ %s (%.2f MB)\n", name, math.Round(float64(info.Size())/1e6*100)/100)
-		} else {
-			fmt.Printf("✓ %s\n", name)
-		}
+	if err := os.WriteFile(filepath.Join(binDir, "checksums.txt"), []byte(checksums.String()), 0644); err != nil {
+		log.Fatalf("failed to write checksums: %v", err)
 	}
 }

@@ -18,7 +18,7 @@ var loginCmd = &cobra.Command{
 
 Personal tokens (from Preferences) unlock the full CLI for interactive use.
 Service tokens (st_… from a project's Access Control) are scoped to one project
-and are the right choice for CI/CD — they can only read secrets.`,
+and are the right choice for CI/CD – they can only read secrets.`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var apiToken string

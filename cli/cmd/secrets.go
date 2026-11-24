@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/manifoldco/promptui"
 	"github.com/matimortari/windkeep/cli/api"
 	"github.com/matimortari/windkeep/cli/ui"
 	"github.com/spf13/cobra"
@@ -182,7 +181,7 @@ Examples:
 
 		values := buildSecretValues(dev, staging, prod)
 		if len(values) == 0 && description == "" {
-			return fmt.Errorf("nothing to update — provide at least one of: --dev, --staging, --prod, or -d/--description")
+			return fmt.Errorf("nothing to update – provide at least one of: --dev, --staging, --prod, or -d/--description")
 		}
 
 		client := newClient()
@@ -298,17 +297,8 @@ var secretsDeleteCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
-		confirm, _ := cmd.Flags().GetBool("confirm")
-
-		if !confirm {
-			prompt := promptui.Prompt{
-				Label:     fmt.Sprintf("Delete '%s' and all its values", key),
-				IsConfirm: true,
-			}
-			if _, err := prompt.Run(); err != nil {
-				ui.PrintInfo("Deletion cancelled")
-				return nil
-			}
+		if !confirmDelete(cmd, fmt.Sprintf("Delete '%s' and all its values", key)) {
+			return nil
 		}
 
 		client := newClient()
@@ -332,22 +322,15 @@ var secretsDeleteCmd = &cobra.Command{
 }
 
 func init() {
-	secretsCmd.AddCommand(secretsListCmd)
-	secretsCmd.AddCommand(secretsGetCmd)
-	secretsCmd.AddCommand(secretsCreateCmd)
-	secretsCmd.AddCommand(secretsSetCmd)
-	secretsCmd.AddCommand(secretsHistoryCmd)
-	secretsCmd.AddCommand(secretsDeleteCmd)
+	secretsCmd.AddCommand(secretsListCmd, secretsGetCmd, secretsCreateCmd, secretsSetCmd, secretsHistoryCmd, secretsDeleteCmd)
 
 	secretsCreateCmd.Flags().StringP("description", "d", "", "Secret description")
-	secretsCreateCmd.Flags().String("dev", "", "Value for DEVELOPMENT environment")
-	secretsCreateCmd.Flags().String("staging", "", "Value for STAGING environment")
-	secretsCreateCmd.Flags().String("prod", "", "Value for PRODUCTION environment")
-
 	secretsSetCmd.Flags().StringP("description", "d", "", "Update the secret's description")
-	secretsSetCmd.Flags().String("dev", "", "Value for DEVELOPMENT environment")
-	secretsSetCmd.Flags().String("staging", "", "Value for STAGING environment")
-	secretsSetCmd.Flags().String("prod", "", "Value for PRODUCTION environment")
+	for _, c := range []*cobra.Command{secretsCreateCmd, secretsSetCmd} {
+		c.Flags().String("dev", "", "Value for DEVELOPMENT environment")
+		c.Flags().String("staging", "", "Value for STAGING environment")
+		c.Flags().String("prod", "", "Value for PRODUCTION environment")
+	}
 
 	secretsHistoryCmd.Flags().StringP("env", "e", "", "Filter by environment (dev/staging/prod)")
 

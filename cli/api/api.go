@@ -43,7 +43,7 @@ func ParseEnvironment(environment string) (Environment, error) {
 	case "PROD", "PRODUCTION":
 		return EnvProduction, nil
 	default:
-		return "", fmt.Errorf("invalid environment '%s' — use: dev, staging, or prod", environment)
+		return "", fmt.Errorf("invalid environment '%s' – use: dev, staging, or prod", environment)
 	}
 }
 
@@ -85,10 +85,8 @@ func (c *Client) doRequest(method, endpoint string, body any) (*http.Response, e
 
 	if resp.StatusCode >= 400 {
 		defer resp.Body.Close()
-		bodyBytes, _ := io.ReadAll(resp.Body)
-
 		var errResp ErrorResponse
-		_ = json.Unmarshal(bodyBytes, &errResp)
+		_ = json.NewDecoder(resp.Body).Decode(&errResp)
 
 		msg := errResp.Message
 		if msg == "" {
@@ -105,58 +103,38 @@ func (c *Client) doRequest(method, endpoint string, body any) (*http.Response, e
 
 func parseResponse(resp *http.Response, v any) error {
 	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	if err := json.Unmarshal(body, v); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
 		return fmt.Errorf("failed to parse response: %w", err)
 	}
+	return nil
+}
 
+func (c *Client) send(method, endpoint string, body, result any) error {
+	resp, err := c.doRequest(method, endpoint, body)
+	if err != nil {
+		return err
+	}
+	if result != nil {
+		return parseResponse(resp, result)
+	}
+	resp.Body.Close()
 	return nil
 }
 
 func (c *Client) Get(endpoint string, result any) error {
-	resp, err := c.doRequest("GET", endpoint, nil)
-	if err != nil {
-		return err
-	}
-	return parseResponse(resp, result)
+	return c.send(http.MethodGet, endpoint, nil, result)
 }
 
-func (c *Client) Post(endpoint string, body any, result any) error {
-	resp, err := c.doRequest("POST", endpoint, body)
-	if err != nil {
-		return err
-	}
-	if result != nil {
-		return parseResponse(resp, result)
-	}
-	resp.Body.Close()
-	return nil
+func (c *Client) Post(endpoint string, body, result any) error {
+	return c.send(http.MethodPost, endpoint, body, result)
 }
 
-func (c *Client) Put(endpoint string, body any, result any) error {
-	resp, err := c.doRequest("PUT", endpoint, body)
-	if err != nil {
-		return err
-	}
-	if result != nil {
-		return parseResponse(resp, result)
-	}
-	resp.Body.Close()
-	return nil
+func (c *Client) Put(endpoint string, body, result any) error {
+	return c.send(http.MethodPut, endpoint, body, result)
 }
 
 func (c *Client) Delete(endpoint string) error {
-	resp, err := c.doRequest("DELETE", endpoint, nil)
-	if err != nil {
-		return err
-	}
-	resp.Body.Close()
-	return nil
+	return c.send(http.MethodDelete, endpoint, nil, nil)
 }
 
 func (c *Client) GetUser() (*User, error) {
