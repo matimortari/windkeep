@@ -19,10 +19,14 @@ const orgStore = useOrgStore()
 const projectStore = useProjectStore()
 const { user } = storeToRefs(userStore)
 const { sidebar } = useUI()
+const { clear } = useUserSession()
 const isLoading = ref(true)
 
 async function goTo(path: string) {
   isLoading.value = false
+  if (path === "/sign-in") {
+    await clear().catch(() => {})
+  }
   await navigateTo(path)
 }
 
