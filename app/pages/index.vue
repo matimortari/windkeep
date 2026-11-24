@@ -2,7 +2,7 @@
   <section
     id="hero" v-motion
     :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0 }"
-    :duration="1000" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-8 md:min-h-[90vh]"
+    :duration="1000" class="relative flex min-h-screen w-full flex-col items-center justify-center border-b px-8"
   >
     <div class="hero-backdrop" />
     <div class="dot-overlay" />
@@ -19,7 +19,7 @@
       </h1>
 
       <p class="max-w-2xl leading-6 font-semibold text-muted-foreground md:text-lg">
-        No more .env headaches — WindKeep is a secrets management platform that helps
+        No more .env headaches – WindKeep is a secrets management platform that helps
         teams and developers to securely store, manage, and share sensitive information.
       </p>
 
@@ -75,7 +75,7 @@
 
         <ul class="flex flex-col gap-2">
           <li v-for="bullet in CLI_BULLETS" :key="bullet.description" class="text-caption navigation-group">
-            <span class="text-primary">—</span>
+            <span class="text-primary">–</span>
             <span>{{ bullet.description }}</span>
           </li>
         </ul>

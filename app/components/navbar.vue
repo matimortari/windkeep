@@ -46,8 +46,8 @@ const NAVBAR_LINKS = [
   { to: "/cli-guide", icon: "ph:terminal-bold", label: "CLI Guide" },
 ]
 
-const handleScroll = () => scrolled.value = window.scrollY > 50
+const handleScroll = () => scrolled.value = globalThis.scrollY > 50
 
-onMounted(() => window.addEventListener("scroll", handleScroll, { passive: true }))
-onBeforeUnmount(() => window.removeEventListener("scroll", handleScroll))
+onMounted(() => globalThis.addEventListener("scroll", handleScroll, { passive: true }))
+onBeforeUnmount(() => globalThis.removeEventListener("scroll", handleScroll))
 </script>

@@ -44,7 +44,7 @@ function eachSecretLoop(indent: string, body: string[]): string[] {
 const windkeepSecrets: IntegrationSecretVar[] = [
   {
     name: "WINDKEEP_PROJECT_ID",
-    description: "This project's ID — used in the secrets API path.",
+    description: "This project's ID – used in the secrets API path.",
     source: "projectId",
   },
   {

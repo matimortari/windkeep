@@ -9,10 +9,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Project not found" })
   }
 
-  // Determine auth method — service token (st_ prefix) or session user
   let allowedEnvironments: Environment[] | null = null
   const rawToken = extractServiceToken(getHeader(event, "authorization"))
-
   if (rawToken) {
     const serviceToken = await requireServiceToken(rawToken)
     if (serviceToken.projectId !== projectId) {
@@ -65,7 +63,7 @@ defineRouteMeta({
     tags: ["Secrets"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },
-      { in: "header", name: "Authorization", required: false, schema: { type: "string" }, description: "Bearer token — service token auth (e.g. `Bearer st_...`). Falls back to session if omitted." },
+      { in: "header", name: "Authorization", required: false, schema: { type: "string" }, description: "Bearer token – service token auth (e.g. `Bearer st_...`). Falls back to session if omitted." },
     ],
     responses: {
       200: { description: "Decrypted secrets, filtered by environment for service tokens and MEMBERs" },

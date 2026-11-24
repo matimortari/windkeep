@@ -3,7 +3,7 @@ const INDEX_CONTENT: CliSection[] = [
     title: "Overview",
     paragraphs: [[
       "The WindKeep CLI lets you manage secrets, organizations, and projects from your terminal.",
-      " It is the fastest way to create projects, rotate keys, and run local commands with injected environment variables — without maintaining ",
+      " It is the fastest way to create projects, rotate keys, and run local commands with injected environment variables – without maintaining ",
       { code: ".env" },
       " files.",
     ]],
@@ -28,7 +28,7 @@ const INDEX_CONTENT: CliSection[] = [
       { code: "$GOPATH/bin" },
       ", or ",
       { code: "~/go/bin" },
-      " by default) — make sure that directory is on your PATH.",
+      " by default) – make sure that directory is on your PATH.",
     ]],
     code: [{ command: "go install github.com/matimortari/windkeep/cli@latest" }],
     note: ["This method does not set up the ", { code: "wk" }, " shortcut."],
@@ -52,16 +52,16 @@ const INDEX_CONTENT: CliSection[] = [
         { code: "WINDKEEP_TOKEN" },
         " and ",
         { code: "WINDKEEP_PROJECT_ID" },
-        " in the environment — see Guides → CI/CD.",
+        " in the environment – see Guides → CI/CD.",
       ],
     ],
     note: ["Login validates your token and saves credentials to ", { code: "~/.config/windkeep/config.yml" }, " (Linux) or ", { code: "%APPDATA%\\windkeep\\config.yml" }, " (Windows)."],
     code: [{
       command: [
-        "# Personal token — full CLI access",
+        "# Personal token – full CLI access",
         "windkeep login YOUR_API_TOKEN",
         "",
-        "# Service token — read-only, single project (CI-friendly)",
+        "# Service token – read-only, single project (CI-friendly)",
         "windkeep login st_YOUR_SERVICE_TOKEN",
         "",
         "# Or use interactive mode (token input is hidden)",
@@ -96,13 +96,13 @@ const ORGS_PROJECTS_CONTENT: CliSection[] = [
     title: "Overview",
     paragraphs: [[
       "Organizations are team workspaces. Projects are secret containers inside an organization.",
-      " You can belong to multiple orgs — each with its own projects, members, and roles.",
+      " You can belong to multiple orgs – each with its own projects, members, and roles.",
     ]],
   },
   {
     title: "Context & Roles",
     paragraphs: [
-      [{ strong: "Active organization" }, " determines where new projects are created. ", { strong: "Active project" }, " is the default target for secret commands — use ", { code: "windkeep projects switch" }, " to change it, or pass ", { code: "-p" }, " on ", { code: "windkeep run" }, " and ", { code: "windkeep pull" }, " to override."],
+      [{ strong: "Active organization" }, " determines where new projects are created. ", { strong: "Active project" }, " is the default target for secret commands – use ", { code: "windkeep projects switch" }, " to change it, or pass ", { code: "-p" }, " on ", { code: "windkeep run" }, " and ", { code: "windkeep pull" }, " to override."],
       ["Each organization member has one of these roles:"],
     ],
     commands: [
@@ -132,7 +132,7 @@ const ORGS_PROJECTS_CONTENT: CliSection[] = [
       "Set the active organization for future commands.",
       " Switching orgs also clears your active project, since projects belong to a single organization.",
     ]],
-    commands: [{ label: "Arguments", code: "ORG_ID", description: "Target org ID (optional — omit to open an interactive selector)." }],
+    commands: [{ label: "Arguments", code: "ORG_ID", description: "Target org ID (optional – omit to open an interactive selector)." }],
     code: [{
       label: "Example & Output:",
       command: "windkeep orgs switch cm789def012",
@@ -181,7 +181,7 @@ const ORGS_PROJECTS_CONTENT: CliSection[] = [
   {
     title: "Projects: Switch",
     paragraphs: [["Set the active project for secret commands and ", { code: "windkeep run" }, ". Only projects from the active organization are shown."]],
-    commands: [{ label: "Arguments", code: "PROJECT_SLUG", description: "Target slug (optional — omit to open an interactive selector)." }],
+    commands: [{ label: "Arguments", code: "PROJECT_SLUG", description: "Target slug (optional – omit to open an interactive selector)." }],
     code: [{
       label: "Example & Output:",
       command: "windkeep projects switch api-service",
@@ -279,7 +279,7 @@ const SECRETS_CONTENT: CliSection[] = [
     title: "Overview",
     paragraphs: [[
       "Secrets are environment variables stored in WindKeep.",
-      " Each secret can hold different values for development, staging, and production — so the same key works across every environment.",
+      " Each secret can hold different values for development, staging, and production – so the same key works across every environment.",
     ]],
   },
   {
@@ -338,7 +338,7 @@ const SECRETS_CONTENT: CliSection[] = [
   },
   {
     title: "Command: Set Secret",
-    paragraphs: [["Update values for an existing secret. Only the environments you specify are changed — all others keep their current values."]],
+    paragraphs: [["Update values for an existing secret. Only the environments you specify are changed – all others keep their current values."]],
     commands: [
       { label: "Arguments", code: "KEY", description: "Secret key (required)." },
       { label: "Flags", code: "-d, --description", description: "Update the description." },
@@ -356,7 +356,7 @@ const SECRETS_CONTENT: CliSection[] = [
   },
   {
     title: "Command: Secret History",
-    paragraphs: [["View the audit trail for a secret — who changed each value and when."]],
+    paragraphs: [["View the audit trail for a secret – who changed each value and when."]],
     commands: [
       { label: "Arguments", code: "KEY", description: "Secret key (required)." },
       { label: "Flags", code: "-e, --env", description: "Filter by environment (dev, staging, or prod)." },
@@ -379,11 +379,11 @@ const SECRETS_CONTENT: CliSection[] = [
   {
     title: "Injecting Secrets at Runtime",
     paragraphs: [
-      [{ code: "windkeep run" }, " fetches secrets from WindKeep and injects them as environment variables into your process — no ", { code: ".env" }, " file required."],
+      [{ code: "windkeep run" }, " fetches secrets from WindKeep and injects them as environment variables into your process – no ", { code: ".env" }, " file required."],
       ["WindKeep flags must come ", { strong: "before" }, " the command you want to run. Use ", { code: "--" }, " to separate flags when your command also uses ", { code: "--" }, " flags."],
     ],
     commands: [
-      { label: "Flags", code: "-e, --env", description: "Environment (dev, staging, or prod — defaults to development)." },
+      { label: "Flags", code: "-e, --env", description: "Environment (dev, staging, or prod – defaults to development)." },
       { label: "Flags", code: "-p, --project", description: "Override the active project by slug." },
       { label: "Flags", code: "-v, --verbose", description: "Print injected secret keys before running (values are never shown)." },
     ],
@@ -529,8 +529,8 @@ const GUIDES_CONTENT: CliSection[] = [
     title: "Workflow: CI/CD Pipeline Integration",
     paragraphs: [
       [{ strong: "Scenario:" }, " You want to inject secrets in GitHub Actions or GitLab CI without committing static config files."],
-      ["Use a ", { strong: "service token" }, " (", { code: "st_…" }, ") from the project's Access Control tab — not a personal API token. Service tokens are scoped to one project and selected environments, so a leaked CI secret cannot list orgs or delete resources."],
-      ["Set ", { code: "WINDKEEP_TOKEN" }, " and ", { code: "WINDKEEP_PROJECT_ID" }, " as CI secrets. The CLI reads them from the environment — no ", { code: "login" }, " or ", { code: "projects switch" }, " step is required."],
+      ["Use a ", { strong: "service token" }, " (", { code: "st_…" }, ") from the project's Access Control tab – not a personal API token. Service tokens are scoped to one project and selected environments, so a leaked CI secret cannot list orgs or delete resources."],
+      ["Set ", { code: "WINDKEEP_TOKEN" }, " and ", { code: "WINDKEEP_PROJECT_ID" }, " as CI secrets. The CLI reads them from the environment – no ", { code: "login" }, " or ", { code: "projects switch" }, " step is required."],
     ],
     code: [
       {
@@ -556,7 +556,7 @@ const GUIDES_CONTENT: CliSection[] = [
         ].join("\n"),
       },
       {
-        label: "Optional — persist a service token locally:",
+        label: "Optional – persist a service token locally:",
         command: [
           "# Validates st_… against /api/service-token and pins the scoped project",
           "windkeep login st_your_service_token",
@@ -572,13 +572,13 @@ const GUIDES_CONTENT: CliSection[] = [
     paragraphs: [[{ strong: "Scenario:" }, " You run multiple services locally, each with its own project and secret set."]],
     code: [{
       command: [
-        "# Terminal 1 — Auth service",
+        "# Terminal 1 – Auth service",
         "windkeep projects switch auth-service && windkeep run npm run dev",
         "",
-        "# Terminal 2 — API gateway",
+        "# Terminal 2 – API gateway",
         "windkeep projects switch api-gateway && windkeep run npm run dev",
         "",
-        "# Terminal 3 — Payment service",
+        "# Terminal 3 – Payment service",
         "windkeep projects switch payment-service && windkeep run npm run dev",
       ].join("\n"),
     }],
@@ -588,7 +588,7 @@ const GUIDES_CONTENT: CliSection[] = [
     paragraphs: [["Centralizing secrets in WindKeep reduces several common risks:"]],
     commands: [
       { label: "Zero disk drift", description: "No .env files to accidentally commit to version control." },
-      { label: "Single source of truth", description: "Rotate keys in one place — CI/CD picks up changes on the next run." },
+      { label: "Single source of truth", description: "Rotate keys in one place – CI/CD picks up changes on the next run." },
       { label: "Fast onboarding", description: "New developers log in, switch to the right project, and run immediately." },
       { label: "Reliable testing", description: "Run staging tests against real secrets, not stale local files." },
     ],
@@ -598,14 +598,14 @@ const GUIDES_CONTENT: CliSection[] = [
     title: "Troubleshooting: Authentication & Context",
     code: [{
       command: [
-        "# Config file not found — you are not logged in",
+        "# Config file not found – you are not logged in",
         "windkeep login YOUR_API_TOKEN",
         "",
-        "# Token expired or invalid — re-authenticate",
+        "# Token expired or invalid – re-authenticate",
         "windkeep logout",
         "windkeep login YOUR_API_TOKEN",
         "",
-        "# No active organization or project — set your context",
+        "# No active organization or project – set your context",
         "windkeep orgs list",
         "windkeep orgs switch ORG_ID",
         "windkeep projects list",
@@ -636,7 +636,7 @@ const GUIDES_CONTENT: CliSection[] = [
     commands: [
       { label: "Never log decrypted values", description: "Keep secrets out of logs, error reports, and metrics." },
       { label: "Least privilege", description: "Assign OWNER, ADMIN, and MEMBER roles based on what each person actually needs. Org owners retain break-glass access to all projects." },
-      { label: "Verify safely", description: "Use -v/--verbose to confirm which keys are injected — values are never printed." },
+      { label: "Verify safely", description: "Use -v/--verbose to confirm which keys are injected – values are never printed." },
     ],
   },
 ]

@@ -32,7 +32,7 @@ export const useOrgStore = defineStore("org", () => {
     { label: "Project Updated", value: "UPDATE.PROJECT" },
     { label: "Project Ownership Transferred", value: "TRANSFER.PROJECT_OWNERSHIP" },
     { label: "Project Member Removed", value: "REMOVE.PROJECT_MEMBER" },
-    { label: "Project Member Role Updated", value: "UPDATE.PROJECT_MEMBER_ROLE" },
+    { label: "Project Member Updated", value: "UPDATE.PROJECT_MEMBER" },
     { label: "Project Member Added", value: "ADD.PROJECT_MEMBER" },
     { label: "Service Token Created", value: "CREATE.SERVICE_TOKEN" },
     { label: "Service Token Revoked", value: "REVOKE.SERVICE_TOKEN" },

@@ -17,7 +17,7 @@
 
         <div v-if="field.label === 'CLI Token'" class="flex max-w-md min-w-0 flex-col items-stretch gap-2 md:items-end">
           <p class="text-caption">
-            <span v-if="generatedToken">Copy this token now — it won't be shown again.</span>
+            <span v-if="generatedToken">Copy this token now – it won't be shown again.</span>
             <span v-else-if="!field.hasToken?.value">No active token</span>
             <span v-else-if="isTokenExpired(field.expiresAt?.value)" class="text-caption-danger">Expired</span>
             <span v-else-if="field.expiresAt?.value">Expires {{ formatDate(field.expiresAt.value) }}</span>

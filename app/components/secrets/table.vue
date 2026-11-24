@@ -195,7 +195,7 @@ async function handleCopy(secretKey: string, env: string, value: string) {
 function renderValue(key: string, env: Environment) {
   const val = secretValuesByKey.value.get(key)?.get(env)
   if (!val) {
-    return "—"
+    return "–"
   }
 
   if (visibleKeys.value[key] ?? props.allVisible) {

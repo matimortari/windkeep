@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
 defineRouteMeta({
   openAPI: {
     summary: "Create service token",
-    description: "Creates a new service token scoped to one or more environments. The raw token is returned only once — store it securely. Requires project OWNER or ADMIN.",
+    description: "Creates a new service token scoped to one or more environments. The raw token is returned only once – store it securely. Requires project OWNER or ADMIN.",
     tags: ["Service Tokens"],
     parameters: [
       { in: "path", name: "project", required: true, schema: { type: "string" }, description: "Project ID" },

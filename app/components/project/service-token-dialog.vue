@@ -3,7 +3,7 @@
     <template v-if="generatedRawToken">
       <div class="flex flex-col gap-3">
         <p class="text-caption">
-          Copy this token now — it won't be shown again.
+          Copy this token now – it won't be shown again.
         </p>
 
         <div class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">

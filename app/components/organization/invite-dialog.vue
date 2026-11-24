@@ -20,7 +20,7 @@
       <template v-if="generatedInviteUrl">
         <div class="flex flex-col gap-1.5">
           <p class="text-xs text-muted-foreground">
-            Invitation created — share this link with the invitee. It will expire in 12 hours.
+            Invitation created – share this link with the invitee. It will expire in 12 hours.
           </p>
           <div class="navigation-group rounded-md border bg-muted/30 px-2 py-1.5 font-mono text-xs">
             <span class="min-w-0 flex-1 truncate select-all" :title="generatedInviteUrl">{{ generatedInviteUrl }}</span>

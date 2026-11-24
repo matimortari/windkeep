@@ -11,7 +11,7 @@
 
       <div v-if="member.role !== 'OWNER'" class="flex flex-col items-start gap-1">
         <label for="project-role" class="text-sm font-semibold">Role</label>
-        <select id="project-role" v-model="selectedRole" class="w-full">
+        <select id="project-role" v-model="selectedRole" class="w-full" :disabled="isRemoving">
           <option v-for="r in ROLES.filter(r => r.value !== 'OWNER')" :key="r.value" :value="r.value">
             {{ r.label }}
           </option>
@@ -20,39 +20,50 @@
 
       <div v-if="member.role !== 'OWNER' && selectedRole === 'MEMBER'" class="flex flex-col items-start gap-1">
         <span class="text-sm font-semibold">Environments</span>
-        <span class="text-xs text-muted-foreground">Member can only read secrets from selected environments.</span>
+        <span v-if="isRemoving" class="text-caption-danger">Remove this member from the project?</span>
+        <span v-else class="text-xs text-muted-foreground">Member can only read secrets from selected environments.</span>
         <div class="navigation-group flex-wrap">
           <button
             v-for="env in ENVIRONMENTS" :key="env.value"
             type="button" class="btn-ghost"
             :class="selectedEnvironments.includes(env.value) ? 'border-secondary! text-secondary!' : ''"
+            :disabled="isRemoving"
             @click="toggleEnvironment(env.value)"
           >
             {{ env.label }}
           </button>
         </div>
       </div>
+      <p v-else-if="member.role !== 'OWNER' && isRemoving" class="text-caption-danger">
+        Remove this member from the project?
+      </p>
       <p v-else-if="member.role !== 'OWNER'" class="text-xs text-muted-foreground">
         Admins can read secrets from all environments.
       </p>
 
       <footer class="flex flex-row items-center justify-end">
         <nav class="navigation-group">
-          <button type="button" class="btn-ghost" @click="emit('update:isOpen', false)">
-            Close
+          <button type="button" class="btn-ghost" @click="handleFooterCancel">
+            {{ isRemoving ? "Cancel" : "Close" }}
           </button>
-          <button
-            v-if="member.role !== 'OWNER' && hasChanges" type="button"
-            class="btn-success" :disabled="!canSave"
-            @click="handleSave"
-          >
-            <icon :name="saveIcon.icon.value" size="20" />
-            <span>Save</span>
-          </button>
-          <button v-if="canRemove && member.role !== 'OWNER'" type="button" class="btn-danger" @click="handleRemove">
+          <button v-if="isRemoving" type="button" class="btn-danger" @click="confirmRemove">
             <icon name="ph:user-minus-bold" size="20" />
-            <span>Remove Member</span>
+            <span>Remove</span>
           </button>
+          <template v-else>
+            <button
+              v-if="member.role !== 'OWNER' && hasChanges" type="button"
+              class="btn-success" :disabled="!canSave"
+              @click="handleSave"
+            >
+              <icon :name="saveIcon.icon.value" size="20" />
+              <span>Save</span>
+            </button>
+            <button v-if="canRemove && member.role !== 'OWNER'" type="button" class="btn-danger" @click="isRemoving = true">
+              <icon name="ph:user-minus-bold" size="20" />
+              <span>Remove Member</span>
+            </button>
+          </template>
         </nav>
       </footer>
     </div>
@@ -73,10 +84,10 @@ const emit = defineEmits<{
 }>()
 
 const projectStore = useProjectStore()
-const { confirm } = useUI()
 const saveIcon = useActionIcon("ph:floppy-disk-bold")
 const selectedRole = ref<"ADMIN" | "MEMBER">("MEMBER")
 const selectedEnvironments = ref<Environment[]>(["DEVELOPMENT"])
+const isRemoving = ref(false)
 
 const hasChanges = computed(() => {
   if (!props.member) {
@@ -96,6 +107,9 @@ const hasChanges = computed(() => {
 const canSave = computed(() => selectedRole.value === "ADMIN" || selectedEnvironments.value.length > 0)
 
 function toggleEnvironment(env: Environment) {
+  if (isRemoving.value) {
+    return
+  }
   const idx = selectedEnvironments.value.indexOf(env)
   if (idx === -1) {
     selectedEnvironments.value.push(env)
@@ -120,25 +134,40 @@ async function handleSave() {
   emit("update:isOpen", false)
 }
 
-async function handleRemove() {
+async function confirmRemove() {
   if (!props.projectId || !props.member?.userId) {
-    return
-  }
-  if (!await confirm({ title: "Remove Member", message: "Are you sure you want to remove this member?", confirmLabel: "Remove", variant: "danger" })) {
+    isRemoving.value = false
     return
   }
 
   await projectStore.removeProjectMember(props.projectId, props.member.userId)
   await projectStore.getProjects()
+  isRemoving.value = false
   emit("updated")
+  emit("update:isOpen", false)
+}
+
+function handleFooterCancel() {
+  if (isRemoving.value) {
+    isRemoving.value = false
+    return
+  }
   emit("update:isOpen", false)
 }
 
 // Sync form when the member changes
 watch(() => props.member, (member) => {
+  isRemoving.value = false
   if (member && member.role !== "OWNER") {
     selectedRole.value = member.role as "ADMIN" | "MEMBER"
     selectedEnvironments.value = member.environment?.length ? [...member.environment] : ["DEVELOPMENT"]
   }
 }, { immediate: true })
+
+// Reset the form when the dialog is closed
+watch(() => props.isOpen, (open) => {
+  if (!open) {
+    isRemoving.value = false
+  }
+})
 </script>

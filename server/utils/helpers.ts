@@ -242,7 +242,7 @@ export async function getBinaryBlobUrl(binaryKey: string): Promise<string> {
 
   const url = BINARIES[binaryKey]
   if (!url) {
-    throw createError({ statusCode: 404, message: "Binary not found" })
+    throw createError({ statusCode: 404, statusMessage: "Binary not found" })
   }
 
   return url
