@@ -1,7 +1,7 @@
 <template>
   <Dialog :is-open="isOpen" title="Generate Service Token" @update:is-open="emit('update:isOpen', $event)">
     <template v-if="generatedRawToken">
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <p class="text-caption">
           Copy this token now – it won't be shown again.
         </p>

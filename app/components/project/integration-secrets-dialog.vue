@@ -17,13 +17,13 @@
       <div class="flex flex-col gap-1">
         <span class="text-sm font-semibold">Secrets</span>
         <ul class="divide-y rounded-md border bg-muted/30">
-          <li v-for="row in rows" :key="row.name" class="flex min-h-11 items-center gap-3 px-3 py-1.5 transition-opacity" :class="row.included ? '' : 'opacity-50'">
+          <li v-for="row in rows" :key="row.name" class="flex min-h-11 items-center gap-2 p-2 transition-opacity" :class="row.included ? '' : 'opacity-50'">
             <button
               type="button" class="flex w-52 shrink-0 items-center gap-2 text-left disabled:cursor-not-allowed"
               :disabled="row.exists" :aria-pressed="row.included"
               @click="row.included = !row.included"
             >
-              <icon :name="row.included ? 'ph:check-square-fill' : 'ph:square-bold'" size="18" class="shrink-0" :class="row.included ? 'text-secondary' : 'text-muted-foreground'" />
+              <icon :name="row.included ? 'ph:check-square-fill' : 'ph:square-bold'" size="15" class="shrink-0" :class="row.included ? 'text-secondary' : 'text-muted-foreground'" />
               <span class="truncate font-mono text-sm font-medium" :title="row.name">{{ row.name }}</span>
             </button>
 
@@ -42,7 +42,7 @@
         <span class="text-xs text-muted-foreground">Empty values are saved as placeholders you can edit later.</span>
       </div>
 
-      <div v-if="includesToken" class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_10rem]">
+      <div v-if="includesToken" class="grid grid-cols-1 gap-2 md:grid-cols-[1fr_10rem]">
         <div class="flex flex-col gap-1">
           <label for="integration-token-name" class="text-sm font-semibold">Token name</label>
           <input id="integration-token-name" v-model="form.tokenName" type="text" placeholder="e.g. Railway Deploy">

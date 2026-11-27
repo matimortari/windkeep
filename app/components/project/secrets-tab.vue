@@ -282,7 +282,7 @@ async function saveAllChanges() {
 }
 
 async function discardAllChanges() {
-  if (!await confirm({ title: "Discard Changes", message: "Are you sure you want to discard all pending changes?", confirmLabel: "Discard", variant: "danger" })) {
+  if (!await confirm({ title: "Discard Changes", message: "Are you sure you want to discard all pending changes?", confirmLabel: "Discard", variant: "warning" })) {
     return
   }
   pendingChanges.clear()

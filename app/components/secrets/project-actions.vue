@@ -1,6 +1,6 @@
 <template>
   <nav class="navigation-group w-full flex-wrap justify-end md:w-auto md:flex-nowrap" aria-label="Project Actions">
-    <div class="hidden min-w-0 flex-1 md:relative md:flex-none">
+    <div class="relative hidden min-w-0 flex-1 md:block md:w-72 md:flex-none">
       <input
         id="search" :value="searchQuery"
         type="text" placeholder="Search secrets..."
@@ -13,10 +13,9 @@
 
     <div v-if="availableTags.length" ref="tagDropdownRef" class="relative z-50">
       <button
-        type="button"
-        class="btn" :class="activeTagFilter ? 'border-secondary! text-secondary!' : ''"
-        :disabled="hasPendingChanges" aria-label="Filter by Tag"
-        @click="isTagDropdownOpen = !isTagDropdownOpen"
+        type="button" class="btn"
+        :class="activeTagFilter ? 'border-secondary! text-secondary!' : ''" :disabled="hasPendingChanges"
+        aria-label="Filter by Tag" @click="isTagDropdownOpen = !isTagDropdownOpen"
       >
         <icon name="ph:tag-bold" size="20" />
         <span class="max-w-24 truncate md:max-w-40">{{ activeTagFilter ? activeTagFilter : 'Tags' }}</span>
@@ -25,10 +24,7 @@
       </button>
 
       <transition name="dropdown">
-        <ul
-          v-if="isTagDropdownOpen" class="dropdown-menu right-auto! left-0! max-w-[min(20rem,calc(100vw-2rem))] whitespace-normal!"
-          role="menu"
-        >
+        <ul v-if="isTagDropdownOpen" class="dropdown-menu right-auto! left-0! max-w-[min(20rem,calc(100vw-2rem))] whitespace-normal!" role="menu">
           <li v-for="tag in availableTags" :key="tag">
             <button
               type="button" class="w-full rounded-lg p-2 text-left text-sm wrap-break-word whitespace-normal hover:bg-muted/60"

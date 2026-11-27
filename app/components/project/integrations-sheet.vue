@@ -61,7 +61,7 @@
                 {{ selected.description }}
                 <nuxt-link v-if="selected.docsUrl" :to="selected.docsUrl" target="_blank" class="ml-1 inline-flex items-center gap-0.5 text-secondary hover:underline">
                   <span>{{ selected.docsLabel }}</span>
-                  <icon name="ph:arrow-up-right-bold" size="12" />
+                  <icon name="ph:arrow-up-right-bold" size="15" />
                 </nuxt-link>
               </p>
 
@@ -104,7 +104,7 @@
                         v-if="secret.description" class="peer/tip shrink-0 cursor-pointer text-muted-foreground"
                         :aria-expanded="openTooltipKey === `secret-${secret.name}`" @click.stop="toggleTooltip(`secret-${secret.name}`, $event)"
                       >
-                        <icon name="ph:info-bold" size="20" />
+                        <icon name="ph:info-bold" size="15" />
                       </span>
                       <span
                         v-if="secret.description" class="card pointer-events-none absolute bottom-full left-0 z-10 w-max max-w-full p-1! text-xs! font-normal! tracking-normal! text-foreground! normal-case! opacity-0 transition-opacity peer-hover/tip:opacity-100"
@@ -115,7 +115,7 @@
                         class="shrink-0 cursor-pointer text-muted-foreground" :aria-label="`Copy ${secret.name}`"
                         @click="copyValue(secret.name, resolveSecretValue(secret)!)"
                       >
-                        <icon :name="copyIcons[secret.name]?.icon.value || 'ph:copy-bold'" size="20" />
+                        <icon :name="copyIcons[secret.name]?.icon.value || 'ph:copy-bold'" size="15" />
                       </button>
                     </div>
                     <span v-if="resolveSecretValue(secret) || secret.placeholder" class="text-caption min-w-0 truncate" :class="secret.instruction && !resolveSecretValue(secret) ? '' : 'font-mono!'" :title="resolveSecretValue(secret) || secret.placeholder">
